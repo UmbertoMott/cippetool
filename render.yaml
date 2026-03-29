@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: cipp-legal-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GCS_BUCKET_NAME
+        sync: false
+      - key: GOOGLE_CLOUD_PROJECT
+        sync: false
+      - key: VERTEX_AI_LOCATION
+        value: us-central1
+      - key: VERTEX_AI_MODEL
+        value: gemini-2.5-flash-lite
+      - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://YOUR-APP.vercel.app,http://localhost:7890
+    disk:
+      name: uploads
+      mountPath: /opt/render/project/src/local_uploads
+      sizeGB: 1

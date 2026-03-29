@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+.env
+*.env
+
+# Secrets & Credentials
+backend/credentials/
+backend/*.json
+!backend/package.json
+*.pem
+*.key
+service_account*.json
+
+# Database files
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal
+*.sqlite
+*.sqlite3
+
+# Local uploads
+backend/local_uploads/
+uploads/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Temp
+/tmp/
+.tmp/
+
+# Claude internal
+.claude/
+
+# Vercel
+.vercel/
