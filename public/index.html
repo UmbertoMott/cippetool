@@ -104,7 +104,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-he
 .login-sub{color:var(--muted);margin-bottom:28px;font-size:14px}
 /* Social login buttons */
 .social-btns{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.btn-social{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border-radius:12px;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:not-allowed;border:1.5px solid var(--bdr);background:var(--sur);color:var(--txt);transition:all 0.18s;position:relative;overflow:visible;opacity:0.52;pointer-events:auto}
+.btn-social{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border-radius:12px;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;border:1.5px solid var(--bdr);background:var(--sur);color:var(--txt);transition:all 0.18s;position:relative;overflow:visible;opacity:1;pointer-events:auto}
+.btn-social:hover{border-color:var(--acc);background:rgba(167,139,250,0.08);transform:translateY(-1px)}
+.btn-social:active{transform:translateY(0)}
 .btn-social svg{flex-shrink:0;width:20px;height:20px}
 /* Tooltip wrapper */
 .social-btn-wrap{position:relative;width:100%}
