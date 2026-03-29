@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document AI Debug Console</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: #0f0f1e;
+      color: #e0e0ff;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      grid-auto-rows: auto;
+    }
+    .panel {
+      background: #1a1a2e;
+      border: 1px solid #4a4a6a;
+      border-radius: 8px;
+      padding: 15px;
+      overflow: auto;
+      max-height: 600px;
+    }
+    .panel h2 {
+      color: #00d9ff;
+      margin-bottom: 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #4a4a6a;
+      padding-bottom: 8px;
+    }
+    .panel h3 {
+      color: #88ff00;
+      font-size: 12px;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+    .log-entry {
+      background: #0f0f1e;
+      border-left: 3px solid;
+      padding: 8px;
+      margin: 5px 0;
+      font-size: 11px;
+      border-radius: 4px;
+    }
+    .log-entry.info { border-color: #00d9ff; }
+    .log-entry.success { border-color: #88ff00; color: #88ff00; }
+    .log-entry.error { border-color: #ff4a4a; color: #ff4a4a; }
+    .log-entry.warning { border-color: #ffaa00; color: #ffaa00; }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      border-bottom: 1px solid #2a2a3e;
+      font-size: 12px;
+    }
+    .status-item:last-child { border-bottom: none; }
+    .status-key { color: #88ff00; font-weight: bold; }
+    .status-value { color: #00d9ff; }
+    .status-value.ok { color: #88ff00; }
+    .status-value.err { color: #ff4a4a; }
+
+    .data-json {
+      background: #0a0a14;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      overflow-x: auto;
+      margin: 8px 0;
+      color: #00ff88;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+    button {
+      background: #7c3aed;
+      border: 1px solid #a78bfa;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+    button:hover { background: #a78bfa; transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+    button.danger { background: #dc2626; border-color: #f87171; }
+    button.danger:hover { background: #f87171; }
+
+    input, textarea {
+      background: #0a0a14;
+      border: 1px solid #4a4a6a;
+      color: #00ff88;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      width: 100%;
+      margin: 5px 0;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #00d9ff;
+      box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+    }
+
+    .grid-2 { grid-column: span 2; }
+    .grid-full { grid-column: span 3; }
+
+    h1 {
+      grid-column: span 3;
+      color: #00d9ff;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #4a4a6a;
+      padding-bottom: 10px;
+    }
+
+    .metric {
+      display: inline-block;
+      background: #0a0a14;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 5px 5px 5px 0;
+      font-size: 11px;
+      border-left: 3px solid #00d9ff;
+    }
+    .metric .value { color: #88ff00; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>🔵 Document AI Pixel-Perfect Debug Console</h1>
+
+<div class="container">
+
+  <!-- STATO BACKEND -->
+  <div class="panel">
+    <h2>Backend Status</h2>
+    <div id="backendStatus">
+      <div class="status-item">
+        <span class="status-key">API Health</span>
+        <span class="status-value" id="apiHealth">⏳ Testing...</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">Document AI</span>
+        <span class="status-value" id="docaiStatus">⏳ Testing...</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">GCS Bucket</span>
+        <span class="status-value" id="gcsStatus">⏳ Testing...</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">Embedding Service</span>
+        <span class="status-value" id="embedStatus">⏳ Testing...</span>
+      </div>
+    </div>
+    <h3>Endpoints</h3>
+    <div class="button-group">
+      <button onclick="testEndpoint('/api/health')">Health</button>
+      <button onclick="testEndpoint('/api/documents/ocr-status')">OCR Status</button>
+      <button onclick="testEndpoint('/api/documents?limit=3')">List Docs</button>
+    </div>
+  </div>
+
+  <!-- LLC STATE -->
+  <div class="panel">
+    <h2>LLC State</h2>
+    <div class="status-item">
+      <span class="status-key">activeChunks</span>
+      <span class="status-value" id="chunksCount">0</span>
+    </div>
+    <div class="status-item">
+      <span class="status-key">activeChunksById</span>
+      <span class="status-value" id="chunksIdCount">0</span>
+    </div>
+    <div class="status-item">
+      <span class="status-key">activeDocBlobName</span>
+      <span class="status-value" id="blobName">–</span>
+    </div>
+    <h3>LLC.activeChunks Preview</h3>
+    <div id="chunksPreview" class="data-json" style="max-height:250px;">–</div>
+  </div>
+
+  <!-- CONSOLE LOG -->
+  <div class="panel grid-2">
+    <h2>Console Logs (DocAI + Pixel-Perfect)</h2>
+    <div id="consoleLogs" style="max-height: 400px; overflow-y: auto;">
+      <div class="log-entry info">🔄 Logger initialized...</div>
+    </div>
+    <div class="button-group" style="margin-top: 10px;">
+      <button onclick="clearLogs()">Clear</button>
+      <button onclick="exportLogs()" class="danger">Export</button>
+    </div>
+  </div>
+
+  <!-- TEST CONTROLS -->
+  <div class="panel">
+    <h2>Test Controls</h2>
+    <h3>Document Blob Name</h3>
+    <input type="text" id="blobNameInput" placeholder="e.g., CELEX_32016R0679_IT_TXT_1_.pdf" value="">
+
+    <div class="button-group">
+      <button onclick="testDocaiChunks()">Get Chunks</button>
+      <button onclick="testDocaiIngest()">Ingest DocAI</button>
+    </div>
+
+    <h3>Simulate _llcLoadDocaiChunks</h3>
+    <button onclick="simulateLoadChunks()" style="width:100%; background:#4a9eff;">
+      🔄 Simulate Load Chunks
+    </button>
+
+    <h3>Simulate _llcDocAIPipeline</h3>
+    <input type="text" id="queryInput" placeholder="Enter query..." value="dimmi del registro dei trattamenti">
+    <button onclick="simulatePipeline()" style="width:100%; background:#9c27b0;">
+      ▶ Simulate Pipeline
+    </button>
+  </div>
+
+  <!-- API REQUESTS LOG -->
+  <div class="panel grid-2">
+    <h2>API Requests</h2>
+    <div id="apiLog" style="max-height: 300px; overflow-y: auto;">
+      <div class="log-entry info">Waiting for API calls...</div>
+    </div>
+  </div>
+
+  <!-- FUNCTION TESTS -->
+  <div class="panel">
+    <h2>Function Tests</h2>
+    <h3>Check Functions Exist</h3>
+    <div id="funcStatus">
+      <div class="status-item">
+        <span class="status-key">_llcLoadDocaiChunks</span>
+        <span class="status-value" id="func1">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">_llcDocAIPipeline</span>
+        <span class="status-value" id="func2">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">_llcScoreChunks</span>
+        <span class="status-value" id="func3">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">LLC.drawHighlight</span>
+        <span class="status-value" id="func4">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">llcClickRef</span>
+        <span class="status-value" id="func5">–</span>
+      </div>
+    </div>
+    <button onclick="checkFunctions()" style="width:100%; margin-top:10px;">
+      ✓ Check All
+    </button>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// DEBUG LOGGER
+// ═══════════════════════════════════════════════════════════════════════════
+
+const logs = [];
+const maxLogs = 100;
+
+function logMsg(type, title, data = null) {
+  const entry = { type, title, data, ts: new Date().toLocaleTimeString() };
+  logs.push(entry);
+  if (logs.length > maxLogs) logs.shift();
+
+  const consoleLogs = document.getElementById('consoleLogs');
+  const div = document.createElement('div');
+  div.className = `log-entry ${type}`;
+  let html = `[${entry.ts}] ${title}`;
+  if (data) html += `<br><small>${JSON.stringify(data).substring(0, 200)}</small>`;
+  div.innerHTML = html;
+  consoleLogs.appendChild(div);
+  consoleLogs.scrollTop = consoleLogs.scrollHeight;
+}
+
+function clearLogs() {
+  logs.length = 0;
+  document.getElementById('consoleLogs').innerHTML = '';
+  logMsg('info', 'Logs cleared');
+}
+
+function exportLogs() {
+  const text = logs.map(l => `[${l.ts}] [${l.type.toUpperCase()}] ${l.title}`).join('\n');
+  navigator.clipboard.writeText(text);
+  logMsg('success', 'Logs copied to clipboard');
+}
+
+// Redirect console.log to our logger
+const originalLog = console.log;
+console.log = function(...args) {
+  originalLog.apply(console, args);
+  const msg = args.join(' ');
+  if (msg.includes('[DocAI]') || msg.includes('[llc')) {
+    logMsg('info', msg);
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// API TESTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function testEndpoint(endpoint) {
+  logMsg('info', `Testing ${endpoint}...`);
+  const apiLog = document.getElementById('apiLog');
+  try {
+    const resp = await fetch(`http://localhost:8000${endpoint}`);
+    const data = await resp.json();
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${resp.ok ? 'success' : 'error'}`;
+    entry.innerHTML = `<b>${endpoint}</b> → ${resp.status}<br><small>${JSON.stringify(data).substring(0, 150)}</small>`;
+    apiLog.appendChild(entry);
+    logMsg(resp.ok ? 'success' : 'error', `${endpoint}`, { status: resp.status });
+  } catch(e) {
+    logMsg('error', `Fetch failed: ${e.message}`);
+  }
+}
+
+async function testDocaiChunks() {
+  const blobName = document.getElementById('blobNameInput').value;
+  if (!blobName) {
+    logMsg('warning', 'Blob name required');
+    return;
+  }
+  logMsg('info', `Testing /api/documents/docai-chunks for "${blobName}"`);
+  try {
+    const resp = await fetch(`http://localhost:8000/api/documents/docai-chunks?blob_name=${encodeURIComponent(blobName)}`);
+    const data = await resp.json();
+    logMsg('success', `Got response: indexed=${data.indexed}, chunks=${data.total || 0}`);
+    document.getElementById('chunksPreview').innerHTML = `<pre>${JSON.stringify(data.chunks?.slice(0,2), null, 2)}</pre>`;
+  } catch(e) {
+    logMsg('error', `Chunks test failed: ${e.message}`);
+  }
+}
+
+async function testDocaiIngest() {
+  const blobName = document.getElementById('blobNameInput').value;
+  if (!blobName) {
+    logMsg('warning', 'Blob name required');
+    return;
+  }
+  logMsg('info', `Testing POST /api/documents/docai-ingest for "${blobName}"...`);
+  try {
+    const resp = await fetch(`http://localhost:8000/api/documents/docai-ingest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ blob_name: blobName, force: false })
+    });
+    const data = await resp.json();
+    logMsg(resp.ok ? 'success' : 'error', `Ingest response`, data);
+  } catch(e) {
+    logMsg('error', `Ingest test failed: ${e.message}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BACKEND HEALTH CHECK
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function checkBackend() {
+  try {
+    const health = await fetch('http://localhost:8000/api/health').then(r => r.json());
+    document.getElementById('apiHealth').textContent = health.status === 'ok' ? '✅ OK' : '❌ Error';
+    document.getElementById('gcsStatus').textContent = health.gcs_connected ? '✅ OK' : '❌ Not connected';
+  } catch(e) {
+    document.getElementById('apiHealth').textContent = '❌ Offline';
+    document.getElementById('gcsStatus').textContent = '❌ Error';
+  }
+
+  try {
+    const ocr = await fetch('http://localhost:8000/api/documents/ocr-status').then(r => r.json());
+    document.getElementById('docaiStatus').textContent = ocr.available ? '✅ OK' : '❌ Not available';
+  } catch(e) {
+    document.getElementById('docaiStatus').textContent = '❌ Error';
+  }
+
+  logMsg('info', 'Backend health check completed');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FUNCTION CHECKS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function checkFunctions() {
+  const checks = [
+    { id: 'func1', name: '_llcLoadDocaiChunks', type: 'function' },
+    { id: 'func2', name: '_llcDocAIPipeline', type: 'function' },
+    { id: 'func3', name: '_llcScoreChunks', type: 'function' },
+    { id: 'func4', name: 'LLC.drawHighlight', type: 'property' },
+    { id: 'func5', name: 'llcClickRef', type: 'function' },
+  ];
+
+  checks.forEach(check => {
+    const el = document.getElementById(check.id);
+    let exists = false;
+    try {
+      if (window[check.name]) {
+        exists = true;
+      } else if (check.id === 'func4') {
+        exists = window.LLC && typeof window.LLC.drawHighlight === 'function';
+      }
+    } catch(e) {}
+
+    el.textContent = exists ? '✅ Found' : '❌ Missing';
+    el.className = exists ? 'status-value ok' : 'status-value err';
+    logMsg(exists ? 'success' : 'error', check.name, { exists });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SIMULATIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function simulateLoadChunks() {
+  const blobName = document.getElementById('blobNameInput').value || 'test.pdf';
+  logMsg('info', `Simulating _llcLoadDocaiChunks('${blobName}')`);
+
+  try {
+    const resp = await fetch(`http://localhost:8000/api/documents/docai-chunks?blob_name=${encodeURIComponent(blobName)}`);
+    const data = await resp.json();
+
+    if (data.indexed && data.chunks.length > 0) {
+      logMsg('success', `Loaded ${data.chunks.length} chunks`);
+      document.getElementById('chunksCount').textContent = data.chunks.length;
+      document.getElementById('chunksPreview').innerHTML = `<pre>${JSON.stringify(data.chunks.slice(0, 3), null, 2)}</pre>`;
+    } else {
+      logMsg('warning', `No chunks found for "${blobName}" - would trigger _llcDocaiIngest()`);
+    }
+  } catch(e) {
+    logMsg('error', `Load simulation failed: ${e.message}`);
+  }
+}
+
+async function simulatePipeline() {
+  const query = document.getElementById('queryInput').value;
+  logMsg('info', `Simulating _llcDocAIPipeline("${query}")`);
+  logMsg('info', `Stage 0: Expert legal analysis...`);
+  // Simula delay
+  await new Promise(r => setTimeout(r, 1000));
+  logMsg('info', `Stage 1: _llcScoreChunks() - selecting top 22 chunks...`);
+  await new Promise(r => setTimeout(r, 800));
+  logMsg('info', `Stage 2: Gemini chunk ID mapper...`);
+  await new Promise(r => setTimeout(r, 1200));
+  logMsg('success', `Pipeline complete - ready to click on points for geometric highlight`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+  logMsg('info', 'Debug Console Initialized');
+  checkBackend();
+  checkFunctions();
+
+  // Detect LLC changes (polling)
+  setInterval(() => {
+    if (window.LLC) {
+      document.getElementById('chunksCount').textContent = (window.LLC.activeChunks || []).length;
+      document.getElementById('chunksIdCount').textContent = Object.keys(window.LLC.activeChunksById || {}).length;
+      document.getElementById('blobName').textContent = window.LLC.activeDocBlobName || '–';
+    }
+  }, 1000);
+});
+
+// Register in window for testing
+window.logMsg = logMsg;
+window.testEndpoint = testEndpoint;
+window.checkFunctions = checkFunctions;
+</script>
+
+</body>
+</html>
