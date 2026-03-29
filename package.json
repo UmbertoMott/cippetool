@@ -2,6 +2,6 @@
   "name": "cipp-legal-saas",
   "version": "1.0.0",
   "scripts": {
-    "start": "cd backend && /Users/umbertomottola/Library/Python/3.9/bin/uvicorn main:app --host 0.0.0.0 --port 8000"
+    "start": "cd backend && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
   }
 }
