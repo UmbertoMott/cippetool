@@ -3366,44 +3366,9 @@ if (window.pdfjsLib) {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ══════════════════════════════════════════════════════════
-     SUPABASE AUTH — Login Screen
+     SUPABASE AUTH — User bar + tracking (no overlay)
      ══════════════════════════════════════════════════════════ -->
 <style>
-#supa-login-overlay{
-  position:fixed;inset:0;z-index:99999;
-  background:var(--bg,#0f0f13);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'DM Sans',sans-serif;
-}
-#supa-login-overlay.hidden{display:none}
-.supa-card{
-  background:#1a1a22;border:1px solid #2e2e3e;
-  border-radius:20px;padding:48px 40px 40px;
-  width:100%;max-width:400px;text-align:center;
-  box-shadow:0 24px 80px rgba(0,0,0,0.5);
-}
-.supa-logo{
-  font-family:'Syne',sans-serif;font-size:22px;font-weight:800;
-  color:#f0f0f5;margin-bottom:6px;
-}
-.supa-logo span{color:#a78bfa}
-.supa-sub{font-size:13px;color:#888899;margin-bottom:36px;line-height:1.5}
-.supa-google-btn{
-  display:flex;align-items:center;justify-content:center;gap:12px;
-  width:100%;padding:14px 20px;
-  background:#fff;border:none;border-radius:12px;
-  font-size:15px;font-weight:600;color:#1a1a22;
-  cursor:pointer;transition:all .18s;
-  box-shadow:0 2px 8px rgba(0,0,0,0.15);
-}
-.supa-google-btn:hover{background:#f5f5f5;box-shadow:0 4px 16px rgba(0,0,0,0.2);transform:translateY(-1px)}
-.supa-google-btn:active{transform:translateY(0)}
-.supa-google-btn svg{flex-shrink:0}
-.supa-divider{font-size:11px;color:#444455;margin:20px 0 16px;
-  display:flex;align-items:center;gap:12px}
-.supa-divider::before,.supa-divider::after{content:'';flex:1;height:1px;background:#2e2e3e}
-.supa-err{font-size:12px;color:#ef4444;margin-top:16px;min-height:20px}
-.supa-footer{font-size:11px;color:#555566;margin-top:28px;line-height:1.6}
 .supa-user-bar{
   position:fixed;top:0;right:0;z-index:9999;
   display:flex;align-items:center;gap:10px;
@@ -3427,21 +3392,7 @@ if (window.pdfjsLib) {
 .supa-logout-btn:hover{border-color:#ef4444;color:#ef4444}
 </style>
 
-<!-- Login overlay -->
-<div id="supa-login-overlay">
-  <div class="supa-card">
-    <div class="supa-logo">Privacy &amp; <span>AI Tool</span></div>
-    <div class="supa-sub">Piattaforma di ricerca legale e formazione GDPR<br>Accedi per continuare</div>
-    <button class="supa-google-btn" id="supa-google-btn">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.9 6.1C12.5 13.2 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.6 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.2-10 7.2-17z"/><path fill="#FBBC05" d="M10.7 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.7-4.6l-7.9-6.1A23.9 23.9 0 0 0 0 24c0 3.8.9 7.5 2.5 10.7l8.2-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.2 0-11.5-4.2-13.4-9.8l-8.2 6.1C6.7 42.6 14.7 48 24 48z"/></svg>
-      Accedi con Google
-    </button>
-    <div class="supa-err" id="supa-err"></div>
-    <div class="supa-footer">Accedendo accetti i termini di utilizzo.<br>I tuoi dati sono protetti e non vengono condivisi.</div>
-  </div>
-</div>
-
-<!-- User bar (visibile dopo login) -->
+<!-- User bar (visibile dopo login Google) -->
 <div id="supa-user-bar" class="supa-user-bar" style="display:none">
   <div id="supa-avatar-wrap"></div>
   <span class="supa-user-name" id="supa-user-name"></span>
@@ -3458,20 +3409,20 @@ var SUPA_ANON = 'sb_publishable_v_Af3s9TBMAJGDZWvf8nIg_VIeP7uy9';
 var _supa = null;
 var _supaUser = null;
 
+// URL di redirect corretto per produzione
+var SUPA_REDIRECT = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? window.location.origin + '/'
+  : 'https://privacyaitool.vercel.app/';
+
 (async function initSupabase() {
   try {
     _supa = supabase.createClient(SUPA_URL, SUPA_ANON);
   } catch(e) {
     console.error('Supabase init failed:', e);
-    // Se Supabase non è configurato, bypassa il login in sviluppo locale
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      document.getElementById('supa-login-overlay').classList.add('hidden');
-      return;
-    }
     return;
   }
 
-  // Controlla se c'è già una sessione attiva
+  // Controlla se c'è già una sessione attiva (ritorno da OAuth redirect)
   var { data: { session } } = await _supa.auth.getSession();
   if (session && session.user) {
     _supaUser = session.user;
@@ -3479,47 +3430,42 @@ var _supaUser = null;
     _supaTrackLogin();
   }
 
-  // Ascolta cambio auth state (dopo OAuth redirect)
+  // Ascolta cambio auth state
   _supa.auth.onAuthStateChange(async function(event, session) {
     if (event === 'SIGNED_IN' && session) {
       _supaUser = session.user;
       _supaShowApp();
-      if (event === 'SIGNED_IN') _supaTrackLogin();
+      _supaTrackLogin();
     } else if (event === 'SIGNED_OUT') {
       _supaUser = null;
-      document.getElementById('supa-login-overlay').classList.remove('hidden');
       document.getElementById('supa-user-bar').style.display = 'none';
     }
   });
 
-  // Bottone Google
-  document.getElementById('supa-google-btn').addEventListener('click', async function() {
-    var btn = this;
-    btn.disabled = true;
-    btn.textContent = 'Connessione in corso...';
-    document.getElementById('supa-err').textContent = '';
-    var { error } = await _supa.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin + window.location.pathname
-      }
-    });
-    if (error) {
-      document.getElementById('supa-err').textContent = 'Errore: ' + error.message;
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.9 6.1C12.5 13.2 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.6 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.2-10 7.2-17z"/><path fill="#FBBC05" d="M10.7 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.7-4.6l-7.9-6.1A23.9 23.9 0 0 0 0 24c0 3.8.9 7.5 2.5 10.7l8.2-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.2 0-11.5-4.2-13.4-9.8l-8.2 6.1C6.7 42.6 14.7 48 24 48z"/></svg> Accedi con Google';
-    }
-  });
-
-  // Bottone Logout
-  document.getElementById('supa-logout-btn').addEventListener('click', async function() {
+  // Logout button
+  var logoutBtn = document.getElementById('supa-logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', async function() {
     await _supa.auth.signOut();
-    window.location.reload();
+    if (typeof logout === 'function') logout();
+    else window.location.reload();
   });
 })();
 
+// Funzione pubblica chiamata dal pulsante Google nella schermata login
+async function _supaSignInWithGoogle() {
+  if (!_supa) { alert('Errore: Supabase non inizializzato.'); return; }
+  var { error } = await _supa.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: SUPA_REDIRECT }
+  });
+  if (error) {
+    var errEl = document.getElementById('loginErr');
+    if (errEl) { errEl.textContent = 'Errore Google: ' + error.message; errEl.style.display='block'; }
+    else alert('Errore: ' + error.message);
+  }
+}
+
 function _supaShowApp() {
-  document.getElementById('supa-login-overlay').classList.add('hidden');
   var bar = document.getElementById('supa-user-bar');
   bar.style.display = 'flex';
   // Avatar
@@ -4171,7 +4117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="social-btns" id="socialBtns">
 
           <div class="social-btn-wrap">
-            <button class="btn-social" onclick="if(typeof _supa!=='undefined'&&_supa){document.getElementById('supa-google-btn').click();}else{alert('Configura Supabase prima di usare Google OAuth.');}">
+            <button class="btn-social" onclick="_supaSignInWithGoogle()">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
