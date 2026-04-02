@@ -3411,6 +3411,69 @@ var SUPA_ANON = 'sb_publishable_v_Af3s9TBMAJGDZWvf8nIg_VIeP7uy9';
 var _supa = null;
 var _supaUser = null;
 
+// ── Supabase persistence helpers ─────────────────────────────────────
+
+// Dati caricati in memoria dopo il login
+var _supaChats      = [];   // chat_sessions rows
+var _supaFlashcards = [];   // flashcards rows
+var _supaQuizProgress = {}; // quiz_progress row
+var _supaFiles      = [];   // file_uploads rows
+
+async function _supaLoadAll() {
+  if (!_supa || !_supaUser) return;
+  try {
+    var [chatsRes, flashRes, quizRes, filesRes] = await Promise.all([
+      _supa.from('chat_sessions').select('*').order('updated_at', { ascending: false }),
+      _supa.from('flashcards').select('*').order('created_at', { ascending: false }),
+      _supa.from('quiz_progress').select('*').eq('user_id', _supaUser.id).maybeSingle(),
+      _supa.from('file_uploads').select('*').order('uploaded_at', { ascending: false })
+    ]);
+    _supaChats        = chatsRes.data  || [];
+    _supaFlashcards   = flashRes.data  || [];
+    _supaQuizProgress = quizRes.data   || {};
+    _supaFiles        = filesRes.data  || [];
+  } catch(e) {
+    console.warn('[Supabase] loadAll error:', e);
+  }
+}
+
+// Salva o aggiorna una chat session
+async function _supaSaveChatSession(module, sessionId, title, messages, blobName) {
+  if (!_supa || !_supaUser) return null;
+  try {
+    var existing = _supaChats.find(function(c) { return c.id === sessionId; });
+    if (existing) {
+      var { data } = await _supa.from('chat_sessions')
+        .update({ title: title, messages: messages, updated_at: new Date().toISOString() })
+        .eq('id', sessionId).select().single();
+      var idx = _supaChats.findIndex(function(c) { return c.id === sessionId; });
+      if (idx >= 0) _supaChats[idx] = data;
+      return data;
+    } else {
+      var { data } = await _supa.from('chat_sessions')
+        .insert({ id: sessionId, user_id: _supaUser.id, module: module,
+                  title: title, messages: messages, blob_name: blobName || null })
+        .select().single();
+      _supaChats.unshift(data);
+      return data;
+    }
+  } catch(e) {
+    console.warn('[Supabase] saveChatSession error:', e);
+    return null;
+  }
+}
+
+// Elimina una chat session
+async function _supaDeleteChatSession(sessionId) {
+  if (!_supa || !_supaUser) return;
+  try {
+    await _supa.from('chat_sessions').delete().eq('id', sessionId);
+    _supaChats = _supaChats.filter(function(c) { return c.id !== sessionId; });
+  } catch(e) {
+    console.warn('[Supabase] deleteChatSession error:', e);
+  }
+}
+
 // URL di redirect corretto per produzione
 var SUPA_REDIRECT = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? window.location.origin + '/'
@@ -3502,6 +3565,7 @@ function _supaShowApp() {
     }
     // Auto-registra l'utente nel sistema locale se non esiste
     (async function() {
+      await _supaLoadAll();   // <-- ADD THIS LINE
       try {
         if (typeof getUsers === 'function') {
           var users = await getUsers() || {};
