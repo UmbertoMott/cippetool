@@ -7125,12 +7125,57 @@ var GEMINI_SAFETY = [
 
 // Funzione con retry automatico su 429 (max 3 tentativi, attesa 2s)
 // Fallback model chain — tried in order when primary model returns 404
-var _GEMINI_FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro'];
+// Ordered fallback chain: stable → latest. First model that responds wins.
+var _GEMINI_FALLBACK_MODELS = [
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-1.5-pro'
+];
+
+// Extract text from a successful Gemini JSON response
+function _geminiExtractText(data) {
+  if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+    return data.candidates[0].content.parts.map(function(p){ return p.text || ''; }).join('');
+  }
+  if (data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
+    throw new Error('Risposta bloccata dai filtri di sicurezza.');
+  }
+  throw new Error('Risposta vuota da Gemini.');
+}
+
+// Try every model in the fallback list; skip on 404/500, throw only when all fail
+async function _geminiTryFallbacks(body, skipStatuses) {
+  for (var _fi = 0; _fi < _GEMINI_FALLBACK_MODELS.length; _fi++) {
+    var _fbModel = _GEMINI_FALLBACK_MODELS[_fi];
+    var _fbEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + _fbModel + ':generateContent';
+    try {
+      var _fbResp = await fetch(_fbEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
+        body: JSON.stringify(body)
+      });
+      if (!_fbResp.ok) {
+        if ((skipStatuses || []).indexOf(_fbResp.status) !== -1) continue;
+        throw new Error('HTTP ' + _fbResp.status);
+      }
+      var _fbData = await _fbResp.json();
+      if (_fbData.error) throw new Error('Gemini: ' + (_fbData.error.message || JSON.stringify(_fbData.error)));
+      console.log('[Gemini] fallback OK → ' + _fbModel);
+      return _geminiExtractText(_fbData);
+    } catch(_fbErr) {
+      console.warn('[Gemini] fallback ' + _fbModel + ' failed: ' + _fbErr.message);
+    }
+  }
+  throw new Error('Nessun modello Gemini disponibile. Controlla la chiave API.');
+}
 
 async function callGeminiWithRetry(body, attempt) {
   attempt = attempt || 1;
   var MAX_ATTEMPTS = 3;
-  var RETRY_DELAY_MS = 2000;
+  var RETRY_DELAY_MS = 1500;
 
   var resp = await fetch(GEMINI_ENDPOINT, {
     method: 'POST',
@@ -7138,53 +7183,34 @@ async function callGeminiWithRetry(body, attempt) {
     body: JSON.stringify(body)
   });
 
-  // 429 = quota superata → aspetta 2s e riprova
+  // 429 = quota → wait and retry
   if (resp.status === 429 && attempt < MAX_ATTEMPTS) {
-    console.warn('Gemini 429 — tentativo ' + attempt + '/' + MAX_ATTEMPTS + ', attendo 2s...');
+    console.warn('[Gemini] 429 — tentativo ' + attempt + '/' + MAX_ATTEMPTS + ', attendo ' + (RETRY_DELAY_MS * attempt) + 'ms...');
     await new Promise(function(resolve) { setTimeout(resolve, RETRY_DELAY_MS * attempt); });
     return callGeminiWithRetry(body, attempt + 1);
   }
 
-  // 404 = model not found → try fallback models in order
-  if (resp.status === 404) {
-    console.warn('Gemini 404 — model "' + GEMINI_MODEL + '" not found, trying fallbacks...');
-    for (var _fi = 0; _fi < _GEMINI_FALLBACK_MODELS.length; _fi++) {
-      var _fbModel = _GEMINI_FALLBACK_MODELS[_fi];
-      var _fbEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + _fbModel + ':generateContent';
-      try {
-        var _fbResp = await fetch(_fbEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-          body: JSON.stringify(body)
-        });
-        if (!_fbResp.ok) {
-          if (_fbResp.status === 404) continue; // try next
-          throw new Error('HTTP ' + _fbResp.status);
-        }
-        var _fbData = await _fbResp.json();
-        if (_fbData.error) throw new Error('Gemini: ' + (_fbData.error.message || JSON.stringify(_fbData.error)));
-        if (_fbData.candidates && _fbData.candidates[0] && _fbData.candidates[0].content) {
-          console.log('Gemini fallback OK using: ' + _fbModel);
-          return _fbData.candidates[0].content.parts.map(function(p){ return p.text || ''; }).join('');
-        }
-      } catch(_fbErr) {
-        console.warn('Fallback model ' + _fbModel + ' failed: ' + _fbErr.message);
-      }
+  // 500 = server error → retry once, then fallback to other models
+  if (resp.status === 500) {
+    if (attempt < 2) {
+      console.warn('[Gemini] 500 — retry ' + attempt + '/2...');
+      await new Promise(function(resolve) { setTimeout(resolve, 1000); });
+      return callGeminiWithRetry(body, attempt + 1);
     }
-    throw new Error('Nessun modello Gemini disponibile (404). Verifica la chiave API.');
+    console.warn('[Gemini] 500 persists — trying fallback models...');
+    return _geminiTryFallbacks(body, [404, 500]);
   }
 
-  if (!resp.ok) throw new Error('HTTP ' + resp.status + ' — ' + resp.statusText);
+  // 404 = model not found → try fallback models immediately
+  if (resp.status === 404) {
+    console.warn('[Gemini] 404 — model "' + GEMINI_MODEL + '" not found, trying fallbacks...');
+    return _geminiTryFallbacks(body, [404, 500]);
+  }
+
+  if (!resp.ok) throw new Error('Gemini HTTP ' + resp.status + ' — ' + resp.statusText);
   var data = await resp.json();
   if (data.error) throw new Error('Gemini: ' + (data.error.message || JSON.stringify(data.error)));
-  if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-    return data.candidates[0].content.parts.map(function(p) { return p.text || ''; }).join('');
-  }
-  // Safety block?
-  if (data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
-    throw new Error('Risposta bloccata dai filtri di sicurezza.');
-  }
-  throw new Error('Risposta vuota da Gemini.');
+  return _geminiExtractText(data);
 }
 
 // ── GEMINI WEB SEARCH (Google Search grounding) ───────────────────────────────
@@ -8518,7 +8544,10 @@ async function llcInit() {
 
   // ── Carica file caricati dall'utente (DB locale) ────────────────────────────
   try {
-    var upResp = await fetch('/api/upload/files?limit=200');
+    var _upCtrl = new AbortController();
+    var _upTimeout = setTimeout(function(){ _upCtrl.abort(); }, 5000);
+    var upResp = await fetch('/api/upload/files?limit=200', { signal: _upCtrl.signal });
+    clearTimeout(_upTimeout);
     if (upResp.ok) {
       var upFiles = await upResp.json();
       upFiles.forEach(function(f) {
@@ -8569,8 +8598,14 @@ window._llcLibFileSelected = async function(input) {
     var xhr = new XMLHttpRequest();
     var result = await new Promise(function(resolve, reject) {
       xhr.open('POST', '/api/upload/direct', true);
+      xhr.timeout = 60000; // 60s — cold start Render può richiedere fino a 60s
+      var _uploadDoneAt = null;
       xhr.upload.onprogress = function(e) {
-        if (e.lengthComputable) { bar.style.width = Math.round(5 + e.loaded/e.total*88) + '%'; }
+        if (e.lengthComputable) {
+          var pct = Math.round(5 + e.loaded/e.total*88);
+          bar.style.width = pct + '%';
+          if (pct >= 93) { lbl.textContent = '⏳ Server in avvio… attendere'; }
+        }
       };
       xhr.onload = function() {
         if (xhr.status >= 200 && xhr.status < 300) {
@@ -8582,7 +8617,8 @@ window._llcLibFileSelected = async function(input) {
           reject(new Error(msg));
         }
       };
-      xhr.onerror = function() { reject(new Error('Errore di rete')); };
+      xhr.onerror = function() { reject(new Error('Errore di rete — riprova')); };
+      xhr.ontimeout = function() { reject(new Error('Timeout: server non risponde (riprova fra qualche secondo)')); };
       xhr.send(fd);
     });
     bar.style.width = '100%';
@@ -10017,22 +10053,16 @@ function _llcBuildDocSysPrompt(docType, docTitle, docText) {
 
 // ── Gemini call with low temperature for precision (DocAI Q&A) ───────────────
 async function llcGeminiPrecision(systemPrompt, userContent, maxTokens) {
-  // Use native Gemini format with separate system_instruction for better precision
-  var r = await fetch('/api/gemini', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: systemPrompt }] },
-      contents: [{ role: 'user', parts: [{ text: userContent || '' }] }],
-      generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: maxTokens || 6144
-      }
-    })
-  });
-  if (!r.ok) throw new Error('Gemini API error ' + r.status);
-  var data = await r.json();
-  return data.text || '';
+  var body = {
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents: [{ role: 'user', parts: [{ text: userContent || '' }] }],
+    safetySettings: GEMINI_SAFETY,
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: maxTokens || 6144
+    }
+  };
+  return callGeminiWithRetry(body, 1);
 }
 
 // ── Academic prose helpers ────────────────────────────────────────────────────
@@ -12329,18 +12359,16 @@ function llcCmdKSelect(docId) {
 
 // ── Gemini API — routed through backend proxy (API key restricted to server) ──
 async function llcGemini(systemPrompt, userContent, maxTokens) {
-  var r = await fetch('/api/gemini', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      prompt: systemPrompt + '\n\n' + (userContent||''),
+  var body = {
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents: [{ role: 'user', parts: [{ text: userContent || '' }] }],
+    safetySettings: GEMINI_SAFETY,
+    generationConfig: {
       temperature: 0.3,
-      max_tokens: maxTokens || 8192
-    })
-  });
-  if (!r.ok) throw new Error('Gemini API error ' + r.status);
-  var data = await r.json();
-  return data.text || '';
+      maxOutputTokens: maxTokens || 8192
+    }
+  };
+  return callGeminiWithRetry(body, 1);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
