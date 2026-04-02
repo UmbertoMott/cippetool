@@ -1035,10 +1035,12 @@ class GeminiProxyRequest(BaseModel):
     model: Optional[str] = None
     max_tokens: int = 2048
     temperature: float = 0.3
-    # Native format: { system_instruction, contents, generationConfig }
+    # Native format: { system_instruction, contents, generationConfig, tools }
     system_instruction: Optional[dict] = None
     contents: Optional[list] = None
     generationConfig: Optional[dict] = None
+    tools: Optional[list] = None          # e.g. [{"googleSearch": {}}]
+    safetySettings: Optional[list] = None  # ignored server-side, accepted to avoid 422
 
 @app.post("/api/gemini")
 async def gemini_proxy(req: GeminiProxyRequest):
@@ -1058,43 +1060,64 @@ async def gemini_proxy(req: GeminiProxyRequest):
     primary_model = req.model or VERTEX_MODEL
     client = _genai.Client(api_key=GEMINI_API_KEY)
 
-    # Build config and contents once, reuse across model attempts
+    # ── Build tools list ─────────────────────────────────────────────────────
+    gemini_tools = None
+    if req.tools:
+        gemini_tools = []
+        for t in req.tools:
+            if 'googleSearch' in t or 'google_search' in t:
+                try:
+                    gemini_tools.append(_genai_types.Tool(
+                        google_search=_genai_types.GoogleSearch()
+                    ))
+                except Exception:
+                    pass  # SDK version may not support this tool
+
+    # ── Build GenerateContentConfig ──────────────────────────────────────────
+    def _build_config(sys_text: Optional[str], gcfg: dict, with_tools: bool):
+        kwargs = {
+            "max_output_tokens": gcfg.get("maxOutputTokens", 6144),
+            "temperature":       gcfg.get("temperature", 0.3),
+        }
+        if sys_text:
+            kwargs["system_instruction"] = sys_text
+        if gcfg.get("responseMimeType"):
+            kwargs["response_mime_type"] = gcfg["responseMimeType"]
+        if with_tools and gemini_tools:
+            kwargs["tools"] = gemini_tools
+        return _genai_types.GenerateContentConfig(**kwargs)
+
+    # ── Build contents and call factory ─────────────────────────────────────
     if req.contents:
         native_contents = req.contents
         gen_cfg = req.generationConfig or {}
+        sys_text = None
         if req.system_instruction:
             sys_parts = req.system_instruction.get('parts', [])
             sys_text = ' '.join(p.get('text', '') for p in sys_parts)
-            config = _genai_types.GenerateContentConfig(
-                max_output_tokens=gen_cfg.get('maxOutputTokens', 6144),
-                temperature=gen_cfg.get('temperature', 0.1),
-                system_instruction=sys_text,
-            )
-        else:
-            config = _genai_types.GenerateContentConfig(
-                max_output_tokens=gen_cfg.get('maxOutputTokens', 6144),
-                temperature=gen_cfg.get('temperature', 0.1),
-            )
-        def _make_call(m):
-            return lambda: client.models.generate_content(
-                model=m, contents=native_contents, config=config)
-    else:
-        config = _genai_types.GenerateContentConfig(
-            max_output_tokens=req.max_tokens,
-            temperature=req.temperature,
-        )
-        def _make_call(m):
-            return lambda: client.models.generate_content(
-                model=m, contents=req.prompt, config=config)
 
-    # Try primary model, then fallbacks on model-not-found errors
+        def _make_call(m, with_tools=True):
+            cfg = _build_config(sys_text, gen_cfg, with_tools)
+            return lambda: client.models.generate_content(
+                model=m, contents=native_contents, config=cfg)
+    else:
+        gen_cfg = {"maxOutputTokens": req.max_tokens, "temperature": req.temperature}
+
+        def _make_call(m, with_tools=False):
+            cfg = _build_config(None, gen_cfg, with_tools)
+            return lambda: client.models.generate_content(
+                model=m, contents=req.prompt, config=cfg)
+
+    # ── Try primary model then fallbacks on model-not-found errors ──────────
     models_to_try = [primary_model] + [
         m for m in _PROXY_FALLBACK_MODELS if m != primary_model
     ]
     last_err: Exception = Exception("No models available")
+    use_tools = bool(gemini_tools)
+
     for model_id in models_to_try:
         try:
-            response = await asyncio.to_thread(_make_call(model_id))
+            response = await asyncio.to_thread(_make_call(model_id, use_tools))
             if model_id != primary_model:
                 logger.info(f"[GeminiProxy] fallback OK → {model_id}")
             return {"text": response.text or ""}
@@ -1104,6 +1127,19 @@ async def gemini_proxy(req: GeminiProxyRequest):
                 "not found", "404", "invalid", "does not exist",
                 "unknown model", "model_not_found", "not supported"
             ])
+            is_tools_err = use_tools and any(k in err_str for k in [
+                "tool", "grounding", "google_search", "unsupported"
+            ])
+            if is_tools_err:
+                # Retry same model without tools
+                logger.warning(f"[GeminiProxy] tools unsupported on '{model_id}', retrying without…")
+                use_tools = False
+                try:
+                    response = await asyncio.to_thread(_make_call(model_id, False))
+                    return {"text": response.text or ""}
+                except Exception as e2:
+                    last_err = e2
+                    continue
             if is_model_err:
                 logger.warning(f"[GeminiProxy] model '{model_id}' unavailable, trying next…")
                 last_err = e
@@ -1112,7 +1148,7 @@ async def gemini_proxy(req: GeminiProxyRequest):
             logger.error(f"[GeminiProxy] error with model '{model_id}': {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
-    logger.error(f"[GeminiProxy] all models exhausted. Last error: {last_err}")
+    logger.error(f"[GeminiProxy] all models exhausted. Last: {last_err}")
     raise HTTPException(status_code=503, detail=f"Nessun modello disponibile: {last_err}")
 
 

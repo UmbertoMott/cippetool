@@ -7100,7 +7100,9 @@ async function abandonExam(quizNumToAbandon){
 // ═══════════════════════════════════════════════════════════════════════════
 // ─── CONFIGURAZIONE API GEMINI ───────────────────────────────────────────────
 // Cambia solo questa riga per aggiornare la chiave API
-var GEMINI_KEY = 'AIzaSyAvnQf2_cGRzq-3S-JFVi6YeBNc9BYY7Sg';
+// API key removed — all Gemini calls go through /api/gemini backend proxy.
+// The key lives only in the Render environment variable GEMINI_API_KEY.
+var GEMINI_KEY = '';
 
 // ─── KNOWLEDGE BASE PDF (inline, sempre disponibile all'agente AI) ─────────────
 // EDPB Guidelines 01/2022 — Right of Access (Art. 15 GDPR)
@@ -7146,138 +7148,29 @@ function _geminiExtractText(data) {
   throw new Error('Risposta vuota da Gemini.');
 }
 
-// Try every model in the fallback list; skip on 404/500, throw only when all fail
-async function _geminiTryFallbacks(body, skipStatuses) {
-  for (var _fi = 0; _fi < _GEMINI_FALLBACK_MODELS.length; _fi++) {
-    var _fbModel = _GEMINI_FALLBACK_MODELS[_fi];
-    var _fbEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + _fbModel + ':generateContent';
-    try {
-      var _fbResp = await fetch(_fbEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-        body: JSON.stringify(body)
-      });
-      if (!_fbResp.ok) {
-        if ((skipStatuses || []).indexOf(_fbResp.status) !== -1) continue;
-        throw new Error('HTTP ' + _fbResp.status);
-      }
-      var _fbData = await _fbResp.json();
-      if (_fbData.error) throw new Error('Gemini: ' + (_fbData.error.message || JSON.stringify(_fbData.error)));
-      console.log('[Gemini] fallback OK → ' + _fbModel);
-      return _geminiExtractText(_fbData);
-    } catch(_fbErr) {
-      console.warn('[Gemini] fallback ' + _fbModel + ' failed: ' + _fbErr.message);
-    }
-  }
-  throw new Error('Nessun modello Gemini disponibile. Controlla la chiave API.');
+// ── All Gemini calls go through /api/gemini backend proxy ────────────────────
+// Model selection, fallbacks and API key are managed server-side on Render.
+// GEMINI_KEY is intentionally empty — never call Google API from the browser.
+
+async function callGeminiWithRetry(body /*, attempt — ignored, backend handles retries */) {
+  return _llcBackendGemini(body);
 }
 
-async function callGeminiWithRetry(body, attempt) {
-  attempt = attempt || 1;
-  var MAX_ATTEMPTS = 3;
-  var RETRY_DELAY_MS = 1500;
-
-  var resp = await fetch(GEMINI_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-    body: JSON.stringify(body)
-  });
-
-  // 429 = quota → wait and retry
-  if (resp.status === 429 && attempt < MAX_ATTEMPTS) {
-    console.warn('[Gemini] 429 — tentativo ' + attempt + '/' + MAX_ATTEMPTS + ', attendo ' + (RETRY_DELAY_MS * attempt) + 'ms...');
-    await new Promise(function(resolve) { setTimeout(resolve, RETRY_DELAY_MS * attempt); });
-    return callGeminiWithRetry(body, attempt + 1);
-  }
-
-  // 500 = server error → retry once, then fallback to other models
-  if (resp.status === 500) {
-    if (attempt < 2) {
-      console.warn('[Gemini] 500 — retry ' + attempt + '/2...');
-      await new Promise(function(resolve) { setTimeout(resolve, 1000); });
-      return callGeminiWithRetry(body, attempt + 1);
-    }
-    console.warn('[Gemini] 500 persists — trying fallback models...');
-    return _geminiTryFallbacks(body, [404, 500]);
-  }
-
-  // 404 = model not found → try fallback models immediately
-  if (resp.status === 404) {
-    console.warn('[Gemini] 404 — model "' + GEMINI_MODEL + '" not found, trying fallbacks...');
-    return _geminiTryFallbacks(body, [404, 500]);
-  }
-
-  if (!resp.ok) throw new Error('Gemini HTTP ' + resp.status + ' — ' + resp.statusText);
-  var data = await resp.json();
-  if (data.error) throw new Error('Gemini: ' + (data.error.message || JSON.stringify(data.error)));
-  return _geminiExtractText(data);
-}
-
-// ── GEMINI WEB SEARCH (Google Search grounding) ───────────────────────────────
-// Usa lo stesso modello della chat (gemini-2.5-flash-lite) con googleSearch tool
-var GEMINI_SEARCH_ENDPOINT = GEMINI_ENDPOINT;
-
+// ── GEMINI WEB SEARCH — routed through backend with googleSearch tool ─────────
 async function callGeminiWithSearch(systemPrompt, userQuery) {
-  var body = {
+  var result = await _llcBackendGemini({
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-    tools: [{ googleSearch: {} }],  // camelCase per gemini-2.5-flash
+    tools: [{ googleSearch: {} }],
     generationConfig: { maxOutputTokens: 3500, temperature: 0.2 }
-  };
-  var resp = await fetch(GEMINI_SEARCH_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-    body: JSON.stringify(body)
   });
-  // Se il modello di ricerca non è disponibile, fallback sul modello principale senza grounding
-  if (resp.status === 404 || resp.status === 400 || resp.status === 429) {
-    console.warn('Web search grounding fallback su knowledge base:', resp.status);
-    var fallbackBody = {
-      system_instruction: { parts: [{ text: systemPrompt + '\n\nNota: non hai accesso a internet in questo momento. Rispondi usando la tua conoscenza aggiornata su GDPR e EU AI Act, citando le fonti ufficiali che conosci (EUR-Lex, EDPB, testi normativi).' }] },
-      contents: [{ role: 'user', parts: [{ text: userQuery }] }],
-      generationConfig: { maxOutputTokens: 3500, temperature: 0.2 }
-    };
-    var fallbackEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GEMINI_KEY;
-    var fbResp = await fetch(fallbackEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(fallbackBody) });
-    if (!fbResp.ok) throw new Error('HTTP ' + fbResp.status + ' — ' + fbResp.statusText);
-    var fbData = await fbResp.json();
-    var fbText = '';
-    if (fbData.candidates && fbData.candidates[0] && fbData.candidates[0].content) {
-      fbText = fbData.candidates[0].content.parts.map(function(p){ return p.text||''; }).join('');
-    }
-    return { text: fbText, sources: [], _isFallback: true };
+  // When going through the proxy the grounding metadata is not returned —
+  // we get plain text back. Wrap in the expected { text, sources } shape.
+  if (typeof result === 'string') {
+    return { text: result, sources: [], _isFallback: false };
   }
-  if (!resp.ok) throw new Error('HTTP ' + resp.status + ' — ' + resp.statusText);
-  var data = await resp.json();
-  if (data.error) throw new Error('Gemini Search: ' + (data.error.message || JSON.stringify(data.error)));
-
-  // Extract text + grounding sources
-  var text = '';
-  var sources = [];
-  if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-    data.candidates[0].content.parts.forEach(function(p) {
-      if (p.text) text += p.text;
-    });
-  }
-  // Extract grounding metadata (web search results) — compatibile Gemini 2.5
-  if (data.candidates && data.candidates[0] && data.candidates[0].groundingMetadata) {
-    var gm = data.candidates[0].groundingMetadata;
-    // groundingChunks: fonti web
-    if (gm.groundingChunks) {
-      gm.groundingChunks.forEach(function(chunk) {
-        if (chunk.web && chunk.web.uri) {
-          sources.push({ url: chunk.web.uri, title: chunk.web.title || chunk.web.uri });
-        }
-      });
-    }
-    // webSearchQueries: query eseguite
-    if (gm.webSearchQueries) sources._searchQueries = gm.webSearchQueries;
-    // searchEntryPoint: Google Search Suggestions HTML (obbligatorio mostrarlo per ToS)
-    if (gm.searchEntryPoint && gm.searchEntryPoint.renderedContent) {
-      sources._searchSuggestions = gm.searchEntryPoint.renderedContent;
-    }
-  }
-  return { text: text, sources: sources };
+  // Fallback: already an object (shouldn't happen, but be safe)
+  return { text: String(result || ''), sources: [] };
 }
 
 
