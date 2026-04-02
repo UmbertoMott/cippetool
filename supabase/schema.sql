@@ -115,3 +115,59 @@ $$;
 CREATE TRIGGER on_doc_insert
   AFTER INSERT ON public.document_history
   FOR EACH ROW EXECUTE FUNCTION public.increment_doc_count();
+
+-- ── Chat sessions (Legal Lab LLC + ESB + EAP) ────────────────────────
+CREATE TABLE IF NOT EXISTS public.chat_sessions (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  module      TEXT NOT NULL,                    -- 'llc' | 'esb' | 'eap'
+  title       TEXT,                             -- primo messaggio troncato 60 chars
+  messages    JSONB NOT NULL DEFAULT '[]',      -- [{role, content, ts}]
+  blob_name   TEXT,                             -- documento GCS collegato (opzionale)
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ── Flashcard ────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.flashcards (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  front       TEXT NOT NULL,
+  back        TEXT NOT NULL,
+  domain      TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ── Progressi quiz (un record per utente, aggiornato in-place) ───────
+CREATE TABLE IF NOT EXISTS public.quiz_progress (
+  user_id       UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
+  answers       JSONB NOT NULL DEFAULT '{}',    -- { "q_id": { correct: bool, ts: iso } }
+  score_total   INTEGER NOT NULL DEFAULT 0,
+  score_correct INTEGER NOT NULL DEFAULT 0,
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ── File uploads (sostituisce SQLite su Render) ───────────────────────
+CREATE TABLE IF NOT EXISTS public.file_uploads (
+  id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id           UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  blob_name         TEXT NOT NULL UNIQUE,
+  original_filename TEXT NOT NULL,
+  file_size_bytes   BIGINT,
+  mime_type         TEXT,
+  status            TEXT NOT NULL DEFAULT 'in_attesa',
+  notes             TEXT,
+  uploaded_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ── RLS ──────────────────────────────────────────────────────────────
+ALTER TABLE public.chat_sessions  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.flashcards     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.quiz_progress  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.file_uploads   ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "own" ON public.chat_sessions  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "own" ON public.flashcards     FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "own" ON public.quiz_progress  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "own" ON public.file_uploads   FOR ALL USING (auth.uid() = user_id);
