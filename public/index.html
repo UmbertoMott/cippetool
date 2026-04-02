@@ -7581,9 +7581,40 @@ function _esbPersist() {
       memory: _esbMemory.slice(0, 50) // persisti anche i tag di memoria
     }));
   } catch(e) { console.warn('ESB persist error:', e); }
+    // Supabase sync: salva la chat attiva
+    if (typeof _supa !== 'undefined' && _supa && typeof _supaUser !== 'undefined' && _supaUser && _esbActive !== null) {
+      var chat = _esbChats.find(function(ch) { return ch.id === _esbActive; });
+      if (chat) {
+        var sid = 'esb_' + _esbActive;
+        var title = chat.name || 'Chat ESB';
+        var messages = (chat.msgs || []).map(function(m) {
+          return { role: m.role, content: m.html || m.text || '', ts: m.ts || new Date().toISOString() };
+        });
+        _supaSaveChatSession('esb', sid, title, messages, null).catch(function(){});
+      }
+    }
 }
 
 function _esbRestore() {
+  // Prima prova da cache Supabase (se disponibile)
+  if (typeof _supaChats !== 'undefined' && _supaChats && _supaChats.length > 0) {
+    var supaEsb = _supaChats.filter(function(c) { return c.module === 'esb'; });
+    if (supaEsb.length > 0) {
+      _esbChats = supaEsb.map(function(c) {
+        return {
+          id:   c.id,
+          name: c.title || 'Chat ESB',
+          date: new Date(c.created_at).toLocaleDateString('it-IT'),
+          msgs: (c.messages || []).map(function(m) {
+            return { role: m.role, html: m.content, ts: m.ts };
+          })
+        };
+      });
+      _esbActive = _esbChats[0].id;
+      return;
+    }
+  }
+  // Fallback: localStorage (codice esistente sotto, lasciarlo invariato)
   try {
     var raw = localStorage.getItem(_ESB_LS_KEY);
     if (!raw) return false;
@@ -7720,6 +7751,9 @@ function _esbLoadChat(id) {
 function _esbDeleteChat(id, e) {
   e.stopPropagation();
   _esbChats = _esbChats.filter(function(x){ return x.id !== id; });
+      if (typeof _supaDeleteChatSession === 'function') {
+        _supaDeleteChatSession('esb_' + id).catch(function(){});
+      }
   if (_esbActive === id) {
     _esbActive = null;
     var msgs = document.getElementById('eapMessages');
