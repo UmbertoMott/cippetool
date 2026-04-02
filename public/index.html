@@ -9537,6 +9537,21 @@ var _llcCurrentSessionId = null;  // ID of active session (null = not started ye
 try { localStorage.removeItem('llc_panel_hist_v1'); } catch(e) {}
 
 function _llcSessionLoad() {
+  // Prima prova da cache Supabase
+  if (typeof _supaChats !== 'undefined' && _supaChats && _supaChats.length > 0) {
+    var supaLlc = _supaChats.filter(function(c) { return c.module === 'llc'; });
+    if (supaLlc.length > 0) {
+      LLC._chatThreads = LLC._chatThreads || {};
+      LLC._sessions = supaLlc.map(function(c) {
+        LLC._chatThreads[c.id] = (c.messages || []).map(function(m) {
+          return { role: m.role, content: m.content, ts: m.ts };
+        });
+        return { id: c.id, docKey: c.blob_name, docTitle: c.title, question: c.title, messages: (c.messages || []), createdAt: c.updated_at };
+      });
+      return;
+    }
+  }
+  // Fallback localStorage:
   try {
     var raw = localStorage.getItem(_LLC_SESSIONS_KEY);
     LLC._sessions = raw ? JSON.parse(raw) : [];
@@ -9549,6 +9564,18 @@ function _llcSessionSave() {
     // Keep max 200 sessions, trim oldest first
     if (LLC._sessions.length > 200) LLC._sessions = LLC._sessions.slice(-200);
     localStorage.setItem(_LLC_SESSIONS_KEY, JSON.stringify(LLC._sessions));
+    // Supabase sync: aggiorna sessioni LLC
+    if (typeof _supa !== 'undefined' && _supa && typeof _supaUser !== 'undefined' && _supaUser && LLC._sessions) {
+      LLC._sessions.forEach(function(sess) {
+        var sid = sess.id;
+        var threads = (typeof LLC._chatThreads !== 'undefined' && LLC._chatThreads && LLC._chatThreads[sid]) ? LLC._chatThreads[sid] : [];
+        var threadArr = Array.isArray(threads) ? threads : (threads.turns || []);
+        var messages = threadArr.map(function(m) {
+          return { role: m.role, content: m.content || m.text || '', ts: m.ts || new Date().toISOString() };
+        });
+        _supaSaveChatSession('llc', sid, sess.question || sess.docTitle || 'Sessione LLC', messages, sess.docKey || null).catch(function(){});
+      });
+    }
   } catch(e) {}
 }
 
@@ -14193,6 +14220,19 @@ function _llcThreadGet(blobName) {
 
 function _llcThreadSave() {
   try { localStorage.setItem(_LLC_THREAD_KEY, JSON.stringify(LLC._chatThreads)); } catch(e) {}
+  // Supabase sync: aggiorna thread della sessione corrente
+  if (typeof _supa !== 'undefined' && _supa && typeof _supaUser !== 'undefined' && _supaUser && typeof LLC !== 'undefined' && LLC._chatThreads) {
+    var _activeSid = typeof _llcCurrentSessionId !== 'undefined' ? _llcCurrentSessionId : null;
+    if (_activeSid) {
+      var _sess = LLC._sessions && LLC._sessions.find(function(s) { return s.id === _activeSid; });
+      var _threadData = LLC._chatThreads[_activeSid] || LLC._chatThreads[(_sess && _sess.docKey)] || {};
+      var _threadArr = Array.isArray(_threadData) ? _threadData : (_threadData.turns || []);
+      var _msgs = _threadArr.map(function(m) {
+        return { role: m.role, content: m.content || m.text || '', ts: m.ts || new Date().toISOString() };
+      });
+      _supaSaveChatSession('llc', _activeSid, (_sess && (_sess.question || _sess.docTitle)) || 'Sessione LLC', _msgs, (_sess && _sess.docKey) || null).catch(function(){});
+    }
+  }
 }
 
 function llcThreadClear(blobName) {
@@ -17124,11 +17164,45 @@ function ermAsk(idx) {
 var _FC_KEY = 'cippe_flashcards_v1';
 
 function fcLoad() {
+  // Prima prova da cache Supabase in-memory
+  if (typeof _supaFlashcards !== 'undefined' && _supaFlashcards && _supaFlashcards.length > 0) {
+    return _supaFlashcards.map(function(f) {
+      return { id: f.id, front: f.front, back: f.back, domain: f.domain || '', due: f.due, interval: f.interval || 1 };
+    });
+  }
+  // Fallback localStorage
   try { return JSON.parse(localStorage.getItem(_FC_KEY) || '[]'); }
   catch(e) { return []; }
 }
 function fcSave(arr) {
   try { localStorage.setItem(_FC_KEY, JSON.stringify(arr)); } catch(e){}
+  // Supabase sync
+  if (typeof _supa !== 'undefined' && _supa && typeof _supaUser !== 'undefined' && _supaUser) {
+    (async function() {
+      try {
+        // IDs con formato UUID (36 chars) sono già su Supabase
+        var supaIds = (typeof _supaFlashcards !== 'undefined' ? _supaFlashcards : []).map(function(f) { return f.id; });
+        // Elimina cards non più presenti
+        var incomingIds = arr.filter(function(c) { return c.id && String(c.id).length === 36; }).map(function(c) { return c.id; });
+        var toDelete = supaIds.filter(function(id) { return incomingIds.indexOf(id) === -1; });
+        if (toDelete.length > 0) {
+          await _supa.from('flashcards').delete().in('id', toDelete);
+          if (typeof _supaFlashcards !== 'undefined') {
+            _supaFlashcards = _supaFlashcards.filter(function(f) { return toDelete.indexOf(f.id) === -1; });
+          }
+        }
+        // Inserisci nuove (senza UUID Supabase)
+        var toInsert = arr.filter(function(c) { return !c.id || String(c.id).length !== 36; })
+          .map(function(c) {
+            return { user_id: _supaUser.id, front: c.front, back: c.back, domain: c.domain || null, due: c.due || null, interval: c.interval || 1 };
+          });
+        if (toInsert.length > 0) {
+          var { data } = await _supa.from('flashcards').insert(toInsert).select();
+          if (data && typeof _supaFlashcards !== 'undefined') _supaFlashcards = _supaFlashcards.concat(data);
+        }
+      } catch(e) { console.warn('[Supabase] fcSave error:', e); }
+    })();
+  }
 }
 
 function fcAddSalvaBtn(msgEl, rawText) {
@@ -17382,10 +17456,27 @@ async function eapScenarioMode() {
 var _HM_KEY = 'cippe_heatmap_v1';
 
 function heatmapLoad() {
+  // Prima prova da cache Supabase
+  if (typeof _supaQuizProgress !== 'undefined' && _supaQuizProgress && _supaQuizProgress.answers && Object.keys(_supaQuizProgress.answers).length > 0) {
+    return _supaQuizProgress.answers;
+  }
   try { return JSON.parse(localStorage.getItem(_HM_KEY) || '{}'); } catch(e) { return {}; }
 }
 function heatmapSave(data) {
   try { localStorage.setItem(_HM_KEY, JSON.stringify(data)); } catch(e) {}
+  // Supabase sync: upsert quiz_progress
+  if (typeof _supa !== 'undefined' && _supa && typeof _supaUser !== 'undefined' && _supaUser) {
+    (async function() {
+      try {
+        var total   = Object.keys(data).length;
+        var correct = Object.values(data).filter(function(v) { return v && v.correct; }).length;
+        var { data: row } = await _supa.from('quiz_progress')
+          .upsert({ user_id: _supaUser.id, answers: data, score_total: total, score_correct: correct, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+          .select().single();
+        if (row && typeof _supaQuizProgress !== 'undefined') _supaQuizProgress = row;
+      } catch(e) { console.warn('[Supabase] hmSave error:', e); }
+    })();
+  }
 }
 
 function heatmapTrack(domain) {
