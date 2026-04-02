@@ -3430,6 +3430,15 @@ var SUPA_REDIRECT = (window.location.hostname === 'localhost' || window.location
     _supaUser = session.user;
     _supaShowApp();
     _supaTrackLogin();
+  } else {
+    // Auth gate: nessun accesso anonimo — mostra sempre il login
+    if (typeof showScreen === 'function') {
+      showScreen('screenLogin');
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof showScreen === 'function') showScreen('screenLogin');
+      });
+    }
   }
 
   // Ascolta cambio auth state
