@@ -8542,12 +8542,30 @@ async function llcInit() {
   var badge = document.getElementById('llcApiBadge');
   LLC.docs = [];
 
-  // ── Carica file caricati dall'utente (DB locale) ────────────────────────────
+  // ── Backend warmup: sveglia Render in background (cold start ~40s) ───────────
+  // Il ping parte subito così quando l'utente usa la chat il server è già caldo.
+  LLC._backendReady = false;
+  LLC._backendWarmup = (async function() {
+    try {
+      if (badge) { badge.style.color = '#fbbf24'; badge.textContent = '⏳ Avvio…'; }
+      var t0 = Date.now();
+      var hResp = await fetch('/api/health');
+      var elapsed = Math.round((Date.now() - t0) / 1000);
+      LLC._backendReady = true;
+      if (badge && hResp.ok) {
+        badge.style.background = 'rgba(34,197,94,.15)';
+        badge.style.color      = '#4ade80';
+        badge.textContent      = '● Connesso' + (elapsed > 5 ? ' (' + elapsed + 's)' : '');
+      }
+    } catch(e) {
+      if (badge) { badge.style.color = '#f87171'; badge.textContent = '✕ Offline'; }
+    }
+  })();
+
+  // ── Carica file caricati dall'utente — aspetta che il warmup finisca ─────────
+  await LLC._backendWarmup;
   try {
-    var _upCtrl = new AbortController();
-    var _upTimeout = setTimeout(function(){ _upCtrl.abort(); }, 5000);
-    var upResp = await fetch('/api/upload/files?limit=200', { signal: _upCtrl.signal });
-    clearTimeout(_upTimeout);
+    var upResp = await fetch('/api/upload/files?limit=200');
     if (upResp.ok) {
       var upFiles = await upResp.json();
       upFiles.forEach(function(f) {
@@ -8559,9 +8577,10 @@ async function llcInit() {
           tag: ext === 'pdf' ? 'pdf' : ext, source: 'upload'
         });
       });
+      var n = upFiles.length;
       badge.style.background = 'rgba(34,197,94,.15)';
       badge.style.color      = '#4ade80';
-      badge.textContent      = '● ' + upFiles.length + (upFiles.length === 1 ? ' doc' : ' doc');
+      badge.textContent      = '● ' + n + (n === 1 ? ' doc' : ' doc');
       llcRenderDocList();
     }
   } catch(e) { /* silently ignore */ }
@@ -10053,16 +10072,11 @@ function _llcBuildDocSysPrompt(docType, docTitle, docText) {
 
 // ── Gemini call with low temperature for precision (DocAI Q&A) ───────────────
 async function llcGeminiPrecision(systemPrompt, userContent, maxTokens) {
-  var body = {
+  return _llcBackendGemini({
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents: [{ role: 'user', parts: [{ text: userContent || '' }] }],
-    safetySettings: GEMINI_SAFETY,
-    generationConfig: {
-      temperature: 0.1,
-      maxOutputTokens: maxTokens || 6144
-    }
-  };
-  return callGeminiWithRetry(body, 1);
+    generationConfig: { temperature: 0.1, maxOutputTokens: maxTokens || 6144 }
+  });
 }
 
 // ── Academic prose helpers ────────────────────────────────────────────────────
@@ -12359,16 +12373,41 @@ function llcCmdKSelect(docId) {
 
 // ── Gemini API — routed through backend proxy (API key restricted to server) ──
 async function llcGemini(systemPrompt, userContent, maxTokens) {
-  var body = {
+  return _llcBackendGemini({
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents: [{ role: 'user', parts: [{ text: userContent || '' }] }],
-    safetySettings: GEMINI_SAFETY,
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: maxTokens || 8192
+    generationConfig: { temperature: 0.3, maxOutputTokens: maxTokens || 8192 }
+  });
+}
+
+// ── Backend Gemini proxy — single shared helper ───────────────────────────────
+// Handles cold-start (Render sleeps after 15 min inactivity → first req ~40s).
+// AbortController with 90s timeout covers cold-start window without hanging.
+async function _llcBackendGemini(bodyObj) {
+  var ctrl = new AbortController();
+  var tid  = setTimeout(function() { ctrl.abort(); }, 90000);
+  try {
+    var r = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: ctrl.signal,
+      body: JSON.stringify(bodyObj)
+    });
+    clearTimeout(tid);
+    if (!r.ok) {
+      var detail = '';
+      try { detail = (await r.json()).detail || ''; } catch(_e) {}
+      throw new Error('Backend Gemini ' + r.status + (detail ? ' — ' + detail : ''));
     }
-  };
-  return callGeminiWithRetry(body, 1);
+    var data = await r.json();
+    return data.text || '';
+  } catch(e) {
+    clearTimeout(tid);
+    if (e.name === 'AbortError') {
+      throw new Error('⏳ Il server si sta avviando (cold start). Riprova tra 15 secondi.');
+    }
+    throw e;
+  }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -62,7 +62,17 @@ BUCKET_NAME        = os.getenv("GCS_BUCKET_NAME", "data-protection-archive")
 CORS_ORIGINS       = os.getenv("CORS_ORIGINS", "http://localhost:7890").split(",")
 VERTEX_PROJECT     = os.getenv("GOOGLE_CLOUD_PROJECT", "")
 VERTEX_LOCATION    = os.getenv("VERTEX_AI_LOCATION", "us-central1")
-VERTEX_MODEL       = os.getenv("VERTEX_AI_MODEL", "gemini-2.5-flash-lite")
+VERTEX_MODEL       = os.getenv("VERTEX_AI_MODEL", "gemini-2.0-flash")
+
+# Ordered fallback chain for the Gemini proxy — first model that responds wins
+_PROXY_FALLBACK_MODELS = [
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-1.5-pro",
+]
 GEMINI_API_KEY     = os.getenv("GEMINI_API_KEY", "")  # Non-Vertex fallback
 
 logging.basicConfig(level=logging.INFO)
@@ -1045,46 +1055,65 @@ async def gemini_proxy(req: GeminiProxyRequest):
     if not req.prompt and not req.contents:
         raise HTTPException(status_code=422, detail="Either 'prompt' or 'contents' is required")
 
-    model_id = req.model or VERTEX_MODEL
-    try:
-        # Build the call as a sync closure, then run it in a thread pool
-        # so the uvicorn event loop is never blocked during Gemini API waits.
-        client = _genai.Client(api_key=GEMINI_API_KEY)
+    primary_model = req.model or VERTEX_MODEL
+    client = _genai.Client(api_key=GEMINI_API_KEY)
 
-        if req.contents:
-            native_contents = req.contents
-            gen_cfg = req.generationConfig or {}
-            if req.system_instruction:
-                sys_parts = req.system_instruction.get('parts', [])
-                sys_text = ' '.join(p.get('text', '') for p in sys_parts)
-                config = _genai_types.GenerateContentConfig(
-                    max_output_tokens=gen_cfg.get('maxOutputTokens', 6144),
-                    temperature=gen_cfg.get('temperature', 0.1),
-                    system_instruction=sys_text,
-                )
-            else:
-                config = _genai_types.GenerateContentConfig(
-                    max_output_tokens=gen_cfg.get('maxOutputTokens', 6144),
-                    temperature=gen_cfg.get('temperature', 0.1),
-                )
-            def _call():
-                return client.models.generate_content(
-                    model=model_id, contents=native_contents, config=config)
-        else:
-            cfg = _genai_types.GenerateContentConfig(
-                max_output_tokens=req.max_tokens,
-                temperature=req.temperature,
+    # Build config and contents once, reuse across model attempts
+    if req.contents:
+        native_contents = req.contents
+        gen_cfg = req.generationConfig or {}
+        if req.system_instruction:
+            sys_parts = req.system_instruction.get('parts', [])
+            sys_text = ' '.join(p.get('text', '') for p in sys_parts)
+            config = _genai_types.GenerateContentConfig(
+                max_output_tokens=gen_cfg.get('maxOutputTokens', 6144),
+                temperature=gen_cfg.get('temperature', 0.1),
+                system_instruction=sys_text,
             )
-            def _call():
-                return client.models.generate_content(
-                    model=model_id, contents=req.prompt, config=cfg)
+        else:
+            config = _genai_types.GenerateContentConfig(
+                max_output_tokens=gen_cfg.get('maxOutputTokens', 6144),
+                temperature=gen_cfg.get('temperature', 0.1),
+            )
+        def _make_call(m):
+            return lambda: client.models.generate_content(
+                model=m, contents=native_contents, config=config)
+    else:
+        config = _genai_types.GenerateContentConfig(
+            max_output_tokens=req.max_tokens,
+            temperature=req.temperature,
+        )
+        def _make_call(m):
+            return lambda: client.models.generate_content(
+                model=m, contents=req.prompt, config=config)
 
-        # asyncio.to_thread offloads the blocking SDK call to the default thread pool
-        response = await asyncio.to_thread(_call)
-        return {"text": response.text or ""}
-    except Exception as e:
-        logger.error(f"[GeminiProxy] Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    # Try primary model, then fallbacks on model-not-found errors
+    models_to_try = [primary_model] + [
+        m for m in _PROXY_FALLBACK_MODELS if m != primary_model
+    ]
+    last_err: Exception = Exception("No models available")
+    for model_id in models_to_try:
+        try:
+            response = await asyncio.to_thread(_make_call(model_id))
+            if model_id != primary_model:
+                logger.info(f"[GeminiProxy] fallback OK → {model_id}")
+            return {"text": response.text or ""}
+        except Exception as e:
+            err_str = str(e).lower()
+            is_model_err = any(k in err_str for k in [
+                "not found", "404", "invalid", "does not exist",
+                "unknown model", "model_not_found", "not supported"
+            ])
+            if is_model_err:
+                logger.warning(f"[GeminiProxy] model '{model_id}' unavailable, trying next…")
+                last_err = e
+                continue
+            # Non-model error (auth, quota, network…) — fail fast
+            logger.error(f"[GeminiProxy] error with model '{model_id}': {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
+    logger.error(f"[GeminiProxy] all models exhausted. Last error: {last_err}")
+    raise HTTPException(status_code=503, detail=f"Nessun modello disponibile: {last_err}")
 
 
 # ═══════════════════════════════════════════════════════════════════
