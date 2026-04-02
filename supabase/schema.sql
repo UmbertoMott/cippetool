@@ -135,6 +135,8 @@ CREATE TABLE IF NOT EXISTS public.flashcards (
   front       TEXT NOT NULL,
   back        TEXT NOT NULL,
   domain      TEXT,
+  due         BIGINT,    -- SRS: next review epoch ms
+  interval    INTEGER DEFAULT 1,  -- SRS: review interval days
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -155,7 +157,7 @@ CREATE TABLE IF NOT EXISTS public.file_uploads (
   original_filename TEXT NOT NULL,
   file_size_bytes   BIGINT,
   mime_type         TEXT,
-  status            TEXT NOT NULL DEFAULT 'in_attesa',
+  status            TEXT NOT NULL DEFAULT 'in_attesa' CHECK (status IN ('in_attesa', 'approvato', 'rifiutato')),
   notes             TEXT,
   uploaded_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -167,7 +169,17 @@ ALTER TABLE public.flashcards     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.quiz_progress  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.file_uploads   ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "own" ON public.chat_sessions  FOR ALL USING (auth.uid() = user_id);
-CREATE POLICY "own" ON public.flashcards     FOR ALL USING (auth.uid() = user_id);
-CREATE POLICY "own" ON public.quiz_progress  FOR ALL USING (auth.uid() = user_id);
-CREATE POLICY "own" ON public.file_uploads   FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "own_chat"      ON public.chat_sessions  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own_flashcards" ON public.flashcards     FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own_quiz"       ON public.quiz_progress  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own_files"      ON public.file_uploads   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- ── Indexes ───────────────────────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_updated
+  ON public.chat_sessions (user_id, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_flashcards_user
+  ON public.flashcards (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_file_uploads_user
+  ON public.file_uploads (user_id);
