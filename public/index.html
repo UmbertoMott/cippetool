@@ -4663,29 +4663,32 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="wb-step-label">STEP 01</span>
         <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· Document Ingestion · PDF, DOC, DOCX</span>
       </div>
-      <div id="wbDropZone" onclick="wbOpenFilePicker(event)" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(211,148,255,.4)'" onmouseout="this.style.borderColor='rgba(72,72,72,.5)'">
+      <!-- Input file reale — sempre presente, cliccabile tramite label -->
+      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx" style="display:none" onchange="wbOnFileSelect(this)">
+      <div id="wbDropZone" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;transition:border-color .2s">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:12px">
             <span style="font-size:22px">📎</span>
             <div>
-              <div id="wbFileName" style="font-size:13px;font-weight:600;color:#ffffff">Nessun documento — clicca per caricare</div>
+              <div id="wbFileName" style="font-size:13px;font-weight:600;color:#ffffff">Nessun documento selezionato</div>
               <div id="wbFileMeta" style="font-size:11px;color:#ababab;margin-top:2px">Formati supportati: PDF · DOC · DOCX</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px">
-            <button id="wbUploadBtn" onclick="event.stopPropagation();wbUpload()" class="wb-neon-btn" style="display:none">Carica →</button>
-            <button id="wbChangeBtn" onclick="event.stopPropagation();_wbPendingFile=null;document.getElementById('wbFileInput').value='';document.getElementById('wbUploadBtn').style.display='none';document.getElementById('wbChangeBtn').style.display='none';document.getElementById('wbFileName').textContent='Nessun documento — clicca per caricare';document.getElementById('wbFileMeta').textContent='Formati supportati: PDF · DOC · DOCX';document.getElementById('wbProgressWrap').style.display='none'" style="display:none;background:rgba(255,255,255,.08);color:#ababab;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer">Cambia</button>
+            <!-- Label nativa: garantisce apertura file picker su ogni browser -->
+            <label for="wbFileInput" id="wbPickerBtn" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace">📂 Scegli file</label>
+            <button id="wbUploadBtn" onclick="wbUpload()" class="wb-neon-btn" style="display:none">Carica →</button>
+            <button id="wbChangeBtn" onclick="wbResetUpload()" style="display:none;background:rgba(255,255,255,.08);color:#ababab;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',monospace">↩ Cambia</button>
           </div>
         </div>
-        <!-- Progress bar visiva -->
+        <!-- Progress bar visiva 0 → 100% -->
         <div id="wbProgressWrap" style="display:none;margin-top:6px">
           <div style="height:4px;background:rgba(211,148,255,.15);border-radius:4px;overflow:hidden">
-            <div id="wbProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#d394ff,#aa30fa);border-radius:4px;transition:width .3s ease"></div>
+            <div id="wbProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#d394ff,#aa30fa);border-radius:4px;transition:width .25s ease"></div>
           </div>
           <div id="wbProgressLabel" style="font-size:11px;color:#d394ff;font-family:'Space Grotesk',monospace;margin-top:4px">0%</div>
         </div>
       </div>
-      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx" style="display:none" onchange="wbOnFileSelect(this)">
     </div>
 
     <!-- MAIN AREA -->
@@ -18823,11 +18826,20 @@ function wbToggleLayout(mode, silent) {
   if (!silent) localStorage.setItem('wb_layout_pref', mode);
 }
 
-function wbOpenFilePicker(e) {
-  // Se il click viene da un pulsante figlio, non aprire il dialog
-  if (e && e.target && (e.target.tagName === 'BUTTON' || e.target.closest('button'))) return;
+function wbResetUpload() {
+  _wbPendingFile = null;
   var fi = document.getElementById('wbFileInput');
-  if (fi) fi.click();
+  if (fi) fi.value = '';
+  document.getElementById('wbUploadBtn').style.display = 'none';
+  document.getElementById('wbChangeBtn').style.display = 'none';
+  document.getElementById('wbPickerBtn').style.display = 'inline-block';
+  document.getElementById('wbFileName').textContent = 'Nessun documento selezionato';
+  document.getElementById('wbFileMeta').textContent = 'Formati supportati: PDF · DOC · DOCX';
+  document.getElementById('wbProgressWrap').style.display = 'none';
+  document.getElementById('wbProgressBar').style.width = '0%';
+  document.getElementById('wbProgressBar').style.background = 'linear-gradient(90deg,#d394ff,#aa30fa)';
+  document.getElementById('wbProgressLabel').textContent = '0%';
+  document.getElementById('wbProgressLabel').style.color = '#d394ff';
 }
 
 function wbOnFileSelect(input) {
@@ -18837,13 +18849,17 @@ function wbOnFileSelect(input) {
   var ext = file.name.split('.').pop().toLowerCase();
   var typeLabel = ext === 'pdf' ? 'PDF' : (ext === 'docx' ? 'Word (.docx)' : 'Word (.doc)');
   document.getElementById('wbFileName').textContent = file.name;
-  document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + (file.size / (1024*1024)).toFixed(2) + ' MB · Pronto per il caricamento';
+  document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + (file.size / (1024*1024)).toFixed(2) + ' MB · Pronto';
+  document.getElementById('wbPickerBtn').style.display = 'none';
   document.getElementById('wbUploadBtn').style.display = 'inline-block';
   document.getElementById('wbChangeBtn').style.display = 'inline-block';
   document.getElementById('wbProgressWrap').style.display = 'none';
   document.getElementById('wbProgressBar').style.width = '0%';
   document.getElementById('wbProgressLabel').textContent = '0%';
   document.getElementById('wbProgressLabel').style.color = '#d394ff';
+  // Evidenzia drop zone
+  var dz = document.getElementById('wbDropZone');
+  if (dz) dz.style.borderColor = 'rgba(211,148,255,.5)';
 }
 
 function _wbSetProgress(pct, label) {
