@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://generativelanguage.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://*.supabase.co wss://*.supabase.co https://cipp-legal-api.onrender.com; img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com; frame-src https://accounts.google.com; object-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://generativelanguage.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://*.supabase.co wss://*.supabase.co https://cipp-legal-api.onrender.com https://storage.googleapis.com https://*.storage.googleapis.com; img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com; frame-src https://accounts.google.com; object-src 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CIPP/E Training Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -33,8 +33,9 @@
 #screenWorkbench .wb-shell {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 0px);
+  height: 100vh;
   overflow: hidden;
+  padding-top: 0;
 }
 #screenWorkbench .wb-header {
   background: #191919;
@@ -4659,15 +4660,15 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="screen" id="screenWorkbench">
   <div class="wb-shell">
     <!-- HEADER -->
-    <div class="wb-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;position:sticky;top:0;z-index:10">
+    <div class="wb-header" style="padding:12px 24px 10px;position:sticky;top:0;z-index:10">
       <div style="display:flex;align-items:center;gap:16px">
-        <button onclick="showScreen('screenMode')" style="background:none;border:1px solid #484848;border-radius:8px;color:#ababab;padding:5px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s" onmouseover="this.style.borderColor='#d394ff';this.style.color='#d394ff'" onmouseout="this.style.borderColor='#484848';this.style.color='#ababab'">← Torna</button>
-        <span style="font-size:16px;font-weight:800;color:#ffffff;letter-spacing:-.01em">🔬 AI Document Workbench</span>
-      </div>
-      <!-- TOGGLE A/B -->
-      <div class="wb-toggle-pill">
-        <button id="wbBtnSplit" onclick="wbToggleLayout('split')" style="background:#d394ff;color:#000">⬜ Split</button>
-        <button id="wbBtnStack" onclick="wbToggleLayout('stack')" style="background:transparent;color:#ababab">⬛ Stack</button>
+        <button onclick="showScreen('screenMode')" style="background:none;border:1px solid #484848;border-radius:8px;color:#ababab;padding:5px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='#d394ff';this.style.color='#d394ff'" onmouseout="this.style.borderColor='#484848';this.style.color='#ababab'">← Torna</button>
+        <span style="font-size:15px;font-weight:800;color:#ffffff;letter-spacing:-.01em;flex:1">🔬 AI Document Workbench</span>
+        <!-- TOGGLE A/B — centrato, lontano dal supa-user-bar che è top-right -->
+        <div class="wb-toggle-pill" style="margin-right:8px">
+          <button id="wbBtnSplit" onclick="wbToggleLayout('split')" style="background:#d394ff;color:#000">⬜ Split</button>
+          <button id="wbBtnStack" onclick="wbToggleLayout('stack')" style="background:transparent;color:#ababab">⬛ Stack</button>
+        </div>
       </div>
     </div>
 
