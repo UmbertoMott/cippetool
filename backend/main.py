@@ -326,6 +326,44 @@ async def extract_text(req: TextExtractionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ── Word/Doc Text Extraction from GCS ─────────────────────────────
+
+@app.get("/api/documents/extract-word")
+async def extract_word_text(blob_name: str = Query(...)):
+    """Estrai testo da un file Word (.docx/.doc) su GCS."""
+    if not gcs:
+        raise HTTPException(status_code=503, detail="GCS client non inizializzato")
+    ext = blob_name.rsplit(".", 1)[-1].lower() if "." in blob_name else ""
+    if ext not in ("docx", "doc"):
+        raise HTTPException(status_code=400, detail="Usa questo endpoint solo per .docx/.doc")
+    try:
+        file_bytes = gcs.download_pdf_bytes(blob_name)  # download_pdf_bytes è generico
+        if ext == "docx":
+            from docx import Document as DocxDocument
+            import io
+            doc = DocxDocument(io.BytesIO(file_bytes))
+            paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+            text = "\n\n".join(paragraphs)
+            return {"blob_name": blob_name, "type": "word", "text": text, "total_chars": len(text)}
+        else:
+            # .doc legacy — antiword se disponibile
+            import subprocess, tempfile, os as _os
+            with tempfile.NamedTemporaryFile(suffix=".doc", delete=False) as tf:
+                tf.write(file_bytes)
+                tf_path = tf.name
+            try:
+                result = subprocess.run(["antiword", tf_path], capture_output=True, text=True, timeout=10)
+                text = result.stdout if result.returncode == 0 else "[Formato .doc legacy: carica in .docx per il testo completo]"
+            finally:
+                _os.unlink(tf_path)
+            return {"blob_name": blob_name, "type": "word_legacy", "text": text, "total_chars": len(text)}
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"File '{blob_name}' non trovato in GCS")
+    except Exception as e:
+        logger.error(f"Errore estrazione Word: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── Highlight Positions ────────────────────────────────────────────
 
 @app.post("/api/documents/highlights")

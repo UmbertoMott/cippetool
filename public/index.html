@@ -4676,7 +4676,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <button id="wbUploadBtn" onclick="wbUpload()" class="wb-neon-btn" style="display:none">Carica</button>
         </div>
       </div>
-      <input type="file" id="wbFileInput" accept=".pdf" style="display:none" onchange="wbOnFileSelect(this)">
+      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx" style="display:none" onchange="wbOnFileSelect(this)">
     </div>
 
     <!-- MAIN AREA -->
@@ -18818,8 +18818,10 @@ function wbOnFileSelect(input) {
   var file = input.files && input.files[0];
   if (!file) return;
   _wbPendingFile = file;
+  var ext = file.name.split('.').pop().toLowerCase();
+  var typeLabel = ext === 'pdf' ? 'PDF' : (ext === 'docx' ? 'Word (.docx)' : 'Word (.doc)');
   document.getElementById('wbFileName').textContent = file.name;
-  document.getElementById('wbFileMeta').textContent = 'PDF · ' + (file.size / (1024*1024)).toFixed(2) + ' MB · Pronto per il caricamento';
+  document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + (file.size / (1024*1024)).toFixed(2) + ' MB · Pronto per il caricamento';
   document.getElementById('wbUploadBtn').style.display = 'inline-block';
 }
 
@@ -18894,42 +18896,57 @@ async function wbUpload() {
 }
 
 async function wbLoadDocText(blobName) {
-  // 1. Mostra PDF nell'iframe usando signed URL da GCS
-  try {
-    var sResp = await fetch('/api/documents/signed-url?blob_name=' + encodeURIComponent(blobName));
-    if (sResp.ok) {
-      var sData = await sResp.json();
-      var signedUrl = sData.signed_url || sData.url || '';
-      if (signedUrl) {
-        document.getElementById('wbDocPlaceholder').style.display = 'none';
-        var iframe = document.getElementById('wbDocIframe');
-        iframe.src = signedUrl;
-        iframe.style.display = 'block';
-      }
-    }
-  } catch(e) { console.warn('[WB] signed-url error:', e); }
+  var ext = blobName.split('.').pop().toLowerCase();
+  var isWord = (ext === 'docx' || ext === 'doc');
 
-  // 2. Estrai testo per i tool AI (POST /api/documents/extract-text → GCS)
-  try {
-    var tResp = await fetch('/api/documents/extract-text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blob_name: blobName, page_start: 0, page_end: 30 })
-    });
-    if (tResp.ok) {
-      var tData = await tResp.json();
-      var text = '';
-      if (tData.pages && Array.isArray(tData.pages)) {
-        text = tData.pages.map(function(p) { return p.text || ''; }).join('\n\n');
-      } else {
-        text = tData.text || tData.content || '';
+  if (!isWord) {
+    // PDF: mostra nell'iframe tramite signed URL
+    try {
+      var sResp = await fetch('/api/documents/signed-url?blob_name=' + encodeURIComponent(blobName));
+      if (sResp.ok) {
+        var sData = await sResp.json();
+        var signedUrl = sData.signed_url || sData.url || '';
+        if (signedUrl) {
+          document.getElementById('wbDocPlaceholder').style.display = 'none';
+          var iframe = document.getElementById('wbDocIframe');
+          iframe.src = signedUrl;
+          iframe.style.display = 'block';
+        }
       }
-      if (text) {
-        var docText = document.getElementById('wbDocText');
-        docText.textContent = text.substring(0, 12000);
+    } catch(e) { console.warn('[WB] signed-url error:', e); }
+
+    // Estrai testo per tool AI
+    try {
+      var tResp = await fetch('/api/documents/extract-text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blob_name: blobName, page_start: 0, page_end: 30 })
+      });
+      if (tResp.ok) {
+        var tData = await tResp.json();
+        var text = tData.full_text || (tData.pages || []).map(function(p){ return p.text || ''; }).join('\n\n') || '';
+        if (text) document.getElementById('wbDocText').textContent = text.substring(0, 12000);
       }
-    }
-  } catch(e) { console.warn('[WB] extract-text error:', e); }
+    } catch(e) { console.warn('[WB] extract-text error:', e); }
+
+  } else {
+    // Word: estrai testo e mostralo direttamente nel pannello
+    try {
+      var wResp = await fetch('/api/documents/extract-word?blob_name=' + encodeURIComponent(blobName));
+      if (wResp.ok) {
+        var wData = await wResp.json();
+        var wText = wData.text || '';
+        if (wText) {
+          document.getElementById('wbDocPlaceholder').style.display = 'none';
+          document.getElementById('wbDocIframe').style.display = 'none';
+          var docTextEl = document.getElementById('wbDocText');
+          docTextEl.style.cssText = 'display:block;padding:24px 28px;white-space:pre-wrap;font-size:13px;line-height:1.9;color:#d4d4d4;overflow-y:auto;flex:1';
+          docTextEl.textContent = wText.substring(0, 15000);
+          // Testo disponibile anche per i tool AI
+        }
+      }
+    } catch(e) { console.warn('[WB] extract-word error:', e); }
+  }
 }
 
 function wbUnlockTools() {
