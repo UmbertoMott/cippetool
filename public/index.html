@@ -4663,8 +4663,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="wb-step-label">STEP 01</span>
         <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· Document Ingestion · PDF, DOC, DOCX</span>
       </div>
-      <!-- Drop zone: click apre file dialog SOLO se non c'è file in attesa -->
-      <div id="wbDropZone" onclick="if(!_wbPendingFile){document.getElementById('wbFileInput').click()}" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(211,148,255,.4)'" onmouseout="this.style.borderColor='rgba(72,72,72,.5)'">
+      <div id="wbDropZone" onclick="wbOpenFilePicker(event)" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(211,148,255,.4)'" onmouseout="this.style.borderColor='rgba(72,72,72,.5)'">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:12px">
             <span style="font-size:22px">📎</span>
@@ -18822,6 +18821,13 @@ function wbToggleLayout(mode, silent) {
     if (docPanel) { docPanel.style.maxHeight = '320px'; docPanel.style.overflow = 'hidden'; }
   }
   if (!silent) localStorage.setItem('wb_layout_pref', mode);
+}
+
+function wbOpenFilePicker(e) {
+  // Se il click viene da un pulsante figlio, non aprire il dialog
+  if (e && e.target && (e.target.tagName === 'BUTTON' || e.target.closest('button'))) return;
+  var fi = document.getElementById('wbFileInput');
+  if (fi) fi.click();
 }
 
 function wbOnFileSelect(input) {
