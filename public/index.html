@@ -175,6 +175,32 @@
 #screenWorkbench ::-webkit-scrollbar { width: 4px; }
 #screenWorkbench ::-webkit-scrollbar-track { background: #0e0e0e; }
 #screenWorkbench ::-webkit-scrollbar-thumb { background: #484848; border-radius: 2px; }
+/* Full-viewport overlay when active (same pattern as screenLRL) */
+#screenWorkbench.active {
+  display: flex;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 50;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Locked tool overlay text */
+#screenWorkbench .wb-tool-card.wb-locked::after {
+  content: '🔒 Carica un documento per attivare';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #ababab;
+  background: rgba(0,0,0,.25);
+  border-radius: 12px;
+  pointer-events: none;
+  font-family: 'Space Grotesk', monospace;
+  letter-spacing: .06em;
+}
 </style>
 <style>
 :root{
@@ -18923,7 +18949,7 @@ async function wbRunTool(toolNum) {
     var aiText = data.text || data.reply || data.response || data.answer || '';
 
     if (loadingEl) loadingEl.style.display = 'none';
-    if (resultEl) resultEl.style.display = 'flex';
+    if (resultEl) resultEl.style.display = (toolNum === 1) ? 'block' : 'flex';
 
     if (toolNum === 1) wbRenderTool01(aiText);
     else if (toolNum === 2) wbRenderTool02(aiText, resultEl);
@@ -18948,7 +18974,7 @@ function wbRenderTool01(text) {
   var metaEl = document.getElementById('wbTool01Metaphor');
   if (diagEl) diagEl.textContent = diagramPart;
   if (metaEl) metaEl.textContent = metaphorPart || text;
-  document.getElementById('wbTool01Result').style.display = 'block';
+  // display already set to 'block' by wbRunTool
 
   // Try to render with Mermaid (already loaded globally)
   if (typeof mermaid !== 'undefined' && diagEl && diagramPart) {
