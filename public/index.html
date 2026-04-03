@@ -3474,6 +3474,97 @@ async function _supaDeleteChatSession(sessionId) {
   }
 }
 
+// Migrazione dati localStorage → Supabase (eseguita una sola volta per utente)
+async function _supaCheckMigration() {
+  var migKey = 'cippe_migrated_' + _supaUser.id;
+  if (localStorage.getItem(migKey)) return;
+
+  var hasLocal = localStorage.getItem('cippe_esbChats_v3') ||
+                 localStorage.getItem('llc_chat_sessions_v2') ||
+                 localStorage.getItem('cippe_flashcards_v1') ||
+                 localStorage.getItem('cippe_heatmap_v1');
+  if (!hasLocal) { localStorage.setItem(migKey, '1'); return; }
+
+  var choice = await new Promise(function(resolve) {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99999;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = '<div style="background:#1e1e2e;border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:32px;max-width:420px;text-align:center;font-family:Inter,sans-serif;color:#e0e0f0">'
+      + '<div style="font-size:32px;margin-bottom:12px">\uD83D\uDCC2</div>'
+      + '<h3 style="margin:0 0 8px;font-size:18px">Dati locali trovati</h3>'
+      + '<p style="color:#aaa;font-size:14px;margin:0 0 24px">Hai chat, flashcard e progressi salvati su questo browser. Vuoi importarli nel tuo account?</p>'
+      + '<div style="display:flex;gap:12px;justify-content:center">'
+      + '<button id="_migYes" style="padding:10px 24px;background:#7c3aed;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">S\xEC, importa</button>'
+      + '<button id="_migNo" style="padding:10px 24px;background:rgba(255,255,255,.08);color:#ccc;border:1px solid rgba(255,255,255,.15);border-radius:8px;cursor:pointer">No, ignora</button>'
+      + '</div></div>';
+    document.body.appendChild(overlay);
+    document.getElementById('_migYes').onclick = function() { document.body.removeChild(overlay); resolve(true); };
+    document.getElementById('_migNo').onclick  = function() { document.body.removeChild(overlay); resolve(false); };
+  });
+
+  if (choice) {
+    // ESB chats
+    var esbRaw = localStorage.getItem('cippe_esbChats_v3');
+    if (esbRaw) {
+      try {
+        var esbData = JSON.parse(esbRaw);
+        var chats = esbData.chats || [];
+        for (var i = 0; i < chats.length; i++) {
+          var ch = chats[i];
+          var msgs = (ch.msgs || []).map(function(m) {
+            return { role: m.role, content: m.html || m.text || '', ts: m.ts || new Date().toISOString() };
+          });
+          await _supa.from('chat_sessions').insert({ user_id: _supaUser.id, module: 'esb', title: ch.name || 'Chat ESB', messages: msgs });
+        }
+      } catch(e) { console.warn('[Migration] ESB error:', e); }
+    }
+    // LLC sessions
+    var llcRaw = localStorage.getItem('llc_chat_sessions_v2');
+    if (llcRaw) {
+      try {
+        var llcSessions = JSON.parse(llcRaw);
+        var threadsRaw = localStorage.getItem('llc_chat_thread_v2');
+        var threads = threadsRaw ? JSON.parse(threadsRaw) : {};
+        for (var sid in llcSessions) {
+          var sess = llcSessions[sid];
+          var threadMsgs = (threads[sid] && threads[sid].turns) ? threads[sid].turns : (Array.isArray(threads[sid]) ? threads[sid] : []);
+          var msgs2 = threadMsgs.map(function(m) {
+            return { role: m.role || 'user', content: m.content || m.q || '', ts: m.ts || new Date().toISOString() };
+          });
+          await _supa.from('chat_sessions').insert({ user_id: _supaUser.id, module: 'llc', title: sess.title || 'Sessione LLC', messages: msgs2, blob_name: sess.blobName || null });
+        }
+      } catch(e) { console.warn('[Migration] LLC error:', e); }
+    }
+    // Flashcards
+    var fcRaw = localStorage.getItem('cippe_flashcards_v1');
+    if (fcRaw) {
+      try {
+        var cards = JSON.parse(fcRaw);
+        var toInsert = cards.map(function(c) {
+          return { user_id: _supaUser.id, front: c.front, back: c.back, domain: c.domain || null, due: c.due || null, interval: c.interval || 1 };
+        });
+        if (toInsert.length > 0) await _supa.from('flashcards').insert(toInsert);
+      } catch(e) { console.warn('[Migration] flashcards error:', e); }
+    }
+    // Quiz progress
+    var hmRaw = localStorage.getItem('cippe_heatmap_v1');
+    if (hmRaw) {
+      try {
+        var hmData = JSON.parse(hmRaw);
+        var total   = Object.keys(hmData).length;
+        var correct = Object.values(hmData).filter(function(v) { return v && v.correct; }).length;
+        await _supa.from('quiz_progress').upsert({ user_id: _supaUser.id, answers: hmData, score_total: total, score_correct: correct }, { onConflict: 'user_id' });
+      } catch(e) { console.warn('[Migration] heatmap error:', e); }
+    }
+    await _supaLoadAll();
+  }
+
+  localStorage.setItem(migKey, '1');
+  ['cippe_esbChats_v3','cippe_esbChats_v2','llc_chat_sessions_v2',
+   'llc_chat_thread_v2','cippe_flashcards_v1','cippe_heatmap_v1'].forEach(function(k) {
+    try { localStorage.removeItem(k); } catch(e) {}
+  });
+}
+
 // URL di redirect corretto per produzione
 var SUPA_REDIRECT = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? window.location.origin + '/'
@@ -3519,6 +3610,14 @@ var SUPA_REDIRECT = (window.location.hostname === 'localhost' || window.location
   // Logout button
   var logoutBtn = document.getElementById('supa-logout-btn');
   if (logoutBtn) logoutBtn.addEventListener('click', async function() {
+    // Pulisci dati utente da localStorage (fonte di verità = Supabase)
+    ['cippe_esbChats_v3','cippe_esbChats_v2','llc_chat_sessions_v2',
+     'llc_chat_thread_v2','llc_panel_hist_v1','cippe_flashcards_v1',
+     'cippe_heatmap_v1','cippe_reports_v1'].forEach(function(k) {
+      try { localStorage.removeItem(k); } catch(e) {}
+    });
+    // Azzera cache in-memory
+    _supaChats = []; _supaFlashcards = []; _supaQuizProgress = {}; _supaFiles = [];
     await _supa.auth.signOut();
     if (typeof logout === 'function') logout();
     else window.location.reload();
@@ -3565,7 +3664,20 @@ function _supaShowApp() {
     }
     // Auto-registra l'utente nel sistema locale se non esiste
     (async function() {
-      await _supaLoadAll();   // <-- ADD THIS LINE
+      await _supaLoadAll();
+      await _supaCheckMigration();
+      // Supabase Realtime: aggiorna chat se cambia su un altro dispositivo
+      _supa.channel('user-chats-' + _supaUser.id)
+        .on('postgres_changes', {
+          event: 'UPDATE', schema: 'public', table: 'chat_sessions',
+          filter: 'user_id=eq.' + _supaUser.id
+        }, function(payload) {
+          var updated = payload.new;
+          var idx = _supaChats.findIndex(function(c) { return c.id === updated.id; });
+          if (idx >= 0) { _supaChats[idx] = updated; } else { _supaChats.unshift(updated); }
+          if (updated.module === 'esb' && typeof esbRenderChatList === 'function') esbRenderChatList();
+        })
+        .subscribe();
       try {
         if (typeof getUsers === 'function') {
           var users = await getUsers() || {};
