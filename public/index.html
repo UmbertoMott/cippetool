@@ -6,6 +6,176 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CIPP/E Training Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style id="wb-theme">
+/* ═══════════════════════════════════════════════════
+   AI DOCUMENT WORKBENCH — scoped CSS (.wb-* / #screenWorkbench)
+   ═══════════════════════════════════════════════════ */
+#screenWorkbench {
+  --wb-bg:        #0e0e0e;
+  --wb-sur-low:   #131313;
+  --wb-sur:       #191919;
+  --wb-sur-high:  #1f1f1f;
+  --wb-sur-top:   #262626;
+  --wb-primary:   #d394ff;
+  --wb-primary-d: #aa30fa;
+  --wb-primary-f: #cb80ff;
+  --wb-tertiary:  #ff6d8d;
+  --wb-cyan:      #06b6d4;
+  --wb-outline:   #484848;
+  --wb-txt:       #ffffff;
+  --wb-muted:     #ababab;
+  --wb-void:      #000000;
+  font-family: 'Inter', sans-serif;
+  background: var(--wb-bg);
+  color: var(--wb-txt);
+}
+#screenWorkbench .wb-shell {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 0px);
+  overflow: hidden;
+}
+#screenWorkbench .wb-header {
+  background: #191919;
+  box-shadow: 0 4px 24px rgba(160,32,240,.08);
+  flex-shrink: 0;
+}
+#screenWorkbench .wb-upload-bar {
+  background: #131313;
+  flex-shrink: 0;
+}
+#screenWorkbench .wb-main {
+  flex: 1;
+  min-height: 0;
+  transition: all 0.3s ease;
+}
+#screenWorkbench .wb-main.wb-layout-split {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  overflow: hidden;
+}
+#screenWorkbench .wb-main.wb-layout-stack {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+#screenWorkbench .wb-doc-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #000000;
+}
+#screenWorkbench .wb-doc-panel .wb-doc-content {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #484848 #0e0e0e;
+}
+#screenWorkbench .wb-tools-panel {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #484848 #0e0e0e;
+}
+#screenWorkbench .wb-tool-card {
+  background: #1f1f1f;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.2s;
+}
+#screenWorkbench .wb-tool-card.wb-locked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+#screenWorkbench .wb-glow-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: 12px 0 0 12px;
+}
+#screenWorkbench .wb-neon-btn {
+  background: linear-gradient(135deg, #d394ff, #aa30fa);
+  color: #000;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 8px 20px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  transition: opacity .15s;
+}
+#screenWorkbench .wb-neon-btn:hover { opacity: 0.88; }
+#screenWorkbench .wb-step-label {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #d394ff;
+}
+#screenWorkbench .wb-reveal-answer {
+  display: none;
+  animation: wbReveal .22s ease both;
+}
+#screenWorkbench .wb-reveal-answer.open {
+  display: block;
+}
+@keyframes wbReveal {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+#screenWorkbench .wb-chat-bubble-user {
+  align-self: flex-end;
+  background: rgba(211,148,255,.15);
+  border-radius: 10px 10px 2px 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #ffffff;
+  max-width: 80%;
+  line-height: 1.5;
+}
+#screenWorkbench .wb-chat-bubble-ai {
+  align-self: flex-start;
+  background: #262626;
+  border-radius: 10px 10px 10px 2px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #ababab;
+  max-width: 85%;
+  line-height: 1.5;
+  border-left: 2px solid #06b6d4;
+}
+#screenWorkbench .wb-toggle-pill {
+  display: flex;
+  background: #131313;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 2px;
+  border: 1px solid #484848;
+}
+#screenWorkbench .wb-toggle-pill button {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: all .2s;
+}
+/* scrollbar for webkit */
+#screenWorkbench ::-webkit-scrollbar { width: 4px; }
+#screenWorkbench ::-webkit-scrollbar-track { background: #0e0e0e; }
+#screenWorkbench ::-webkit-scrollbar-thumb { background: #484848; border-radius: 2px; }
+</style>
 <style>
 :root{
   --d1:#FF6B35;--d1l:#fff0eb;
@@ -4374,7 +4544,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:8px" id="modeGreet">Bentornato!</div>
       <div style="color:var(--muted);font-size:14px">Scegli la modalità di studio per questa sessione</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;max-width:680px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;width:100%;max-width:1020px">
 
       <!-- QUIZ CARD -->
       <button onclick="lrlGoMode('quiz')" style="
@@ -4412,12 +4582,182 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </button>
 
+      <!-- AI WORKBENCH CARD -->
+      <button onclick="showScreen('screenWorkbench');wbInit()" style="
+        background:var(--sur);border:1.5px solid var(--bdr);border-radius:20px;
+        padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
+        color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
+        display:flex;flex-direction:column;gap:14px;
+      " onmouseover="this.style.borderColor='#d394ff';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(211,148,255,.2)'"
+         onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:40px">🔬</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;margin-bottom:6px">AI Document Workbench</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">Carica un PDF · Analisi AI strutturata · Visual Storytelling · Sintesi concetti · Domande di ripasso · Flashcard automatiche</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#d394ff;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
+          Apri il workbench <span style="font-size:16px">→</span>
+        </div>
+      </button>
+
     </div>
     <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
       <span>Puoi tornare qui in qualsiasi momento</span>
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     AI DOCUMENT WORKBENCH SCREEN
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenWorkbench">
+  <div class="wb-shell">
+    <!-- HEADER -->
+    <div class="wb-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;position:sticky;top:0;z-index:10">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onclick="showScreen('screenMode')" style="background:none;border:1px solid #484848;border-radius:8px;color:#ababab;padding:5px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s" onmouseover="this.style.borderColor='#d394ff';this.style.color='#d394ff'" onmouseout="this.style.borderColor='#484848';this.style.color='#ababab'">← Torna</button>
+        <span style="font-size:16px;font-weight:800;color:#ffffff;letter-spacing:-.01em">🔬 AI Document Workbench</span>
+      </div>
+      <!-- TOGGLE A/B -->
+      <div class="wb-toggle-pill">
+        <button id="wbBtnSplit" onclick="wbToggleLayout('split')" style="background:#d394ff;color:#000">⬜ Split</button>
+        <button id="wbBtnStack" onclick="wbToggleLayout('stack')" style="background:transparent;color:#ababab">⬛ Stack</button>
+      </div>
+    </div>
+
+    <!-- STEP 01: UPLOAD BAR -->
+    <div class="wb-upload-bar" style="padding:16px 24px;border-bottom:1px solid rgba(72,72,72,.3)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span class="wb-step-label">STEP 01</span>
+        <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· Document Ingestion</span>
+      </div>
+      <div id="wbDropZone" onclick="document.getElementById('wbFileInput').click()" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(211,148,255,.4)'" onmouseout="this.style.borderColor='rgba(72,72,72,.5)'">
+        <div id="wbDropLabel" style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">📎</span>
+          <div>
+            <div id="wbFileName" style="font-size:13px;font-weight:600;color:#ffffff">Nessun documento — clicca per caricare PDF</div>
+            <div id="wbFileMeta" style="font-size:11px;color:#ababab;margin-top:2px"></div>
+          </div>
+        </div>
+        <div id="wbUploadActions" style="display:flex;align-items:center;gap:10px">
+          <div id="wbUploadProgress" style="display:none;font-size:12px;color:#d394ff;font-family:'Space Grotesk',monospace"></div>
+          <button id="wbUploadBtn" onclick="wbUpload()" class="wb-neon-btn" style="display:none">Carica</button>
+        </div>
+      </div>
+      <input type="file" id="wbFileInput" accept=".pdf" style="display:none" onchange="wbOnFileSelect(this)">
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="wbMain" class="wb-main wb-layout-split">
+
+      <!-- STEP 02: DOCUMENT PANEL -->
+      <div id="wbDocPanel" class="wb-doc-panel" style="border-right:1px solid rgba(72,72,72,.2)">
+        <div style="padding:12px 20px;background:#1f1f1f;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(72,72,72,.2);flex-shrink:0">
+          <div>
+            <div class="wb-step-label">STEP 02</div>
+            <div style="font-size:11px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">Full Document View</div>
+          </div>
+        </div>
+        <div id="wbDocContent" class="wb-doc-content" style="flex:1;overflow-y:auto;padding:32px;background:#000000;color:#ababab;font-size:14px;line-height:1.8">
+          <div id="wbDocPlaceholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;opacity:.35">
+            <span style="font-size:48px">📄</span>
+            <span style="font-size:13px;color:#ababab">Il documento apparirà qui dopo il caricamento</span>
+          </div>
+          <div id="wbDocText" style="display:none;white-space:pre-wrap;font-size:13px;line-height:1.9;color:#d4d4d4"></div>
+        </div>
+      </div>
+
+      <!-- STEP 03: TOOLS PANEL -->
+      <div id="wbToolsPanel" class="wb-tools-panel" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span class="wb-step-label">STEP 03</span>
+          <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· AI Analysis &amp; Tools</span>
+        </div>
+
+        <!-- TOOL 01: Visual Storytelling -->
+        <div id="wbTool01" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
+          <div class="wb-glow-bar" style="background:#d394ff"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#d394ff;font-family:'Space Grotesk',monospace">TOOL 01</div>
+              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Visual Storytelling</div>
+            </div>
+            <button onclick="wbRunTool(1)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#d394ff,#aa30fa);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
+          </div>
+          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Diagramma visivo del concetto principale + metafora cognitiva quotidiana.</p>
+          <div id="wbTool01Result" style="display:none">
+            <div id="wbTool01Diagram" style="background:#000000;border-radius:8px;padding:16px;border:1px solid rgba(211,148,255,.15);font-family:monospace;font-size:12px;color:#d394ff;white-space:pre;overflow-x:auto;margin-bottom:12px"></div>
+            <div id="wbTool01Metaphor" style="background:#262626;border-radius:8px;padding:14px;font-size:13px;color:#e0e0e0;font-style:italic;line-height:1.7;border-left:3px solid rgba(211,148,255,.4)"></div>
+          </div>
+          <div id="wbTool01Loading" style="display:none;font-size:12px;color:#d394ff;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Generazione in corso…</div>
+        </div>
+
+        <!-- TOOL 02: Sintesi & Chunks -->
+        <div id="wbTool02" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
+          <div class="wb-glow-bar" style="background:#cb80ff"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#cb80ff;font-family:'Space Grotesk',monospace">TOOL 02</div>
+              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Sintesi &amp; Chunks</div>
+            </div>
+            <button onclick="wbRunTool(2)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#cb80ff,#9100e0);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
+          </div>
+          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">6-8 blocchi concettuali con titolo, sintesi e tag articolo GDPR.</p>
+          <div id="wbTool02Result" style="display:none;flex-direction:column;gap:10px"></div>
+          <div id="wbTool02Loading" style="display:none;font-size:12px;color:#cb80ff;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Analisi in corso…</div>
+        </div>
+
+        <!-- TOOL 03: Domande di Ripasso -->
+        <div id="wbTool03" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
+          <div class="wb-glow-bar" style="background:#ff6d8d"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#ff6d8d;font-family:'Space Grotesk',monospace">TOOL 03</div>
+              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Domande di Ripasso</div>
+            </div>
+            <button onclick="wbRunTool(3)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#ff6d8d,#e2165f);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
+          </div>
+          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">5 domande a risposta aperta. Clicca per rivelare la risposta AI.</p>
+          <div id="wbTool03Result" style="display:none;flex-direction:column;gap:10px"></div>
+          <div id="wbTool03Loading" style="display:none;font-size:12px;color:#ff6d8d;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Generazione domande…</div>
+        </div>
+
+        <!-- TOOL 04: Flashcard Automatiche -->
+        <div id="wbTool04" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
+          <div class="wb-glow-bar" style="background:#aa30fa"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#aa30fa;font-family:'Space Grotesk',monospace">TOOL 04</div>
+              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Flashcard Automatiche</div>
+            </div>
+            <button onclick="wbRunTool(4)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#aa30fa,#7c3aed);color:#fff;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
+          </div>
+          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Estrai 5-10 coppie termine/definizione GDPR e salvale come flashcard.</p>
+          <div id="wbTool04Result" style="display:none;flex-direction:column;gap:8px"></div>
+          <div id="wbTool04Loading" style="display:none;font-size:12px;color:#aa30fa;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Estrazione flashcard…</div>
+          <button id="wbSaveFlashcardsBtn" onclick="wbSaveFlashcards()" style="display:none;margin-top:12px;background:linear-gradient(135deg,#aa30fa,#7c3aed);color:#fff;font-weight:700;border-radius:999px;padding:8px 20px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em">💾 Salva flashcard</button>
+          <div id="wbSaveFlashcardsDone" style="display:none;font-size:12px;color:#34d399;font-family:'Space Grotesk',monospace;margin-top:8px">✓ Flashcard salvate in Supabase</div>
+        </div>
+
+        <!-- TOOL 05: Chat Contestuale -->
+        <div id="wbTool05" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
+          <div class="wb-glow-bar" style="background:#06b6d4"></div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#06b6d4;font-family:'Space Grotesk',monospace">TOOL 05</div>
+            <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Chat Contestuale</div>
+          </div>
+          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Fai domande libere sul documento caricato.</p>
+          <div id="wbChatMessages" style="background:#000000;border-radius:8px;padding:12px;min-height:80px;max-height:200px;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:#484848 #0e0e0e"></div>
+          <div style="display:flex;gap:8px">
+            <input id="wbChatInput" type="text" placeholder="Chiedi qualcosa sul documento…" style="flex:1;background:#000000;border:1px solid rgba(72,72,72,.5);border-radius:8px;padding:9px 14px;color:#ffffff;font-size:13px;font-family:inherit;outline:none;transition:border-color .2s" onkeydown="if(event.key==='Enter')wbChatSend()" onfocus="this.style.borderColor='#06b6d4'" onblur="this.style.borderColor='rgba(72,72,72,.5)'">
+            <button onclick="wbChatSend()" style="background:#06b6d4;color:#000;font-weight:700;border-radius:8px;padding:9px 16px;border:none;cursor:pointer;font-size:13px;white-space:nowrap">→</button>
+          </div>
+        </div>
+
+      </div><!-- end tools panel -->
+    </div><!-- end wbMain -->
+  </div><!-- end wb-shell -->
+</div><!-- end screenWorkbench -->
 
 <div class="screen" id="screenDash">
   <!-- back to mode choice -->
@@ -18394,6 +18734,376 @@ if (typeof _origToggle === 'function') {
     }
   };
 }
+
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// AI DOCUMENT WORKBENCH
+// ═══════════════════════════════════════════════════════════════════
+
+var _wbCurrentBlob = null;   // blob_name after successful upload
+var _wbCurrentFile = null;   // original filename
+var _wbPendingFile = null;   // File object selected but not yet uploaded
+var _wbFlashcardQueue = [];  // flashcards waiting to be saved
+
+function wbInit() {
+  // Restore layout preference
+  var pref = localStorage.getItem('wb_layout_pref') || 'split';
+  wbToggleLayout(pref, true);
+}
+
+function wbToggleLayout(mode, silent) {
+  var main = document.getElementById('wbMain');
+  var btnSplit = document.getElementById('wbBtnSplit');
+  var btnStack = document.getElementById('wbBtnStack');
+  if (!main) return;
+
+  if (mode === 'split') {
+    main.style.gridTemplateColumns = '45% 55%';
+    main.style.display = 'grid';
+    main.style.flexDirection = '';
+    if (btnSplit) { btnSplit.style.background = '#d394ff'; btnSplit.style.color = '#000'; }
+    if (btnStack) { btnStack.style.background = 'transparent'; btnStack.style.color = '#ababab'; }
+    var docPanel = document.getElementById('wbDocPanel');
+    if (docPanel) { docPanel.style.maxHeight = ''; docPanel.style.overflow = 'hidden'; }
+  } else {
+    main.style.gridTemplateColumns = '';
+    main.style.display = 'flex';
+    main.style.flexDirection = 'column';
+    main.style.overflow = 'auto';
+    if (btnStack) { btnStack.style.background = '#d394ff'; btnStack.style.color = '#000'; }
+    if (btnSplit) { btnSplit.style.background = 'transparent'; btnSplit.style.color = '#ababab'; }
+    var docPanel = document.getElementById('wbDocPanel');
+    if (docPanel) { docPanel.style.maxHeight = '320px'; docPanel.style.overflow = 'hidden'; }
+  }
+  if (!silent) localStorage.setItem('wb_layout_pref', mode);
+}
+
+function wbOnFileSelect(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  _wbPendingFile = file;
+  document.getElementById('wbFileName').textContent = file.name;
+  document.getElementById('wbFileMeta').textContent = 'PDF · ' + (file.size / (1024*1024)).toFixed(2) + ' MB · Pronto per il caricamento';
+  document.getElementById('wbUploadBtn').style.display = 'inline-block';
+}
+
+async function wbUpload() {
+  if (!_wbPendingFile) return;
+  var file = _wbPendingFile;
+  var progressEl = document.getElementById('wbUploadProgress');
+  var uploadBtn = document.getElementById('wbUploadBtn');
+  var userId = (typeof _supaUser !== 'undefined' && _supaUser) ? _supaUser.id : (typeof _upGetUserId === 'function' ? _upGetUserId() : 'anon');
+  var mime = file.type || 'application/pdf';
+
+  uploadBtn.style.display = 'none';
+  progressEl.style.display = 'block';
+  progressEl.textContent = '🔐 Richiesta URL…';
+
+  try {
+    // Step 1: Request signed URL
+    var r1 = await fetch('/api/upload/request-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, filename: file.name, content_type: mime, file_size: file.size })
+    });
+    if (!r1.ok) throw new Error('Errore richiesta URL');
+    var urlData = await r1.json();
+    progressEl.textContent = '☁️ Upload GCS…';
+
+    // Step 2: PUT to GCS
+    await new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('PUT', urlData.signed_url, true);
+      xhr.setRequestHeader('Content-Type', mime);
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) progressEl.textContent = '☁️ ' + Math.round(e.loaded/e.total*100) + '%';
+      };
+      xhr.onload = function() { xhr.status < 300 ? resolve() : reject(new Error('GCS error ' + xhr.status)); };
+      xhr.onerror = function() { reject(new Error('Network error')); };
+      xhr.send(file);
+    });
+    progressEl.textContent = '💾 Conferma…';
+
+    // Step 3: Confirm
+    var r3 = await fetch('/api/upload/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, blob_name: urlData.blob_name, original_filename: file.name, file_size: file.size, mime_type: mime })
+    });
+    if (!r3.ok) throw new Error('Errore conferma');
+
+    // Supabase sync
+    if (typeof _supa !== 'undefined' && _supa && typeof _supaUser !== 'undefined' && _supaUser) {
+      try {
+        var fRes = await _supa.from('file_uploads').insert({ user_id: _supaUser.id, blob_name: urlData.blob_name, original_filename: file.name, file_size_bytes: file.size, mime_type: mime, status: 'in_attesa' }).select();
+        if (fRes.data && fRes.data[0] && typeof _supaFiles !== 'undefined') _supaFiles.unshift(fRes.data[0]);
+      } catch(e) { console.warn('[WB] Supabase file_uploads error:', e); }
+    }
+
+    _wbCurrentBlob = urlData.blob_name;
+    _wbCurrentFile = file.name;
+    progressEl.textContent = '✅ ' + file.name;
+    progressEl.style.color = '#34d399';
+
+    // Load document text
+    wbLoadDocText(urlData.blob_name);
+    // Unlock tools
+    wbUnlockTools();
+
+  } catch(e) {
+    progressEl.textContent = '⚠️ ' + e.message;
+    progressEl.style.color = '#ff6d8d';
+    uploadBtn.style.display = 'inline-block';
+  }
+}
+
+async function wbLoadDocText(blobName) {
+  try {
+    var resp = await fetch('/api/upload/local/' + encodeURIComponent(blobName) + '/extract-text');
+    if (!resp.ok) return;
+    var data = await resp.json();
+    var text = data.text || data.content || '';
+    if (text) {
+      document.getElementById('wbDocPlaceholder').style.display = 'none';
+      var docText = document.getElementById('wbDocText');
+      docText.style.display = 'block';
+      docText.textContent = text.substring(0, 8000); // cap for performance
+    }
+  } catch(e) { console.warn('[WB] extract-text error:', e); }
+}
+
+function wbUnlockTools() {
+  ['wbTool01','wbTool02','wbTool03','wbTool04','wbTool05'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('wb-locked');
+  });
+  document.querySelectorAll('#screenWorkbench .wb-tool-card').forEach(function(c) {
+    c.style.opacity = '';
+    c.style.pointerEvents = '';
+  });
+}
+
+async function wbRunTool(toolNum) {
+  if (!_wbCurrentBlob) return;
+  var prompts = {
+    1: 'Analizza questo documento legale GDPR/privacy. Prima crea un diagramma Mermaid (flowchart LR o graph TD) che rappresenti i concetti principali e le loro relazioni. Poi scrivi UNA metafora cognitiva potente che colleghi il concetto principale a un\'esperienza quotidiana comune. Formato risposta:\n---DIAGRAM---\n[codice mermaid]\n---METAPHOR---\n[metafora in 2-3 frasi]',
+    2: 'Analizza questo documento GDPR/privacy e suddividilo in 6-8 blocchi concettuali. Per ogni blocco usa questo formato:\n**TITOLO** | [tag articolo GDPR es. Art.5]\n[3 righe di sintesi concettuale]\n---',
+    3: 'Genera 5 domande di ripasso a risposta aperta su questo documento GDPR/privacy. Per ogni domanda usa questo formato:\nDOMANDA: [testo domanda]\nRISPOSTA: [risposta completa 3-5 righe]\n---',
+    4: 'Estrai 8-10 termini chiave GDPR/privacy da questo documento con le loro definizioni precise. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [definizione 1-2 frasi]\n---'
+  };
+
+  var loadingId = 'wbTool0' + toolNum + 'Loading';
+  var resultId  = 'wbTool0' + toolNum + 'Result';
+  var loadingEl = document.getElementById(loadingId);
+  var resultEl  = document.getElementById(resultId);
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
+
+  try {
+    var docText = document.getElementById('wbDocText') ? document.getElementById('wbDocText').textContent : '';
+    var fullPrompt = prompts[toolNum] + '\n\nDOCUMENTO:\n' + docText.substring(0, 6000);
+
+    // Call via backend Gemini proxy (same as _llcBackendGemini)
+    var ctrl = new AbortController();
+    var tid = setTimeout(function() { ctrl.abort(); }, 90000);
+    var resp = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: ctrl.signal,
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+        generationConfig: { temperature: 0.4, maxOutputTokens: 8192 }
+      })
+    });
+    clearTimeout(tid);
+
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    var data = await resp.json();
+    var aiText = data.text || data.reply || data.response || data.answer || '';
+
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (resultEl) resultEl.style.display = 'flex';
+
+    if (toolNum === 1) wbRenderTool01(aiText);
+    else if (toolNum === 2) wbRenderTool02(aiText, resultEl);
+    else if (toolNum === 3) wbRenderTool03(aiText, resultEl);
+    else if (toolNum === 4) wbRenderTool04(aiText, resultEl);
+
+  } catch(e) {
+    if (loadingEl) { loadingEl.style.display = 'block'; loadingEl.textContent = '⚠️ ' + e.message; }
+    console.warn('[WB] Tool ' + toolNum + ' error:', e);
+  }
+}
+
+function wbRenderTool01(text) {
+  var parts = text.split('---METAPHOR---');
+  var diagramPart = parts[0].replace('---DIAGRAM---','').trim();
+  var metaphorPart = parts[1] ? parts[1].trim() : '';
+
+  // Clean mermaid code block markers
+  diagramPart = diagramPart.replace(/```mermaid\n?/gi,'').replace(/```\n?/gi,'').trim();
+
+  var diagEl = document.getElementById('wbTool01Diagram');
+  var metaEl = document.getElementById('wbTool01Metaphor');
+  if (diagEl) diagEl.textContent = diagramPart;
+  if (metaEl) metaEl.textContent = metaphorPart || text;
+  document.getElementById('wbTool01Result').style.display = 'block';
+
+  // Try to render with Mermaid (already loaded globally)
+  if (typeof mermaid !== 'undefined' && diagEl && diagramPart) {
+    try {
+      mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+      mermaid.render('wbMermaid_' + Date.now(), diagramPart).then(function(r) {
+        diagEl.innerHTML = r.svg;
+      }).catch(function(err) { console.warn('[WB] Mermaid render error:', err); });
+    } catch(e) { /* keep ASCII text */ }
+  }
+}
+
+function wbRenderTool02(text, resultEl) {
+  var chunks = text.split('---').filter(function(c) { return c.trim(); });
+  resultEl.style.flexDirection = 'column';
+  chunks.forEach(function(chunk) {
+    chunk = chunk.trim();
+    if (!chunk) return;
+    var lines = chunk.split('\n').filter(Boolean);
+    var titleLine = lines[0] || '';
+    var tagMatch = titleLine.match(/\|\s*(.+)$/);
+    var tag = tagMatch ? tagMatch[1].trim() : '';
+    var title = titleLine.replace(/\*\*/g,'').replace(/\|.*$/, '').trim();
+    var body = lines.slice(1).join(' ').trim();
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#262626;border-radius:8px;padding:14px 16px;border-left:3px solid rgba(203,128,255,.4)';
+    card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+      + '<span style="font-size:13px;font-weight:700;color:#ffffff">' + (title || '—') + '</span>'
+      + (tag ? '<span style="font-size:10px;background:rgba(211,148,255,.1);color:#d394ff;border-radius:999px;padding:2px 8px;font-family:\'Space Grotesk\',monospace;font-weight:700">' + tag + '</span>' : '')
+      + '</div>'
+      + '<p style="font-size:12px;color:#ababab;line-height:1.7;margin:0">' + body + '</p>';
+    resultEl.appendChild(card);
+  });
+}
+
+function wbRenderTool03(text, resultEl) {
+  var blocks = text.split('---').filter(function(b) { return b.trim(); });
+  resultEl.style.flexDirection = 'column';
+  blocks.forEach(function(block, i) {
+    block = block.trim();
+    var qMatch = block.match(/DOMANDA:\s*(.+?)(?=RISPOSTA:|$)/s);
+    var aMatch = block.match(/RISPOSTA:\s*(.+)$/s);
+    var q = qMatch ? qMatch[1].trim() : block;
+    var a = aMatch ? aMatch[1].trim() : '';
+    var item = document.createElement('div');
+    item.style.cssText = 'background:#262626;border-radius:8px;overflow:hidden;border:1px solid rgba(255,109,141,.15)';
+    var qDiv = document.createElement('div');
+    qDiv.style.cssText = 'padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:12px';
+    var iconId = 'wbQ' + i + 'Icon_' + Date.now();
+    qDiv.innerHTML = '<span style="font-size:13px;color:#ffffff;font-weight:600;line-height:1.5">' + q + '</span>'
+      + '<span style="font-size:18px;color:#ff6d8d;flex-shrink:0;transition:transform .2s" id="' + iconId + '">▾</span>';
+    var aDiv = document.createElement('div');
+    aDiv.style.cssText = 'max-height:0;overflow:hidden;transition:max-height .3s ease';
+    aDiv.innerHTML = '<p style="font-size:13px;color:#ababab;line-height:1.7;border-top:1px solid rgba(255,109,141,.15);padding:12px 16px 14px;margin:0">' + a + '</p>';
+    var open = false;
+    qDiv.onclick = function() {
+      open = !open;
+      aDiv.style.maxHeight = open ? '300px' : '0';
+      var icon = document.getElementById(iconId);
+      if (icon) icon.style.transform = open ? 'rotate(180deg)' : '';
+    };
+    item.appendChild(qDiv);
+    item.appendChild(aDiv);
+    resultEl.appendChild(item);
+  });
+}
+
+function wbRenderTool04(text, resultEl) {
+  _wbFlashcardQueue = [];
+  var blocks = text.split('---').filter(function(b) { return b.trim(); });
+  resultEl.style.flexDirection = 'column';
+  blocks.forEach(function(block) {
+    block = block.trim();
+    var tMatch = block.match(/TERMINE:\s*(.+?)(?=DEFINIZIONE:|$)/s);
+    var dMatch = block.match(/DEFINIZIONE:\s*(.+)$/s);
+    var term = tMatch ? tMatch[1].trim() : '';
+    var def  = dMatch ? dMatch[1].trim() : block;
+    if (!term) return;
+    _wbFlashcardQueue.push({ id: Date.now() + '_' + Math.random(), front: term, back: def, domain: 'GDPR', interval: 1 });
+    var row = document.createElement('div');
+    row.style.cssText = 'background:#000000;border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;border:1px solid rgba(170,48,250,.2)';
+    row.innerHTML = '<span style="font-size:11px;color:#aa30fa;font-family:\'Space Grotesk\',monospace;font-weight:700;flex-shrink:0;margin-top:1px">FRONT</span>'
+      + '<div><div style="font-size:13px;font-weight:700;color:#ffffff">' + term + '</div>'
+      + '<div style="font-size:12px;color:#ababab;margin-top:4px;line-height:1.6">' + def + '</div></div>';
+    resultEl.appendChild(row);
+  });
+  if (_wbFlashcardQueue.length > 0) {
+    var btn = document.getElementById('wbSaveFlashcardsBtn');
+    if (btn) { btn.style.display = 'inline-block'; btn.textContent = '💾 Salva ' + _wbFlashcardQueue.length + ' flashcard'; }
+  }
+}
+
+function wbSaveFlashcards() {
+  if (!_wbFlashcardQueue.length) return;
+  var existing = (typeof fcLoad === 'function') ? fcLoad() : [];
+  var combined = existing.concat(_wbFlashcardQueue);
+  if (typeof fcSave === 'function') fcSave(combined);
+  var btn = document.getElementById('wbSaveFlashcardsBtn');
+  var done = document.getElementById('wbSaveFlashcardsDone');
+  if (btn) btn.style.display = 'none';
+  if (done) done.style.display = 'block';
+  _wbFlashcardQueue = [];
+}
+
+async function wbChatSend() {
+  var input = document.getElementById('wbChatInput');
+  var msg = input ? input.value.trim() : '';
+  if (!msg || !_wbCurrentBlob) return;
+  input.value = '';
+
+  var messagesEl = document.getElementById('wbChatMessages');
+
+  // Append user bubble
+  var userBubble = document.createElement('div');
+  userBubble.className = 'wb-chat-bubble-user';
+  userBubble.textContent = msg;
+  messagesEl.appendChild(userBubble);
+
+  // Thinking bubble
+  var aiBubble = document.createElement('div');
+  aiBubble.className = 'wb-chat-bubble-ai';
+  aiBubble.textContent = '⟳ …';
+  messagesEl.appendChild(aiBubble);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  try {
+    var docText = document.getElementById('wbDocText') ? document.getElementById('wbDocText').textContent : '';
+    var contextMsg = 'Sei un assistente GDPR/privacy. Il contesto è questo documento:\n\n' + docText.substring(0,4000) + '\n\n---\nDomanda: ' + msg;
+
+    var ctrl = new AbortController();
+    var tid = setTimeout(function() { ctrl.abort(); }, 90000);
+    var resp = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: ctrl.signal,
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: contextMsg }] }],
+        generationConfig: { temperature: 0.4, maxOutputTokens: 4096 }
+      })
+    });
+    clearTimeout(tid);
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    var data = await resp.json();
+    aiBubble.textContent = data.text || data.reply || data.response || data.answer || '(nessuna risposta)';
+    aiBubble.style.color = '#e0e0e0';
+  } catch(e) {
+    aiBubble.textContent = '⚠️ ' + e.message;
+    aiBubble.style.color = '#ff6d8d';
+  }
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// END AI DOCUMENT WORKBENCH
+// ═══════════════════════════════════════════════════════════════════
 
 })();
 </script>
