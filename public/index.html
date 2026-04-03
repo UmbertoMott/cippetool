@@ -18889,84 +18889,70 @@ async function wbUpload() {
   var file = _wbPendingFile;
   var uploadBtn = document.getElementById('wbUploadBtn');
   var changeBtn = document.getElementById('wbChangeBtn');
-  var lblEl    = document.getElementById('wbProgressLabel');
-  var userId = (typeof _supaUser !== 'undefined' && _supaUser) ? _supaUser.id : (typeof _upGetUserId === 'function' ? _upGetUserId() : 'anon');
-
-  // MIME fallback per Word (alcuni browser restituiscono stringa vuota)
-  var ext = file.name.split('.').pop().toLowerCase();
-  var mime = file.type;
-  if (!mime || mime === 'application/octet-stream') {
-    if (ext === 'pdf')  mime = 'application/pdf';
-    else if (ext === 'docx') mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    else if (ext === 'doc')  mime = 'application/msword';
-  }
+  var lblEl = document.getElementById('wbProgressLabel');
+  var userId = (typeof _supaUser !== 'undefined' && _supaUser) ? _supaUser.id : 'anon';
 
   uploadBtn.style.display = 'none';
   changeBtn.style.display = 'none';
-  _wbSetProgress(5, '🔐 Richiesta URL sicura…');
+  _wbSetProgress(5, '📤 Preparazione…');
 
   try {
-    // Step 1: Request signed URL (5% → 15%)
-    var r1 = await fetch('/api/upload/request-url', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, filename: file.name, content_type: mime, file_size: file.size })
-    });
-    if (!r1.ok) {
-      var errData = await r1.json().catch(function(){ return {}; });
-      throw new Error(errData.detail || 'Errore richiesta URL (' + r1.status + ')');
-    }
-    var urlData = await r1.json();
-    _wbSetProgress(15, '☁️ Caricamento su Google Cloud…');
+    // Upload diretto al backend (browser → Render → GCS) — nessun CORS GCS richiesto
+    var formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('user_id', userId);
 
-    // Step 2: PUT to GCS con progress reale (15% → 85%)
-    await new Promise(function(resolve, reject) {
+    var result = await new Promise(function(resolve, reject) {
       var xhr = new XMLHttpRequest();
-      xhr.open('PUT', urlData.signed_url, true);
-      xhr.setRequestHeader('Content-Type', mime);
+      xhr.open('POST', '/api/upload/direct', true);
       xhr.upload.onprogress = function(e) {
         if (e.lengthComputable) {
-          var pct = Math.round(15 + (e.loaded / e.total) * 70);
+          var pct = Math.round(5 + (e.loaded / e.total) * 85);
           _wbSetProgress(pct, '☁️ ' + pct + '% — ' + (e.loaded / (1024*1024)).toFixed(1) + ' MB');
         }
       };
-      xhr.onload = function() { xhr.status < 300 ? resolve() : reject(new Error('Errore GCS: HTTP ' + xhr.status)); };
-      xhr.onerror = function() { reject(new Error('Errore di rete durante il caricamento')); };
-      xhr.send(file);
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch(e) { reject(new Error('Risposta non valida dal server')); }
+        } else {
+          var msg = 'Errore server: HTTP ' + xhr.status;
+          try { msg = JSON.parse(xhr.responseText).detail || msg; } catch(e2) {}
+          reject(new Error(msg));
+        }
+      };
+      xhr.onerror = function() { reject(new Error('Errore di rete — verifica la connessione')); };
+      xhr.send(formData);
     });
-    _wbSetProgress(88, '💾 Registrazione nel database…');
 
-    // Step 3: Confirm (88% → 95%)
-    var r3 = await fetch('/api/upload/confirm', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, blob_name: urlData.blob_name, original_filename: file.name, file_size: file.size, mime_type: mime })
-    });
-    if (!r3.ok) throw new Error('Errore conferma upload');
-    _wbSetProgress(95, '🔗 Sincronizzazione…');
+    _wbSetProgress(95, '💾 Finalizzazione…');
 
-    // Supabase sync
+    // Supabase sync metadati
     if (typeof _supa !== 'undefined' && _supa && typeof _supaUser !== 'undefined' && _supaUser) {
       try {
-        var fRes = await _supa.from('file_uploads').insert({ user_id: _supaUser.id, blob_name: urlData.blob_name, original_filename: file.name, file_size_bytes: file.size, mime_type: mime, status: 'in_attesa' }).select();
+        var ext2 = file.name.split('.').pop().toLowerCase();
+        var mimeMap = { pdf: 'application/pdf', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', doc: 'application/msword' };
+        var fRes = await _supa.from('file_uploads').insert({
+          user_id: _supaUser.id, blob_name: result.blob_name,
+          original_filename: file.name, file_size_bytes: file.size,
+          mime_type: mimeMap[ext2] || file.type || 'application/octet-stream', status: 'in_attesa'
+        }).select();
         if (fRes.data && fRes.data[0] && typeof _supaFiles !== 'undefined') _supaFiles.unshift(fRes.data[0]);
-      } catch(e) { console.warn('[WB] Supabase file_uploads error:', e); }
+      } catch(e) { console.warn('[WB] Supabase sync error:', e); }
     }
 
-    // 100% ✅
     _wbSetProgress(100, '✅ Caricamento completato!');
     document.getElementById('wbProgressBar').style.background = 'linear-gradient(90deg,#34d399,#059669)';
     if (lblEl) lblEl.style.color = '#34d399';
     document.getElementById('wbFileName').textContent = '✅ ' + file.name;
 
-    _wbCurrentBlob = urlData.blob_name;
+    _wbCurrentBlob = result.blob_name;
     _wbCurrentFile = file.name;
 
-    // Carica documento e sblocca tool dopo breve pausa
     setTimeout(function() {
-      wbLoadDocText(urlData.blob_name);
+      wbLoadDocText(result.blob_name);
       wbUnlockTools();
-    }, 600);
+    }, 500);
 
   } catch(e) {
     _wbSetProgress(0, '⚠️ ' + e.message);
@@ -18980,83 +18966,91 @@ async function wbUpload() {
 async function wbLoadDocText(blobName) {
   var ext = blobName.split('.').pop().toLowerCase();
   var isWord = (ext === 'docx' || ext === 'doc');
+  // Per blob locali (upload diretto), usa /api/upload/local/ invece di /api/documents/pdf
+  var isLocal = blobName.startsWith('local/');
+  var localFilename = isLocal ? blobName.substring(6) : null; // strip 'local/'
 
   if (!isWord) {
-    // ── PDF: usa PDF.js tramite proxy backend (CORS-safe) ──────────
+    // ── PDF: PDF.js via backend proxy ────────────────────────────
     var container = document.getElementById('wbPdfContainer');
-    var placeholder = document.getElementById('wbDocPlaceholder');
-    placeholder.style.display = 'none';
+    document.getElementById('wbDocPlaceholder').style.display = 'none';
     container.style.display = 'block';
-    container.innerHTML = '<div style="text-align:center;padding:32px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">Caricamento PDF…</div>';
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">⏳ Caricamento PDF…</div>';
 
     if (typeof pdfjsLib === 'undefined') {
       container.innerHTML = '<div style="padding:24px;color:#ff6d8d;font-size:13px">PDF.js non disponibile — ricarica la pagina.</div>';
-    } else {
-      try {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        var pdfUrl = '/api/documents/pdf?blob_name=' + encodeURIComponent(blobName);
-        var loadingTask = pdfjsLib.getDocument({ url: pdfUrl, disableRange: true });
-        loadingTask.onProgress = function(p) {
-          if (p.total) container.innerHTML = '<div style="text-align:center;padding:32px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">Caricamento ' + Math.round(p.loaded/p.total*100) + '%…</div>';
-        };
-        var pdfDoc = await loadingTask.promise;
-        container.innerHTML = '';
-        var scale = 1.3;
-        for (var pn = 1; pn <= pdfDoc.numPages; pn++) {
-          var page = await pdfDoc.getPage(pn);
-          var vp = page.getViewport({ scale: scale });
-          var pageDiv = document.createElement('div');
-          pageDiv.className = 'wb-pdf-page';
-          pageDiv.style.width = vp.width + 'px';
-          pageDiv.style.height = vp.height + 'px';
-          var canvas = document.createElement('canvas');
-          canvas.width = vp.width; canvas.height = vp.height;
-          var lbl = document.createElement('div');
-          lbl.className = 'wb-pdf-page-label';
-          lbl.textContent = pn + ' / ' + pdfDoc.numPages;
-          pageDiv.appendChild(canvas);
-          pageDiv.appendChild(lbl);
-          container.appendChild(pageDiv);
-          await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-        }
-      } catch(e) {
-        container.innerHTML = '<div style="padding:24px;color:#ff6d8d;font-size:13px">Errore rendering PDF: ' + e.message + '</div>';
-        console.warn('[WB] PDF.js error:', e);
+      return;
+    }
+    try {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      // URL: locale se upload direct, altrimenti proxy GCS
+      var pdfUrl = isLocal
+        ? '/api/upload/local/' + encodeURIComponent(localFilename)
+        : '/api/documents/pdf?blob_name=' + encodeURIComponent(blobName);
+
+      var loadingTask = pdfjsLib.getDocument({ url: pdfUrl, disableRange: true });
+      loadingTask.onProgress = function(p) {
+        if (p.total) container.innerHTML = '<div style="text-align:center;padding:40px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">📄 ' + Math.round(p.loaded/p.total*100) + '%…</div>';
+      };
+      var pdfDoc = await loadingTask.promise;
+      container.innerHTML = '';
+      var scale = 1.3;
+      var textParts = [];
+      for (var pn = 1; pn <= pdfDoc.numPages; pn++) {
+        var page = await pdfDoc.getPage(pn);
+        var vp = page.getViewport({ scale: scale });
+        var pageDiv = document.createElement('div');
+        pageDiv.className = 'wb-pdf-page';
+        pageDiv.style.width = vp.width + 'px';
+        pageDiv.style.height = vp.height + 'px';
+        var canvas = document.createElement('canvas');
+        canvas.width = vp.width; canvas.height = vp.height;
+        var lbl = document.createElement('div');
+        lbl.className = 'wb-pdf-page-label';
+        lbl.textContent = pn + ' / ' + pdfDoc.numPages;
+        pageDiv.appendChild(canvas);
+        pageDiv.appendChild(lbl);
+        container.appendChild(pageDiv);
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+        // Estrai testo per tool AI durante il rendering
+        try {
+          var tc = await page.getTextContent();
+          textParts.push(tc.items.map(function(i){ return i.str; }).join(' '));
+        } catch(te) {}
       }
+      // Salva testo estratto per i tool AI
+      var fullText = textParts.join('\n\n');
+      if (fullText) document.getElementById('wbDocText').textContent = fullText.substring(0, 15000);
+
+    } catch(e) {
+      container.innerHTML = '<div style="padding:24px;color:#ff6d8d;font-size:13px">⚠️ Errore rendering PDF: ' + e.message + '</div>';
+      console.warn('[WB] PDF.js error:', e);
     }
 
-    // Estrai testo per tool AI (in background, non blocca viewer)
-    fetch('/api/documents/extract-text', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blob_name: blobName, page_start: 0, page_end: 30 })
-    }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
-      if (!d) return;
-      var text = d.full_text || (d.pages||[]).map(function(p){ return p.text||''; }).join('\n\n');
-      if (text) document.getElementById('wbDocText').textContent = text.substring(0, 15000);
-    }).catch(function(e){ console.warn('[WB] extract-text error:', e); });
-
   } else {
-    // ── Word: mostra testo estratto da GCS ─────────────────────────
-    var placeholder2 = document.getElementById('wbDocPlaceholder');
-    var docTextEl = document.getElementById('wbDocText');
-    placeholder2.innerHTML = '<span style="font-size:32px">⏳</span><span style="font-size:13px;color:#ababab">Estrazione testo Word…</span>';
+    // ── Word: testo estratto dal backend ─────────────────────────
+    var ph = document.getElementById('wbDocPlaceholder');
+    ph.innerHTML = '<span style="font-size:32px">⏳</span><span style="font-size:13px;color:#ababab;margin-top:8px">Estrazione testo Word…</span>';
     try {
-      var wResp = await fetch('/api/documents/extract-word?blob_name=' + encodeURIComponent(blobName));
-      if (wResp.ok) {
-        var wData = await wResp.json();
-        var wText = wData.text || '';
-        if (wText) {
-          placeholder2.style.display = 'none';
-          docTextEl.style.display = 'block';
-          docTextEl.textContent = wText.substring(0, 15000);
-        } else {
-          placeholder2.innerHTML = '<span style="font-size:32px">⚠️</span><span style="font-size:13px;color:#ababab">Nessun testo estratto dal documento Word.</span>';
-        }
+      // Per file locali usa extract-text locale, altrimenti GCS
+      var wordUrl = isLocal
+        ? '/api/upload/local/' + encodeURIComponent(localFilename) + '/extract-text'
+        : '/api/documents/extract-word?blob_name=' + encodeURIComponent(blobName);
+      var wResp = await fetch(wordUrl);
+      if (!wResp.ok) throw new Error('HTTP ' + wResp.status);
+      var wData = await wResp.json();
+      var wText = wData.text || '';
+      if (wText) {
+        ph.style.display = 'none';
+        var dtEl = document.getElementById('wbDocText');
+        dtEl.style.display = 'block';
+        dtEl.textContent = wText.substring(0, 15000);
+      } else {
+        ph.innerHTML = '<span style="font-size:32px">⚠️</span><span style="font-size:13px;color:#ababab">Nessun testo estratto.</span>';
       }
     } catch(e) {
-      placeholder2.innerHTML = '<span style="font-size:32px">⚠️</span><span style="font-size:13px;color:#ff6d8d">Errore: ' + e.message + '</span>';
-      console.warn('[WB] extract-word error:', e);
+      document.getElementById('wbDocPlaceholder').innerHTML = '<span style="font-size:32px">⚠️</span><span style="font-size:13px;color:#ff6d8d">Errore: ' + e.message + '</span>';
+      console.warn('[WB] Word extract error:', e);
     }
   }
 }

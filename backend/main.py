@@ -221,12 +221,21 @@ _PDF_CACHE: dict = {}          # blob_name → {"data": bytes, "ts": float}
 _PDF_CACHE_TTL = 600           # 10 min — riuso tra richieste successive nella stessa sessione
 
 def _pdf_bytes_cached(blob_name: str) -> bytes:
-    """Scarica il PDF da GCS con cache in memoria (TTL 10 min)."""
+    """Scarica il PDF da GCS (o filesystem locale per blob 'local/') con cache TTL 10 min."""
     now = time.time()
     entry = _PDF_CACHE.get(blob_name)
     if entry and now - entry["ts"] < _PDF_CACHE_TTL:
         return entry["data"]
-    data = gcs.download_pdf_bytes(blob_name)
+    # Blob salvati localmente via /api/upload/direct hanno prefisso 'local/'
+    if blob_name.startswith("local/"):
+        local_filename = blob_name[len("local/"):]
+        local_path = os.path.join(LOCAL_UPLOADS_DIR, _sanitize_filename(local_filename))
+        if not os.path.exists(local_path):
+            raise FileNotFoundError(f"File locale '{local_filename}' non trovato")
+        with open(local_path, "rb") as fh:
+            data = fh.read()
+    else:
+        data = gcs.download_pdf_bytes(blob_name)
     _PDF_CACHE[blob_name] = {"data": data, "ts": now}
     return data
 
