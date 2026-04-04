@@ -3575,6 +3575,7 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
 <script>
 if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -4678,30 +4679,28 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="wb-step-label">STEP 01</span>
         <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· Document Ingestion · PDF, DOC, DOCX</span>
       </div>
-      <!-- Input file reale — sempre presente, cliccabile tramite label -->
-      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx" style="display:none" onchange="wbOnFileSelect(this)">
+      <!-- Input file — si apre tramite label, rendering immediato client-side -->
+      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="wbOnFileSelect(this)">
       <div id="wbDropZone" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;transition:border-color .2s">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:12px">
             <span style="font-size:22px">📎</span>
             <div>
               <div id="wbFileName" style="font-size:13px;font-weight:600;color:#ffffff">Nessun documento selezionato</div>
-              <div id="wbFileMeta" style="font-size:11px;color:#ababab;margin-top:2px">Formati supportati: PDF · DOC · DOCX</div>
+              <div id="wbFileMeta" style="font-size:11px;color:#ababab;margin-top:2px">Formati supportati: PDF · DOC · DOCX — visualizzazione immediata</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px">
-            <!-- Label nativa: garantisce apertura file picker su ogni browser -->
-            <label for="wbFileInput" id="wbPickerBtn" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace">📂 Scegli file</label>
-            <button id="wbUploadBtn" onclick="wbUpload()" class="wb-neon-btn" style="display:none">Carica →</button>
+            <label for="wbFileInput" id="wbPickerBtn" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace;user-select:none">📂 Scegli file</label>
             <button id="wbChangeBtn" onclick="wbResetUpload()" style="display:none;background:rgba(255,255,255,.08);color:#ababab;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',monospace">↩ Cambia</button>
           </div>
         </div>
-        <!-- Progress bar visiva 0 → 100% -->
+        <!-- Progress bar lettura file -->
         <div id="wbProgressWrap" style="display:none;margin-top:6px">
           <div style="height:4px;background:rgba(211,148,255,.15);border-radius:4px;overflow:hidden">
             <div id="wbProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#d394ff,#aa30fa);border-radius:4px;transition:width .25s ease"></div>
           </div>
-          <div id="wbProgressLabel" style="font-size:11px;color:#d394ff;font-family:'Space Grotesk',monospace;margin-top:4px">0%</div>
+          <div id="wbProgressLabel" style="font-size:11px;color:#d394ff;font-family:'Space Grotesk',monospace;margin-top:4px">Lettura…</div>
         </div>
       </div>
     </div>
@@ -18804,7 +18803,8 @@ if (typeof _origToggle === 'function') {
 // AI DOCUMENT WORKBENCH
 // ═══════════════════════════════════════════════════════════════════
 
-var _wbCurrentBlob = null;   // blob_name after successful upload
+var _wbCurrentBlob = null;   // blob_name after upload (optional, for legacy flow)
+var _wbDocText = '';         // testo estratto per tool AI (client-side)
 var _wbCurrentFile = null;   // original filename
 var _wbPendingFile = null;   // File object selected but not yet uploaded
 var _wbFlashcardQueue = [];  // flashcards waiting to be saved
@@ -18844,18 +18844,27 @@ function wbToggleLayout(mode, silent) {
 
 function wbResetUpload() {
   _wbPendingFile = null;
+  _wbDocText = '';
   var fi = document.getElementById('wbFileInput');
   if (fi) fi.value = '';
-  document.getElementById('wbUploadBtn').style.display = 'none';
   document.getElementById('wbChangeBtn').style.display = 'none';
   document.getElementById('wbPickerBtn').style.display = 'inline-block';
   document.getElementById('wbFileName').textContent = 'Nessun documento selezionato';
-  document.getElementById('wbFileMeta').textContent = 'Formati supportati: PDF · DOC · DOCX';
+  document.getElementById('wbFileMeta').textContent = 'Formati supportati: PDF · DOC · DOCX — visualizzazione immediata';
   document.getElementById('wbProgressWrap').style.display = 'none';
   document.getElementById('wbProgressBar').style.width = '0%';
   document.getElementById('wbProgressBar').style.background = 'linear-gradient(90deg,#d394ff,#aa30fa)';
-  document.getElementById('wbProgressLabel').textContent = '0%';
+  document.getElementById('wbProgressLabel').textContent = 'Lettura…';
   document.getElementById('wbProgressLabel').style.color = '#d394ff';
+  // Resetta viewer
+  document.getElementById('wbDocPlaceholder').style.display = 'flex';
+  document.getElementById('wbDocText').style.display = 'none';
+  document.getElementById('wbPdfContainer').style.display = 'none';
+  document.getElementById('wbPdfContainer').innerHTML = '';
+  // Riloca tool
+  document.querySelectorAll('#screenWorkbench .wb-tool-card').forEach(function(c) { c.classList.add('wb-locked'); });
+  document.getElementById('wbDropZone').style.borderColor = 'rgba(72,72,72,.5)';
+  document.getElementById('wbDropZone').style.borderStyle = 'dashed';
 }
 
 function wbOnFileSelect(input) {
@@ -18863,19 +18872,47 @@ function wbOnFileSelect(input) {
   if (!file) return;
   _wbPendingFile = file;
   var ext = file.name.split('.').pop().toLowerCase();
-  var typeLabel = ext === 'pdf' ? 'PDF' : (ext === 'docx' ? 'Word (.docx)' : 'Word (.doc)');
-  document.getElementById('wbFileName').textContent = file.name;
-  document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + (file.size / (1024*1024)).toFixed(2) + ' MB · Pronto';
+  var typeLabel = ext === 'pdf' ? 'PDF' : (ext === 'docx' ? 'Word DOCX' : 'Word DOC');
+  var sizeMB = (file.size / (1024*1024)).toFixed(2);
+
+  // Aggiorna UI immediatamente
+  document.getElementById('wbFileName').textContent = '📄 ' + file.name;
+  document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + sizeMB + ' MB · Lettura in corso…';
   document.getElementById('wbPickerBtn').style.display = 'none';
-  document.getElementById('wbUploadBtn').style.display = 'inline-block';
   document.getElementById('wbChangeBtn').style.display = 'inline-block';
-  document.getElementById('wbProgressWrap').style.display = 'none';
-  document.getElementById('wbProgressBar').style.width = '0%';
-  document.getElementById('wbProgressLabel').textContent = '0%';
-  document.getElementById('wbProgressLabel').style.color = '#d394ff';
-  // Evidenzia drop zone
-  var dz = document.getElementById('wbDropZone');
-  if (dz) dz.style.borderColor = 'rgba(211,148,255,.5)';
+  document.getElementById('wbDropZone').style.borderColor = 'rgba(211,148,255,.5)';
+  document.getElementById('wbDropZone').style.borderStyle = 'solid';
+  _wbSetProgress(10, '📖 Lettura file…');
+
+  // Legge il file come ArrayBuffer — tutto client-side, nessun server needed
+  var reader = new FileReader();
+  reader.onprogress = function(e) {
+    if (e.lengthComputable) {
+      var pct = Math.round(10 + (e.loaded / e.total) * 30);
+      _wbSetProgress(pct, '📖 ' + pct + '%…');
+    }
+  };
+  reader.onload = function(e) {
+    var arrayBuffer = e.target.result;
+    _wbSetProgress(40, '🖥️ Rendering…');
+    // Avvia rendering in base al tipo
+    wbRenderClientSide(file, arrayBuffer, ext).then(function() {
+      _wbSetProgress(100, '✅ Documento pronto');
+      document.getElementById('wbProgressBar').style.background = 'linear-gradient(90deg,#34d399,#059669)';
+      document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + sizeMB + ' MB · ✅ Pronto';
+      wbUnlockTools();
+      setTimeout(function() { document.getElementById('wbProgressWrap').style.display = 'none'; }, 1500);
+    }).catch(function(err) {
+      _wbSetProgress(0, '⚠️ ' + err.message);
+      document.getElementById('wbProgressBar').style.background = '#ff6d8d';
+      document.getElementById('wbFileMeta').textContent = '⚠️ Errore: ' + err.message;
+    });
+  };
+  reader.onerror = function() {
+    _wbSetProgress(0, '⚠️ Errore lettura file');
+    document.getElementById('wbFileMeta').textContent = '⚠️ Impossibile leggere il file';
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 function _wbSetProgress(pct, label) {
@@ -18960,6 +18997,88 @@ async function wbUpload() {
     if (lblEl) lblEl.style.color = '#ff6d8d';
     uploadBtn.style.display = 'inline-block';
     changeBtn.style.display = 'inline-block';
+  }
+}
+
+// Rendering 100% client-side — nessun upload al server
+async function wbRenderClientSide(file, arrayBuffer, ext) {
+  var container = document.getElementById('wbPdfContainer');
+  var placeholder = document.getElementById('wbDocPlaceholder');
+  var docTextEl  = document.getElementById('wbDocText');
+
+  if (ext === 'pdf') {
+    // ── PDF via PDF.js da ArrayBuffer ─────────────────────────
+    placeholder.style.display = 'none';
+    container.style.display = 'block';
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">⏳ Rendering pagine…</div>';
+
+    if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js non disponibile — ricarica la pagina');
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    var pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+    container.innerHTML = '';
+    var scale = 1.3;
+    var textParts = [];
+
+    for (var pn = 1; pn <= pdfDoc.numPages; pn++) {
+      var page = await pdfDoc.getPage(pn);
+      var vp = page.getViewport({ scale: scale });
+      var pageDiv = document.createElement('div');
+      pageDiv.className = 'wb-pdf-page';
+      pageDiv.style.cssText = 'position:relative;margin:0 auto 8px;box-shadow:0 2px 12px rgba(0,0,0,.5)';
+      pageDiv.style.width  = vp.width + 'px';
+      pageDiv.style.height = vp.height + 'px';
+      var canvas = document.createElement('canvas');
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+      var lbl = document.createElement('div');
+      lbl.className = 'wb-pdf-page-label';
+      lbl.textContent = pn + ' / ' + pdfDoc.numPages;
+      pageDiv.appendChild(canvas);
+      pageDiv.appendChild(lbl);
+      container.appendChild(pageDiv);
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+      // Estrai testo per AI
+      try {
+        var tc = await page.getTextContent();
+        textParts.push(tc.items.map(function(i){ return i.str; }).join(' '));
+      } catch(te) {}
+      // Update progress
+      _wbSetProgress(40 + Math.round((pn / pdfDoc.numPages) * 55), '📄 Pagina ' + pn + '/' + pdfDoc.numPages);
+    }
+    _wbDocText = textParts.join('\n\n').substring(0, 20000);
+    docTextEl.textContent = _wbDocText;
+
+  } else if (ext === 'docx') {
+    // ── DOCX via mammoth.js da ArrayBuffer ────────────────────
+    if (typeof mammoth === 'undefined') throw new Error('mammoth.js non disponibile — ricarica la pagina');
+    _wbSetProgress(50, '📝 Estrazione testo Word…');
+    var result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+    var html = result.value || '';
+    placeholder.style.display = 'none';
+    docTextEl.style.display = 'none';
+    // Mostra Word renderizzato come HTML nel container
+    container.style.display = 'block';
+    container.innerHTML = '<div style="padding:24px 28px;font-family:Georgia,serif;font-size:14px;line-height:1.7;color:#e0e0f0;max-width:760px;margin:0 auto">' + html + '</div>';
+    // Testo puro per AI
+    var tmpDiv = document.createElement('div');
+    tmpDiv.innerHTML = html;
+    _wbDocText = (tmpDiv.textContent || '').substring(0, 20000);
+    _wbSetProgress(95, '✅ Documento Word pronto');
+
+  } else {
+    // .doc non supportato nativamente — tentiamo come testo
+    _wbSetProgress(50, '📝 Lettura formato .doc…');
+    var decoder = new TextDecoder('utf-8', { fatal: false });
+    var text = decoder.decode(new Uint8Array(arrayBuffer));
+    // Filtra caratteri non stampabili (doc è binario, prendiamo il testo leggibile)
+    var readable = text.replace(/[^\x20-\x7E\xC0-\xFF\n\r\t]/g, ' ').replace(/\s{3,}/g, '\n').trim();
+    if (readable.length < 100) throw new Error('Il formato .doc non è leggibile — converti in .docx o .pdf');
+    placeholder.style.display = 'none';
+    docTextEl.style.display = 'block';
+    docTextEl.style.cssText = 'padding:24px;font-family:Georgia,serif;font-size:13px;line-height:1.7;color:#e0e0f0;white-space:pre-wrap;overflow-y:auto';
+    docTextEl.textContent = readable.substring(0, 20000);
+    _wbDocText = readable.substring(0, 20000);
   }
 }
 
@@ -19067,7 +19186,7 @@ function wbUnlockTools() {
 }
 
 async function wbRunTool(toolNum) {
-  if (!_wbCurrentBlob) return;
+  if (!_wbDocText && !_wbPendingFile) return;
   var prompts = {
     1: 'Analizza questo documento legale GDPR/privacy. Prima crea un diagramma Mermaid (flowchart LR o graph TD) che rappresenti i concetti principali e le loro relazioni. Poi scrivi UNA metafora cognitiva potente che colleghi il concetto principale a un\'esperienza quotidiana comune. Formato risposta:\n---DIAGRAM---\n[codice mermaid]\n---METAPHOR---\n[metafora in 2-3 frasi]',
     2: 'Analizza questo documento GDPR/privacy e suddividilo in 6-8 blocchi concettuali. Per ogni blocco usa questo formato:\n**TITOLO** | [tag articolo GDPR es. Art.5]\n[3 righe di sintesi concettuale]\n---',
@@ -19083,7 +19202,7 @@ async function wbRunTool(toolNum) {
   if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
   try {
-    var docText = document.getElementById('wbDocText') ? document.getElementById('wbDocText').textContent : '';
+    var docText = _wbDocText || (document.getElementById('wbDocText') ? document.getElementById('wbDocText').textContent : '');
     var fullPrompt = prompts[toolNum] + '\n\nDOCUMENTO:\n' + docText.substring(0, 6000);
 
     // Call via backend Gemini proxy (same as _llcBackendGemini)
