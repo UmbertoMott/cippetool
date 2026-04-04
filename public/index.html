@@ -4690,7 +4690,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px">
-            <label for="wbFileInput" id="wbPickerBtn" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace;user-select:none">📂 Scegli file</label>
+            <label for="wbFileInput" id="wbPickerBtn" onclick="document.getElementById('wbFileInput').click();return false;" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace;user-select:none;display:inline-block">📂 Scegli file</label>
             <button id="wbChangeBtn" onclick="wbResetUpload()" style="display:none;background:rgba(255,255,255,.08);color:#ababab;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',monospace">↩ Cambia</button>
           </div>
         </div>
@@ -18999,86 +18999,56 @@ async function wbUpload() {
   }
 }
 
-// Rendering 100% client-side — nessun upload al server
+// Estrazione testo integrale client-side — nessun canvas, nessun server
 async function wbRenderClientSide(file, arrayBuffer, ext) {
-  var container = document.getElementById('wbPdfContainer');
+  var container   = document.getElementById('wbPdfContainer');
   var placeholder = document.getElementById('wbDocPlaceholder');
-  var docTextEl  = document.getElementById('wbDocText');
+  var docTextEl   = document.getElementById('wbDocText');
+  var text = '';
 
   if (ext === 'pdf') {
-    // ── PDF via PDF.js da ArrayBuffer ─────────────────────────
-    placeholder.style.display = 'none';
-    container.style.display = 'block';
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">⏳ Rendering pagine…</div>';
-
-    if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js non disponibile — ricarica la pagina');
-
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    var pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-    container.innerHTML = '';
-    var scale = 1.3;
-    var textParts = [];
-
+    // ── PDF: PDF.js testo (senza canvas, senza worker CSP issues) ──
+    _wbSetProgress(30, '📖 Lettura pagine PDF…');
+    if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js non disponibile');
+    // Disabilita worker — testo estratto in main thread, nessun blocco CSP
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+    var pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer), useWorkerFetch: false, isEvalSupported: false }).promise;
+    var parts = [];
     for (var pn = 1; pn <= pdfDoc.numPages; pn++) {
       var page = await pdfDoc.getPage(pn);
-      var vp = page.getViewport({ scale: scale });
-      var pageDiv = document.createElement('div');
-      pageDiv.className = 'wb-pdf-page';
-      pageDiv.style.cssText = 'position:relative;margin:0 auto 8px;box-shadow:0 2px 12px rgba(0,0,0,.5)';
-      pageDiv.style.width  = vp.width + 'px';
-      pageDiv.style.height = vp.height + 'px';
-      var canvas = document.createElement('canvas');
-      canvas.width  = vp.width;
-      canvas.height = vp.height;
-      var lbl = document.createElement('div');
-      lbl.className = 'wb-pdf-page-label';
-      lbl.textContent = pn + ' / ' + pdfDoc.numPages;
-      pageDiv.appendChild(canvas);
-      pageDiv.appendChild(lbl);
-      container.appendChild(pageDiv);
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-      // Estrai testo per AI
-      try {
-        var tc = await page.getTextContent();
-        textParts.push(tc.items.map(function(i){ return i.str; }).join(' '));
-      } catch(te) {}
-      // Update progress
-      _wbSetProgress(40 + Math.round((pn / pdfDoc.numPages) * 55), '📄 Pagina ' + pn + '/' + pdfDoc.numPages);
+      var tc = await page.getTextContent();
+      var pageText = tc.items.map(function(i){ return i.str; }).join(' ');
+      parts.push('─── Pagina ' + pn + ' ───\n' + pageText);
+      _wbSetProgress(30 + Math.round((pn / pdfDoc.numPages) * 60), '📄 Pagina ' + pn + '/' + pdfDoc.numPages);
     }
-    _wbDocText = textParts.join('\n\n').substring(0, 20000);
-    docTextEl.textContent = _wbDocText;
+    text = parts.join('\n\n');
 
   } else if (ext === 'docx') {
-    // ── DOCX via mammoth.js da ArrayBuffer ────────────────────
-    if (typeof mammoth === 'undefined') throw new Error('mammoth.js non disponibile — ricarica la pagina');
-    _wbSetProgress(50, '📝 Estrazione testo Word…');
-    var result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
-    var html = result.value || '';
-    placeholder.style.display = 'none';
-    docTextEl.style.display = 'none';
-    // Mostra Word renderizzato come HTML nel container
-    container.style.display = 'block';
-    container.innerHTML = '<div style="padding:24px 28px;font-family:Georgia,serif;font-size:14px;line-height:1.7;color:#e0e0f0;max-width:760px;margin:0 auto">' + html + '</div>';
-    // Testo puro per AI
-    var tmpDiv = document.createElement('div');
-    tmpDiv.innerHTML = html;
-    _wbDocText = (tmpDiv.textContent || '').substring(0, 20000);
-    _wbSetProgress(95, '✅ Documento Word pronto');
+    // ── DOCX: mammoth.js testo puro ──────────────────────────────
+    _wbSetProgress(40, '📝 Estrazione testo DOCX…');
+    if (typeof mammoth === 'undefined') throw new Error('mammoth.js non disponibile');
+    var res = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+    text = res.value || '';
 
   } else {
-    // .doc non supportato nativamente — tentiamo come testo
-    _wbSetProgress(50, '📝 Lettura formato .doc…');
+    // ── DOC: fallback TextDecoder (testo leggibile) ───────────────
+    _wbSetProgress(40, '📝 Lettura .doc…');
     var decoder = new TextDecoder('utf-8', { fatal: false });
-    var text = decoder.decode(new Uint8Array(arrayBuffer));
-    // Filtra caratteri non stampabili (doc è binario, prendiamo il testo leggibile)
-    var readable = text.replace(/[^\x20-\x7E\xC0-\xFF\n\r\t]/g, ' ').replace(/\s{3,}/g, '\n').trim();
-    if (readable.length < 100) throw new Error('Il formato .doc non è leggibile — converti in .docx o .pdf');
-    placeholder.style.display = 'none';
-    docTextEl.style.display = 'block';
-    docTextEl.style.cssText = 'padding:24px;font-family:Georgia,serif;font-size:13px;line-height:1.7;color:#e0e0f0;white-space:pre-wrap;overflow-y:auto';
-    docTextEl.textContent = readable.substring(0, 20000);
-    _wbDocText = readable.substring(0, 20000);
+    var raw = decoder.decode(new Uint8Array(arrayBuffer));
+    text = raw.replace(/[^\x20-\x7E\xC0-\xFF\n\r\t]/g, ' ').replace(/\s{3,}/g, '\n').trim();
+    if (text.length < 80) throw new Error('.doc non leggibile — converti in .docx o .pdf');
   }
+
+  if (!text || text.trim().length < 10) throw new Error('Nessun testo estratto dal documento');
+
+  // Mostra testo nel pannello sinistra
+  placeholder.style.display = 'none';
+  container.style.display   = 'none';
+  docTextEl.style.display   = 'block';
+  docTextEl.style.cssText   = 'flex:1;padding:20px 24px;font-family:Georgia,serif;font-size:13px;line-height:1.75;color:#d8d8e8;white-space:pre-wrap;overflow-y:auto;background:#0d0d0d;word-break:break-word';
+  docTextEl.textContent     = text;
+  _wbDocText = text.substring(0, 25000);
+  _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
 }
 
 async function wbLoadDocText(blobName) {
