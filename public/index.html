@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://generativelanguage.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://*.supabase.co wss://*.supabase.co https://cipp-legal-api.onrender.com https://storage.googleapis.com https://*.storage.googleapis.com; img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com; frame-src https://accounts.google.com; object-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://generativelanguage.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; worker-src blob: 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://generativelanguage.googleapis.com https://*.supabase.co wss://*.supabase.co https://cipp-legal-api.onrender.com https://storage.googleapis.com https://*.storage.googleapis.com; img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com; frame-src https://accounts.google.com; object-src 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CIPP/E Training Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
@@ -3575,7 +3575,6 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
 <script>
 if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -4680,7 +4679,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· Document Ingestion · PDF, DOC, DOCX</span>
       </div>
       <!-- Input file — si apre tramite label, rendering immediato client-side -->
-      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="wbOnFileSelect(this)">
+      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="wbOnFileSelect(this)">
       <div id="wbDropZone" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;transition:border-color .2s">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:12px">
