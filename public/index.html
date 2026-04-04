@@ -4678,20 +4678,20 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="wb-step-label">STEP 01</span>
         <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· Document Ingestion · PDF, DOC, DOCX</span>
       </div>
-      <!-- Input file — si apre tramite label, rendering immediato client-side -->
-      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="wbOnFileSelect(this)">
+      <!-- Input file nascosto + button esplicito (più affidabile di label su tutti i browser) -->
+      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx" style="display:none">
       <div id="wbDropZone" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;transition:border-color .2s">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:12px">
             <span style="font-size:22px">📎</span>
             <div>
               <div id="wbFileName" style="font-size:13px;font-weight:600;color:#ffffff">Nessun documento selezionato</div>
-              <div id="wbFileMeta" style="font-size:11px;color:#ababab;margin-top:2px">Formati supportati: PDF · DOC · DOCX — visualizzazione immediata</div>
+              <div id="wbFileMeta" style="font-size:11px;color:#ababab;margin-top:2px">PDF · DOC · DOCX — clicca il pulsante per caricare</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px">
-            <label for="wbFileInput" id="wbPickerBtn" onclick="document.getElementById('wbFileInput').click();return false;" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace;user-select:none;display:inline-block">📂 Scegli file</label>
-            <button id="wbChangeBtn" onclick="wbResetUpload()" style="display:none;background:rgba(255,255,255,.08);color:#ababab;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',monospace">↩ Cambia</button>
+            <button id="wbPickerBtn" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace">📂 Scegli file</button>
+            <button id="wbChangeBtn" style="display:none;background:rgba(255,255,255,.08);color:#ababab;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',monospace">↩ Cambia</button>
           </div>
         </div>
         <!-- Progress bar lettura file -->
@@ -18809,6 +18809,18 @@ var _wbPendingFile = null;   // File object selected but not yet uploaded
 var _wbFlashcardQueue = [];  // flashcards waiting to be saved
 
 function wbInit() {
+  // Collega file input + bottoni via JS (più affidabile di attributi onchange/onclick inline)
+  var fi = document.getElementById('wbFileInput');
+  var pickerBtn = document.getElementById('wbPickerBtn');
+  var changeBtn = document.getElementById('wbChangeBtn');
+  if (fi && pickerBtn) {
+    // Rimuovi listener precedenti clonando il nodo
+    var fiNew = fi.cloneNode(false);
+    fi.parentNode.replaceChild(fiNew, fi);
+    fiNew.addEventListener('change', function() { wbOnFileSelect(fiNew); });
+    pickerBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); fiNew.click(); };
+    if (changeBtn) changeBtn.onclick = function() { wbResetUpload(); };
+  }
   // Restore layout preference
   var pref = localStorage.getItem('wb_layout_pref') || 'split';
   wbToggleLayout(pref, true);
@@ -18870,6 +18882,9 @@ function wbOnFileSelect(input) {
   var file = input.files && input.files[0];
   if (!file) return;
   _wbPendingFile = file;
+  // Feedback sincrono immediato — conferma che l'evento è scattato
+  var fnEl = document.getElementById('wbFileName');
+  if (fnEl) fnEl.textContent = '⏳ ' + file.name;
   var ext = file.name.split('.').pop().toLowerCase();
   var typeLabel = ext === 'pdf' ? 'PDF' : (ext === 'docx' ? 'Word DOCX' : 'Word DOC');
   var sizeMB = (file.size / (1024*1024)).toFixed(2);
@@ -19011,8 +19026,8 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
     _wbSetProgress(30, '📖 Lettura pagine PDF…');
     if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js non disponibile');
     // Disabilita worker — testo estratto in main thread, nessun blocco CSP
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-    var pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer), useWorkerFetch: false, isEvalSupported: false }).promise;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    var pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
     var parts = [];
     for (var pn = 1; pn <= pdfDoc.numPages; pn++) {
       var page = await pdfDoc.getPage(pn);
