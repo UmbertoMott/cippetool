@@ -3660,6 +3660,77 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
 .llc-upload-status.rifiutato{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.2)}
 .llc-upload-item-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:1px 4px;border-radius:4px;color:rgba(167,139,250,.5);transition:color .12s}
 .llc-upload-item-btn:hover{color:#c4b5fd}
+/* ── SEGMENTED DOCUMENT VIEW ── */
+#llcDocBody{background:#0b0b18}
+.llc-seg-doc-wrap{padding:24px 32px;display:flex;flex-direction:column;gap:14px;min-height:100%}
+.llc-seg-loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;gap:14px}
+.llc-seg-loading-icon{font-size:36px;animation:docaiPulse 1.5s ease infinite}
+.llc-seg-loading-text{font-size:12px;color:rgba(124,58,237,.6);letter-spacing:.4px}
+.llc-seg-raw-banner{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:7px;font-size:10px;color:rgba(167,139,250,.7);margin-bottom:8px;flex-shrink:0}
+.llc-seg-raw-body{font-family:'Georgia',serif;font-size:13px;line-height:1.85;color:rgba(220,216,255,.88);text-align:justify;hyphens:auto}
+.llc-seg-raw-body p{margin-bottom:14px}
+.llc-seg-card{background:rgba(255,255,255,.03);border:1px solid rgba(124,58,237,.18);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;position:relative;overflow:hidden}
+.llc-seg-card:hover{border-color:rgba(167,139,250,.45);background:rgba(124,58,237,.07);transform:translateY(-1px)}
+.llc-seg-card.selected{border-color:#7c3aed;background:rgba(124,58,237,.13);box-shadow:0 0 0 2px rgba(124,58,237,.2)}
+.llc-seg-card.selected::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#a78bfa,#7c3aed)}
+.llc-seg-badge{font-size:9px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;padding:2px 8px;border-radius:5px;background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3);display:inline-block;margin-bottom:8px}
+.llc-seg-badge.b-article{background:rgba(37,99,235,.12);color:#60a5fa;border-color:rgba(37,99,235,.3)}
+.llc-seg-badge.b-recital{background:rgba(5,150,105,.12);color:#34d399;border-color:rgba(5,150,105,.3)}
+.llc-seg-badge.b-definitions{background:rgba(217,119,6,.12);color:#fbbf24;border-color:rgba(217,119,6,.3)}
+.llc-seg-badge.b-chapter{background:rgba(79,70,229,.12);color:#818cf8;border-color:rgba(79,70,229,.3)}
+.llc-seg-badge.b-preamble{background:rgba(168,85,247,.12);color:#c084fc;border-color:rgba(168,85,247,.3)}
+.llc-seg-badge.b-annex{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.25)}
+.llc-seg-title{font-size:13px;font-weight:800;color:#e2e0ff;margin-bottom:6px;font-family:'Syne',sans-serif;line-height:1.35}
+.llc-seg-excerpt{font-size:11.5px;line-height:1.7;color:rgba(196,181,253,.65);text-align:justify;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.llc-seg-footer{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(124,58,237,.12)}
+.llc-seg-num{font-size:9.5px;font-weight:700;color:rgba(124,58,237,.5);font-family:'Syne',sans-serif}
+.llc-seg-hint{font-size:9.5px;color:rgba(167,139,250,.35);margin-left:auto;opacity:0;transition:opacity .15s}
+.llc-seg-card:hover .llc-seg-hint,.llc-seg-card.selected .llc-seg-hint{opacity:1}
+/* ── CONTEXTUAL TOOLS PANEL ── */
+.llc-ctx-wrap{display:none;border-bottom:1px solid rgba(124,58,237,.18);flex-shrink:0}
+.llc-ctx-wrap.active{display:block}
+.llc-ctx-hdr{display:flex;align-items:center;gap:7px;padding:9px 12px;background:linear-gradient(90deg,rgba(124,58,237,.12),rgba(79,70,229,.06));border-bottom:1px solid rgba(124,58,237,.15)}
+.llc-ctx-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(167,139,250,.9);flex:1}
+.llc-ctx-segname{font-size:9px;color:rgba(167,139,250,.55);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.llc-ctx-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 12px}
+.llc-ctx-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;cursor:pointer;transition:all .15s;font-family:inherit}
+.llc-ctx-btn:hover{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.35)}
+.llc-ctx-btn.loading{opacity:.5;pointer-events:none}
+.llc-ctx-btn-icon{font-size:16px}
+.llc-ctx-btn-label{font-size:9px;font-weight:700;text-align:center;letter-spacing:.2px;color:rgba(196,181,253,.8)}
+.llc-ctx-output{padding:10px 12px 12px;font-size:11px;line-height:1.55;color:#c4b5fd;background:rgba(124,58,237,.06);border-top:1px solid rgba(124,58,237,.12);display:none}
+.llc-ctx-output.active{display:block}
+/* ── LUMINANCE SCHOLAR — rich card design ── */
+.llc-scholar-output{border-top:1px solid rgba(124,58,237,.15)}
+.llc-scholar-loading{padding:14px;font-size:11px;color:rgba(167,139,250,.5);display:flex;align-items:center;gap:8px}
+.llc-scholar-wrap{display:flex;flex-direction:column;gap:0}
+.llc-sch-header{padding:10px 12px 8px;background:rgba(124,58,237,.08);border-bottom:1px solid rgba(124,58,237,.2)}
+.llc-sch-num-label{font-size:8px;font-weight:800;letter-spacing:1.2px;color:rgba(167,139,250,.55);text-transform:uppercase;display:block;margin-bottom:3px}
+.llc-sch-seg-title{font-size:11px;font-weight:700;color:#c4b5fd;line-height:1.3;font-style:italic}
+.llc-sch-card{border-bottom:1px solid rgba(124,58,237,.12)}
+.llc-sch-card-label{padding:7px 12px 5px;font-size:8.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:rgba(167,139,250,.55);display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.015)}
+.llc-sch-card-num{color:#7c3aed;background:rgba(124,58,237,.18);padding:1px 5px;border-radius:3px;font-size:8px}
+.llc-sch-card-body{padding:8px 12px 10px;font-size:11px;line-height:1.65;color:rgba(220,216,255,.82)}
+.llc-sch-visual-body{font-style:italic;text-align:justify;border-left:2px solid rgba(124,58,237,.3);padding-left:10px;color:rgba(196,181,253,.85)}
+.llc-sch-syn-grid{display:flex;flex-direction:column;gap:6px}
+.llc-sch-syn-item{background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.16);border-radius:6px;padding:6px 9px}
+.llc-sch-syn-ref{font-size:8.5px;font-weight:800;color:#7c3aed;letter-spacing:.4px;margin-bottom:2px;text-transform:uppercase}
+.llc-sch-syn-point{font-size:10.5px;font-weight:700;color:#e2e0ff;margin-bottom:2px}
+.llc-sch-syn-sum{font-size:10px;color:rgba(196,181,253,.7);line-height:1.5}
+.llc-sch-metaphor-card{display:flex;gap:10px;align-items:flex-start;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);border-radius:8px;padding:10px 12px}
+.llc-sch-metaphor-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.llc-sch-metaphor-quote{margin:0;font-style:italic;color:rgba(220,216,255,.85);font-size:11px;line-height:1.7;border:none;padding:0;text-align:justify}
+.llc-sch-q-list{display:flex;flex-direction:column;gap:7px}
+.llc-sch-q-item{display:flex;gap:8px;align-items:flex-start}
+.llc-sch-q-num{font-size:8.5px;font-weight:800;color:#7c3aed;background:rgba(124,58,237,.15);padding:2px 5px;border-radius:4px;flex-shrink:0;margin-top:1px}
+.llc-sch-q-text{font-size:11px;color:rgba(226,224,255,.85);line-height:1.55;font-weight:600}
+.llc-sch-fc-grid{display:flex;flex-direction:column;gap:5px}
+.llc-sch-fc{background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.16);border-radius:6px;padding:6px 9px;display:flex;gap:8px;align-items:baseline}
+.llc-sch-fc-term{font-weight:800;font-size:10px;color:#a78bfa;flex-shrink:0;min-width:80px}
+.llc-sch-fc-def{font-size:10px;color:rgba(220,216,255,.72);line-height:1.5}
+.llc-sch-fc-saved{font-size:9px;opacity:.45;margin-top:5px;text-align:right}
+.llc-sch-cp-list{display:flex;flex-direction:column;gap:5px}
+.llc-sch-cp-item{font-size:10.5px;color:rgba(196,181,253,.8);padding:5px 8px;background:rgba(124,58,237,.06);border-radius:5px;border-left:2px solid rgba(124,58,237,.3);line-height:1.5;font-style:italic}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -5264,6 +5335,37 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <div class="llc-col-c-content" id="llcColCContent">
+        <!-- ═══ STRUMENTI SEZIONE ═══ -->
+        <div class="llc-ctx-wrap" id="llcCtxWrap">
+          <div class="llc-ctx-hdr">
+            <span class="llc-ctx-label">🛠 Strumenti Sezione</span>
+            <span class="llc-ctx-segname" id="llcCtxSegName">—</span>
+          </div>
+          <div class="llc-ctx-grid">
+            <button class="llc-ctx-btn" id="llcCtxBtnFlash" onclick="llcRunSegTool('flashcard')">
+              <span class="llc-ctx-btn-icon">🃏</span>
+              <span class="llc-ctx-btn-label">Crea Flashcard</span>
+            </button>
+            <button class="llc-ctx-btn" id="llcCtxBtnQ" onclick="llcRunSegTool('question')">
+              <span class="llc-ctx-btn-icon">🎓</span>
+              <span class="llc-ctx-btn-label">Domanda Recall</span>
+            </button>
+            <button class="llc-ctx-btn" id="llcCtxBtnExp" onclick="llcRunSegTool('explain')">
+              <span class="llc-ctx-btn-icon">💡</span>
+              <span class="llc-ctx-btn-label">Spiega</span>
+            </button>
+            <button class="llc-ctx-btn" id="llcCtxBtnCorn" onclick="llcRunSegTool('cornell')">
+              <span class="llc-ctx-btn-icon">📝</span>
+              <span class="llc-ctx-btn-label">Note Cornell</span>
+            </button>
+            <button class="llc-ctx-btn llc-ctx-btn-scholar" id="llcCtxBtnScholar" onclick="llcRunScholarAnalysis()" style="grid-column:1/-1;background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.35)">
+              <span class="llc-ctx-btn-icon">📚</span>
+              <span class="llc-ctx-btn-label">Analisi Scholar</span>
+            </button>
+          </div>
+          <div class="llc-ctx-output" id="llcCtxOutput"></div>
+          <div class="llc-scholar-output" id="llcScholarOutput" style="display:none"></div>
+        </div>
         <!-- Deep Work panel switch — only visible in deep-work mode -->
         <div class="llc-dw-switch" id="llcDwSwitch">
           <button class="llc-dw-switch-btn active" id="llcDwBtnTutor" onclick="llcDwSwitchPanel('tutor')">
@@ -10025,29 +10127,259 @@ function llcPostDocLoad(doc) {
   var docaiMsgs = document.getElementById('llcDocAiMsgs');
   if (docaiMsgs) docaiMsgs.innerHTML = '<div class="llc-docai-msg ai" style="opacity:.6;font-size:12px">Clicca <em>🤖 Assistente AI</em> in alto per inizializzare l\'analisi del documento.</div>';
 
-  // Reset graph + avvia pre-generazione in background (fire & forget)
+  // Reset segment state + hide contextual tools
+  LLC._docSegments = null;
+  LLC._selectedSegIdx = null;
+  var ctxWrap = document.getElementById('llcCtxWrap');
+  if (ctxWrap) ctxWrap.classList.remove('active');
+  var ctxOut = document.getElementById('llcCtxOutput');
+  if (ctxOut) { ctxOut.textContent = ''; ctxOut.classList.remove('active'); }
+  var schOut = document.getElementById('llcScholarOutput');
+  if (schOut) { schOut.innerHTML = ''; schOut.style.display = 'none'; }
+
+  // Auto-segment document (fire & forget, only for text-based docs)
+  setTimeout(llcAutoSegmentDoc, 200);
+
+  // Reset graph state — lazy al click di 🗺️
   LLC.graphNodes = null;
   LLC.graphLinks = null;
-  LLC._graphPrewarmDoc  = LLC.activeDocBlobName;
+  LLC._graphPrewarmDoc  = null;
   LLC._graphPrewarmDone = false;
   LLC._graphPrewarmPromise = null;
-
   var graphStatus = document.getElementById('llcGraphStatus');
-  if (graphStatus) graphStatus.textContent = '⚙️ Mappa in preparazione…';
+  if (graphStatus) graphStatus.textContent = 'Clicca 🗺️ per generare la mappa.';
+}
 
-  // Pre-warm: genera la mappa subito in background, senza bloccare nulla
-  LLC._graphPrewarmPromise = (async function() {
-    try {
-      await llcGenGraph(true); // true = silent mode (no status update on fail)
-      LLC._graphPrewarmDone = true;
-      var gs = document.getElementById('llcGraphStatus');
-      if (gs && LLC._graphPrewarmDoc === LLC.activeDocBlobName) {
-        gs.textContent = '✅ Mappa pronta — clicca 🗺️ per visualizzare.';
-      }
-    } catch(e) {
-      LLC._graphPrewarmDone = false;
+// ══════════════════════════════════════════════════════════════════════════
+// DOCUMENT AUTO-SEGMENTATION — ULA (Logical Learning Units)
+// ══════════════════════════════════════════════════════════════════════════
+var _LLC_SEG_CACHE_KEY = 'llc_seg_cache_v1';
+function _llcSegCacheGet(docId, textLen) {
+  try {
+    var raw = localStorage.getItem(_LLC_SEG_CACHE_KEY);
+    if (!raw) return null;
+    var cache = JSON.parse(raw);
+    return cache[docId + '_' + textLen] || null;
+  } catch(e) { return null; }
+}
+function _llcSegCacheSet(docId, textLen, segments) {
+  try {
+    var raw = localStorage.getItem(_LLC_SEG_CACHE_KEY);
+    var cache = raw ? JSON.parse(raw) : {};
+    var keys = Object.keys(cache);
+    if (keys.length >= 30) delete cache[keys[0]];
+    cache[docId + '_' + textLen] = segments;
+    localStorage.setItem(_LLC_SEG_CACHE_KEY, JSON.stringify(cache));
+  } catch(e) {}
+}
+
+async function llcAutoSegmentDoc() {
+  var text = LLC.activeDocText;
+  var docBody = document.getElementById('llcDocBody');
+  if (!docBody || docBody.style.display === 'none') return;
+  if (!text || text.length < 300) return;
+
+  var cachedSegs = _llcSegCacheGet(LLC.activeDocId || LLC.activeDocTitle, text.length);
+  if (cachedSegs && cachedSegs.length) {
+    LLC._docSegments = cachedSegs;
+    LLC._selectedSegIdx = null;
+    _llcRenderSegments();
+    return;
+  }
+
+  // Show raw text immediately while AI segments in background
+  var _rawParagraphs = text.slice(0, 20000).split(/\n{2,}/).map(function(p) {
+    return '<p>' + llcEsc(p.trim()) + '</p>';
+  }).join('');
+  docBody.innerHTML =
+    '<div class="llc-seg-doc-wrap">' +
+      '<div class="llc-seg-raw-banner"><span class="llc-spinner" style="width:10px;height:10px;border-width:1.5px"></span> Analisi struttura in corso…</div>' +
+      '<div class="llc-seg-raw-body">' + _rawParagraphs + '</div>' +
+    '</div>';
+
+  try {
+    var truncated = text.slice(0, 8000);
+    var result = await llcGemini(
+      'Legal instructional designer. Divide into Logical Learning Units (ULA): each segment = one complete legal concept (self-consistent). Group related short paragraphs. Target 300-800 words/segment. Create 6-14 segments. Reply ONLY valid JSON: {"segments":[{"title":"Concept name (not chapter heading)","type":"article|recital|definitions|intro|chapter|annex|preamble|other","content":"First 350 chars of segment"}]}.',
+      truncated,
+      1200
+    );
+    var data = llcParseJSON(result);
+    if (!data || !data.segments || !data.segments.length) throw new Error('no_segments');
+    LLC._docSegments = data.segments;
+    LLC._selectedSegIdx = null;
+    _llcSegCacheSet(LLC.activeDocId || LLC.activeDocTitle, text.length, data.segments);
+    _llcRenderSegments();
+  } catch(e) {
+    if (docBody && LLC.activeDocText) {
+      var t = LLC.activeDocText.slice(0, 30000);
+      docBody.innerHTML = '<div style="padding:28px 40px;font-size:13px;line-height:1.85;color:#dcd8ff;white-space:pre-wrap;font-family:Georgia,serif;text-align:justify">' + llcEsc(t) + '</div>';
     }
-  })();
+  }
+}
+
+function _llcRenderSegments() {
+  var segs = LLC._docSegments;
+  var docBody = document.getElementById('llcDocBody');
+  if (!segs || !docBody) return;
+  var html = '<div class="llc-seg-doc-wrap">';
+  segs.forEach(function(seg, i) {
+    var tp = (seg.type || 'section').toLowerCase().replace(/[^a-z]/g, '');
+    var tpLabel = tp.charAt(0).toUpperCase() + tp.slice(1);
+    html += '<div class="llc-seg-card" id="llcSeg' + i + '" onclick="llcSelectSeg(' + i + ')">' +
+      '<span class="llc-seg-badge b-' + tp + '">' + llcEsc(tpLabel) + '</span>' +
+      '<div class="llc-seg-title">' + llcEsc(seg.title) + '</div>' +
+      '<div class="llc-seg-excerpt">' + llcEsc(seg.content || '') + '</div>' +
+      '<div class="llc-seg-footer"><span class="llc-seg-num">§ ' + (i + 1) + ' / ' + segs.length + '</span>' +
+      '<span class="llc-seg-hint">Seleziona per attivare strumenti →</span></div>' +
+      '</div>';
+  });
+  html += '</div>';
+  docBody.innerHTML = html;
+}
+
+function llcSelectSeg(idx) {
+  var segs = LLC._docSegments;
+  if (!segs || !segs[idx]) return;
+  if (LLC._selectedSegIdx !== null && LLC._selectedSegIdx !== undefined) {
+    var prev = document.getElementById('llcSeg' + LLC._selectedSegIdx);
+    if (prev) prev.classList.remove('selected');
+  }
+  var card = document.getElementById('llcSeg' + idx);
+  if (card) { card.classList.add('selected'); card.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+  LLC._selectedSegIdx = idx;
+  var wrap = document.getElementById('llcCtxWrap');
+  var nameEl = document.getElementById('llcCtxSegName');
+  var outEl = document.getElementById('llcCtxOutput');
+  if (wrap) wrap.classList.add('active');
+  if (nameEl) nameEl.textContent = segs[idx].title;
+  if (outEl) { outEl.textContent = ''; outEl.classList.remove('active'); }
+  var schOut = document.getElementById('llcScholarOutput');
+  if (schOut) { schOut.innerHTML = ''; schOut.style.display = 'none'; }
+  var colC = document.getElementById('llcColC');
+  if (colC && colC.classList.contains('llc-col-collapsed')) llcToggleCol('c');
+}
+
+async function llcRunSegTool(tool) {
+  var idx = LLC._selectedSegIdx;
+  var segs = LLC._docSegments;
+  if (idx === null || idx === undefined || !segs || !segs[idx]) return;
+  var seg = segs[idx];
+  var segCtx = 'Section "' + seg.title + '" from document "' + LLC.activeDocTitle + '": ' + (seg.content || '');
+  var outEl = document.getElementById('llcCtxOutput');
+  var btnIds = {flashcard:'llcCtxBtnFlash', question:'llcCtxBtnQ', explain:'llcCtxBtnExp', cornell:'llcCtxBtnCorn'};
+  var btn = document.getElementById(btnIds[tool]);
+  if (btn) btn.classList.add('loading');
+  if (outEl) { outEl.innerHTML = '<span style="opacity:.5">⏳ Elaborando…</span>'; outEl.classList.add('active'); }
+  try {
+    var result;
+    if (tool === 'flashcard') {
+      result = await llcGemini('Create a CIPP/E exam-style flashcard. Reply ONLY JSON: {"front":"exam question","back":"concise answer with article references"}', segCtx, 512);
+      var fc = llcParseJSON(result);
+      if (fc && fc.front) {
+        LLC.flashcards = LLC.flashcards || [];
+        LLC.flashcards.push({front: fc.front, back: fc.back, due: Date.now(), interval: 1, showBack: false});
+        if (typeof llcSaveFlashcards === 'function') llcSaveFlashcards();
+        if (typeof llcRenderFlashcards === 'function') llcRenderFlashcards();
+        outEl.innerHTML = '✅ <strong>Flashcard salvata!</strong><br><em style="font-size:10px;opacity:.8">' + llcEsc(fc.front) + '</em>';
+      }
+    } else if (tool === 'question') {
+      result = await llcGemini('CIPP/E tutor: generate ONE challenging recall question (2 sentences max). Just the question.', segCtx, 256);
+      outEl.innerHTML = '🎓 <strong>Domanda di recall:</strong><br>' + llcEsc(result);
+    } else if (tool === 'explain') {
+      result = await llcGemini('CIPP/E expert: in 3-4 sentences explain: 1) what this establishes, 2) why it matters, 3) key GDPR article. Be pedagogical.', segCtx, 512);
+      outEl.innerHTML = '💡 ' + llcMarkdown(result);
+    } else if (tool === 'cornell') {
+      result = await llcGemini('Cornell notes. Reply ONLY JSON: {"cue":"key question","notes":"2-3 bullet points","summary":"one-sentence takeaway"}', segCtx, 512);
+      var cn = llcParseJSON(result);
+      if (cn) outEl.innerHTML = '📝 <strong>Domanda:</strong> ' + llcEsc(cn.cue || '') + '<br><strong>Note:</strong> ' + llcEsc(cn.notes || '') + '<br><strong>Sintesi:</strong> ' + llcEsc(cn.summary || '');
+    }
+    if (outEl) outEl.classList.add('active');
+  } catch(e) {
+    if (outEl) { outEl.textContent = '❌ ' + llcEsc(e.message); outEl.classList.add('active'); }
+  } finally {
+    if (btn) btn.classList.remove('loading');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// LUMINANCE SCHOLAR — 6-module analysis (single AI call + cache)
+// ══════════════════════════════════════════════════════════════════════════
+var _LLC_SCHOLAR_CACHE_KEY = 'llc_scholar_cache_v1';
+function _llcScholarCacheGet(docId, segIdx) {
+  try { var c = JSON.parse(localStorage.getItem(_LLC_SCHOLAR_CACHE_KEY)||'{}'); return c[docId+'_'+segIdx]||null; } catch(e) { return null; }
+}
+function _llcScholarCacheSet(docId, segIdx, data) {
+  try {
+    var c = JSON.parse(localStorage.getItem(_LLC_SCHOLAR_CACHE_KEY)||'{}');
+    var keys = Object.keys(c); if (keys.length >= 100) delete c[keys[0]];
+    c[docId+'_'+segIdx] = data;
+    localStorage.setItem(_LLC_SCHOLAR_CACHE_KEY, JSON.stringify(c));
+  } catch(e) {}
+}
+
+async function llcRunScholarAnalysis() {
+  var idx = LLC._selectedSegIdx;
+  var segs = LLC._docSegments;
+  if (idx === null || idx === undefined || !segs || !segs[idx]) return;
+  var seg = segs[idx];
+  var docKey = LLC.activeDocId || LLC.activeDocTitle;
+  var btn = document.getElementById('llcCtxBtnScholar');
+  var outEl = document.getElementById('llcScholarOutput');
+  var ctxOut = document.getElementById('llcCtxOutput');
+  if (!outEl) return;
+  if (ctxOut) { ctxOut.textContent = ''; ctxOut.classList.remove('active'); }
+  outEl.style.display = 'block';
+  var cached = _llcScholarCacheGet(docKey, idx);
+  if (cached) { outEl.innerHTML = _llcRenderScholar(cached, seg.title); return; }
+  if (btn) btn.classList.add('loading');
+  outEl.innerHTML = '<div class="llc-scholar-loading"><span class="llc-spinner" style="width:10px;height:10px;border-width:1.5px"></span> Analisi Scholar in corso…</div>';
+  var segCtx = 'Document: "' + LLC.activeDocTitle + '". Section "' + seg.title + '": ' + (seg.content || '');
+  try {
+    var result = await llcGemini(
+      'Legal expert. Analyze this section. Reply ONLY valid JSON: {"visual":"1 paragraph: everyday metaphor explaining the legal structure","synthesis":[{"point":"key legal point","ref":"GDPR Art. X","summary":"1-2 line explanation"}],"metaphor":"1 paragraph: academic/literary metaphor for deep memorization","questions":["question 1","question 2","question 3"],"flashcards":[{"term":"term or norm","def":"definition or effect"}],"chat_prompts":["deep question 1","deep question 2","deep question 3"]}. Rules: synthesis 4-5 items; flashcards exactly 5; all output in Italian; professional pedagogical tone.',
+      segCtx, 1600
+    );
+    var data = llcParseJSON(result);
+    if (!data) throw new Error('invalid_json');
+    if (data.flashcards && data.flashcards.length) {
+      LLC.flashcards = LLC.flashcards || [];
+      data.flashcards.forEach(function(fc) { LLC.flashcards.push({front:fc.term,back:fc.def,due:Date.now(),interval:1,showBack:false}); });
+      if (typeof llcSaveFlashcards === 'function') llcSaveFlashcards();
+      if (typeof llcRenderFlashcards === 'function') llcRenderFlashcards();
+    }
+    _llcScholarCacheSet(docKey, idx, data);
+    outEl.innerHTML = _llcRenderScholar(data, seg.title);
+  } catch(e) {
+    outEl.innerHTML = '<div style="padding:8px;color:#f87171;font-size:12px">❌ ' + llcEsc(e.message) + '</div>';
+  } finally {
+    if (btn) btn.classList.remove('loading');
+  }
+}
+
+function _llcRenderScholar(d, title) {
+  var html = '<div class="llc-scholar-wrap">';
+  html += '<div class="llc-sch-header"><span class="llc-sch-num-label">ANALISI SCHOLAR</span><div class="llc-sch-seg-title">' + llcEsc(title) + '</div></div>';
+  html += '<div class="llc-sch-card"><div class="llc-sch-card-label"><span class="llc-sch-card-num">TOOL 01</span> VISUAL STORYTELLING</div><div class="llc-sch-card-body llc-sch-visual-body">' + llcEsc(d.visual||'') + '</div></div>';
+  var synHtml = '<div class="llc-sch-syn-grid">';
+  (d.synthesis||[]).forEach(function(s){ synHtml += '<div class="llc-sch-syn-item"><div class="llc-sch-syn-ref">'+llcEsc(s.ref||'')+'</div><div class="llc-sch-syn-point">'+llcEsc(s.point||'')+'</div><div class="llc-sch-syn-sum">'+llcEsc(s.summary||'')+'</div></div>'; });
+  synHtml += '</div>';
+  html += '<div class="llc-sch-card"><div class="llc-sch-card-label"><span class="llc-sch-card-num">TOOL 02</span> KNOWLEDGE SYNTHESIS</div><div class="llc-sch-card-body">'+synHtml+'</div></div>';
+  html += '<div class="llc-sch-card"><div class="llc-sch-card-label"><span class="llc-sch-card-num">TOOL 03</span> THE SCHOLAR\'S METAPHOR</div><div class="llc-sch-card-body"><div class="llc-sch-metaphor-card"><div class="llc-sch-metaphor-icon">📖</div><blockquote class="llc-sch-metaphor-quote">'+llcEsc(d.metaphor||'')+'</blockquote></div></div></div>';
+  var qHtml = '<div class="llc-sch-q-list">';
+  (d.questions||[]).forEach(function(q,i){ qHtml += '<div class="llc-sch-q-item"><span class="llc-sch-q-num">Q'+(i+1)+'</span><span class="llc-sch-q-text">'+llcEsc(q)+'</span></div>'; });
+  qHtml += '</div>';
+  html += '<div class="llc-sch-card"><div class="llc-sch-card-label"><span class="llc-sch-card-num">TOOL 04</span> ACTIVE RECALL</div><div class="llc-sch-card-body">'+qHtml+'</div></div>';
+  var fcHtml = '<div class="llc-sch-fc-grid">';
+  (d.flashcards||[]).forEach(function(fc){ fcHtml += '<div class="llc-sch-fc"><div class="llc-sch-fc-term">'+llcEsc(fc.term||'')+'</div><div class="llc-sch-fc-def">'+llcEsc(fc.def||'')+'</div></div>'; });
+  fcHtml += '</div><div class="llc-sch-fc-saved">✅ Salvate nel mazzo SRS</div>';
+  html += '<div class="llc-sch-card"><div class="llc-sch-card-label"><span class="llc-sch-card-num">TOOL 05</span> FLASHCARD AUTOMATICHE</div><div class="llc-sch-card-body">'+fcHtml+'</div></div>';
+  var cpHtml = '<div class="llc-sch-cp-list">';
+  (d.chat_prompts||[]).forEach(function(p){ cpHtml += '<div class="llc-sch-cp-item">💬 '+llcEsc(p)+'</div>'; });
+  cpHtml += '</div>';
+  html += '<div class="llc-sch-card"><div class="llc-sch-card-label"><span class="llc-sch-card-num">TOOL 06</span> INCIPIT PER LA CHAT</div><div class="llc-sch-card-body">'+cpHtml+'</div></div>';
+  html += '</div>';
+  return html;
 }
 
 // ── AI Tool activation buttons ────────────────────────────────────────────────
@@ -10064,9 +10396,8 @@ async function llcActivateTool(tool) {
       var hdr = secBody.previousElementSibling;
       if (hdr) hdr.click();
     }
-    // Pre-warm già completato → mostra subito senza Gemini
-    if (LLC._graphPrewarmDone && LLC._graphPrewarmDoc === LLC.activeDocBlobName &&
-        LLC.graphNodes && LLC.graphNodes.length) {
+    // Se già generata per questo doc, mostra subito
+    if (LLC.graphNodes && LLC.graphNodes.length && LLC._graphDoc === LLC.activeDocBlobName) {
       llcRenderGraph();
       btnMap.classList.add('active');
       btnMap.querySelector('.llc-dtb-label').textContent = 'Mappa Concettuale';
@@ -10074,25 +10405,11 @@ async function llcActivateTool(tool) {
       if (gs) gs.textContent = LLC.graphNodes.length + ' concepts mapped';
       return;
     }
-    // Pre-warm ancora in corso → aspetta il promise esistente
-    if (LLC._graphPrewarmPromise && !LLC._graphPrewarmDone) {
-      btnMap.classList.add('loading');
-      btnMap.querySelector('.llc-dtb-label').textContent = 'Finalizzando…';
-      await LLC._graphPrewarmPromise;
-      btnMap.classList.remove('loading');
-      if (LLC.graphNodes && LLC.graphNodes.length) {
-        llcRenderGraph();
-        btnMap.classList.add('active');
-        btnMap.querySelector('.llc-dtb-label').textContent = 'Mappa Concettuale';
-        var gs2 = document.getElementById('llcGraphStatus');
-        if (gs2) gs2.textContent = LLC.graphNodes.length + ' concepts mapped';
-        return;
-      }
-    }
-    // Fallback: genera ora
+    // Genera lazy al click
     btnMap.classList.add('loading');
     btnMap.querySelector('.llc-dtb-label').textContent = 'Generando…';
     await llcGenGraph();
+    LLC._graphDoc = LLC.activeDocBlobName;
     btnMap.classList.remove('loading');
     btnMap.classList.add('active');
     btnMap.querySelector('.llc-dtb-label').textContent = 'Mappa Concettuale';
