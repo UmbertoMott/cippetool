@@ -222,6 +222,95 @@
   font-family: 'Space Grotesk', monospace;
   letter-spacing: .06em;
 }
+/* ── Document white panel ──────────────────────────────────── */
+#screenWorkbench .wb-doc-panel {
+  background: #fafaf8 !important;
+}
+#screenWorkbench #wbDocContent {
+  background: #fafaf8 !important;
+}
+/* ── Section cards ─────────────────────────────────────────── */
+#screenWorkbench .wb-sections-hint {
+  padding: 10px 24px;
+  background: #f0eaff;
+  border-bottom: 1px solid #e0d5ff;
+  font-size: 11px;
+  color: #7c3aed;
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 600;
+  letter-spacing: .04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+#screenWorkbench .wb-section-card {
+  padding: 24px 28px;
+  border-bottom: 1px solid #ece8f0;
+  cursor: pointer;
+  transition: background .15s, border-left .12s;
+  border-left: 3px solid transparent;
+  background: #ffffff;
+}
+#screenWorkbench .wb-section-card:hover {
+  background: #f8f4ff;
+  border-left-color: rgba(211,148,255,.45);
+}
+#screenWorkbench .wb-section-card.wb-section-active {
+  background: #f3edff;
+  border-left-color: #d394ff;
+}
+#screenWorkbench .wb-section-num {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #d394ff;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-family: 'Space Grotesk', monospace;
+  margin-bottom: 5px;
+}
+#screenWorkbench .wb-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1528;
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+#screenWorkbench .wb-section-body {
+  font-size: 12.5px;
+  line-height: 1.85;
+  color: #2d2540;
+  font-family: Georgia, 'Times New Roman', serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+#screenWorkbench .wb-segment-pulse {
+  padding: 36px 32px;
+  text-align: center;
+  color: #8b5cf6;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 12px;
+  background: #fafaf8;
+  animation: wbPulse 1.5s ease-in-out infinite;
+}
+@keyframes wbPulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .35; }
+}
+/* ── Tool auto-run badge ───────────────────────────────────── */
+#screenWorkbench .wb-tool-select-hint {
+  font-size: 11px;
+  color: #ababab;
+  font-family: 'Space Grotesk', monospace;
+  padding: 0 0 8px;
+  text-align: center;
+  letter-spacing: .04em;
+}
+/* ── Scrollbar per white panel ─────────────────────────────── */
+#wbSectionsContainer::-webkit-scrollbar { width: 5px; }
+#wbSectionsContainer::-webkit-scrollbar-track { background: #f0ece8; }
+#wbSectionsContainer::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
 </style>
 <style>
 :root{
@@ -18807,6 +18896,8 @@ var _wbDocText = '';         // testo estratto per tool AI (client-side)
 var _wbCurrentFile = null;   // original filename
 var _wbPendingFile = null;   // File object selected but not yet uploaded
 var _wbFlashcardQueue = [];  // flashcards waiting to be saved
+var _wbSections = [];        // sezioni estratte da Gemini auto-segment
+var _wbSelectedSection = -1; // indice sezione selezionata (-1 = nessuna)
 
 function wbInit() {
   // Collega file input + bottoni via JS (più affidabile di attributi onchange/onclick inline)
@@ -18872,8 +18963,17 @@ function wbResetUpload() {
   document.getElementById('wbDocText').style.display = 'none';
   document.getElementById('wbPdfContainer').style.display = 'none';
   document.getElementById('wbPdfContainer').innerHTML = '';
+  var oldSec = document.getElementById('wbSectionsContainer');
+  if (oldSec) oldSec.remove();
+  _wbSections = [];
+  _wbSelectedSection = -1;
   // Riloca tool
   document.querySelectorAll('#screenWorkbench .wb-tool-card').forEach(function(c) { c.classList.add('wb-locked'); });
+  // Reset tool results
+  ['wbTool01Result','wbTool02Result','wbTool03Result','wbTool04Result'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+  });
   document.getElementById('wbDropZone').style.borderColor = 'rgba(72,72,72,.5)';
   document.getElementById('wbDropZone').style.borderStyle = 'dashed';
 }
@@ -18911,11 +19011,13 @@ function wbOnFileSelect(input) {
     _wbSetProgress(40, '🖥️ Rendering…');
     // Avvia rendering in base al tipo
     wbRenderClientSide(file, arrayBuffer, ext).then(function() {
-      _wbSetProgress(100, '✅ Documento pronto');
+      _wbSetProgress(100, '✅ Documento pronto — analisi struttura…');
       document.getElementById('wbProgressBar').style.background = 'linear-gradient(90deg,#34d399,#059669)';
       document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + sizeMB + ' MB · ✅ Pronto';
       wbUnlockTools();
       setTimeout(function() { document.getElementById('wbProgressWrap').style.display = 'none'; }, 1500);
+      // Auto-segmenta con Gemini
+      wbAutoSegment();
     }).catch(function(err) {
       _wbSetProgress(0, '⚠️ ' + err.message);
       document.getElementById('wbProgressBar').style.background = '#ff6d8d';
@@ -19056,11 +19158,11 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
 
   if (!text || text.trim().length < 10) throw new Error('Nessun testo estratto dal documento');
 
-  // Mostra testo nel pannello sinistra
+  // Mostra testo nel pannello sinistra (sarà sostituito da auto-segment)
   placeholder.style.display = 'none';
   container.style.display   = 'none';
   docTextEl.style.display   = 'block';
-  docTextEl.style.cssText   = 'flex:1;padding:20px 24px;font-family:Georgia,serif;font-size:13px;line-height:1.75;color:#d8d8e8;white-space:pre-wrap;overflow-y:auto;background:#0d0d0d;word-break:break-word';
+  docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#2d2540;white-space:pre-wrap;overflow-y:auto;background:#fafaf8;word-break:break-word;scrollbar-width:thin;scrollbar-color:#c4b5fd #f0f0ec';
   docTextEl.textContent     = text;
   _wbDocText = text.substring(0, 25000);
   _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
@@ -19169,13 +19271,25 @@ function wbUnlockTools() {
   });
 }
 
-async function wbRunTool(toolNum) {
-  if (!_wbDocText && !_wbPendingFile) return;
+async function wbRunTool(toolNum, overrideText) {
+  // Determina il testo da analizzare: sezione selezionata > full doc
+  var docText = overrideText || _wbDocText;
+  if (!docText || docText.trim().length < 20) return;
+
+  var isSection = !!overrideText;
   var prompts = {
-    1: 'Analizza questo documento legale GDPR/privacy. Prima crea un diagramma Mermaid (flowchart LR o graph TD) che rappresenti i concetti principali e le loro relazioni. Poi scrivi UNA metafora cognitiva potente che colleghi il concetto principale a un\'esperienza quotidiana comune. Formato risposta:\n---DIAGRAM---\n[codice mermaid]\n---METAPHOR---\n[metafora in 2-3 frasi]',
-    2: 'Analizza questo documento GDPR/privacy e suddividilo in 6-8 blocchi concettuali. Per ogni blocco usa questo formato:\n**TITOLO** | [tag articolo GDPR es. Art.5]\n[3 righe di sintesi concettuale]\n---',
-    3: 'Genera 5 domande di ripasso a risposta aperta su questo documento GDPR/privacy. Per ogni domanda usa questo formato:\nDOMANDA: [testo domanda]\nRISPOSTA: [risposta completa 3-5 righe]\n---',
-    4: 'Estrai 8-10 termini chiave GDPR/privacy da questo documento con le loro definizioni precise. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [definizione 1-2 frasi]\n---'
+    1: isSection
+      ? 'Analizza questa sezione di un documento GDPR/privacy. Crea un diagramma ASCII (non mermaid) con frecce testuali che mostra la struttura dei concetti. Poi scrivi una metafora cognitiva quotidiana (2-3 frasi). Formato:\n---DIAGRAM---\n[diagramma ASCII con frecce -> e caselle]\n---METAPHOR---\n[metafora]'
+      : 'Analizza questo documento legale GDPR/privacy. Prima crea un diagramma Mermaid (flowchart LR o graph TD) che rappresenti i concetti principali. Poi scrivi UNA metafora cognitiva potente. Formato risposta:\n---DIAGRAM---\n[codice mermaid]\n---METAPHOR---\n[metafora in 2-3 frasi]',
+    2: isSection
+      ? 'Analizza questa sezione e identifica: 1) Il Concetto Chiave principale (titolo + 2 righe), 2) 2-3 Tag normativi rilevanti (es. Art.5 GDPR), 3) Una frase di sintesi. Formato:\nCONCETTO: [titolo]\n[2 righe spiegazione]\nTAG: [Art.X] [Art.Y]\nSINTESI: [frase unica]\n---'
+      : 'Analizza questo documento GDPR/privacy e suddividilo in 6-8 blocchi concettuali. Per ogni blocco:\n**TITOLO** | [tag articolo GDPR]\n[3 righe sintesi]\n---',
+    3: isSection
+      ? 'Genera 2 domande di ripasso a risposta aperta su questa sezione. Formato:\nDOMANDA: [testo]\nRISPOSTA: [risposta 2-4 righe]\n---'
+      : 'Genera 5 domande di ripasso a risposta aperta su questo documento GDPR. Formato:\nDOMANDA: [testo]\nRISPOSTA: [risposta 3-5 righe]\n---',
+    4: isSection
+      ? 'Estrai 3-4 termini chiave da questa sezione con definizioni precise. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
+      : 'Estrai 8-10 termini chiave GDPR da questo documento. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
   };
 
   var loadingId = 'wbTool0' + toolNum + 'Loading';
@@ -19186,7 +19300,6 @@ async function wbRunTool(toolNum) {
   if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
   try {
-    var docText = _wbDocText || (document.getElementById('wbDocText') ? document.getElementById('wbDocText').textContent : '');
     var fullPrompt = prompts[toolNum] + '\n\nDOCUMENTO:\n' + docText.substring(0, 6000);
 
     // Call via backend Gemini proxy (same as _llcBackendGemini)
@@ -19341,18 +19454,16 @@ function wbSaveFlashcards() {
 async function wbChatSend() {
   var input = document.getElementById('wbChatInput');
   var msg = input ? input.value.trim() : '';
-  if (!msg || !_wbCurrentBlob) return;
+  if (!msg || !_wbDocText) return;
   input.value = '';
 
   var messagesEl = document.getElementById('wbChatMessages');
 
-  // Append user bubble
   var userBubble = document.createElement('div');
   userBubble.className = 'wb-chat-bubble-user';
   userBubble.textContent = msg;
   messagesEl.appendChild(userBubble);
 
-  // Thinking bubble
   var aiBubble = document.createElement('div');
   aiBubble.className = 'wb-chat-bubble-ai';
   aiBubble.textContent = '⟳ …';
@@ -19360,8 +19471,11 @@ async function wbChatSend() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
-    var docText = document.getElementById('wbDocText') ? document.getElementById('wbDocText').textContent : '';
-    var contextMsg = 'Sei un assistente GDPR/privacy. Il contesto è questo documento:\n\n' + docText.substring(0,4000) + '\n\n---\nDomanda: ' + msg;
+    // Usa testo sezione selezionata se disponibile, altrimenti full doc
+    var docText = (_wbSelectedSection >= 0 && _wbSections[_wbSelectedSection])
+      ? (_wbSections[_wbSelectedSection].testo || _wbSections[_wbSelectedSection].text || _wbDocText)
+      : _wbDocText;
+    var contextMsg = 'Sei un assistente GDPR/privacy. Il contesto è questo documento:\n\n' + docText.substring(0,5000) + '\n\n---\nDomanda: ' + msg;
 
     var ctrl = new AbortController();
     var tid = setTimeout(function() { ctrl.abort(); }, 90000);
@@ -19384,6 +19498,119 @@ async function wbChatSend() {
     aiBubble.style.color = '#ff6d8d';
   }
   messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+// ── Auto-segmentazione con Gemini ──────────────────────────────────
+async function wbAutoSegment() {
+  if (!_wbDocText || _wbDocText.trim().length < 100) return;
+  var wbDocContent = document.getElementById('wbDocContent');
+  if (!wbDocContent) return;
+
+  // Mostra testo raw temporaneamente con sfondo bianco, poi loading
+  var rawTxt = document.getElementById('wbDocText');
+  if (rawTxt) rawTxt.style.display = 'none';
+
+  var loadDiv = document.createElement('div');
+  loadDiv.id = 'wbSegmentLoading';
+  loadDiv.className = 'wb-segment-pulse';
+  loadDiv.innerHTML = '✦ Gemini sta strutturando il documento in sezioni…';
+  wbDocContent.appendChild(loadDiv);
+
+  var prompt = 'Sei un assistente di studio. Analizza il documento e dividilo in 5-8 sezioni concettuali.\n\nRispondi SOLO con JSON valido (nessun altro testo, nessun ```json```):\n[\n  {"titolo":"Titolo sezione","testo":"Contenuto originale 200-400 parole"},\n  ...\n]\n\nRegole: usa testo originale (non parafrasare), titoli chiari max 60 caratteri.\n\nDOCUMENTO:\n';
+  try {
+    var resp = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt + _wbDocText.substring(0, 18000) }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
+      })
+    });
+    var ld = document.getElementById('wbSegmentLoading');
+    if (ld) ld.remove();
+
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    var data = await resp.json();
+    var aiText = (data.text || data.reply || data.response || '').trim();
+    // Estrai JSON dall'output (rimuovi eventuali backtick/code block)
+    var js = aiText.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    var a = js.indexOf('['), b = js.lastIndexOf(']');
+    if (a < 0 || b < 0) throw new Error('No JSON array');
+    var sections = JSON.parse(js.substring(a, b + 1));
+    if (!Array.isArray(sections) || sections.length === 0) throw new Error('Empty sections');
+    _wbSections = sections;
+    wbRenderSections(sections);
+  } catch(e) {
+    var ld = document.getElementById('wbSegmentLoading');
+    if (ld) ld.remove();
+    // Fallback: mostra testo raw con sfondo bianco
+    if (rawTxt) rawTxt.style.display = 'block';
+    console.warn('[WB] Auto-segment error:', e);
+  }
+}
+
+function wbRenderSections(sections) {
+  var wbDocContent = document.getElementById('wbDocContent');
+  if (!wbDocContent) return;
+  // Nascondi tutto il contenuto esistente
+  ['wbDocPlaceholder','wbPdfContainer','wbDocText'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  var old = document.getElementById('wbSectionsContainer');
+  if (old) old.remove();
+
+  var cont = document.createElement('div');
+  cont.id = 'wbSectionsContainer';
+  cont.style.cssText = 'flex:1;overflow-y:auto;background:#fafaf8;display:flex;flex-direction:column;';
+
+  // Hint bar
+  var hint = document.createElement('div');
+  hint.className = 'wb-sections-hint';
+  hint.innerHTML = '✦ <span>' + sections.length + ' sezioni &nbsp;·&nbsp; Clicca una sezione per analizzarla con gli AI tools</span>';
+  cont.appendChild(hint);
+
+  sections.forEach(function(sec, idx) {
+    var card = document.createElement('div');
+    card.className = 'wb-section-card';
+    card.setAttribute('data-idx', String(idx));
+
+    var numEl = document.createElement('span');
+    numEl.className = 'wb-section-num';
+    numEl.textContent = '§ ' + (idx + 1);
+
+    var titleEl = document.createElement('div');
+    titleEl.className = 'wb-section-title';
+    titleEl.textContent = sec.titolo || sec.title || ('Sezione ' + (idx + 1));
+
+    var bodyEl = document.createElement('div');
+    bodyEl.className = 'wb-section-body';
+    bodyEl.textContent = (sec.testo || sec.text || '').substring(0, 800);
+
+    card.appendChild(numEl);
+    card.appendChild(titleEl);
+    card.appendChild(bodyEl);
+    card.addEventListener('click', function() { wbSelectSection(idx); });
+    cont.appendChild(card);
+  });
+
+  wbDocContent.appendChild(cont);
+}
+
+function wbSelectSection(idx) {
+  if (!_wbSections[idx]) return;
+  _wbSelectedSection = idx;
+
+  document.querySelectorAll('#screenWorkbench .wb-section-card').forEach(function(c) {
+    c.classList.remove('wb-section-active');
+  });
+  var activeCard = document.querySelector('#screenWorkbench .wb-section-card[data-idx="' + idx + '"]');
+  if (activeCard) activeCard.classList.add('wb-section-active');
+
+  var sectionText = _wbSections[idx].testo || _wbSections[idx].text || '';
+
+  // Auto-run tool 1-4 sulla sezione
+  [1, 2, 3, 4].forEach(function(n) { wbRunTool(n, sectionText); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
