@@ -4975,6 +4975,21 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
 
+        <!-- TOOL 06: Luminance Scholar -->
+        <div id="wbTool06" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
+          <div class="wb-glow-bar" style="background:#f59e0b"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#f59e0b;font-family:'Space Grotesk',monospace">TOOL 06</div>
+              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">📚 Luminance Scholar</div>
+            </div>
+            <button onclick="wbRunScholar()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Analizza</button>
+          </div>
+          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Analisi completa in un click: visuale, sintesi, metafora, domande di ripasso, flashcard e incipit per chat.</p>
+          <div id="wbTool06Result" style="display:none;flex-direction:column;gap:12px"></div>
+          <div id="wbTool06Loading" style="display:none;font-size:12px;color:#f59e0b;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Analisi Scholar in corso…</div>
+        </div>
+
       </div><!-- end tools panel -->
     </div><!-- end wbMain -->
   </div><!-- end wb-shell -->
@@ -19578,7 +19593,7 @@ async function wbLoadDocText(blobName) {
 }
 
 function wbUnlockTools() {
-  ['wbTool01','wbTool02','wbTool03','wbTool04','wbTool05'].forEach(function(id) {
+  ['wbTool01','wbTool02','wbTool03','wbTool04','wbTool05','wbTool06'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.classList.remove('wb-locked');
   });
@@ -19766,6 +19781,125 @@ function wbSaveFlashcards() {
   if (btn) btn.style.display = 'none';
   if (done) done.style.display = 'block';
   _wbFlashcardQueue = [];
+}
+
+// ── TOOL 06: LUMINANCE SCHOLAR ──────────────────────────────────────────────
+var _WB_SCHOLAR_CACHE_KEY = 'wb_scholar_cache_v1';
+function _wbScholarCacheGet(docId) {
+  try { var c = JSON.parse(localStorage.getItem(_WB_SCHOLAR_CACHE_KEY)||'{}'); return c[docId]||null; } catch(e){return null;}
+}
+function _wbScholarCacheSet(docId, data) {
+  try {
+    var c = JSON.parse(localStorage.getItem(_WB_SCHOLAR_CACHE_KEY)||'{}');
+    var keys = Object.keys(c); if (keys.length >= 20) delete c[keys[0]];
+    c[docId] = data; localStorage.setItem(_WB_SCHOLAR_CACHE_KEY, JSON.stringify(c));
+  } catch(e){}
+}
+
+async function wbRunScholar() {
+  var loadEl = document.getElementById('wbTool06Loading');
+  var resEl  = document.getElementById('wbTool06Result');
+  if (!_wbDocText || _wbDocText.trim().length < 20) return;
+
+  // Cache key: filename + text length
+  var docId = (_wbCurrentFile ? _wbCurrentFile.name : 'doc') + '_' + _wbDocText.length;
+  var cached = _wbScholarCacheGet(docId);
+  if (cached) { wbRenderScholar(cached); return; }
+
+  if (loadEl) { loadEl.style.display = 'block'; loadEl.textContent = '⟳ Analisi Scholar in corso…'; }
+  if (resEl)  { resEl.style.display = 'none'; resEl.innerHTML = ''; }
+
+  var segCtx = (_wbSelectedSection >= 0 && _wbSections[_wbSelectedSection])
+    ? (_wbSections[_wbSelectedSection].testo || _wbSections[_wbSelectedSection].text || _wbDocText)
+    : _wbDocText;
+
+  var prompt = 'Analizza questo testo legale/privacy come Luminance Scholar. '
+    + 'Rispondi SOLO con JSON valido (nessun testo fuori), struttura esatta:\n'
+    + '{"visual":"[diagramma ASCII concetti]","synthesis":"[3-4 frasi sintesi strutturata]",'
+    + '"metaphor":"[metafora cognitiva quotidiana 2-3 frasi]",'
+    + '"questions":["domanda1","domanda2","domanda3"],'
+    + '"flashcards":[{"term":"termine","def":"definizione"},{"term":"termine2","def":"def2"}],'
+    + '"chat_prompts":["prompt1","prompt2","prompt3"]}\n\nTESTO:\n' + segCtx.substring(0, 6000);
+
+  try {
+    var ctrl = new AbortController();
+    var tid = setTimeout(function() { ctrl.abort(); }, 90000);
+    var resp = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: ctrl.signal,
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.3, maxOutputTokens: 1800 }
+      })
+    });
+    clearTimeout(tid);
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    var data = await resp.json();
+    var raw = data.text || data.reply || data.response || data.answer || '';
+    // Strip markdown code fences if present
+    raw = raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+    var parsed = JSON.parse(raw);
+    _wbScholarCacheSet(docId, parsed);
+    if (loadEl) loadEl.style.display = 'none';
+    wbRenderScholar(parsed);
+  } catch(e) {
+    if (loadEl) { loadEl.textContent = '⚠️ ' + e.message; }
+    console.warn('[WB Scholar]', e);
+  }
+}
+
+function wbRenderScholar(d) {
+  var resEl = document.getElementById('wbTool06Result');
+  if (!resEl) return;
+  resEl.innerHTML = '';
+  resEl.style.display = 'flex';
+
+  function card(label, color, content) {
+    var el = document.createElement('div');
+    el.style.cssText = 'background:#1a1a1a;border-radius:10px;padding:14px 16px;border-left:3px solid ' + color;
+    el.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:' + color + ';font-family:\'Space Grotesk\',monospace;margin-bottom:8px">' + label + '</div>' + content;
+    resEl.appendChild(el);
+  }
+
+  if (d.visual) card('Visual Storytelling', '#d394ff',
+    '<pre style="font-size:11px;color:#d394ff;white-space:pre-wrap;line-height:1.5;margin:0;font-family:monospace">' + d.visual + '</pre>');
+
+  if (d.synthesis) card('Knowledge Synthesis', '#06b6d4',
+    '<p style="font-size:12px;color:#e0e0e0;line-height:1.7;margin:0">' + d.synthesis + '</p>');
+
+  if (d.metaphor) card('Scholar\'s Metaphor', '#34d399',
+    '<p style="font-size:12px;color:#e0e0e0;line-height:1.7;margin:0;font-style:italic">' + d.metaphor + '</p>');
+
+  if (d.questions && d.questions.length) {
+    var qHtml = d.questions.map(function(q,i) {
+      return '<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;color:#e0e0e0;line-height:1.6">' + (i+1) + '. ' + q + '</div>';
+    }).join('');
+    card('Active Recall', '#f59e0b', '<div>' + qHtml + '</div>');
+  }
+
+  if (d.flashcards && d.flashcards.length) {
+    var fcHtml = d.flashcards.map(function(fc) {
+      return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
+        + '<span style="font-size:11px;font-weight:700;color:#aa30fa;min-width:110px;flex-shrink:0">' + fc.term + '</span>'
+        + '<span style="font-size:11px;color:#ababab;line-height:1.5">' + fc.def + '</span>'
+        + '</div>';
+    }).join('');
+    card('Flashcard Automatiche', '#aa30fa', '<div>' + fcHtml + '</div>');
+  }
+
+  if (d.chat_prompts && d.chat_prompts.length) {
+    var cpHtml = d.chat_prompts.map(function(p) {
+      return '<button onclick="wbScholarPrompt(this)" data-prompt="' + p.replace(/"/g,'&quot;') + '" style="display:block;width:100%;text-align:left;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:6px;padding:7px 10px;color:#06b6d4;font-size:11px;cursor:pointer;margin-bottom:5px;font-family:inherit;line-height:1.5">→ ' + p + '</button>';
+    }).join('');
+    card('Incipit per Chat', '#06b6d4', '<div>' + cpHtml + '</div>');
+  }
+}
+
+function wbScholarPrompt(btn) {
+  var p = btn.getAttribute('data-prompt');
+  var inp = document.getElementById('wbChatInput');
+  if (inp && p) { inp.value = p; wbChatSend(); }
 }
 
 async function wbChatSend() {
