@@ -4913,15 +4913,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="font-size:11px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">Full Document View</div>
           </div>
         </div>
-        <!-- Banner selezione attiva -->
-        <div id="wbSelectionBanner" style="display:none;padding:8px 16px;background:rgba(211,148,255,.07);border-bottom:1px solid rgba(211,148,255,.18);align-items:center;gap:10px;flex-shrink:0">
-          <div style="width:3px;height:34px;background:#d394ff;border-radius:2px;flex-shrink:0"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:9px;color:#d394ff;font-family:'Space Grotesk',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Selezione attiva · <span id="wbSelCount"></span></div>
-            <div id="wbSelPreview" style="font-size:11px;color:#e0e0e0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:italic;opacity:.8"></div>
-          </div>
-          <button onclick="_wbClearSelection()" title="Rimuovi selezione" style="background:none;border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#ababab;font-size:10px;cursor:pointer;padding:3px 10px;white-space:nowrap;font-family:'Space Grotesk',monospace;transition:all .15s" onmouseover="this.style.borderColor='rgba(211,148,255,.4)';this.style.color='#d394ff'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#ababab'">✕ Annulla</button>
-        </div>
+
         <div id="wbDocContent" class="wb-doc-content" style="flex:1;overflow:hidden;background:#111111;display:flex;flex-direction:column;">
           <!-- Placeholder -->
           <div id="wbDocPlaceholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;opacity:.35">
@@ -19316,40 +19308,8 @@ function wbInit() {
   wbToggleLayout(pref, true);
   wbHistRender();
   _wbInitResize();
-  _wbInitSelectionListener();
 }
 
-// ── SELEZIONE TESTO LIBERA nel pannello documento ─────────────────────────────
-function _wbInitSelectionListener() {
-  var docPanel = document.getElementById('wbDocPanel');
-  if (!docPanel) return;
-  docPanel.addEventListener('mouseup', function() {
-    // Piccolo delay per dare tempo al browser di aggiornare la selezione
-    setTimeout(function() {
-      var sel = window.getSelection();
-      var txt = sel ? sel.toString().trim() : '';
-      if (txt.length >= 60) {
-        _wbActiveSelection = txt;
-        _wbShowSelectionBanner(txt);
-      }
-    }, 60);
-  });
-}
-function _wbShowSelectionBanner(txt) {
-  var banner  = document.getElementById('wbSelectionBanner');
-  var preview = document.getElementById('wbSelPreview');
-  var count   = document.getElementById('wbSelCount');
-  if (!banner) return;
-  if (count)   count.textContent   = txt.length + ' caratteri';
-  if (preview) preview.textContent = '"' + txt.substring(0, 110) + (txt.length > 110 ? '…' : '') + '"';
-  banner.style.display = 'flex';
-}
-function _wbClearSelection() {
-  _wbActiveSelection = '';
-  var banner = document.getElementById('wbSelectionBanner');
-  if (banner) banner.style.display = 'none';
-  if (window.getSelection) window.getSelection().removeAllRanges();
-}
 
 // ── MINIMIZE / EXPAND SINGOLO TOOL ───────────────────────────────────────────
 function wbToggleTool(cardId) {
@@ -19489,8 +19449,7 @@ function wbResetUpload() {
   _wbSections = [];
   _wbSelectedSection = -1;
   _wbActiveSelection = '';
-  var selBanner = document.getElementById('wbSelectionBanner');
-  if (selBanner) selBanner.style.display = 'none';
+
   // Riloca tool
   document.querySelectorAll('#screenWorkbench .wb-tool-card').forEach(function(c) { c.classList.add('wb-locked'); });
   // Reset tool results
@@ -20468,7 +20427,6 @@ function wbSelectSection(idx) {
   // Imposta testo attivo per i tool
   var sectionText = sec.testo || sec.text || '';
   _wbActiveSelection = sectionText;
-  _wbShowSelectionBanner(sectionText);
 
   // Tool girano automaticamente sulla sezione corrente
   [1, 2, 3, 4].forEach(function(n) { wbRunTool(n); });
