@@ -19681,8 +19681,8 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
     var pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     var totalPages = pdfDoc.numPages;
     _wbSetProgress(50, '📄 ' + totalPages + ' pag — lettura anteprima…');
-    // Prime 6 pagine subito per display istantaneo
-    var PREVIEW = Math.min(6, totalPages);
+    // Prime 15 pagine subito per display immediato
+    var PREVIEW = Math.min(15, totalPages);
     var previewNums = [];
     for (var pi = 1; pi <= PREVIEW; pi++) previewNums.push(pi);
     var previewParts = await Promise.all(previewNums.map(async function(pn) {
@@ -19691,20 +19691,28 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
       return tc.items.map(function(i){ return i.str; }).join(' ');
     }));
     text = previewParts.join('\n\n');
-    // FIX BUG 4: imposta _wbDocText subito con il testo preview (wbAutoSegment lo legge dopo .then())
-    _wbDocText = text.substring(0, 25000);
+    // Imposta _wbDocText subito con preview (wbAutoSegment lo legge dopo .then())
+    _wbDocText = text.substring(0, 40000);
     _wbSetProgress(90, '✅ Anteprima pronta · ' + totalPages + ' pag totali');
-    // Carica resto in background — estende _wbDocText con le pagine rimanenti
+    // Carica TUTTE le pagine rimanenti in background (fino a 200 pag)
     if (totalPages > PREVIEW) {
       (async function() {
         var restNums = [];
-        for (var rp = PREVIEW + 1; rp <= Math.min(totalPages, 80); rp++) restNums.push(rp);
+        for (var rp = PREVIEW + 1; rp <= Math.min(totalPages, 200); rp++) restNums.push(rp);
         var restParts = await Promise.all(restNums.map(async function(pn) {
-          var page = await pdfDoc.getPage(pn);
-          var tc = await page.getTextContent();
-          return tc.items.map(function(i){ return i.str; }).join(' ');
+          try {
+            var page = await pdfDoc.getPage(pn);
+            var tc = await page.getTextContent();
+            return tc.items.map(function(i){ return i.str; }).join(' ');
+          } catch(e) { return ''; }
         }));
-        _wbDocText = (text + '\n\n' + restParts.join('\n\n')).substring(0, 25000);
+        var fullText = text + '\n\n' + restParts.join('\n\n');
+        _wbDocText = fullText.substring(0, 40000);
+        // Aggiorna il pannello visivo con il testo completo (fino a 150K chars)
+        var dtEl = document.getElementById('wbDocText');
+        if (dtEl && dtEl.style.display !== 'none') {
+          dtEl.textContent = fullText.substring(0, 150000);
+        }
       })();
     }
 
@@ -19726,14 +19734,13 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
 
   if (!text || text.trim().length < 10) throw new Error('Nessun testo estratto dal documento');
 
-  // Mostra testo nel pannello — testo completo (fino a 25000 chars)
+  // Mostra testo nel pannello — limite display 150K chars (~100+ pagine)
   placeholder.style.display = 'none';
   container.style.display   = 'none';
   docTextEl.style.display   = 'block';
   docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#c8c8d0;white-space:pre-wrap;overflow-y:auto;background:#111111;word-break:break-word;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111';
-  var fullDisplayText = text.substring(0, 25000);
-  docTextEl.textContent     = fullDisplayText;
-  if (ext !== 'pdf') _wbDocText = text.substring(0, 25000); // PDF già impostato sopra
+  docTextEl.textContent     = text.substring(0, 150000);
+  if (ext !== 'pdf') _wbDocText = text.substring(0, 40000); // PDF già impostato sopra
   _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
 }
 
