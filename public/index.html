@@ -217,16 +217,17 @@
 #screenWorkbench ::-webkit-scrollbar { width: 4px; }
 #screenWorkbench ::-webkit-scrollbar-track { background: #0e0e0e; }
 #screenWorkbench ::-webkit-scrollbar-thumb { background: #484848; border-radius: 2px; }
-/* Tool result: altezza fissa ~8.5cm, scrollbar sempre visibile */
+/* Tool result: ~14cm, scrollbar verticale sempre visibile */
 #screenWorkbench [id^="wbTool"][id$="Result"]:not([style*="display: none"]):not([style*="display:none"]) {
-  min-height: 320px;
-  max-height: 320px;
+  min-height: 530px;
+  max-height: 530px;
   overflow-y: scroll;
   scrollbar-width: thin;
-  scrollbar-color: #6b6b6b #1f1f1f;
+  scrollbar-color: #6b6b6b #1a1a1a;
   scroll-behavior: smooth;
   border-radius: 6px;
-  margin-top: 4px;
+  margin-top: 6px;
+  padding-right: 2px;
 }
 /* Pulsante minimize card */
 #screenWorkbench .wb-toggle-btn {
@@ -293,74 +294,77 @@
 }
 /* ── Section cards ─────────────────────────────────────────── */
 #screenWorkbench .wb-sections-hint {
-  padding: 10px 24px;
-  background: #f0eaff;
-  border-bottom: 1px solid #e0d5ff;
-  font-size: 11px;
-  color: #7c3aed;
+  padding: 8px 24px;
+  background: rgba(211,148,255,.06);
+  border-bottom: 1px solid rgba(211,148,255,.15);
+  font-size: 10px;
+  color: rgba(211,148,255,.7);
   font-family: 'Space Grotesk', monospace;
   font-weight: 600;
-  letter-spacing: .04em;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
 }
 #screenWorkbench .wb-section-card {
-  padding: 24px 28px;
-  border-bottom: 1px solid #ece8f0;
+  padding: 22px 28px 22px 32px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
   cursor: pointer;
-  transition: background .15s, border-left .12s;
-  border-left: 3px solid transparent;
-  background: #ffffff;
+  transition: background .15s, border-left-color .12s;
+  border-left: 3px solid rgba(211,148,255,.12);
+  background: #111111;
 }
 #screenWorkbench .wb-section-card:hover {
-  background: #f8f4ff;
-  border-left-color: rgba(211,148,255,.45);
+  background: rgba(211,148,255,.04);
+  border-left-color: rgba(211,148,255,.4);
 }
 #screenWorkbench .wb-section-card.wb-section-active {
-  background: #f3edff;
+  background: rgba(211,148,255,.06);
   border-left-color: #d394ff;
 }
 #screenWorkbench .wb-section-num {
   display: block;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  color: #d394ff;
+  color: rgba(211,148,255,.6);
   text-transform: uppercase;
-  letter-spacing: .12em;
+  letter-spacing: .14em;
   font-family: 'Space Grotesk', monospace;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 #screenWorkbench .wb-section-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #1a1528;
-  margin: 0 0 10px;
-  line-height: 1.35;
+  color: #ffffff;
+  margin: 0 0 12px;
+  line-height: 1.4;
 }
 #screenWorkbench .wb-section-body {
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.85;
-  color: #2d2540;
+  color: #b0b0b8;
   font-family: Georgia, 'Times New Roman', serif;
   white-space: pre-wrap;
   word-break: break-word;
 }
+#screenWorkbench .wb-section-card.wb-section-active .wb-section-body {
+  color: #d0d0da;
+}
 #screenWorkbench .wb-segment-pulse {
   padding: 36px 32px;
   text-align: center;
-  color: #8b5cf6;
+  color: rgba(211,148,255,.6);
   font-family: 'Space Grotesk', monospace;
-  font-size: 12px;
-  background: #fafaf8;
+  font-size: 11px;
+  background: #111111;
   animation: wbPulse 1.5s ease-in-out infinite;
 }
 @keyframes wbPulse {
   0%,100% { opacity: 1; }
-  50%      { opacity: .35; }
+  50%      { opacity: .3; }
 }
-/* ── Tool auto-run badge ───────────────────────────────────── */
 #screenWorkbench .wb-tool-select-hint {
   font-size: 11px;
   color: #ababab;
@@ -369,10 +373,9 @@
   text-align: center;
   letter-spacing: .04em;
 }
-/* ── Scrollbar per white panel ─────────────────────────────── */
 #wbSectionsContainer::-webkit-scrollbar { width: 5px; }
-#wbSectionsContainer::-webkit-scrollbar-track { background: #f0ece8; }
-#wbSectionsContainer::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
+#wbSectionsContainer::-webkit-scrollbar-track { background: #111111; }
+#wbSectionsContainer::-webkit-scrollbar-thumb { background: rgba(211,148,255,.3); border-radius: 3px; }
 </style>
 <style>
 :root{
@@ -19731,7 +19734,7 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
   placeholder.style.display = 'none';
   container.style.display   = 'none';
   docTextEl.style.display   = 'block';
-  docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#2d2540;white-space:pre-wrap;overflow-y:auto;background:#fafaf8;word-break:break-word;scrollbar-width:thin;scrollbar-color:#c4b5fd #f0f0ec';
+  docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#b8b8c0;white-space:pre-wrap;overflow-y:auto;background:#111111;word-break:break-word;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111';
   var displayText = text.substring(0, 6000) + (text.length > 6000 ? '\n\n… [testo completo disponibile per i tool AI] …' : '');
   docTextEl.textContent     = displayText;
   if (ext !== 'pdf') _wbDocText = text.substring(0, 25000); // PDF già impostato sopra
@@ -20238,12 +20241,12 @@ function wbRenderSections(sections) {
 
   var cont = document.createElement('div');
   cont.id = 'wbSectionsContainer';
-  cont.style.cssText = 'flex:1;overflow-y:auto;background:#fafaf8;display:flex;flex-direction:column;';
+  cont.style.cssText = 'flex:1;overflow-y:auto;background:#111111;display:flex;flex-direction:column;';
 
   // Hint bar
   var hint = document.createElement('div');
   hint.className = 'wb-sections-hint';
-  hint.innerHTML = '✦ <span>' + sections.length + ' sezioni &nbsp;·&nbsp; Clicca una sezione per analizzarla con gli AI tools</span>';
+  hint.textContent = '✦ ' + sections.length + ' sezioni estratte · clicca per analizzare';
   cont.appendChild(hint);
 
   sections.forEach(function(sec, idx) {
@@ -20261,7 +20264,8 @@ function wbRenderSections(sections) {
 
     var bodyEl = document.createElement('div');
     bodyEl.className = 'wb-section-body';
-    bodyEl.textContent = (sec.testo || sec.text || '').substring(0, 800);
+    // Testo completo — nessun limite (l'AI ha già estratto 200-350 parole per sezione)
+    bodyEl.textContent = sec.testo || sec.text || '';
 
     card.appendChild(numEl);
     card.appendChild(titleEl);
@@ -20271,6 +20275,8 @@ function wbRenderSections(sections) {
   });
 
   wbDocContent.appendChild(cont);
+  // Seleziona la prima sezione automaticamente
+  wbSelectSection(0);
 }
 
 function wbSelectSection(idx) {
