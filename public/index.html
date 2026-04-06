@@ -19456,21 +19456,23 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
   var text = '';
 
   if (ext === 'pdf') {
-    // ── PDF: PDF.js testo (senza canvas, senza worker CSP issues) ──
-    _wbSetProgress(30, '📖 Lettura pagine PDF…');
+    // ── PDF: PDF.js testo — estrazione parallela per pagina ──────
+    _wbSetProgress(30, '📖 Apertura PDF…');
     if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js non disponibile');
-    // Disabilita worker — testo estratto in main thread, nessun blocco CSP
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     var pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-    var parts = [];
-    for (var pn = 1; pn <= pdfDoc.numPages; pn++) {
+    var numPages = Math.min(pdfDoc.numPages, 80); // cap a 80 pag
+    _wbSetProgress(50, '📄 ' + numPages + ' pagine — lettura parallela…');
+    // Estrai tutte le pagine in parallelo (vs. loop sequenziale)
+    var pageNums = [];
+    for (var pi = 1; pi <= numPages; pi++) pageNums.push(pi);
+    var parts = await Promise.all(pageNums.map(async function(pn) {
       var page = await pdfDoc.getPage(pn);
       var tc = await page.getTextContent();
-      var pageText = tc.items.map(function(i){ return i.str; }).join(' ');
-      parts.push('─── Pagina ' + pn + ' ───\n' + pageText);
-      _wbSetProgress(30 + Math.round((pn / pdfDoc.numPages) * 60), '📄 Pagina ' + pn + '/' + pdfDoc.numPages);
-    }
+      return '─── Pagina ' + pn + ' ───\n' + tc.items.map(function(i){ return i.str; }).join(' ');
+    }));
     text = parts.join('\n\n');
+    _wbSetProgress(90, '✅ ' + numPages + '/' + pdfDoc.numPages + ' pagine estratte');
 
   } else if (ext === 'docx') {
     // ── DOCX: mammoth.js testo puro ──────────────────────────────
