@@ -123,7 +123,7 @@
   background: #1f1f1f;
   border-radius: 12px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;  /* FIX BUG 3: hidden sopprimeva la scrollbar webkit dei figli */
   transition: opacity 0.2s;
 }
 #screenWorkbench .wb-tool-card.wb-locked {
@@ -251,7 +251,7 @@
 }
 #screenWorkbench .wb-tool-card.wb-collapsed {
   max-height: 60px;
-  overflow: hidden;
+  overflow: hidden; /* necessario solo quando collassata */
 }
 /* Full-viewport overlay when active (same pattern as screenLRL) */
 #screenWorkbench.active {
@@ -19691,8 +19691,10 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
       return tc.items.map(function(i){ return i.str; }).join(' ');
     }));
     text = previewParts.join('\n\n');
+    // FIX BUG 4: imposta _wbDocText subito con il testo preview (wbAutoSegment lo legge dopo .then())
+    _wbDocText = text.substring(0, 25000);
     _wbSetProgress(90, '✅ Anteprima pronta · ' + totalPages + ' pag totali');
-    // Carica resto in background (non blocca UI/tools)
+    // Carica resto in background — estende _wbDocText con le pagine rimanenti
     if (totalPages > PREVIEW) {
       (async function() {
         var restNums = [];
@@ -19845,10 +19847,10 @@ async function wbRunTool(toolNum, overrideText) {
 
   // Prompts neutri — funzionano su qualsiasi tipo di documento
   var prompts = {
-    1: 'Analizza questo testo. Crea un diagramma ASCII (con frecce -> e caselle [ ]) che mostra la struttura dei concetti principali. Poi scrivi una metafora cognitiva quotidiana vivida (2-3 frasi). Formato:\n---DIAGRAM---\n[diagramma ASCII]\n---METAPHOR---\n[metafora]',
-    2: 'Identifica i blocchi concettuali di questo testo. Per ognuno:\n**TITOLO** | [tema]\n[2-3 righe sintesi]\n---',
-    3: 'Genera 3 domande di studio a risposta aperta su questo testo. Formato:\nDOMANDA: [testo]\nRISPOSTA: [risposta 2-4 righe]\n---',
-    4: 'Estrai 5-7 termini chiave da questo testo con definizioni precise. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
+    1: 'Analizza questo testo. Crea un diagramma ASCII (con frecce -> e caselle [ ]) che mostra la struttura dei concetti principali. Poi scrivi una metafora cognitiva quotidiana vivida (2-3 frasi). Formato obbligatorio:\n---DIAGRAM---\n[diagramma ASCII qui]\n---METAPHOR---\n[metafora qui]',
+    2: 'Identifica 4-6 blocchi concettuali in questo testo. Usa ESATTAMENTE "---" (tre trattini) come separatore tra i blocchi. Formato obbligatorio:\n**Titolo blocco** | tema\nSintesi del blocco in 2-3 righe.\n---\n**Titolo blocco 2** | tema2\nSintesi del blocco 2.\n---',
+    3: 'Genera 3 domande di studio a risposta aperta su questo testo. Separa ogni domanda con "---". Formato:\nDOMANDA: [domanda]\nRISPOSTA: [risposta 2-4 righe]\n---',
+    4: 'Estrai 5-7 termini chiave da questo testo con definizioni precise. Separa ogni termine con "---". Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
   };
 
   var loadingId = 'wbTool0' + toolNum + 'Loading';
@@ -19859,8 +19861,8 @@ async function wbRunTool(toolNum, overrideText) {
   if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
   try {
-    // Token budgets per tool (root cause della lentezza: 8192 → valori mirati)
-    var tokenBudget = { 1: 500, 2: 700, 3: 500, 4: 450 };
+    // Token budgets per tool — tool 2 ha bisogno di più spazio per i blocchi multipli
+    var tokenBudget = { 1: 600, 2: 1100, 3: 600, 4: 550 };
     var fullPrompt = prompts[toolNum] + '\n\nDOCUMENTO:\n' + docText.substring(0, 4000);
 
     var ctrl = new AbortController();
@@ -19895,7 +19897,7 @@ async function wbRunTool(toolNum, overrideText) {
       resultEl.style.boxSizing  = 'border-box';
     }
 
-    if (toolNum === 1) wbRenderTool01(aiText);
+    if (toolNum === 1) wbRenderTool01(aiText, resultEl); // FIX BUG 1: passa resultEl
     else if (toolNum === 2) wbRenderTool02(aiText, resultEl);
     else if (toolNum === 3) wbRenderTool03(aiText, resultEl);
     else if (toolNum === 4) wbRenderTool04(aiText, resultEl);
@@ -19906,33 +19908,39 @@ async function wbRunTool(toolNum, overrideText) {
   }
 }
 
-function wbRenderTool01(text) {
+// FIX BUG 1: crea elementi fresh invece di cercare ID eliminati da innerHTML=''
+function wbRenderTool01(text, resultEl) {
   var parts = text.split('---METAPHOR---');
   var diagramPart = parts[0].replace('---DIAGRAM---','').trim();
   var metaphorPart = parts[1] ? parts[1].trim() : '';
-
-  // Clean mermaid code block markers
   diagramPart = diagramPart.replace(/```mermaid\n?/gi,'').replace(/```\n?/gi,'').trim();
 
-  var diagEl = document.getElementById('wbTool01Diagram');
-  var metaEl = document.getElementById('wbTool01Metaphor');
-  if (diagEl) diagEl.textContent = diagramPart;
-  if (metaEl) metaEl.textContent = metaphorPart || text;
-  // display already set to 'block' by wbRunTool
+  // resultEl è già visibile e vuoto — crea elementi fresh
+  resultEl.style.flexDirection = 'column';
 
-  // Try to render with Mermaid (already loaded globally)
-  if (typeof mermaid !== 'undefined' && diagEl && diagramPart) {
-    try {
-      mermaid.initialize({ startOnLoad: false, theme: 'dark' });
-      mermaid.render('wbMermaid_' + Date.now(), diagramPart).then(function(r) {
-        diagEl.innerHTML = r.svg;
-      }).catch(function(err) { console.warn('[WB] Mermaid render error:', err); });
-    } catch(e) { /* keep ASCII text */ }
+  var diagEl = document.createElement('div');
+  diagEl.id = 'wbTool01Diagram';
+  diagEl.style.cssText = 'background:#000000;border-radius:8px;padding:16px;border:1px solid rgba(211,148,255,.15);font-family:monospace;font-size:12px;color:#d394ff;white-space:pre-wrap;overflow-x:auto;margin-bottom:12px;word-break:break-word';
+  diagEl.textContent = diagramPart || text;
+  resultEl.appendChild(diagEl);
+
+  if (metaphorPart) {
+    var metaEl = document.createElement('div');
+    metaEl.id = 'wbTool01Metaphor';
+    metaEl.style.cssText = 'background:#262626;border-radius:8px;padding:14px;font-size:13px;color:#e0e0e0;font-style:italic;line-height:1.7;border-left:3px solid rgba(211,148,255,.4)';
+    metaEl.textContent = metaphorPart;
+    resultEl.appendChild(metaEl);
   }
 }
 
 function wbRenderTool02(text, resultEl) {
-  var chunks = text.split('---').filter(function(c) { return c.trim(); });
+  // Prova split con --- ; se non trovato, fallback su paragrafi separati da **
+  var chunks = text.split(/\n---+\n?|\n?---+\n/).filter(function(c) { return c.trim(); });
+  if (chunks.length < 2) {
+    // Fallback: split su blocchi che iniziano con ** (bold title)
+    chunks = text.split(/\n(?=\*\*)/).filter(function(c) { return c.trim(); });
+  }
+  if (chunks.length < 1) chunks = [text];
   resultEl.style.flexDirection = 'column';
   chunks.forEach(function(chunk) {
     chunk = chunk.trim();
