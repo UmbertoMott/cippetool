@@ -196,6 +196,14 @@
 #screenWorkbench ::-webkit-scrollbar { width: 4px; }
 #screenWorkbench ::-webkit-scrollbar-track { background: #0e0e0e; }
 #screenWorkbench ::-webkit-scrollbar-thumb { background: #484848; border-radius: 2px; }
+/* Tool result: si espande con scroll proprio, non taglia i tool sotto */
+#screenWorkbench [id^="wbTool"][id$="Result"] {
+  max-height: 340px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #484848 #1f1f1f;
+  scroll-behavior: smooth;
+}
 /* Full-viewport overlay when active (same pattern as screenLRL) */
 #screenWorkbench.active {
   display: flex;
@@ -4824,8 +4832,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div style="display:flex;align-items:center;gap:16px">
         <button onclick="showScreen('screenMode')" style="background:none;border:1px solid #484848;border-radius:8px;color:#ababab;padding:5px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='#d394ff';this.style.color='#d394ff'" onmouseout="this.style.borderColor='#484848';this.style.color='#ababab'">← Torna</button>
         <span style="font-size:15px;font-weight:800;color:#ffffff;letter-spacing:-.01em;flex:1">🔬 AI Document Workbench</span>
+        <!-- STORICO DOCUMENTI — centro header -->
+        <div id="wbHistoryStrip" style="flex:1;display:flex;align-items:center;gap:6px;overflow:hidden;min-width:0;padding:0 8px"></div>
         <!-- TOGGLE A/B — centrato, lontano dal supa-user-bar che è top-right -->
-        <div class="wb-toggle-pill" style="margin-right:8px">
+        <div class="wb-toggle-pill" style="margin-right:8px;flex-shrink:0">
           <button id="wbBtnSplit" onclick="wbToggleLayout('split')" style="background:#d394ff;color:#000">⬜ Split</button>
           <button id="wbBtnStack" onclick="wbToggleLayout('stack')" style="background:transparent;color:#ababab">⬛ Stack</button>
         </div>
@@ -19247,6 +19257,38 @@ function wbInit() {
   // Restore layout preference
   var pref = localStorage.getItem('wb_layout_pref') || 'split';
   wbToggleLayout(pref, true);
+  wbHistRender();
+}
+
+// ── DOCUMENT HISTORY ─────────────────────────────────────────────────────────
+var _WB_HIST_KEY = 'wb_doc_history_v1';
+function _wbHistLoad() {
+  try { return JSON.parse(localStorage.getItem(_WB_HIST_KEY) || '[]'); } catch(e) { return []; }
+}
+function wbHistSave(name, sizeMB) {
+  var hist = _wbHistLoad();
+  // rimuovi eventuale duplicato per stesso nome
+  hist = hist.filter(function(h) { return h.name !== name; });
+  hist.unshift({ name: name, size: sizeMB, ts: Date.now() });
+  if (hist.length > 8) hist = hist.slice(0, 8);
+  try { localStorage.setItem(_WB_HIST_KEY, JSON.stringify(hist)); } catch(e) {}
+  wbHistRender();
+}
+function wbHistRender() {
+  var strip = document.getElementById('wbHistoryStrip');
+  if (!strip) return;
+  var hist = _wbHistLoad();
+  if (!hist.length) { strip.innerHTML = ''; return; }
+  strip.innerHTML = '<span style="font-size:9px;color:#484848;font-family:\'Space Grotesk\',monospace;text-transform:uppercase;letter-spacing:.08em;flex-shrink:0">Recenti:</span>';
+  hist.slice(0, 5).forEach(function(h) {
+    var pill = document.createElement('button');
+    pill.title = h.name + ' · ' + h.size + ' MB';
+    pill.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;color:#ababab;font-size:10px;font-family:\'Space Grotesk\',monospace;padding:3px 10px;cursor:pointer;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;transition:all .15s;flex-shrink:0';
+    pill.textContent = h.name.length > 14 ? h.name.substring(0, 12) + '…' : h.name;
+    pill.onmouseover = function() { pill.style.borderColor = 'rgba(211,148,255,.4)'; pill.style.color = '#d394ff'; };
+    pill.onmouseout  = function() { pill.style.borderColor = 'rgba(255,255,255,.1)'; pill.style.color = '#ababab'; };
+    strip.appendChild(pill);
+  });
 }
 
 function wbToggleLayout(mode, silent) {
@@ -19347,6 +19389,7 @@ function wbOnFileSelect(input) {
       document.getElementById('wbProgressBar').style.background = 'linear-gradient(90deg,#34d399,#059669)';
       document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + sizeMB + ' MB · ✅ Pronto';
       wbUnlockTools();
+      wbHistSave(file.name, sizeMB);
       setTimeout(function() { document.getElementById('wbProgressWrap').style.display = 'none'; }, 1500);
       // Auto-segmenta con Gemini
       wbAutoSegment();
@@ -19456,23 +19499,37 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
   var text = '';
 
   if (ext === 'pdf') {
-    // ── PDF: PDF.js testo — estrazione parallela per pagina ──────
+    // ── PDF: mostra prime pagine subito, resto in background ─────
     _wbSetProgress(30, '📖 Apertura PDF…');
     if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js non disponibile');
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    var pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-    var numPages = Math.min(pdfDoc.numPages, 80); // cap a 80 pag
-    _wbSetProgress(50, '📄 ' + numPages + ' pagine — lettura parallela…');
-    // Estrai tutte le pagine in parallelo (vs. loop sequenziale)
-    var pageNums = [];
-    for (var pi = 1; pi <= numPages; pi++) pageNums.push(pi);
-    var parts = await Promise.all(pageNums.map(async function(pn) {
+    var pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    var totalPages = pdfDoc.numPages;
+    _wbSetProgress(50, '📄 ' + totalPages + ' pag — lettura anteprima…');
+    // Prime 6 pagine subito per display istantaneo
+    var PREVIEW = Math.min(6, totalPages);
+    var previewNums = [];
+    for (var pi = 1; pi <= PREVIEW; pi++) previewNums.push(pi);
+    var previewParts = await Promise.all(previewNums.map(async function(pn) {
       var page = await pdfDoc.getPage(pn);
       var tc = await page.getTextContent();
-      return '─── Pagina ' + pn + ' ───\n' + tc.items.map(function(i){ return i.str; }).join(' ');
+      return tc.items.map(function(i){ return i.str; }).join(' ');
     }));
-    text = parts.join('\n\n');
-    _wbSetProgress(90, '✅ ' + numPages + '/' + pdfDoc.numPages + ' pagine estratte');
+    text = previewParts.join('\n\n');
+    _wbSetProgress(90, '✅ Anteprima pronta · ' + totalPages + ' pag totali');
+    // Carica resto in background (non blocca UI/tools)
+    if (totalPages > PREVIEW) {
+      (async function() {
+        var restNums = [];
+        for (var rp = PREVIEW + 1; rp <= Math.min(totalPages, 80); rp++) restNums.push(rp);
+        var restParts = await Promise.all(restNums.map(async function(pn) {
+          var page = await pdfDoc.getPage(pn);
+          var tc = await page.getTextContent();
+          return tc.items.map(function(i){ return i.str; }).join(' ');
+        }));
+        _wbDocText = (text + '\n\n' + restParts.join('\n\n')).substring(0, 25000);
+      })();
+    }
 
   } else if (ext === 'docx') {
     // ── DOCX: mammoth.js testo puro ──────────────────────────────
@@ -19492,13 +19549,14 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
 
   if (!text || text.trim().length < 10) throw new Error('Nessun testo estratto dal documento');
 
-  // Mostra testo nel pannello sinistra (sarà sostituito da auto-segment)
+  // Mostra testo nel pannello — solo primi 6000 chars nel DOM (DOM reflow istantaneo)
   placeholder.style.display = 'none';
   container.style.display   = 'none';
   docTextEl.style.display   = 'block';
   docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#2d2540;white-space:pre-wrap;overflow-y:auto;background:#fafaf8;word-break:break-word;scrollbar-width:thin;scrollbar-color:#c4b5fd #f0f0ec';
-  docTextEl.textContent     = text;
-  _wbDocText = text.substring(0, 25000);
+  var displayText = text.substring(0, 6000) + (text.length > 6000 ? '\n\n… [testo completo disponibile per i tool AI] …' : '');
+  docTextEl.textContent     = displayText;
+  if (ext !== 'pdf') _wbDocText = text.substring(0, 25000); // PDF già impostato sopra
   _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
 }
 
@@ -19959,24 +20017,22 @@ async function wbAutoSegment() {
   var wbDocContent = document.getElementById('wbDocContent');
   if (!wbDocContent) return;
 
-  // Mostra testo raw temporaneamente con sfondo bianco, poi loading
+  // Il testo raw resta VISIBILE — il banner di loading appare sopra
   var rawTxt = document.getElementById('wbDocText');
-  if (rawTxt) rawTxt.style.display = 'none';
+  var loadBanner = document.createElement('div');
+  loadBanner.id = 'wbSegmentLoading';
+  loadBanner.style.cssText = 'padding:6px 20px;background:rgba(211,148,255,.08);border-bottom:1px solid rgba(211,148,255,.15);font-size:11px;color:#d394ff;font-family:\'Space Grotesk\',monospace;flex-shrink:0';
+  loadBanner.textContent = '✦ Strutturazione in sezioni in corso…';
+  wbDocContent.insertBefore(loadBanner, wbDocContent.firstChild);
 
-  var loadDiv = document.createElement('div');
-  loadDiv.id = 'wbSegmentLoading';
-  loadDiv.className = 'wb-segment-pulse';
-  loadDiv.innerHTML = '✦ Gemini sta strutturando il documento in sezioni…';
-  wbDocContent.appendChild(loadDiv);
-
-  var prompt = 'Sei un assistente di studio. Analizza il documento e dividilo in 5-8 sezioni concettuali.\n\nRispondi SOLO con JSON valido (nessun altro testo, nessun ```json```):\n[\n  {"titolo":"Titolo sezione","testo":"Contenuto originale 200-400 parole"},\n  ...\n]\n\nRegole: usa testo originale (non parafrasare), titoli chiari max 60 caratteri.\n\nDOCUMENTO:\n';
+  var prompt = 'Dividi questo testo in 5-8 sezioni concettuali. Rispondi SOLO JSON:\n[{"titolo":"max 60 chars","testo":"200-350 parole originali"},...]\n\nTESTO:\n';
   try {
     var resp = await fetch('/api/gemini', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt + _wbDocText.substring(0, 18000) }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
+        contents: [{ role: 'user', parts: [{ text: prompt + _wbDocText.substring(0, 8000) }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 1500 }
       })
     });
     var ld = document.getElementById('wbSegmentLoading');
