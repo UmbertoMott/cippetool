@@ -4939,6 +4939,15 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="font-size:11px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">Full Document View</div>
           </div>
         </div>
+        <!-- Banner selezione attiva -->
+        <div id="wbSelectionBanner" style="display:none;padding:8px 16px;background:rgba(211,148,255,.07);border-bottom:1px solid rgba(211,148,255,.18);align-items:center;gap:10px;flex-shrink:0">
+          <div style="width:3px;height:34px;background:#d394ff;border-radius:2px;flex-shrink:0"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:9px;color:#d394ff;font-family:'Space Grotesk',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Selezione attiva · <span id="wbSelCount"></span></div>
+            <div id="wbSelPreview" style="font-size:11px;color:#e0e0e0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:italic;opacity:.8"></div>
+          </div>
+          <button onclick="_wbClearSelection()" title="Rimuovi selezione" style="background:none;border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#ababab;font-size:10px;cursor:pointer;padding:3px 10px;white-space:nowrap;font-family:'Space Grotesk',monospace;transition:all .15s" onmouseover="this.style.borderColor='rgba(211,148,255,.4)';this.style.color='#d394ff'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#ababab'">✕ Annulla</button>
+        </div>
         <div id="wbDocContent" class="wb-doc-content" style="flex:1;overflow:hidden;background:#111111;display:flex;flex-direction:column;">
           <!-- Placeholder -->
           <div id="wbDocPlaceholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;opacity:.35">
@@ -19315,6 +19324,7 @@ var _wbPendingFile = null;   // File object selected but not yet uploaded
 var _wbFlashcardQueue = [];  // flashcards waiting to be saved
 var _wbSections = [];        // sezioni estratte da Gemini auto-segment
 var _wbSelectedSection = -1; // indice sezione selezionata (-1 = nessuna)
+var _wbActiveSelection = ''; // testo attivo: selezione mouse o sezione cliccata
 
 function wbInit() {
   // Collega file input + bottoni via JS (più affidabile di attributi onchange/onclick inline)
@@ -19334,6 +19344,39 @@ function wbInit() {
   wbToggleLayout(pref, true);
   wbHistRender();
   _wbInitResize();
+  _wbInitSelectionListener();
+}
+
+// ── SELEZIONE TESTO LIBERA nel pannello documento ─────────────────────────────
+function _wbInitSelectionListener() {
+  var docPanel = document.getElementById('wbDocPanel');
+  if (!docPanel) return;
+  docPanel.addEventListener('mouseup', function() {
+    // Piccolo delay per dare tempo al browser di aggiornare la selezione
+    setTimeout(function() {
+      var sel = window.getSelection();
+      var txt = sel ? sel.toString().trim() : '';
+      if (txt.length >= 60) {
+        _wbActiveSelection = txt;
+        _wbShowSelectionBanner(txt);
+      }
+    }, 60);
+  });
+}
+function _wbShowSelectionBanner(txt) {
+  var banner  = document.getElementById('wbSelectionBanner');
+  var preview = document.getElementById('wbSelPreview');
+  var count   = document.getElementById('wbSelCount');
+  if (!banner) return;
+  if (count)   count.textContent   = txt.length + ' caratteri';
+  if (preview) preview.textContent = '"' + txt.substring(0, 110) + (txt.length > 110 ? '…' : '') + '"';
+  banner.style.display = 'flex';
+}
+function _wbClearSelection() {
+  _wbActiveSelection = '';
+  var banner = document.getElementById('wbSelectionBanner');
+  if (banner) banner.style.display = 'none';
+  if (window.getSelection) window.getSelection().removeAllRanges();
 }
 
 // ── MINIMIZE / EXPAND SINGOLO TOOL ───────────────────────────────────────────
@@ -19473,6 +19516,9 @@ function wbResetUpload() {
   if (oldSec) oldSec.remove();
   _wbSections = [];
   _wbSelectedSection = -1;
+  _wbActiveSelection = '';
+  var selBanner = document.getElementById('wbSelectionBanner');
+  if (selBanner) selBanner.style.display = 'none';
   // Riloca tool
   document.querySelectorAll('#screenWorkbench .wb-tool-card').forEach(function(c) { c.classList.add('wb-locked'); });
   // Reset tool results
@@ -19796,24 +19842,16 @@ function wbUnlockTools() {
 }
 
 async function wbRunTool(toolNum, overrideText) {
-  // Determina il testo da analizzare: sezione selezionata > full doc
-  var docText = overrideText || _wbDocText;
+  // Priorità: override (da sezione) > selezione attiva > full doc
+  var docText = overrideText || _wbActiveSelection || _wbDocText;
   if (!docText || docText.trim().length < 20) return;
 
-  var isSection = !!overrideText;
+  // Prompts neutri — funzionano su qualsiasi tipo di documento
   var prompts = {
-    1: isSection
-      ? 'Analizza questa sezione di un documento GDPR/privacy. Crea un diagramma ASCII (non mermaid) con frecce testuali che mostra la struttura dei concetti. Poi scrivi una metafora cognitiva quotidiana (2-3 frasi). Formato:\n---DIAGRAM---\n[diagramma ASCII con frecce -> e caselle]\n---METAPHOR---\n[metafora]'
-      : 'Analizza questo documento legale GDPR/privacy. Prima crea un diagramma Mermaid (flowchart LR o graph TD) che rappresenti i concetti principali. Poi scrivi UNA metafora cognitiva potente. Formato risposta:\n---DIAGRAM---\n[codice mermaid]\n---METAPHOR---\n[metafora in 2-3 frasi]',
-    2: isSection
-      ? 'Analizza questa sezione e identifica: 1) Il Concetto Chiave principale (titolo + 2 righe), 2) 2-3 Tag normativi rilevanti (es. Art.5 GDPR), 3) Una frase di sintesi. Formato:\nCONCETTO: [titolo]\n[2 righe spiegazione]\nTAG: [Art.X] [Art.Y]\nSINTESI: [frase unica]\n---'
-      : 'Analizza questo documento GDPR/privacy e suddividilo in 6-8 blocchi concettuali. Per ogni blocco:\n**TITOLO** | [tag articolo GDPR]\n[3 righe sintesi]\n---',
-    3: isSection
-      ? 'Genera 2 domande di ripasso a risposta aperta su questa sezione. Formato:\nDOMANDA: [testo]\nRISPOSTA: [risposta 2-4 righe]\n---'
-      : 'Genera 5 domande di ripasso a risposta aperta su questo documento GDPR. Formato:\nDOMANDA: [testo]\nRISPOSTA: [risposta 3-5 righe]\n---',
-    4: isSection
-      ? 'Estrai 3-4 termini chiave da questa sezione con definizioni precise. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
-      : 'Estrai 8-10 termini chiave GDPR da questo documento. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
+    1: 'Analizza questo testo. Crea un diagramma ASCII (con frecce -> e caselle [ ]) che mostra la struttura dei concetti principali. Poi scrivi una metafora cognitiva quotidiana vivida (2-3 frasi). Formato:\n---DIAGRAM---\n[diagramma ASCII]\n---METAPHOR---\n[metafora]',
+    2: 'Identifica i blocchi concettuali di questo testo. Per ognuno:\n**TITOLO** | [tema]\n[2-3 righe sintesi]\n---',
+    3: 'Genera 3 domande di studio a risposta aperta su questo testo. Formato:\nDOMANDA: [testo]\nRISPOSTA: [risposta 2-4 righe]\n---',
+    4: 'Estrai 5-7 termini chiave da questo testo con definizioni precise. Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
   };
 
   var loadingId = 'wbTool0' + toolNum + 'Loading';
@@ -20002,9 +20040,7 @@ async function wbRunScholar() {
   if (loadEl) { loadEl.style.display = 'block'; loadEl.textContent = '⟳ Analisi Scholar in corso…'; }
   if (resEl)  { resEl.style.display = 'none'; resEl.innerHTML = ''; }
 
-  var segCtx = (_wbSelectedSection >= 0 && _wbSections[_wbSelectedSection])
-    ? (_wbSections[_wbSelectedSection].testo || _wbSections[_wbSelectedSection].text || _wbDocText)
-    : _wbDocText;
+  var segCtx = _wbActiveSelection || _wbDocText;
 
   var prompt = 'Analizza questo testo legale/privacy come Luminance Scholar. '
     + 'Rispondi SOLO con JSON valido (nessun testo fuori), struttura esatta:\n'
@@ -20116,10 +20152,8 @@ async function wbChatSend() {
 
   try {
     // Usa testo sezione selezionata se disponibile, altrimenti full doc
-    var docText = (_wbSelectedSection >= 0 && _wbSections[_wbSelectedSection])
-      ? (_wbSections[_wbSelectedSection].testo || _wbSections[_wbSelectedSection].text || _wbDocText)
-      : _wbDocText;
-    var contextMsg = 'Sei un assistente GDPR/privacy. Il contesto è questo documento:\n\n' + docText.substring(0,5000) + '\n\n---\nDomanda: ' + msg;
+    var docText = _wbActiveSelection || _wbDocText;
+    var contextMsg = 'Sei un assistente di studio. Il contesto è questo testo:\n\n' + docText.substring(0,5000) + '\n\n---\nDomanda: ' + msg;
 
     var ctrl = new AbortController();
     var tid = setTimeout(function() { ctrl.abort(); }, 90000);
@@ -20158,7 +20192,7 @@ async function wbAutoSegment() {
   loadBanner.textContent = '✦ Strutturazione in sezioni in corso…';
   wbDocContent.insertBefore(loadBanner, wbDocContent.firstChild);
 
-  var prompt = 'Dividi questo testo in 5-8 sezioni concettuali. Rispondi SOLO JSON:\n[{"titolo":"max 60 chars","testo":"200-350 parole originali"},...]\n\nTESTO:\n';
+  var prompt = 'Analizza il testo e dividilo in 5-8 sezioni concettuali significative (qualsiasi tipo di documento). Rispondi SOLO JSON valido:\n[{"titolo":"titolo chiaro max 60 chars","testo":"200-350 parole originali del testo"},...]\n\nTESTO:\n';
   try {
     var resp = await fetch('/api/gemini', {
       method: 'POST',
@@ -20250,9 +20284,12 @@ function wbSelectSection(idx) {
   if (activeCard) activeCard.classList.add('wb-section-active');
 
   var sectionText = _wbSections[idx].testo || _wbSections[idx].text || '';
+  // Imposta come selezione attiva → banner + tool usano questo testo
+  _wbActiveSelection = sectionText;
+  _wbShowSelectionBanner(sectionText);
 
-  // Auto-run tool 1-4 sulla sezione
-  [1, 2, 3, 4].forEach(function(n) { wbRunTool(n, sectionText); });
+  // Auto-run tool 1-4
+  [1, 2, 3, 4].forEach(function(n) { wbRunTool(n); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
