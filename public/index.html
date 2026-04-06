@@ -4104,8 +4104,9 @@ function _supaShowApp() {
       // Vai alla dashboard
       try {
         if (typeof showDashboard === 'function') await showDashboard();
-        if (typeof showScreen === 'function') showScreen('screenMode');
-      } catch(e) {}
+      } catch(e) { console.warn('[Auth] showDashboard error:', e); }
+      // Naviga sempre dopo auth, indipendentemente da errori di showDashboard
+      if (typeof showScreen === 'function') showScreen('screenMode');
     })();
   }
 }
