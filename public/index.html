@@ -214,21 +214,15 @@
   transition: all .2s;
 }
 /* scrollbar for webkit */
-#screenWorkbench ::-webkit-scrollbar { width: 4px; }
+#screenWorkbench ::-webkit-scrollbar { width: 5px; }
 #screenWorkbench ::-webkit-scrollbar-track { background: #0e0e0e; }
-#screenWorkbench ::-webkit-scrollbar-thumb { background: #484848; border-radius: 2px; }
-/* Tool result: ~14cm, scrollbar verticale sempre visibile */
-#screenWorkbench [id^="wbTool"][id$="Result"]:not([style*="display: none"]):not([style*="display:none"]) {
-  min-height: 530px;
-  max-height: 530px;
-  overflow-y: scroll;
-  scrollbar-width: thin;
-  scrollbar-color: #6b6b6b #1a1a1a;
-  scroll-behavior: smooth;
-  border-radius: 6px;
-  margin-top: 6px;
-  padding-right: 2px;
-}
+#screenWorkbench ::-webkit-scrollbar-thumb { background: #555555; border-radius: 3px; }
+#screenWorkbench ::-webkit-scrollbar-thumb:hover { background: #888888; }
+/* Tool result scrollbars — wider, always visible */
+#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar { width: 8px; }
+#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
+#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar-thumb { background: #585858; border-radius: 4px; border: 1px solid #111; }
+#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar-thumb:hover { background: #888888; }
 /* Pulsante minimize card */
 #screenWorkbench .wb-toggle-btn {
   background: rgba(255,255,255,.06);
@@ -285,12 +279,12 @@
   font-family: 'Space Grotesk', monospace;
   letter-spacing: .06em;
 }
-/* ── Document white panel ──────────────────────────────────── */
+/* ── Document dark panel ──────────────────────────────────── */
 #screenWorkbench .wb-doc-panel {
-  background: #fafaf8 !important;
+  background: #111111;
 }
 #screenWorkbench #wbDocContent {
-  background: #fafaf8 !important;
+  background: #111111;
 }
 /* ── Section cards ─────────────────────────────────────────── */
 #screenWorkbench .wb-sections-hint {
@@ -19730,13 +19724,13 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
 
   if (!text || text.trim().length < 10) throw new Error('Nessun testo estratto dal documento');
 
-  // Mostra testo nel pannello — solo primi 6000 chars nel DOM (DOM reflow istantaneo)
+  // Mostra testo nel pannello — testo completo (fino a 25000 chars)
   placeholder.style.display = 'none';
   container.style.display   = 'none';
   docTextEl.style.display   = 'block';
-  docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#b8b8c0;white-space:pre-wrap;overflow-y:auto;background:#111111;word-break:break-word;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111';
-  var displayText = text.substring(0, 6000) + (text.length > 6000 ? '\n\n… [testo completo disponibile per i tool AI] …' : '');
-  docTextEl.textContent     = displayText;
+  docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#c8c8d0;white-space:pre-wrap;overflow-y:auto;background:#111111;word-break:break-word;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111';
+  var fullDisplayText = text.substring(0, 25000);
+  docTextEl.textContent     = fullDisplayText;
   if (ext !== 'pdf') _wbDocText = text.substring(0, 25000); // PDF già impostato sopra
   _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
 }
@@ -19887,7 +19881,19 @@ async function wbRunTool(toolNum, overrideText) {
     var aiText = data.text || data.reply || data.response || data.answer || '';
 
     if (loadingEl) loadingEl.style.display = 'none';
-    if (resultEl) resultEl.style.display = (toolNum === 1) ? 'block' : 'flex';
+    if (resultEl) {
+      resultEl.style.display    = (toolNum === 1) ? 'block' : 'flex';
+      resultEl.style.minHeight  = '530px';
+      resultEl.style.maxHeight  = '530px';
+      resultEl.style.overflowY  = 'scroll';
+      resultEl.style.scrollbarWidth = 'thin';
+      resultEl.style.scrollbarColor = '#666666 #1a1a1a';
+      resultEl.style.borderRadius   = '6px';
+      resultEl.style.marginTop  = '6px';
+      resultEl.style.padding    = '8px 4px 8px 8px';
+      resultEl.style.gap        = '10px';
+      resultEl.style.boxSizing  = 'border-box';
+    }
 
     if (toolNum === 1) wbRenderTool01(aiText);
     else if (toolNum === 2) wbRenderTool02(aiText, resultEl);
@@ -20085,7 +20091,17 @@ function wbRenderScholar(d) {
   var resEl = document.getElementById('wbTool06Result');
   if (!resEl) return;
   resEl.innerHTML = '';
-  resEl.style.display = 'flex';
+  resEl.style.display       = 'flex';
+  resEl.style.minHeight     = '530px';
+  resEl.style.maxHeight     = '530px';
+  resEl.style.overflowY     = 'scroll';
+  resEl.style.scrollbarWidth = 'thin';
+  resEl.style.scrollbarColor = '#666666 #1a1a1a';
+  resEl.style.borderRadius  = '6px';
+  resEl.style.marginTop     = '6px';
+  resEl.style.padding       = '8px 4px 8px 8px';
+  resEl.style.gap           = '10px';
+  resEl.style.boxSizing     = 'border-box';
 
   function card(label, color, content) {
     var el = document.createElement('div');
@@ -20195,14 +20211,14 @@ async function wbAutoSegment() {
   loadBanner.textContent = '✦ Strutturazione in sezioni in corso…';
   wbDocContent.insertBefore(loadBanner, wbDocContent.firstChild);
 
-  var prompt = 'Analizza il testo e dividilo in 5-8 sezioni concettuali significative (qualsiasi tipo di documento). Rispondi SOLO JSON valido:\n[{"titolo":"titolo chiaro max 60 chars","testo":"200-350 parole originali del testo"},...]\n\nTESTO:\n';
+  var prompt = 'Analizza il testo e dividilo in 5-8 sezioni concettuali significative (qualsiasi tipo di documento). Per ogni sezione riporta il testo originale VERBATIM (copiato dal documento senza riscrivere), 300-500 parole per sezione. Rispondi SOLO JSON valido:\n[{"titolo":"titolo chiaro max 60 chars","testo":"testo verbatim originale del documento 300-500 parole"},...]\n\nTESTO:\n';
   try {
     var resp = await fetch('/api/gemini', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt + _wbDocText.substring(0, 8000) }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 1500 }
+        contents: [{ role: 'user', parts: [{ text: prompt + _wbDocText.substring(0, 12000) }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 2400 }
       })
     });
     var ld = document.getElementById('wbSegmentLoading');
@@ -20241,12 +20257,12 @@ function wbRenderSections(sections) {
 
   var cont = document.createElement('div');
   cont.id = 'wbSectionsContainer';
-  cont.style.cssText = 'flex:1;overflow-y:auto;background:#111111;display:flex;flex-direction:column;';
+  cont.style.cssText = 'flex:1;overflow-y:auto;background:#111111;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111';
 
   // Hint bar
   var hint = document.createElement('div');
   hint.className = 'wb-sections-hint';
-  hint.textContent = '✦ ' + sections.length + ' sezioni estratte · clicca per analizzare';
+  hint.textContent = '✦ ' + sections.length + ' sezioni · testo verbatim · clicca per analizzare';
   cont.appendChild(hint);
 
   sections.forEach(function(sec, idx) {
