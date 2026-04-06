@@ -12,19 +12,19 @@
    AI DOCUMENT WORKBENCH — scoped CSS (.wb-* / #screenWorkbench)
    ═══════════════════════════════════════════════════ */
 #screenWorkbench {
-  --wb-bg:        #0e0e0e;
-  --wb-sur-low:   #131313;
-  --wb-sur:       #191919;
-  --wb-sur-high:  #1f1f1f;
-  --wb-sur-top:   #262626;
-  --wb-primary:   #d394ff;
-  --wb-primary-d: #aa30fa;
-  --wb-primary-f: #cb80ff;
-  --wb-tertiary:  #ff6d8d;
-  --wb-cyan:      #06b6d4;
-  --wb-outline:   #484848;
+  --wb-bg:        #0D0D0D;   /* era #0e0e0e */
+  --wb-sur-low:   #111111;
+  --wb-sur:       #161616;
+  --wb-sur-high:  #1e1e1e;
+  --wb-sur-top:   #232323;
+  --wb-primary:   #A855F7;   /* viola neon */
+  --wb-primary-d: #9333ea;
+  --wb-primary-f: #c084fc;
+  --wb-tertiary:  #f472b6;
+  --wb-cyan:      #22d3ee;
+  --wb-outline:   #333333;
   --wb-txt:       #ffffff;
-  --wb-muted:     #ababab;
+  --wb-muted:     #888888;
   --wb-void:      #000000;
   font-family: 'Inter', sans-serif;
   background: var(--wb-bg);
@@ -289,12 +289,23 @@
 /* ── Section cards ─────────────────────────────────────────── */
 /* Sezione viewer — nav buttons hover */
 #wbSecPrev:hover:not(:disabled), #wbSecNext:hover:not(:disabled) {
-  background: rgba(211,148,255,.22) !important;
-  border-color: rgba(211,148,255,.55) !important;
+  background: rgba(168,85,247,.22) !important;
+  border-color: rgba(168,85,247,.55) !important;
 }
 #wbSecView::-webkit-scrollbar { width: 5px; }
-#wbSecView::-webkit-scrollbar-track { background: #111111; }
-#wbSecView::-webkit-scrollbar-thumb { background: rgba(211,148,255,.3); border-radius: 3px; }
+#wbSecView::-webkit-scrollbar-track { background: #111; }
+#wbSecView::-webkit-scrollbar-thumb { background: rgba(168,85,247,.35); border-radius: 3px; }
+/* Cyber-Academic tool card glow */
+#screenWorkbench .wb-tool-card {
+  border: 1px solid rgba(255,255,255,.06);
+}
+#screenWorkbench .wb-tool-card:hover:not(.wb-locked) {
+  border-color: rgba(168,85,247,.28);
+  box-shadow: 0 0 22px rgba(168,85,247,.09);
+}
+#screenWorkbench .wb-tools-panel {
+  background: #0D0D0D;
+}
 #screenWorkbench .wb-segment-pulse {
   padding: 36px 32px;
   text-align: center;
@@ -319,6 +330,23 @@
 #wbSectionsContainer::-webkit-scrollbar { width: 5px; }
 #wbSectionsContainer::-webkit-scrollbar-track { background: #111111; }
 #wbSectionsContainer::-webkit-scrollbar-thumb { background: rgba(211,148,255,.3); border-radius: 3px; }
+/* ── Cyber-Academic tool card glow ────────────────────────── */
+#screenWorkbench .wb-tool-card {
+  border: 1px solid rgba(255,255,255,.06);
+  transition: border-color .2s, box-shadow .2s, opacity 0.2s, max-height 0.22s ease;
+}
+#screenWorkbench .wb-tool-card:hover:not(.wb-locked) {
+  border-color: rgba(168,85,247,.25);
+  box-shadow: 0 0 20px rgba(168,85,247,.08);
+}
+/* Tool result gap uniforme */
+#screenWorkbench [id$="Result"] {
+  gap: 10px;
+}
+/* Section view webkit scrollbar */
+#wbSecView::-webkit-scrollbar { width: 5px; }
+#wbSecView::-webkit-scrollbar-track { background: #111; }
+#wbSecView::-webkit-scrollbar-thumb { background: rgba(168,85,247,.35); border-radius: 3px; }
 </style>
 <style>
 :root{
@@ -4956,42 +4984,40 @@ document.addEventListener('DOMContentLoaded', function() {
           <div id="wbTool02Loading" style="display:none;font-size:12px;color:#cb80ff;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Analisi in corso…</div>
         </div>
 
-        <!-- TOOL 03: Domande di Ripasso -->
+        <!-- TOOL 03: Scholar's Metaphor -->
         <div id="wbTool03" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#ff6d8d"></div>
+          <div class="wb-glow-bar" style="background:#c084fc"></div>
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
             <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#ff6d8d;font-family:'Space Grotesk',monospace">TOOL 03</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Domande di Ripasso</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#c084fc;font-family:'Space Grotesk',monospace">TOOL 03</div>
+              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">📖 Scholar's Metaphor</div>
             </div>
             <div style="display:flex;gap:6px;align-items:center">
-              <button onclick="wbRunTool(3)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#ff6d8d,#e2165f);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
+              <button onclick="wbRunTool(3)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#c084fc,#9333ea);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
               <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool03')" title="Minimizza">−</button>
             </div>
           </div>
-          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">5 domande a risposta aperta. Clicca per rivelare la risposta AI.</p>
+          <p style="font-size:12px;color:#888888;margin-bottom:12px;line-height:1.6">Metafora cognitiva originale che cattura l'essenza del testo.</p>
           <div id="wbTool03Result" style="display:none;flex-direction:column;gap:10px"></div>
-          <div id="wbTool03Loading" style="display:none;font-size:12px;color:#ff6d8d;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Generazione domande…</div>
+          <div id="wbTool03Loading" style="display:none;font-size:12px;color:#c084fc;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Metafora in corso…</div>
         </div>
 
-        <!-- TOOL 04: Flashcard Automatiche -->
+        <!-- TOOL 04: Active Recall -->
         <div id="wbTool04" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#aa30fa"></div>
+          <div class="wb-glow-bar" style="background:#22d3ee"></div>
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
             <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#aa30fa;font-family:'Space Grotesk',monospace">TOOL 04</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Flashcard Automatiche</div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#22d3ee;font-family:'Space Grotesk',monospace">TOOL 04</div>
+              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">⚡ Active Recall</div>
             </div>
             <div style="display:flex;gap:6px;align-items:center">
-              <button onclick="wbRunTool(4)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#aa30fa,#7c3aed);color:#fff;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
+              <button onclick="wbRunTool(4)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#22d3ee,#0891b2);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
               <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool04')" title="Minimizza">−</button>
             </div>
           </div>
-          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Estrai 5-10 coppie termine/definizione GDPR e salvale come flashcard.</p>
-          <div id="wbTool04Result" style="display:none;flex-direction:column;gap:8px"></div>
-          <div id="wbTool04Loading" style="display:none;font-size:12px;color:#aa30fa;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Estrazione flashcard…</div>
-          <button id="wbSaveFlashcardsBtn" onclick="wbSaveFlashcards()" style="display:none;margin-top:12px;background:linear-gradient(135deg,#aa30fa,#7c3aed);color:#fff;font-weight:700;border-radius:999px;padding:8px 20px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em">💾 Salva flashcard</button>
-          <div id="wbSaveFlashcardsDone" style="display:none;font-size:12px;color:#34d399;font-family:'Space Grotesk',monospace;margin-top:8px">✓ Flashcard salvate in Supabase</div>
+          <p style="font-size:12px;color:#888888;margin-bottom:12px;line-height:1.6">3 domande a risposta multipla. Clicca un'opzione per rivelare la corretta.</p>
+          <div id="wbTool04Result" style="display:none;flex-direction:column;gap:10px"></div>
+          <div id="wbTool04Loading" style="display:none;font-size:12px;color:#22d3ee;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Generazione quiz…</div>
         </div>
 
         <!-- TOOL 05: Chat Contestuale -->
@@ -19805,8 +19831,8 @@ async function wbRunTool(toolNum, overrideText) {
   var prompts = {
     1: 'Analizza questo testo. Crea un diagramma ASCII (con frecce -> e caselle [ ]) che mostra la struttura dei concetti principali. Poi scrivi una metafora cognitiva quotidiana vivida (2-3 frasi). Formato obbligatorio:\n---DIAGRAM---\n[diagramma ASCII qui]\n---METAPHOR---\n[metafora qui]',
     2: 'Identifica 4-6 blocchi concettuali in questo testo. Usa ESATTAMENTE "---" (tre trattini) come separatore tra i blocchi. Formato obbligatorio:\n**Titolo blocco** | tema\nSintesi del blocco in 2-3 righe.\n---\n**Titolo blocco 2** | tema2\nSintesi del blocco 2.\n---',
-    3: 'Genera 3 domande di studio a risposta aperta su questo testo. Separa ogni domanda con "---". Formato:\nDOMANDA: [domanda]\nRISPOSTA: [risposta 2-4 righe]\n---',
-    4: 'Estrai 5-7 termini chiave da questo testo con definizioni precise. Separa ogni termine con "---". Formato:\nTERMINE: [termine]\nDEFINIZIONE: [1-2 frasi]\n---'
+    3: 'Scrivi una metafora originale e potente che spieghi visivamente l\'essenza di questo testo. Formato obbligatorio:\nTITOLO: [titolo evocativo della metafora]\nMETAFORA: [2-3 paragrafi ricchi e vividi — prima introduci l\'oggetto analogico, poi sviluppa il parallelo, poi collega al testo]\nANALOGIA: [una analogia quotidiana in max 15 parole]',
+    4: 'Crea 3 domande di Active Recall su questo testo. Ogni domanda ha 3 opzioni (A, B, C). Formato obbligatorio:\nDOMANDA: [testo domanda]\nA: [opzione A]\nB: [opzione B]\nC: [opzione C]\nCORRETTA: [A o B o C]\nSPIEGAZIONE: [2 frasi di spiegazione]\n---'
   };
 
   var loadingId = 'wbTool0' + toolNum + 'Loading';
@@ -19818,7 +19844,7 @@ async function wbRunTool(toolNum, overrideText) {
 
   try {
     // Token budgets per tool — tool 2 ha bisogno di più spazio per i blocchi multipli
-    var tokenBudget = { 1: 600, 2: 1100, 3: 600, 4: 550 };
+    var tokenBudget = { 1: 600, 2: 1100, 3: 700, 4: 800 };
     var fullPrompt = prompts[toolNum] + '\n\nDOCUMENTO:\n' + docText.substring(0, 4000);
 
     var ctrl = new AbortController();
@@ -19890,89 +19916,162 @@ function wbRenderTool01(text, resultEl) {
 }
 
 function wbRenderTool02(text, resultEl) {
-  // Prova split con --- ; se non trovato, fallback su paragrafi separati da **
   var chunks = text.split(/\n---+\n?|\n?---+\n/).filter(function(c) { return c.trim(); });
   if (chunks.length < 2) {
-    // Fallback: split su blocchi che iniziano con ** (bold title)
     chunks = text.split(/\n(?=\*\*)/).filter(function(c) { return c.trim(); });
   }
   if (chunks.length < 1) chunks = [text];
   resultEl.style.flexDirection = 'column';
-  chunks.forEach(function(chunk) {
+
+  var colors = ['#A855F7','#22d3ee','#f472b6','#34d399','#f59e0b','#60a5fa'];
+
+  chunks.forEach(function(chunk, i) {
     chunk = chunk.trim();
     if (!chunk) return;
     var lines = chunk.split('\n').filter(Boolean);
     var titleLine = lines[0] || '';
     var tagMatch = titleLine.match(/\|\s*(.+)$/);
-    var tag = tagMatch ? tagMatch[1].trim() : '';
-    var title = titleLine.replace(/\*\*/g,'').replace(/\|.*$/, '').trim();
-    var body = lines.slice(1).join(' ').trim();
+    var tag   = tagMatch ? tagMatch[1].trim() : '';
+    var title = titleLine.replace(/\*\*/g,'').replace(/\|.*$/,'').trim();
+    var body  = lines.slice(1).join(' ').trim();
+    var col   = colors[i % colors.length];
+
     var card = document.createElement('div');
-    card.style.cssText = 'background:#262626;border-radius:8px;padding:14px 16px;border-left:3px solid rgba(203,128,255,.4)';
-    card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
-      + '<span style="font-size:13px;font-weight:700;color:#ffffff">' + (title || '—') + '</span>'
-      + (tag ? '<span style="font-size:10px;background:rgba(211,148,255,.1);color:#d394ff;border-radius:999px;padding:2px 8px;font-family:\'Space Grotesk\',monospace;font-weight:700">' + tag + '</span>' : '')
-      + '</div>'
-      + '<p style="font-size:12px;color:#ababab;line-height:1.7;margin:0">' + body + '</p>';
+    card.style.cssText = [
+      'background:#131313;border-radius:10px;padding:14px 16px 14px 20px',
+      'border-left:3px solid ' + col,
+      'border:1px solid rgba(255,255,255,.06)',
+      'border-left:3px solid ' + col
+    ].join(';');
+
+    var topRow = document.createElement('div');
+    topRow.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px';
+    topRow.innerHTML = '<span style="font-size:13px;font-weight:700;color:#ffffff;line-height:1.4">' + (title || '—') + '</span>'
+      + (tag ? '<span style="font-size:9px;background:' + col.replace(')',', .12)').replace('rgb','rgba') + ';color:' + col + ';border:1px solid ' + col.replace(')',', .3)').replace('rgb','rgba') + ';border-radius:999px;padding:2px 9px;font-family:\'Space Grotesk\',monospace;font-weight:700;white-space:nowrap;flex-shrink:0">' + tag + '</span>' : '');
+    card.appendChild(topRow);
+
+    var bodyEl = document.createElement('p');
+    bodyEl.style.cssText = 'font-size:12.5px;color:#999999;line-height:1.75;margin:0';
+    bodyEl.textContent = body;
+    card.appendChild(bodyEl);
+
     resultEl.appendChild(card);
   });
 }
 
 function wbRenderTool03(text, resultEl) {
-  var blocks = text.split('---').filter(function(b) { return b.trim(); });
   resultEl.style.flexDirection = 'column';
-  blocks.forEach(function(block, i) {
-    block = block.trim();
-    var qMatch = block.match(/DOMANDA:\s*(.+?)(?=RISPOSTA:|$)/s);
-    var aMatch = block.match(/RISPOSTA:\s*(.+)$/s);
-    var q = qMatch ? qMatch[1].trim() : block;
-    var a = aMatch ? aMatch[1].trim() : '';
-    var item = document.createElement('div');
-    item.style.cssText = 'background:#262626;border-radius:8px;overflow:hidden;border:1px solid rgba(255,109,141,.15)';
-    var qDiv = document.createElement('div');
-    qDiv.style.cssText = 'padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:12px';
-    var iconId = 'wbQ' + i + 'Icon_' + Date.now();
-    qDiv.innerHTML = '<span style="font-size:13px;color:#ffffff;font-weight:600;line-height:1.5">' + q + '</span>'
-      + '<span style="font-size:18px;color:#ff6d8d;flex-shrink:0;transition:transform .2s" id="' + iconId + '">▾</span>';
-    var aDiv = document.createElement('div');
-    aDiv.style.cssText = 'max-height:0;overflow:hidden;transition:max-height .3s ease';
-    aDiv.innerHTML = '<p style="font-size:13px;color:#ababab;line-height:1.7;border-top:1px solid rgba(255,109,141,.15);padding:12px 16px 14px;margin:0">' + a + '</p>';
-    var open = false;
-    qDiv.onclick = function() {
-      open = !open;
-      aDiv.style.maxHeight = open ? '300px' : '0';
-      var icon = document.getElementById(iconId);
-      if (icon) icon.style.transform = open ? 'rotate(180deg)' : '';
-    };
-    item.appendChild(qDiv);
-    item.appendChild(aDiv);
-    resultEl.appendChild(item);
-  });
+
+  // Estrai campi
+  var titleM = text.match(/TITOLO:\s*(.+?)(?=\nMETAFORA:|$)/s);
+  var metaM  = text.match(/METAFORA:\s*(.+?)(?=\nANALOGIA:|$)/s);
+  var analM  = text.match(/ANALOGIA:\s*(.+)$/s);
+  var title  = titleM ? titleM[1].trim() : 'Scholar\'s Metaphor';
+  var meta   = metaM  ? metaM[1].trim()  : text;
+  var anal   = analM  ? analM[1].trim()  : '';
+
+  // Header card
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;gap:12px;padding:16px 18px;background:rgba(168,85,247,.07);border-radius:10px;border:1px solid rgba(168,85,247,.2)';
+  hdr.innerHTML = '<span style="font-size:28px;flex-shrink:0">📖</span>'
+    + '<div><div style="font-size:13px;font-weight:800;color:#c084fc;margin-bottom:3px">' + title + '</div>'
+    + '<div style="font-size:10px;color:rgba(168,85,247,.5);font-family:\'Space Grotesk\',monospace;text-transform:uppercase;letter-spacing:.1em">Scholar\'s Metaphor</div></div>';
+  resultEl.appendChild(hdr);
+
+  // Metaphor body
+  var body = document.createElement('div');
+  body.style.cssText = 'background:#131313;border-radius:10px;padding:18px 20px;border-left:3px solid #A855F7;position:relative';
+  var quoteOpen = document.createElement('div');
+  quoteOpen.style.cssText = 'font-size:48px;line-height:.8;color:rgba(168,85,247,.25);font-family:Georgia,serif;position:absolute;top:10px;left:14px';
+  quoteOpen.textContent = '\u201C';
+  body.appendChild(quoteOpen);
+  var metaText = document.createElement('div');
+  metaText.style.cssText = 'font-size:13.5px;line-height:1.85;color:#e2e2e8;font-style:italic;font-family:Georgia,\'Times New Roman\',serif;padding-left:24px;white-space:pre-wrap';
+  metaText.textContent = meta;
+  body.appendChild(metaText);
+  resultEl.appendChild(body);
+
+  // Analogia box
+  if (anal) {
+    var analBox = document.createElement('div');
+    analBox.style.cssText = 'background:rgba(168,85,247,.06);border-radius:8px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(168,85,247,.15)';
+    analBox.innerHTML = '<span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span>'
+      + '<span style="font-size:12px;color:#c084fc;line-height:1.6;font-style:italic">' + anal + '</span>';
+    resultEl.appendChild(analBox);
+  }
 }
 
 function wbRenderTool04(text, resultEl) {
-  _wbFlashcardQueue = [];
-  var blocks = text.split('---').filter(function(b) { return b.trim(); });
   resultEl.style.flexDirection = 'column';
-  blocks.forEach(function(block) {
+  var blocks = text.split(/\n---+\n?|\n?---+\n/).filter(function(b) { return b.trim(); });
+  if (blocks.length < 1) blocks = [text];
+
+  blocks.forEach(function(block, qi) {
     block = block.trim();
-    var tMatch = block.match(/TERMINE:\s*(.+?)(?=DEFINIZIONE:|$)/s);
-    var dMatch = block.match(/DEFINIZIONE:\s*(.+)$/s);
-    var term = tMatch ? tMatch[1].trim() : '';
-    var def  = dMatch ? dMatch[1].trim() : block;
-    if (!term) return;
-    _wbFlashcardQueue.push({ id: Date.now() + '_' + Math.random(), front: term, back: def, domain: 'GDPR', interval: 1 });
-    var row = document.createElement('div');
-    row.style.cssText = 'background:#000000;border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;border:1px solid rgba(170,48,250,.2)';
-    row.innerHTML = '<span style="font-size:11px;color:#aa30fa;font-family:\'Space Grotesk\',monospace;font-weight:700;flex-shrink:0;margin-top:1px">FRONT</span>'
-      + '<div><div style="font-size:13px;font-weight:700;color:#ffffff">' + term + '</div>'
-      + '<div style="font-size:12px;color:#ababab;margin-top:4px;line-height:1.6">' + def + '</div></div>';
-    resultEl.appendChild(row);
+    var qM  = block.match(/DOMANDA:\s*(.+?)(?=\nA:|$)/s);
+    var aM  = block.match(/^A:\s*(.+)$/m);
+    var bM  = block.match(/^B:\s*(.+)$/m);
+    var cM  = block.match(/^C:\s*(.+)$/m);
+    var corM = block.match(/CORRETTA:\s*([ABC])/);
+    var splM = block.match(/SPIEGAZIONE:\s*(.+)$/s);
+
+    var q    = qM  ? qM[1].trim()  : block;
+    var opts = { A: aM ? aM[1].trim() : '', B: bM ? bM[1].trim() : '', C: cM ? cM[1].trim() : '' };
+    var cor  = corM ? corM[1] : 'A';
+    var spl  = splM ? splM[1].trim() : '';
+
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#131313;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.07)';
+
+    var qDiv = document.createElement('div');
+    qDiv.style.cssText = 'padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,.06)';
+    qDiv.innerHTML = '<div style="font-size:9px;color:rgba(168,85,247,.6);font-family:\'Space Grotesk\',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Q ' + (qi+1) + '</div>'
+      + '<div style="font-size:13px;font-weight:700;color:#ffffff;line-height:1.5">' + q + '</div>';
+    card.appendChild(qDiv);
+
+    var optWrap = document.createElement('div');
+    optWrap.style.cssText = 'padding:10px 16px;display:flex;flex-direction:column;gap:6px';
+
+    ['A','B','C'].forEach(function(key) {
+      if (!opts[key]) return;
+      var isCorrect = key === cor;
+      var opt = document.createElement('div');
+      opt.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:7px;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:all .15s;background:rgba(255,255,255,.02)';
+      opt.setAttribute('data-key', key);
+      opt.setAttribute('data-correct', isCorrect ? '1' : '0');
+      opt.innerHTML = '<div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:transparent;transition:all .15s"></div>'
+        + '<span style="font-size:12.5px;color:#cccccc">' + key + '. ' + opts[key] + '</span>';
+      opt.onclick = function() {
+        // Mostra risultato
+        optWrap.querySelectorAll('[data-key]').forEach(function(o) {
+          var ok = o.getAttribute('data-correct') === '1';
+          var circle = o.querySelector('div');
+          if (ok) {
+            o.style.background = 'rgba(52,211,153,.1)';
+            o.style.borderColor = 'rgba(52,211,153,.4)';
+            circle.style.borderColor = '#34d399';
+            circle.style.background = '#34d399';
+            circle.style.color = '#000';
+            circle.textContent = '✓';
+          } else {
+            o.style.opacity = '.45';
+          }
+          o.style.pointerEvents = 'none';
+        });
+        if (spl && card.querySelector('.wb-ar-spl') === null) {
+          var splDiv = document.createElement('div');
+          splDiv.className = 'wb-ar-spl';
+          splDiv.style.cssText = 'margin:0 16px 14px;padding:10px 14px;background:rgba(52,211,153,.07);border-radius:7px;border-left:3px solid #34d399;font-size:12px;color:#a7f3d0;line-height:1.6';
+          splDiv.textContent = spl;
+          card.appendChild(splDiv);
+        }
+      };
+      optWrap.appendChild(opt);
+    });
+
+    card.appendChild(optWrap);
+    resultEl.appendChild(card);
   });
-  if (_wbFlashcardQueue.length > 0) {
-    var btn = document.getElementById('wbSaveFlashcardsBtn');
-    if (btn) { btn.style.display = 'inline-block'; btn.textContent = '💾 Salva ' + _wbFlashcardQueue.length + ' flashcard'; }
-  }
 }
 
 function wbSaveFlashcards() {
@@ -20203,9 +20302,36 @@ async function wbAutoSegment() {
     var ld = document.getElementById('wbSegmentLoading');
     if (ld) ld.remove();
     // Fallback: mostra testo raw con sfondo bianco
-    if (rawTxt) rawTxt.style.display = 'block';
-    console.warn('[WB] Auto-segment error:', e);
+    // Fallback: chunking client-side con regex
+    var fallbackSections = _wbSmartChunk(_wbDocText);
+    if (fallbackSections.length > 1) {
+      _wbSections = fallbackSections;
+      wbRenderSections(fallbackSections);
+    } else {
+      if (rawTxt) rawTxt.style.display = 'block';
+    }
+    console.warn('[WB] Auto-segment AI failed, used smart chunker:', e);
   }
+}
+
+// Chunker client-side: divide il testo in sezioni logiche con regex
+function _wbSmartChunk(text) {
+  if (!text || text.trim().length < 80) return [];
+  // Split su pattern numerici/titoli comuni nei documenti
+  var SPLIT_RE = /\n(?=(?:\d{1,2}[\.\)]\s|[IVX]{1,5}[\.\)]\s|ARTICLE\s|ARTICOLO\s|SECTION\s|SEZIONE\s|CAPITOLO\s|CHAPTER\s|§\s*\d|Articolo\s\d|Article\s\d))/g;
+  var chunks = text.split(SPLIT_RE).filter(function(c) { return c.trim().length > 80; });
+  if (chunks.length < 2) {
+    // Fallback: split ogni ~400 parole
+    var words = text.split(/\s+/);
+    chunks = [];
+    for (var i = 0; i < words.length; i += 350) {
+      chunks.push(words.slice(i, i + 350).join(' '));
+    }
+  }
+  return chunks.slice(0, 10).map(function(c, i) {
+    var firstLine = c.trim().split('\n')[0].replace(/^[\d\.\)\s]+/, '').substring(0, 70).trim();
+    return { titolo: firstLine || ('Sezione ' + (i + 1)), testo: c.trim() };
+  });
 }
 
 function wbRenderSections(sections) {
@@ -20315,15 +20441,21 @@ function wbSelectSection(idx) {
     numEl.textContent = '§ ' + (idx + 1) + ' · ' + (sec.titolo || sec.title || 'Sezione');
     view.appendChild(numEl);
 
-    // Title
-    var titleEl = document.createElement('h2');
-    titleEl.style.cssText = 'font-size:19px;font-weight:800;color:#ffffff;margin:0 0 20px;line-height:1.3;letter-spacing:-.01em';
-    titleEl.textContent = sec.titolo || sec.title || ('Sezione ' + (idx + 1));
+    // Gerarchia visiva: h1 se titolo è tutto MAIUSCOLO o inizia con keyword di capitolo
+    var rawTitle = sec.titolo || sec.title || ('Sezione ' + (idx + 1));
+    var isH1 = (rawTitle === rawTitle.toUpperCase() && rawTitle.replace(/[^a-zA-Z]/g,'').length > 3)
+      || /^(capitolo|chapter|parte|part|introduction|introduzione|abstract|sommario|premessa|preamble)\b/i.test(rawTitle)
+      || idx === 0;
+    var titleEl = document.createElement(isH1 ? 'h1' : 'h2');
+    titleEl.style.cssText = isH1
+      ? 'font-size:24px;font-weight:900;color:#ffffff;margin:0 0 20px;line-height:1.2;letter-spacing:-.02em'
+      : 'font-size:19px;font-weight:800;color:#e8e8f0;margin:0 0 20px;line-height:1.3;letter-spacing:-.01em';
+    titleEl.textContent = rawTitle;
     view.appendChild(titleEl);
 
-    // Separator
+    // Separator — neon violet
     var sep = document.createElement('div');
-    sep.style.cssText = 'width:36px;height:3px;background:linear-gradient(90deg,#d394ff,#aa30fa);border-radius:2px;margin-bottom:22px';
+    sep.style.cssText = 'width:36px;height:3px;background:linear-gradient(90deg,#A855F7,#6d28d9);border-radius:2px;margin-bottom:22px';
     view.appendChild(sep);
 
     // Body text
