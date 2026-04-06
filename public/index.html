@@ -287,65 +287,14 @@
   background: #111111;
 }
 /* ── Section cards ─────────────────────────────────────────── */
-#screenWorkbench .wb-sections-hint {
-  padding: 8px 24px;
-  background: rgba(211,148,255,.06);
-  border-bottom: 1px solid rgba(211,148,255,.15);
-  font-size: 10px;
-  color: rgba(211,148,255,.7);
-  font-family: 'Space Grotesk', monospace;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
+/* Sezione viewer — nav buttons hover */
+#wbSecPrev:hover:not(:disabled), #wbSecNext:hover:not(:disabled) {
+  background: rgba(211,148,255,.22) !important;
+  border-color: rgba(211,148,255,.55) !important;
 }
-#screenWorkbench .wb-section-card {
-  padding: 22px 28px 22px 32px;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  cursor: pointer;
-  transition: background .15s, border-left-color .12s;
-  border-left: 3px solid rgba(211,148,255,.12);
-  background: #111111;
-}
-#screenWorkbench .wb-section-card:hover {
-  background: rgba(211,148,255,.04);
-  border-left-color: rgba(211,148,255,.4);
-}
-#screenWorkbench .wb-section-card.wb-section-active {
-  background: rgba(211,148,255,.06);
-  border-left-color: #d394ff;
-}
-#screenWorkbench .wb-section-num {
-  display: block;
-  font-size: 9px;
-  font-weight: 700;
-  color: rgba(211,148,255,.6);
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  font-family: 'Space Grotesk', monospace;
-  margin-bottom: 6px;
-}
-#screenWorkbench .wb-section-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 12px;
-  line-height: 1.4;
-}
-#screenWorkbench .wb-section-body {
-  font-size: 13px;
-  line-height: 1.85;
-  color: #b0b0b8;
-  font-family: Georgia, 'Times New Roman', serif;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-#screenWorkbench .wb-section-card.wb-section-active .wb-section-body {
-  color: #d0d0da;
-}
+#wbSecView::-webkit-scrollbar { width: 5px; }
+#wbSecView::-webkit-scrollbar-track { background: #111111; }
+#wbSecView::-webkit-scrollbar-thumb { background: rgba(211,148,255,.3); border-radius: 3px; }
 #screenWorkbench .wb-segment-pulse {
   padding: 36px 32px;
   text-align: center;
@@ -20262,7 +20211,8 @@ async function wbAutoSegment() {
 function wbRenderSections(sections) {
   var wbDocContent = document.getElementById('wbDocContent');
   if (!wbDocContent) return;
-  // Nascondi tutto il contenuto esistente
+
+  // Nascondi contenuto grezzo
   ['wbDocPlaceholder','wbPdfContainer','wbDocText'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = 'none';
@@ -20270,62 +20220,125 @@ function wbRenderSections(sections) {
   var old = document.getElementById('wbSectionsContainer');
   if (old) old.remove();
 
+  // Contenitore principale
   var cont = document.createElement('div');
   cont.id = 'wbSectionsContainer';
-  cont.style.cssText = 'flex:1;overflow-y:auto;background:#111111;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111';
+  cont.style.cssText = 'flex:1;display:flex;flex-direction:column;background:#111111;overflow:hidden';
 
-  // Hint bar
-  var hint = document.createElement('div');
-  hint.className = 'wb-sections-hint';
-  hint.textContent = '✦ ' + sections.length + ' sezioni · testo verbatim · clicca per analizzare';
-  cont.appendChild(hint);
+  // ── Barra navigazione sezioni ──────────────────────────────────────────
+  var nav = document.createElement('div');
+  nav.id = 'wbSecNav';
+  nav.style.cssText = [
+    'display:flex;align-items:center;justify-content:space-between',
+    'padding:10px 18px;background:#171717',
+    'border-bottom:1px solid rgba(211,148,255,.14)',
+    'flex-shrink:0'
+  ].join(';');
 
-  sections.forEach(function(sec, idx) {
-    var card = document.createElement('div');
-    card.className = 'wb-section-card';
-    card.setAttribute('data-idx', String(idx));
+  var btnStyle = [
+    'background:rgba(211,148,255,.1);border:1px solid rgba(211,148,255,.25)',
+    'border-radius:7px;color:#d394ff;font-size:16px;line-height:1',
+    'width:32px;height:32px;cursor:pointer;display:flex;align-items:center',
+    'justify-content:center;transition:all .15s;flex-shrink:0'
+  ].join(';');
 
-    var numEl = document.createElement('span');
-    numEl.className = 'wb-section-num';
-    numEl.textContent = '§ ' + (idx + 1);
+  var prevBtn = document.createElement('button');
+  prevBtn.id = 'wbSecPrev';
+  prevBtn.title = 'Sezione precedente';
+  prevBtn.style.cssText = btnStyle;
+  prevBtn.innerHTML = '&#8592;';
+  prevBtn.onclick = function() { wbNavSection(-1); };
 
-    var titleEl = document.createElement('div');
-    titleEl.className = 'wb-section-title';
-    titleEl.textContent = sec.titolo || sec.title || ('Sezione ' + (idx + 1));
+  var counter = document.createElement('div');
+  counter.id = 'wbSecCounter';
+  counter.style.cssText = 'flex:1;text-align:center;font-family:\'Space Grotesk\',monospace;font-size:11px;font-weight:700;color:rgba(211,148,255,.7);letter-spacing:.08em;text-transform:uppercase';
+  counter.textContent = '§ 1 DI ' + sections.length;
 
-    var bodyEl = document.createElement('div');
-    bodyEl.className = 'wb-section-body';
-    // Testo completo — nessun limite (l'AI ha già estratto 200-350 parole per sezione)
-    bodyEl.textContent = sec.testo || sec.text || '';
+  var nextBtn = document.createElement('button');
+  nextBtn.id = 'wbSecNext';
+  nextBtn.title = 'Sezione successiva';
+  nextBtn.style.cssText = btnStyle;
+  nextBtn.innerHTML = '&#8594;';
+  nextBtn.onclick = function() { wbNavSection(1); };
 
-    card.appendChild(numEl);
-    card.appendChild(titleEl);
-    card.appendChild(bodyEl);
-    card.addEventListener('click', function() { wbSelectSection(idx); });
-    cont.appendChild(card);
-  });
+  nav.appendChild(prevBtn);
+  nav.appendChild(counter);
+  nav.appendChild(nextBtn);
+  cont.appendChild(nav);
+
+  // ── Area contenuto sezione corrente ───────────────────────────────────
+  var view = document.createElement('div');
+  view.id = 'wbSecView';
+  view.style.cssText = [
+    'flex:1;overflow-y:auto;padding:30px 32px 40px',
+    'background:#111111',
+    'scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111'
+  ].join(';');
+  cont.appendChild(view);
 
   wbDocContent.appendChild(cont);
-  // Seleziona la prima sezione automaticamente
+
+  // Seleziona la prima sezione — avvia tool automaticamente
   wbSelectSection(0);
 }
 
+// Naviga avanti/indietro tra le sezioni
+function wbNavSection(delta) {
+  wbSelectSection((_wbSelectedSection || 0) + delta);
+}
+
 function wbSelectSection(idx) {
-  if (!_wbSections[idx]) return;
+  if (!_wbSections || !_wbSections[idx]) return;
   _wbSelectedSection = idx;
+  var total = _wbSections.length;
+  var sec = _wbSections[idx];
 
-  document.querySelectorAll('#screenWorkbench .wb-section-card').forEach(function(c) {
-    c.classList.remove('wb-section-active');
-  });
-  var activeCard = document.querySelector('#screenWorkbench .wb-section-card[data-idx="' + idx + '"]');
-  if (activeCard) activeCard.classList.add('wb-section-active');
+  // Aggiorna counter
+  var counter = document.getElementById('wbSecCounter');
+  if (counter) counter.textContent = '§ ' + (idx + 1) + ' DI ' + total;
 
-  var sectionText = _wbSections[idx].testo || _wbSections[idx].text || '';
-  // Imposta come selezione attiva → banner + tool usano questo testo
+  // Prev/Next disabled state
+  var prevBtn = document.getElementById('wbSecPrev');
+  var nextBtn = document.getElementById('wbSecNext');
+  if (prevBtn) { prevBtn.disabled = (idx === 0); prevBtn.style.opacity = idx === 0 ? '.3' : '1'; }
+  if (nextBtn) { nextBtn.disabled = (idx === total - 1); nextBtn.style.opacity = idx === total - 1 ? '.3' : '1'; }
+
+  // Renderizza testo nella view
+  var view = document.getElementById('wbSecView');
+  if (view) {
+    view.innerHTML = '';
+    view.scrollTop = 0;
+
+    // Num label
+    var numEl = document.createElement('div');
+    numEl.style.cssText = 'font-size:9px;font-weight:700;color:rgba(211,148,255,.55);text-transform:uppercase;letter-spacing:.15em;font-family:\'Space Grotesk\',monospace;margin-bottom:10px';
+    numEl.textContent = '§ ' + (idx + 1) + ' · ' + (sec.titolo || sec.title || 'Sezione');
+    view.appendChild(numEl);
+
+    // Title
+    var titleEl = document.createElement('h2');
+    titleEl.style.cssText = 'font-size:19px;font-weight:800;color:#ffffff;margin:0 0 20px;line-height:1.3;letter-spacing:-.01em';
+    titleEl.textContent = sec.titolo || sec.title || ('Sezione ' + (idx + 1));
+    view.appendChild(titleEl);
+
+    // Separator
+    var sep = document.createElement('div');
+    sep.style.cssText = 'width:36px;height:3px;background:linear-gradient(90deg,#d394ff,#aa30fa);border-radius:2px;margin-bottom:22px';
+    view.appendChild(sep);
+
+    // Body text
+    var bodyEl = document.createElement('div');
+    bodyEl.style.cssText = 'font-size:13.5px;line-height:1.9;color:#c8c8d4;font-family:Georgia,\'Times New Roman\',serif;white-space:pre-wrap;word-break:break-word';
+    bodyEl.textContent = sec.testo || sec.text || '';
+    view.appendChild(bodyEl);
+  }
+
+  // Imposta testo attivo per i tool
+  var sectionText = sec.testo || sec.text || '';
   _wbActiveSelection = sectionText;
   _wbShowSelectionBanner(sectionText);
 
-  // Auto-run tool 1-4
+  // Tool girano automaticamente sulla sezione corrente
   [1, 2, 3, 4].forEach(function(n) { wbRunTool(n); });
 }
 
