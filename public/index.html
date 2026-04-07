@@ -5032,7 +5032,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
   <!-- RESIZER -->
-  <div id="wbResizeHandle" style="width:6px;cursor:col-resize;background:rgba(255,255,255,.04);flex-shrink:0;transition:background .15s" onmouseover="this.style.background='rgba(168,85,247,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)'"></div>
+  <div id="wbResizeHandle" style="width:8px;cursor:col-resize;background:rgba(168,85,247,.12);flex-shrink:0;transition:background .15s;display:flex;align-items:center;justify-content:center;position:relative" onmouseover="this.style.background='rgba(168,85,247,.4)'" onmouseout="this.style.background='rgba(168,85,247,.12)'" title="Trascina per ridimensionare"><div style="width:2px;height:40px;background:rgba(168,85,247,.5);border-radius:2px;pointer-events:none"></div></div>
 
   <!-- RIGHT: Tools -->
   <div class="wb-tools" id="wbToolsPanel">
@@ -19431,9 +19431,9 @@ function _wbInitResize() {
   if (!handle || !main) return;
   var dragging = false, startX = 0, startCols = '';
   function getDocPct() {
-    var cols = main.style.gridTemplateColumns || '50% 6px 1fr';
+    var cols = main.style.gridTemplateColumns || '58% 8px 1fr';
     var m = cols.match(/^([\d.]+)%/);
-    return m ? parseFloat(m[1]) : 45;
+    return m ? parseFloat(m[1]) : 58;
   }
   handle.addEventListener('mousedown', function(e) {
     if (main.style.display !== 'grid') return;
@@ -19448,8 +19448,8 @@ function _wbInitResize() {
     if (!dragging) return;
     var dx = e.clientX - startX;
     var mainW = main.offsetWidth || 1;
-    var newPct = Math.min(Math.max(startCols + (dx / mainW * 100), 20), 75);
-    main.style.gridTemplateColumns = newPct.toFixed(1) + '% 6px 1fr';
+    var newPct = Math.min(Math.max(startCols + (dx / mainW * 100), 20), 78);
+    main.style.gridTemplateColumns = newPct.toFixed(1) + '% 8px 1fr';
   });
   document.addEventListener('mouseup', function() {
     if (!dragging) return;
@@ -19499,7 +19499,7 @@ function wbToggleLayout(mode, silent) {
 
   var rh = document.getElementById('wbResizeHandle');
   if (mode === 'split') {
-    main.style.gridTemplateColumns = '50% 6px 1fr';
+    main.style.gridTemplateColumns = '58% 8px 1fr';
     main.style.display = 'grid';
     if (rh) rh.style.display = '';
     main.style.flexDirection = '';
@@ -20492,7 +20492,7 @@ async function wbAutoSegment() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt + _wbDocText.substring(0, 12000) }] }],
+        contents: [{ role: 'user', parts: [{ text: prompt + _wbDocText.substring(0, 25000) }] }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 2400 }
       })
     });
