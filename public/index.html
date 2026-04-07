@@ -5021,6 +5021,12 @@ document.addEventListener('DOMContentLoaded', function() {
       <div>Il documento apparirà qui dopo il caricamento</div>
     </div>
 
+    <!-- PDF container (populated by wbRenderClientSide for PDFs) -->
+    <div id="wbPdfContainer" style="display:none;flex:1;overflow-y:auto;padding:16px;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111"></div>
+
+    <!-- Plain text display (DOCX/DOC) -->
+    <div id="wbDocText" style="display:none"></div>
+
     <!-- Sections (populated by wbRenderSections) -->
     <div class="wb-sections" id="wbSections" style="display:none"></div>
   </div>
