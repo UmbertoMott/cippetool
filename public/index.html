@@ -8,345 +8,452 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style id="wb-theme">
-/* ═══════════════════════════════════════════════════
-   AI DOCUMENT WORKBENCH — scoped CSS (.wb-* / #screenWorkbench)
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   AI DOCUMENT WORKBENCH — LUMINANCE SCHOLAR (redesign)
+═══════════════════════════════════════════════════════════════ */
 #screenWorkbench {
-  --wb-bg:        #0D0D0D;   /* era #0e0e0e */
-  --wb-sur-low:   #111111;
-  --wb-sur:       #161616;
-  --wb-sur-high:  #1e1e1e;
-  --wb-sur-top:   #232323;
-  --wb-primary:   #A855F7;   /* viola neon */
-  --wb-primary-d: #9333ea;
-  --wb-primary-f: #c084fc;
-  --wb-tertiary:  #f472b6;
-  --wb-cyan:      #22d3ee;
-  --wb-outline:   #333333;
-  --wb-txt:       #ffffff;
-  --wb-muted:     #888888;
-  --wb-void:      #000000;
-  font-family: 'Inter', sans-serif;
+  --wb-bg:      #000000;
+  --wb-card:    #0D0D0D;
+  --wb-border:  rgba(255,255,255,0.06);
+  --wb-border2: rgba(255,255,255,0.10);
+  --wb-acc:     #A855F7;
+  --wb-acc-dim: rgba(168,85,247,0.15);
+  --wb-acc-glow:rgba(168,85,247,0.30);
+  --wb-acc-lt:  #c084fc;
+  --wb-cyan:    #22d3ee;
+  --wb-cyan-dim:rgba(34,211,238,0.12);
+  --wb-amber:   #f59e0b;
+  --wb-green:   #10b981;
+  --wb-blue:    #60a5fa;
+  --wb-text:    #FFFFFF;
+  --wb-text2:   #CCCCCC;
+  --wb-meta:    #666666;
+  position: fixed; inset: 0; z-index: 1000;
   background: var(--wb-bg);
-  color: var(--wb-txt);
+  display: none; flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-#screenWorkbench .wb-shell {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-  padding-top: 0;
-}
+#screenWorkbench.active { display: flex; }
+
+/* scrollbars */
+#screenWorkbench ::-webkit-scrollbar { width: 4px; height: 4px; }
+#screenWorkbench ::-webkit-scrollbar-track { background: transparent; }
+#screenWorkbench ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+
+/* header */
 #screenWorkbench .wb-header {
-  background: #191919;
-  box-shadow: 0 4px 24px rgba(160,32,240,.08);
-  flex-shrink: 0;
+  flex-shrink: 0; display: flex; align-items: center; gap: 14px;
+  padding: 0 20px; height: 52px;
+  background: #060606; border-bottom: 1px solid var(--wb-border);
+  z-index: 10;
 }
-#screenWorkbench .wb-upload-bar {
-  background: #131313;
-  flex-shrink: 0;
+#screenWorkbench .wb-back {
+  height: 30px; padding: 0 14px;
+  background: transparent; border: 1px solid var(--wb-border2);
+  color: var(--wb-text2); border-radius: 6px;
+  font: 600 11px/1 'Inter',sans-serif; cursor: pointer;
+  letter-spacing: 0.02em; transition: all 0.15s;
 }
-#screenWorkbench .wb-main {
-  flex: 1;
-  min-height: 0;
-  transition: all 0.3s ease;
+#screenWorkbench .wb-back:hover { border-color: var(--wb-acc); color: var(--wb-acc); }
+#screenWorkbench .wb-brand {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
-#screenWorkbench .wb-main.wb-layout-split {
-  display: grid;
-  grid-template-columns: 45% 6px 1fr;
-  overflow: hidden;
+#screenWorkbench .wb-brand-name {
+  font-size: 14px; font-weight: 800; letter-spacing: -0.03em; color: #fff;
 }
-#wbResizeHandle {
-  cursor: col-resize;
-  background: rgba(72,72,72,.15);
-  transition: background .15s;
-  position: relative;
+#screenWorkbench .wb-brand-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--wb-acc); background: var(--wb-acc-dim);
+  padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(168,85,247,0.2);
 }
-#wbResizeHandle::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  width: 2px;
-  height: 32px;
-  background: rgba(211,148,255,.25);
-  border-radius: 2px;
+#screenWorkbench .wb-recenti {
+  display: flex; align-items: center; gap: 6px; margin-left: 16px;
 }
-#wbResizeHandle:hover, #wbResizeHandle.wb-dragging {
-  background: rgba(211,148,255,.15);
+#screenWorkbench .wb-recenti-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--wb-meta);
 }
-#wbResizeHandle.wb-dragging::after { background: rgba(211,148,255,.6); }
-#screenWorkbench .wb-main.wb-layout-stack {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+#screenWorkbench .wb-pill-recent {
+  height: 24px; padding: 0 10px;
+  background: #141414; border: 1px solid var(--wb-border);
+  border-radius: 999px; font-size: 11px; color: #999;
+  cursor: pointer; display: flex; align-items: center; transition: all 0.15s;
 }
-#screenWorkbench .wb-doc-panel {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: #000000;
+#screenWorkbench .wb-pill-recent:hover,
+#screenWorkbench .wb-pill-recent.active {
+  border-color: rgba(168,85,247,0.4); color: var(--wb-acc-lt);
+  background: var(--wb-acc-dim);
 }
-#screenWorkbench .wb-doc-panel .wb-doc-content {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+#screenWorkbench .wb-spacer { flex: 1; }
+#screenWorkbench .wb-layout-group {
+  display: flex; background: #0e0e0e;
+  border: 1px solid var(--wb-border); border-radius: 6px; overflow: hidden;
 }
-#wbPdfContainer .wb-pdf-page {
-  position: relative;
-  margin: 0 auto 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.6);
-  border-radius: 4px;
-  overflow: hidden;
+#screenWorkbench .wb-layout-btn {
+  height: 28px; padding: 0 12px;
+  font: 700 10px/1 'Inter',sans-serif; letter-spacing: 0.06em;
+  cursor: pointer; border: none; background: transparent;
+  color: var(--wb-meta); transition: all 0.15s;
 }
-#wbPdfContainer .wb-pdf-page canvas {
-  display: block;
-  max-width: 100%;
+#screenWorkbench .wb-layout-btn.active { background: var(--wb-acc); color: #fff; }
+
+/* upload bar */
+#screenWorkbench .wb-upload {
+  flex-shrink: 0; display: flex; align-items: center; gap: 20px;
+  padding: 0 20px; height: 48px;
+  background: #050505; border-bottom: 1px solid var(--wb-border);
 }
-#wbPdfContainer .wb-pdf-page-label {
-  position: absolute;
-  bottom: 6px;
-  right: 8px;
-  font-size: 10px;
-  color: rgba(255,255,255,.3);
-  font-family: 'Space Grotesk', monospace;
-  pointer-events: none;
+#screenWorkbench .wb-step-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--wb-acc); flex-shrink: 0; white-space: nowrap;
 }
-#screenWorkbench .wb-tools-panel {
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #484848 #0e0e0e;
+#screenWorkbench .wb-file-info {
+  display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
 }
-#screenWorkbench .wb-tool-card {
-  background: #1f1f1f;
-  border-radius: 12px;
-  position: relative;
-  overflow: visible;  /* FIX BUG 3: hidden sopprimeva la scrollbar webkit dei figli */
-  transition: opacity 0.2s;
+#screenWorkbench .wb-file-icon {
+  width: 28px; height: 28px; background: var(--wb-acc-dim);
+  border: 1px solid rgba(168,85,247,0.2); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
 }
-#screenWorkbench .wb-tool-card.wb-locked {
-  opacity: 0.4;
-  pointer-events: none;
+#screenWorkbench .wb-file-name {
+  font-size: 12px; font-weight: 700; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-#screenWorkbench .wb-glow-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
+#screenWorkbench .wb-file-sub { font-size: 10px; color: var(--wb-meta); margin-top: 1px; }
+#screenWorkbench .wb-upload-placeholder {
+  font-size: 13px; color: var(--wb-meta); flex: 1;
+}
+#screenWorkbench .wb-btn-file {
+  height: 34px; padding: 0 18px;
+  background: var(--wb-acc); color: #fff; border: none;
+  border-radius: 8px; font: 700 12px/1 'Inter',sans-serif;
+  cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+  box-shadow: 0 0 16px var(--wb-acc-glow);
+}
+#screenWorkbench .wb-btn-file:hover { opacity: 0.85; }
+#screenWorkbench .wb-btn-change {
+  height: 30px; padding: 0 14px;
+  background: transparent; border: 1px solid var(--wb-border2);
+  color: var(--wb-text2); border-radius: 6px;
+  font: 600 11px/1 'Inter',sans-serif; cursor: pointer; transition: all 0.15s;
+}
+#screenWorkbench .wb-btn-change:hover { border-color: var(--wb-acc); color: var(--wb-acc); }
+
+/* main split body */
+#screenWorkbench .wb-body {
+  flex: 1; display: flex; min-height: 0; overflow: hidden;
+}
+#screenWorkbench.wb-layout-stack .wb-body { flex-direction: column; }
+
+/* LEFT: document panel */
+#screenWorkbench .wb-doc {
+  width: 60%; flex-shrink: 0; display: flex; flex-direction: column;
+  border-right: 1px solid var(--wb-border); background: #000; overflow: hidden;
+}
+#screenWorkbench.wb-layout-stack .wb-doc { width: 100%; height: 40vh; }
+#screenWorkbench .wb-doc-topbar {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; height: 38px;
+  border-bottom: 1px solid var(--wb-border); background: #040404;
+}
+#screenWorkbench .wb-doc-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--wb-acc);
+}
+#screenWorkbench .wb-doc-sub { font-size: 10px; color: var(--wb-meta); }
+#screenWorkbench .wb-segment-btn {
+  height: 24px; padding: 0 12px;
+  background: var(--wb-acc-dim); border: 1px solid rgba(168,85,247,0.3);
+  color: var(--wb-acc-lt); border-radius: 999px;
+  font: 600 10px/1 'Inter',sans-serif; cursor: pointer; transition: all 0.15s;
+}
+#screenWorkbench .wb-segment-btn:hover { background: var(--wb-acc-glow); border-color: var(--wb-acc); }
+
+/* sections list */
+#screenWorkbench .wb-sections {
+  flex: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+#screenWorkbench .wb-doc-placeholder {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+  color: var(--wb-meta); font-size: 13px;
+}
+#screenWorkbench .wb-doc-placeholder-icon { font-size: 40px; opacity: 0.3; }
+
+/* section cards */
+#screenWorkbench .wb-sec {
+  background: var(--wb-card); border: 1px solid var(--wb-border);
+  border-radius: 12px; cursor: pointer; transition: all 0.18s;
+  position: relative; overflow: visible; flex-shrink: 0;
+}
+#screenWorkbench .wb-sec::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: transparent; transition: background 0.18s;
   border-radius: 12px 0 0 12px;
 }
+#screenWorkbench .wb-sec:hover { border-color: rgba(168,85,247,0.25); background: #0f0f0f; }
+#screenWorkbench .wb-sec.active { border-color: rgba(168,85,247,0.45); background: rgba(168,85,247,0.04); }
+#screenWorkbench .wb-sec.active::before { background: var(--wb-acc); }
+
+#screenWorkbench .wb-sec-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 10px;
+}
+#screenWorkbench .wb-sec-num {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--wb-acc); opacity: 0.7;
+}
+#screenWorkbench .wb-sec-badge {
+  font-size: 9px; font-weight: 700;
+  background: var(--wb-acc); color: #fff;
+  padding: 2px 8px; border-radius: 999px; letter-spacing: 0.04em; display: none;
+}
+#screenWorkbench .wb-sec.active .wb-sec-badge { display: block; }
+#screenWorkbench .wb-sec-title {
+  font-size: 14px; font-weight: 800; letter-spacing: -0.02em;
+  line-height: 1.3; color: #fff; padding: 0 18px 10px;
+}
+#screenWorkbench .wb-sec-body {
+  padding: 0 18px 16px; font-size: 13px; line-height: 1.75; color: #a0a0a0;
+}
+#screenWorkbench .wb-sec-body p { margin-bottom: 12px; }
+#screenWorkbench .wb-sec-body p:last-child { margin-bottom: 0; }
+#screenWorkbench .wb-sec-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 18px 14px; border-top: 1px solid rgba(255,255,255,0.04);
+}
+#screenWorkbench .wb-sec-words { font-size: 10px; color: var(--wb-meta); }
+#screenWorkbench .wb-ctx-label {
+  font-size: 10px; color: var(--wb-acc); font-weight: 600;
+  opacity: 0; transition: opacity 0.2s;
+}
+#screenWorkbench .wb-sec.active .wb-ctx-label { opacity: 1; }
+
+/* RIGHT: tools panel */
+#screenWorkbench .wb-tools {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #050505;
+}
+#screenWorkbench .wb-tools-topbar {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px; height: 38px;
+  border-bottom: 1px solid var(--wb-border); background: #040404;
+}
+#screenWorkbench .wb-tools-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--wb-acc);
+}
+#screenWorkbench .wb-tools-ctx { font-size: 10px; color: var(--wb-meta); }
+#screenWorkbench .wb-tools-ctx span { color: #ccc; font-weight: 600; }
+#screenWorkbench .wb-tools-scroll {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+/* context strip */
+#screenWorkbench .wb-ctx-strip {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.18);
+  border-radius: 8px; flex-shrink: 0;
+}
+#screenWorkbench .wb-ctx-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--wb-acc);
+  animation: wb-pulse-dot 2s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes wb-pulse-dot {
+  0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)}
+}
+#screenWorkbench .wb-ctx-text { font-size: 11px; color: #888; }
+#screenWorkbench .wb-ctx-text strong { color: #ccc; font-weight: 600; }
+
+/* tool card */
+#screenWorkbench .wb-tool {
+  background: var(--wb-card); border: 1px solid var(--wb-border);
+  border-radius: 12px; overflow: visible; flex-shrink: 0; transition: border-color 0.18s;
+}
+#screenWorkbench .wb-tool:hover { border-color: rgba(168,85,247,0.2); }
+#screenWorkbench .wb-tool-head {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px 12px;
+}
+#screenWorkbench .wb-glow-bar {
+  width: 3px; border-radius: 999px; flex-shrink: 0; align-self: stretch; min-height: 36px;
+}
+#screenWorkbench .wb-tool-info { flex: 1; min-width: 0; }
+#screenWorkbench .wb-tool-n {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--wb-meta); margin-bottom: 3px;
+}
+#screenWorkbench .wb-tool-name {
+  font-size: 13px; font-weight: 800; letter-spacing: -0.02em; color: #fff; line-height: 1.2;
+}
+#screenWorkbench .wb-tool-desc {
+  font-size: 11px; color: var(--wb-meta); line-height: 1.55;
+  padding: 0 16px 14px 31px; margin-top: -4px;
+}
 #screenWorkbench .wb-neon-btn {
-  background: linear-gradient(135deg, #d394ff, #aa30fa);
-  color: #000;
-  font-weight: 700;
-  border-radius: 999px;
-  padding: 8px 20px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Space Grotesk', monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  transition: opacity .15s;
+  flex-shrink: 0; height: 30px; padding: 0 14px; border: none;
+  border-radius: 999px; font: 700 11px/1 'Inter',sans-serif;
+  cursor: pointer; letter-spacing: 0.03em; transition: all 0.15s;
+  white-space: nowrap; display: flex; align-items: center; gap: 5px;
 }
-#screenWorkbench .wb-neon-btn:hover { opacity: 0.88; }
-#screenWorkbench .wb-step-label {
-  font-family: 'Space Grotesk', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: #d394ff;
+#screenWorkbench .wb-neon-btn:hover { transform: translateY(-1px); opacity: 0.88; }
+#screenWorkbench .wb-tool.wb-locked { opacity: 0.4; pointer-events: none; }
+#screenWorkbench .wb-tool.wb-locked .wb-neon-btn::before { content: '🔒 '; }
+
+/* tool output */
+#screenWorkbench .wb-out {
+  border-top: 1px solid rgba(255,255,255,0.05); padding: 16px;
+  background: #070707; display: flex; flex-direction: column; gap: 16px;
 }
-#screenWorkbench .wb-reveal-answer {
-  display: none;
-  animation: wbReveal .22s ease both;
+#screenWorkbench .wb-out-section { display: flex; flex-direction: column; gap: 8px; }
+#screenWorkbench .wb-out-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
 }
-#screenWorkbench .wb-reveal-answer.open {
-  display: block;
+#screenWorkbench .wb-out-label::after {
+  content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.05);
 }
-@keyframes wbReveal {
-  from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
+
+/* pills */
+#screenWorkbench .wb-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+#screenWorkbench .wb-pill {
+  font-size: 11px; font-weight: 500; padding: 5px 11px;
+  border-radius: 6px; line-height: 1.4; transition: all 0.15s;
 }
-#screenWorkbench .wb-chat-bubble-user {
-  align-self: flex-end;
-  background: rgba(211,148,255,.15);
-  border-radius: 10px 10px 2px 10px;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: #ffffff;
-  max-width: 80%;
-  line-height: 1.5;
+#screenWorkbench .wb-pill:hover { transform: translateY(-1px); }
+#screenWorkbench .pill-f { background:rgba(168,85,247,0.1); color:#c084fc; border:1px solid rgba(168,85,247,0.22); }
+#screenWorkbench .pill-h { background:rgba(96,165,250,0.1);  color:#93c5fd; border:1px solid rgba(96,165,250,0.22); }
+#screenWorkbench .pill-p { background:rgba(16,185,129,0.1);  color:#6ee7b7; border:1px solid rgba(16,185,129,0.22); }
+
+/* latex box */
+#screenWorkbench .wb-latex {
+  background: #0c0c0c; border: 1px solid rgba(34,211,238,0.2);
+  border-radius: 8px; padding: 14px 16px;
+  font-family: 'Courier New', monospace; font-size: 13px;
+  line-height: 1.8; color: #a5f3fc;
 }
-#screenWorkbench .wb-chat-bubble-ai {
-  align-self: flex-start;
-  background: #262626;
-  border-radius: 10px 10px 10px 2px;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: #ababab;
-  max-width: 85%;
-  line-height: 1.5;
-  border-left: 2px solid #06b6d4;
+#screenWorkbench .wb-latex .lx-main { font-size: 14px; color: #e0f2fe; font-weight: 600; }
+#screenWorkbench .wb-latex .lx-sub  { font-size: 11px; color: #67e8f9; margin-top: 4px; opacity: 0.8; }
+#screenWorkbench .wb-latex .lx-note { font-size: 10px; color: var(--wb-meta); margin-top: 6px; font-family: 'Inter',sans-serif; }
+
+/* key concept */
+#screenWorkbench .wb-key-concept {
+  border: 1px solid var(--wb-acc); border-radius: 10px; padding: 14px 16px;
+  background: rgba(168,85,247,0.05); position: relative;
+  box-shadow: 0 0 24px rgba(168,85,247,0.08);
 }
-#screenWorkbench .wb-toggle-pill {
-  display: flex;
-  background: #131313;
-  border-radius: 999px;
-  padding: 4px;
-  gap: 2px;
-  border: 1px solid #484848;
+#screenWorkbench .wb-key-concept::before {
+  content: 'KEY CONCEPT'; position: absolute; top: -1px; left: 14px;
+  font-size: 8px; font-weight: 800; letter-spacing: 0.14em;
+  background: #070707; color: var(--wb-acc);
+  padding: 0 6px; transform: translateY(-50%);
 }
-#screenWorkbench .wb-toggle-pill button {
-  padding: 6px 16px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Space Grotesk', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  transition: all .2s;
+#screenWorkbench .wb-kc-title {
+  font-size: 13px; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--wb-acc-lt); margin-bottom: 6px; margin-top: 4px;
 }
-/* scrollbar for webkit */
-#screenWorkbench ::-webkit-scrollbar { width: 5px; }
-#screenWorkbench ::-webkit-scrollbar-track { background: #0e0e0e; }
-#screenWorkbench ::-webkit-scrollbar-thumb { background: #555555; border-radius: 3px; }
-#screenWorkbench ::-webkit-scrollbar-thumb:hover { background: #888888; }
-/* Tool result scrollbars — wider, always visible */
-#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar { width: 8px; }
-#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
-#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar-thumb { background: #585858; border-radius: 4px; border: 1px solid #111; }
-#screenWorkbench [id^="wbTool"][id$="Result"]::-webkit-scrollbar-thumb:hover { background: #888888; }
-/* Pulsante minimize card */
-#screenWorkbench .wb-toggle-btn {
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 6px;
-  color: #ababab;
-  font-size: 14px;
-  line-height: 1;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s;
-  flex-shrink: 0;
+#screenWorkbench .wb-kc-body { font-size: 12px; color: #b0b0b0; line-height: 1.6; }
+
+/* learning timeline */
+#screenWorkbench .wb-timeline {
+  display: flex; align-items: flex-start; position: relative; padding-top: 4px;
 }
-#screenWorkbench .wb-toggle-btn:hover {
-  background: rgba(211,148,255,.12);
-  border-color: rgba(211,148,255,.3);
-  color: #d394ff;
+#screenWorkbench .wb-timeline::before {
+  content: ''; position: absolute; top: 11px; left: 11px; right: 11px; height: 1px;
+  background: linear-gradient(90deg, var(--wb-cyan) 0%, rgba(34,211,238,0.3) 100%);
 }
-/* Card collassata: solo header visibile */
-#screenWorkbench .wb-tool-card {
-  transition: max-height 0.22s ease;
+#screenWorkbench .wb-tl-step {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 8px; position: relative; z-index: 1; text-align: center;
 }
-#screenWorkbench .wb-tool-card.wb-collapsed {
-  max-height: 60px;
-  overflow: hidden; /* necessario solo quando collassata */
+#screenWorkbench .wb-tl-dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #070707; border: 2px solid var(--wb-cyan);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: var(--wb-cyan);
+  box-shadow: 0 0 10px rgba(34,211,238,0.3);
 }
-/* Full-viewport overlay when active (same pattern as screenLRL) */
-#screenWorkbench.active {
-  display: flex;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  z-index: 50;
-  flex-direction: column;
-  overflow: hidden;
+#screenWorkbench .wb-tl-text {
+  font-size: 10px; color: var(--wb-meta); line-height: 1.5; max-width: 90px; font-weight: 500;
 }
-/* Locked tool overlay text */
-#screenWorkbench .wb-tool-card.wb-locked::after {
-  content: '🔒 Carica un documento per attivare';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  color: #ababab;
-  background: rgba(0,0,0,.25);
-  border-radius: 12px;
-  pointer-events: none;
-  font-family: 'Space Grotesk', monospace;
-  letter-spacing: .06em;
+
+/* metaphor card */
+#screenWorkbench .wb-metaphor-card {
+  background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.18);
+  border-radius: 10px; padding: 14px;
 }
-/* ── Document dark panel ──────────────────────────────────── */
-#screenWorkbench .wb-doc-panel {
-  background: #111111;
+#screenWorkbench .wb-metaphor-quote {
+  font-size: 14px; font-weight: 700; color: #fcd34d;
+  margin-bottom: 10px; line-height: 1.4; font-style: italic;
 }
-#screenWorkbench #wbDocContent {
-  background: #111111;
+#screenWorkbench .wb-metaphor-text { font-size: 12px; color: #a0a0a0; line-height: 1.65; }
+
+/* MCQ */
+#screenWorkbench .wb-mcq-question {
+  font-size: 13px; font-weight: 600; color: #e5e5e5; line-height: 1.5; margin-bottom: 12px;
 }
-/* ── Section cards ─────────────────────────────────────────── */
-/* Sezione viewer — nav buttons hover */
-#wbSecPrev:hover:not(:disabled), #wbSecNext:hover:not(:disabled) {
-  background: rgba(168,85,247,.22) !important;
-  border-color: rgba(168,85,247,.55) !important;
+#screenWorkbench .wb-mcq-options { display: flex; flex-direction: column; gap: 7px; }
+#screenWorkbench .wb-mcq-option {
+  display: flex; align-items: center; gap: 10px; padding: 9px 13px;
+  background: #0d0d0d; border: 1px solid var(--wb-border); border-radius: 8px;
+  cursor: pointer; transition: all 0.15s; font-size: 12px; color: #bbb;
 }
-#wbSecView::-webkit-scrollbar { width: 5px; }
-#wbSecView::-webkit-scrollbar-track { background: #111; }
-#wbSecView::-webkit-scrollbar-thumb { background: rgba(168,85,247,.35); border-radius: 3px; }
-/* Cyber-Academic tool card glow */
-#screenWorkbench .wb-tool-card {
-  border: 1px solid rgba(255,255,255,.06);
+#screenWorkbench .wb-mcq-option:hover { border-color: rgba(168,85,247,0.3); color: #ddd; }
+#screenWorkbench .wb-mcq-option.correct { border-color: var(--wb-green); background: rgba(16,185,129,0.08); color: #6ee7b7; }
+#screenWorkbench .wb-mcq-option.wrong   { border-color: #ef4444; background: rgba(239,68,68,0.08); color: #fca5a5; }
+#screenWorkbench .wb-mcq-radio {
+  width: 14px; height: 14px; border-radius: 50%; border: 2px solid #333;
+  flex-shrink: 0; transition: all 0.15s; display: flex; align-items: center; justify-content: center;
 }
-#screenWorkbench .wb-tool-card:hover:not(.wb-locked) {
-  border-color: rgba(168,85,247,.28);
-  box-shadow: 0 0 22px rgba(168,85,247,.09);
+#screenWorkbench .wb-mcq-option.correct .wb-mcq-radio { border-color: var(--wb-green); background: var(--wb-green); }
+#screenWorkbench .wb-mcq-reveal {
+  margin-top: 12px; padding: 12px 14px;
+  background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px;
 }
-#screenWorkbench .wb-tools-panel {
-  background: #0D0D0D;
+#screenWorkbench .wb-mcq-reveal-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--wb-green); margin-bottom: 6px;
 }
-#screenWorkbench .wb-segment-pulse {
-  padding: 36px 32px;
-  text-align: center;
-  color: rgba(211,148,255,.6);
-  font-family: 'Space Grotesk', monospace;
-  font-size: 11px;
-  background: #111111;
-  animation: wbPulse 1.5s ease-in-out infinite;
+#screenWorkbench .wb-mcq-reveal-text { font-size: 12px; color: #a0a0a0; line-height: 1.6; }
+
+/* Visual Memory Map (Tool 05) */
+#screenWorkbench .vmm-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
 }
-@keyframes wbPulse {
-  0%,100% { opacity: 1; }
-  50%      { opacity: .3; }
+#screenWorkbench .vmm-node {
+  background: var(--vmm-nc-dim, rgba(168,85,247,0.08));
+  border: 1px solid var(--vmm-nc-border, rgba(168,85,247,0.25));
+  border-radius: 12px; padding: 14px; position: relative;
+  transition: all 0.18s; cursor: pointer;
 }
-#screenWorkbench .wb-tool-select-hint {
-  font-size: 11px;
-  color: #ababab;
-  font-family: 'Space Grotesk', monospace;
-  padding: 0 0 8px;
-  text-align: center;
-  letter-spacing: .04em;
+#screenWorkbench .vmm-node:hover {
+  border-color: var(--vmm-nc, var(--wb-acc));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--vmm-nc-dim, rgba(168,85,247,0.2));
 }
-#wbSectionsContainer::-webkit-scrollbar { width: 5px; }
-#wbSectionsContainer::-webkit-scrollbar-track { background: #111111; }
-#wbSectionsContainer::-webkit-scrollbar-thumb { background: rgba(211,148,255,.3); border-radius: 3px; }
-/* ── Cyber-Academic tool card glow ────────────────────────── */
-#screenWorkbench .wb-tool-card {
-  border: 1px solid rgba(255,255,255,.06);
-  transition: border-color .2s, box-shadow .2s, opacity 0.2s, max-height 0.22s ease;
+#screenWorkbench .vmm-emoji { font-size: 28px; margin-bottom: 8px; line-height: 1; }
+#screenWorkbench .vmm-label {
+  font-size: 13px; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--vmm-nc, var(--wb-acc)); margin-bottom: 3px;
 }
-#screenWorkbench .wb-tool-card:hover:not(.wb-locked) {
-  border-color: rgba(168,85,247,.25);
-  box-shadow: 0 0 20px rgba(168,85,247,.08);
+#screenWorkbench .vmm-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #666; margin-bottom: 8px; font-family: monospace;
 }
-/* Tool result gap uniforme */
-#screenWorkbench [id$="Result"] {
-  gap: 10px;
+#screenWorkbench .vmm-desc { font-size: 11px; color: #888; line-height: 1.55; }
+#screenWorkbench .vmm-legend {
+  display: flex; flex-direction: column; gap: 6px; padding: 12px 14px;
+  background: rgba(255,255,255,0.02); border: 1px solid var(--wb-border); border-radius: 8px;
 }
-/* Section view webkit scrollbar */
-#wbSecView::-webkit-scrollbar { width: 5px; }
-#wbSecView::-webkit-scrollbar-track { background: #111; }
-#wbSecView::-webkit-scrollbar-thumb { background: rgba(168,85,247,.35); border-radius: 3px; }
+#screenWorkbench .vmm-legend-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 11px; color: var(--wb-meta); line-height: 1.5;
+}
+#screenWorkbench .vmm-legend-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+}
 </style>
 <style>
 :root{
@@ -4855,203 +4962,169 @@ document.addEventListener('DOMContentLoaded', function() {
      AI DOCUMENT WORKBENCH SCREEN
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="screen" id="screenWorkbench">
-  <div class="wb-shell">
-    <!-- HEADER -->
-    <div class="wb-header" style="padding:12px 24px 10px;position:sticky;top:0;z-index:10">
-      <div style="display:flex;align-items:center;gap:16px">
-        <button onclick="showScreen('screenMode')" style="background:none;border:1px solid #484848;border-radius:8px;color:#ababab;padding:5px 14px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='#d394ff';this.style.color='#d394ff'" onmouseout="this.style.borderColor='#484848';this.style.color='#ababab'">← Torna</button>
-        <span style="font-size:15px;font-weight:800;color:#ffffff;letter-spacing:-.01em;flex:1">🔬 AI Document Workbench</span>
-        <!-- STORICO DOCUMENTI — centro header -->
-        <div id="wbHistoryStrip" style="flex:1;display:flex;align-items:center;gap:6px;overflow:hidden;min-width:0;padding:0 8px"></div>
-        <!-- TOGGLE A/B — centrato, lontano dal supa-user-bar che è top-right -->
-        <div class="wb-toggle-pill" style="margin-right:8px;flex-shrink:0">
-          <button id="wbBtnSplit" onclick="wbToggleLayout('split')" style="background:#d394ff;color:#000">⬜ Split</button>
-          <button id="wbBtnStack" onclick="wbToggleLayout('stack')" style="background:transparent;color:#ababab">⬛ Stack</button>
-        </div>
+<div class="wb-header">
+  <button class="wb-back" onclick="showScreen('screenMode')">← Torna</button>
+  <div class="wb-brand">
+    <span style="font-size:16px">🔬</span>
+    <span class="wb-brand-name">AI Document Workbench</span>
+    <span class="wb-brand-tag">Luminance Scholar</span>
+  </div>
+  <div class="wb-recenti">
+    <span class="wb-recenti-label">Recenti:</span>
+    <div id="wbHistStrip" style="display:flex;gap:6px"></div>
+  </div>
+  <div class="wb-spacer"></div>
+  <div class="wb-layout-group">
+    <button class="wb-layout-btn active" id="wbBtnSplit" onclick="wbToggleLayout('split')">▪ SPLIT</button>
+    <button class="wb-layout-btn" id="wbBtnStack" onclick="wbToggleLayout('stack')">≡ STACK</button>
+  </div>
+</div>
+
+<div class="wb-upload" id="wbUploadBar">
+  <span class="wb-step-tag">Step 01 · Document Ingestion</span>
+  <div id="wbNoFile" style="display:flex;align-items:center;gap:12px;flex:1">
+    <span class="wb-upload-placeholder">PDF · DOC · DOCX — clicca per caricare</span>
+  </div>
+  <div id="wbFileInfo" style="display:none;flex:1" class="wb-file-info">
+    <div class="wb-file-icon">📄</div>
+    <div>
+      <div class="wb-file-name" id="wbFileName">—</div>
+      <div class="wb-file-sub" id="wbFileSub">—</div>
+    </div>
+  </div>
+  <input type="file" id="wbFilePicker" accept=".pdf,.doc,.docx" style="display:none">
+  <button class="wb-btn-file" id="wbPickerBtn">📄 Scegli file</button>
+  <button class="wb-btn-change" id="wbChangeBtn" style="display:none" onclick="wbResetUpload()">Cambia file</button>
+</div>
+
+<div class="wb-body" id="wbMain">
+
+  <!-- LEFT: Document -->
+  <div class="wb-doc" id="wbDocPanel">
+    <div class="wb-doc-topbar">
+      <div>
+        <span class="wb-doc-label">Step 02 · Full Document View · Semantic Parsing</span>
+        <span class="wb-doc-sub" id="wbDocSub" style="margin-left:10px">Carica un documento per iniziare</span>
       </div>
+      <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
     </div>
 
-    <!-- STEP 01: UPLOAD BAR -->
-    <div class="wb-upload-bar" style="padding:16px 24px;border-bottom:1px solid rgba(72,72,72,.3)">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <span class="wb-step-label">STEP 01</span>
-        <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· Document Ingestion · PDF, DOC, DOCX</span>
-      </div>
-      <!-- Input file nascosto + button esplicito (più affidabile di label su tutti i browser) -->
-      <input type="file" id="wbFileInput" accept=".pdf,.doc,.docx" style="display:none">
-      <div id="wbDropZone" style="border:2px dashed rgba(72,72,72,.5);border-radius:12px;background:#000000;padding:14px 20px;transition:border-color .2s">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <span style="font-size:22px">📎</span>
-            <div>
-              <div id="wbFileName" style="font-size:13px;font-weight:600;color:#ffffff">Nessun documento selezionato</div>
-              <div id="wbFileMeta" style="font-size:11px;color:#ababab;margin-top:2px">PDF · DOC · DOCX — clicca il pulsante per caricare</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <button id="wbPickerBtn" style="padding:7px 18px;background:rgba(211,148,255,.12);color:#d394ff;border:1px solid rgba(211,148,255,.35);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',monospace">📂 Scegli file</button>
-            <button id="wbChangeBtn" style="display:none;background:rgba(255,255,255,.08);color:#ababab;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',monospace">↩ Cambia</button>
-          </div>
-        </div>
-        <!-- Progress bar lettura file -->
-        <div id="wbProgressWrap" style="display:none;margin-top:6px">
-          <div style="height:4px;background:rgba(211,148,255,.15);border-radius:4px;overflow:hidden">
-            <div id="wbProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#d394ff,#aa30fa);border-radius:4px;transition:width .25s ease"></div>
-          </div>
-          <div id="wbProgressLabel" style="font-size:11px;color:#d394ff;font-family:'Space Grotesk',monospace;margin-top:4px">Lettura…</div>
-        </div>
-      </div>
+    <!-- Placeholder pre-upload -->
+    <div class="wb-doc-placeholder" id="wbDocPlaceholder">
+      <div class="wb-doc-placeholder-icon">📄</div>
+      <div>Il documento apparirà qui dopo il caricamento</div>
     </div>
 
-    <!-- MAIN AREA -->
-    <div id="wbMain" class="wb-main wb-layout-split">
+    <!-- Sections (populated by wbRenderSections) -->
+    <div class="wb-sections" id="wbSections" style="display:none"></div>
+  </div>
 
-      <!-- STEP 02: DOCUMENT PANEL -->
-      <div id="wbDocPanel" class="wb-doc-panel" style="border-right:1px solid rgba(72,72,72,.2)">
-        <div style="padding:12px 20px;background:#1f1f1f;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(72,72,72,.2);flex-shrink:0">
-          <div>
-            <div class="wb-step-label">STEP 02</div>
-            <div style="font-size:11px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">Full Document View</div>
-          </div>
-        </div>
+  <!-- RIGHT: Tools -->
+  <div class="wb-tools" id="wbToolsPanel">
+    <div class="wb-tools-topbar">
+      <span class="wb-tools-label">Step 03 · AI Analysis &amp; Tools</span>
+      <span class="wb-tools-ctx" id="wbCtxLabel">Contesto: <span>nessuno</span></span>
+    </div>
+    <div class="wb-tools-scroll" id="wbToolsScroll">
 
-        <div id="wbDocContent" class="wb-doc-content" style="flex:1;overflow:hidden;background:#111111;display:flex;flex-direction:column;">
-          <!-- Placeholder -->
-          <div id="wbDocPlaceholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;opacity:.35">
-            <span style="font-size:48px">📄</span>
-            <span style="font-size:13px;color:#ababab">Il documento apparirà qui dopo il caricamento</span>
-          </div>
-          <!-- PDF.js canvas container (PDF) -->
-          <div id="wbPdfContainer" style="display:none;flex:1;overflow-y:auto;padding:16px;background:#1a1a1a;scrollbar-width:thin;scrollbar-color:#484848 #111"></div>
-          <!-- Word text viewer -->
-          <div id="wbDocText" style="display:none;flex:1;overflow-y:auto;padding:24px 28px;white-space:pre-wrap;font-size:13px;line-height:1.9;color:#d4d4d4;background:#111111;scrollbar-width:thin;scrollbar-color:#484848 #111"></div>
-        </div>
+      <!-- Context strip -->
+      <div class="wb-ctx-strip" id="wbCtxStrip" style="display:none">
+        <div class="wb-ctx-dot"></div>
+        <div class="wb-ctx-text" id="wbCtxText">Seleziona una sezione</div>
       </div>
 
-      <!-- RESIZE HANDLE -->
-      <div id="wbResizeHandle" title="Trascina per ridimensionare"></div>
-
-      <!-- STEP 03: TOOLS PANEL -->
-      <div id="wbToolsPanel" class="wb-tools-panel" style="padding:20px;display:flex;flex-direction:column;gap:16px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span class="wb-step-label">STEP 03</span>
-          <span style="font-size:10px;color:#ababab;text-transform:uppercase;letter-spacing:.08em;font-family:'Space Grotesk',monospace">· AI Analysis &amp; Tools</span>
+      <!-- TOOL 01: Visual Storytelling -->
+      <div class="wb-tool wb-locked" id="wbTool01">
+        <div class="wb-tool-head">
+          <div class="wb-glow-bar" style="background:linear-gradient(180deg,#c084fc,#7c3aed)"></div>
+          <div class="wb-tool-info">
+            <div class="wb-tool-n">Tool 01</div>
+            <div class="wb-tool-name">Visual Storytelling</div>
+          </div>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#c084fc,#9333ea);color:#fff;box-shadow:0 0 16px rgba(168,85,247,0.35)" onclick="wbRunTool(1)">▶ GENERA</button>
         </div>
+        <div class="wb-tool-desc">Mappa in 3 livelli: aspetti principali (Features), casi particolari (Hidden Layers), comportamenti derivati (Presumptions).</div>
+        <div class="wb-out" id="wbOut01" style="display:none"></div>
+      </div>
 
-        <!-- TOOL 01: Visual Storytelling -->
-        <div id="wbTool01" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#d394ff"></div>
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#d394ff;font-family:'Space Grotesk',monospace">TOOL 01</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Visual Storytelling</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <button onclick="wbRunTool(1)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#d394ff,#aa30fa);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
-              <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool01')" title="Minimizza">−</button>
-            </div>
+      <!-- TOOL 02: Knowledge Synthesis -->
+      <div class="wb-tool wb-locked" id="wbTool02">
+        <div class="wb-tool-head">
+          <div class="wb-glow-bar" style="background:linear-gradient(180deg,#67e8f9,#0891b2)"></div>
+          <div class="wb-tool-info">
+            <div class="wb-tool-n">Tool 02</div>
+            <div class="wb-tool-name">Knowledge Synthesis</div>
           </div>
-          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Diagramma visivo del concetto principale + metafora cognitiva quotidiana.</p>
-          <div id="wbTool01Result" style="display:none">
-            <div id="wbTool01Diagram" style="background:#000000;border-radius:8px;padding:16px;border:1px solid rgba(211,148,255,.15);font-family:monospace;font-size:12px;color:#d394ff;white-space:pre;overflow-x:auto;margin-bottom:12px"></div>
-            <div id="wbTool01Metaphor" style="background:#262626;border-radius:8px;padding:14px;font-size:13px;color:#e0e0e0;font-style:italic;line-height:1.7;border-left:3px solid rgba(211,148,255,.4)"></div>
-          </div>
-          <div id="wbTool01Loading" style="display:none;font-size:12px;color:#d394ff;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Generazione in corso…</div>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#67e8f9,#0891b2);color:#000;box-shadow:0 0 16px rgba(34,211,238,0.25)" onclick="wbRunTool(2)">▶ GENERA</button>
         </div>
+        <div class="wb-tool-desc">Formula logica del concetto · Key Concept con bordo neon · Learning Process in 3 step progressivi.</div>
+        <div class="wb-out" id="wbOut02" style="display:none"></div>
+      </div>
 
-        <!-- TOOL 02: Sintesi & Chunks -->
-        <div id="wbTool02" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#cb80ff"></div>
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#cb80ff;font-family:'Space Grotesk',monospace">TOOL 02</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Sintesi &amp; Chunks</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <button onclick="wbRunTool(2)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#cb80ff,#9100e0);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
-              <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool02')" title="Minimizza">−</button>
-            </div>
+      <!-- TOOL 03: Scholar's Metaphor -->
+      <div class="wb-tool wb-locked" id="wbTool03">
+        <div class="wb-tool-head">
+          <div class="wb-glow-bar" style="background:linear-gradient(180deg,#fcd34d,#b45309)"></div>
+          <div class="wb-tool-info">
+            <div class="wb-tool-n">Tool 03</div>
+            <div class="wb-tool-name">Scholar's Metaphor</div>
           </div>
-          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">6-8 blocchi concettuali con titolo, sintesi e tag articolo GDPR.</p>
-          <div id="wbTool02Result" style="display:none;flex-direction:column;gap:10px"></div>
-          <div id="wbTool02Loading" style="display:none;font-size:12px;color:#cb80ff;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Analisi in corso…</div>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#fcd34d,#d97706);color:#000;box-shadow:0 0 16px rgba(245,158,11,0.25)" onclick="wbRunTool(3)">▶ GENERA</button>
         </div>
+        <div class="wb-tool-desc">Metafora cognitiva originale che cattura l'essenza del concetto in termini quotidiani e memorabili.</div>
+        <div class="wb-out" id="wbOut03" style="display:none"></div>
+      </div>
 
-        <!-- TOOL 03: Scholar's Metaphor -->
-        <div id="wbTool03" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#c084fc"></div>
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#c084fc;font-family:'Space Grotesk',monospace">TOOL 03</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">📖 Scholar's Metaphor</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <button onclick="wbRunTool(3)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#c084fc,#9333ea);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
-              <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool03')" title="Minimizza">−</button>
-            </div>
+      <!-- TOOL 04: Active Recall -->
+      <div class="wb-tool wb-locked" id="wbTool04">
+        <div class="wb-tool-head">
+          <div class="wb-glow-bar" style="background:linear-gradient(180deg,#6ee7b7,#059669)"></div>
+          <div class="wb-tool-info">
+            <div class="wb-tool-n">Tool 04</div>
+            <div class="wb-tool-name">Active Recall</div>
           </div>
-          <p style="font-size:12px;color:#888888;margin-bottom:12px;line-height:1.6">Metafora cognitiva originale che cattura l'essenza del testo.</p>
-          <div id="wbTool03Result" style="display:none;flex-direction:column;gap:10px"></div>
-          <div id="wbTool03Loading" style="display:none;font-size:12px;color:#c084fc;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Metafora in corso…</div>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#6ee7b7,#059669);color:#000;box-shadow:0 0 16px rgba(16,185,129,0.25)" onclick="wbRunTool(4)">▶ GENERA</button>
         </div>
+        <div class="wb-tool-desc">3 domande a risposta multipla sulla sezione selezionata. Clicca un'opzione per rivelare la risposta corretta.</div>
+        <div class="wb-out" id="wbOut04" style="display:none"></div>
+      </div>
 
-        <!-- TOOL 04: Active Recall -->
-        <div id="wbTool04" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#22d3ee"></div>
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#22d3ee;font-family:'Space Grotesk',monospace">TOOL 04</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">⚡ Active Recall</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <button onclick="wbRunTool(4)" class="wb-tool-run-btn" style="background:linear-gradient(135deg,#22d3ee,#0891b2);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Genera</button>
-              <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool04')" title="Minimizza">−</button>
-            </div>
+      <!-- TOOL 05: Visual Memory Map -->
+      <div class="wb-tool wb-locked" id="wbTool05">
+        <div class="wb-tool-head">
+          <div class="wb-glow-bar" style="background:linear-gradient(180deg,#f472b6,#db2777)"></div>
+          <div class="wb-tool-info">
+            <div class="wb-tool-n">Tool 05</div>
+            <div class="wb-tool-name">Visual Memory Map</div>
           </div>
-          <p style="font-size:12px;color:#888888;margin-bottom:12px;line-height:1.6">3 domande a risposta multipla. Clicca un'opzione per rivelare la corretta.</p>
-          <div id="wbTool04Result" style="display:none;flex-direction:column;gap:10px"></div>
-          <div id="wbTool04Loading" style="display:none;font-size:12px;color:#22d3ee;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Generazione quiz…</div>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#f9a8d4,#db2777);color:#fff;box-shadow:0 0 16px rgba(219,39,119,0.3)" onclick="wbRunTool(5)">▶ GENERA</button>
         </div>
+        <div class="wb-tool-desc">Mappa cognitiva visiva: ogni concetto chiave diventa un nodo colorato con emoji e micro-spiegazione per la memoria visiva.</div>
+        <div class="wb-out" id="wbOut05" style="display:none"></div>
+      </div>
 
-        <!-- TOOL 05: Chat Contestuale -->
-        <div id="wbTool05" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#06b6d4"></div>
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#06b6d4;font-family:'Space Grotesk',monospace">TOOL 05</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">Chat Contestuale</div>
-            </div>
-            <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool05')" title="Minimizza">−</button>
+      <!-- TOOL 06: Chat Contestuale -->
+      <div class="wb-tool wb-locked" id="wbTool06">
+        <div class="wb-tool-head">
+          <div class="wb-glow-bar" style="background:linear-gradient(180deg,#818cf8,#4f46e5)"></div>
+          <div class="wb-tool-info">
+            <div class="wb-tool-n">Tool 06</div>
+            <div class="wb-tool-name">Chat Contestuale</div>
           </div>
-          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Fai domande libere sul documento caricato.</p>
-          <div id="wbChatMessages" style="background:#000000;border-radius:8px;padding:12px;min-height:80px;max-height:200px;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:#484848 #0e0e0e"></div>
+        </div>
+        <div class="wb-tool-desc">Fai domande libere sul contenuto della sezione selezionata. L'AI risponde usando solo il testo del documento.</div>
+        <div class="wb-out" id="wbOut06" style="display:none">
+          <div id="wbChatMessages" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
           <div style="display:flex;gap:8px">
-            <input id="wbChatInput" type="text" placeholder="Chiedi qualcosa sul documento…" style="flex:1;background:#000000;border:1px solid rgba(72,72,72,.5);border-radius:8px;padding:9px 14px;color:#ffffff;font-size:13px;font-family:inherit;outline:none;transition:border-color .2s" onkeydown="if(event.key==='Enter')wbChatSend()" onfocus="this.style.borderColor='#06b6d4'" onblur="this.style.borderColor='rgba(72,72,72,.5)'">
-            <button onclick="wbChatSend()" style="background:#06b6d4;color:#000;font-weight:700;border-radius:8px;padding:9px 16px;border:none;cursor:pointer;font-size:13px;white-space:nowrap">→</button>
+            <input id="wbChatInput" type="text" placeholder="Fai una domanda sul testo..." style="flex:1;background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#fff;font-size:12px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')wbChatSend()">
+            <button onclick="wbChatSend()" style="background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:0 14px;font:600 11px/1 Inter,sans-serif;cursor:pointer">Invia</button>
           </div>
         </div>
+      </div>
 
-        <!-- TOOL 06: Luminance Scholar -->
-        <div id="wbTool06" class="wb-tool-card wb-locked" style="padding:20px 20px 20px 26px">
-          <div class="wb-glow-bar" style="background:#f59e0b"></div>
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#f59e0b;font-family:'Space Grotesk',monospace">TOOL 06</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-top:2px">📚 Luminance Scholar</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <button onclick="wbRunScholar()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:700;border-radius:999px;padding:6px 14px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">▶ Analizza</button>
-              <button class="wb-toggle-btn" onclick="wbToggleTool('wbTool06')" title="Minimizza">−</button>
-            </div>
-          </div>
-          <p style="font-size:12px;color:#ababab;margin-bottom:12px;line-height:1.6">Analisi completa in un click: visuale, sintesi, metafora, domande di ripasso, flashcard e incipit per chat.</p>
-          <div id="wbTool06Result" style="display:none;flex-direction:column;gap:12px"></div>
-          <div id="wbTool06Loading" style="display:none;font-size:12px;color:#f59e0b;font-family:'Space Grotesk',monospace;padding:8px 0">⟳ Analisi Scholar in corso…</div>
-        </div>
-
-      </div><!-- end tools panel -->
-    </div><!-- end wbMain -->
-  </div><!-- end wb-shell -->
+    </div>
+  </div>
+</div>
 </div><!-- end screenWorkbench -->
 
 <div class="screen" id="screenDash">
@@ -19789,10 +19862,11 @@ async function wbRunTool(toolNum, overrideText) {
 
   // Prompts neutri — funzionano su qualsiasi tipo di documento
   var prompts = {
-    1: 'Analizza questo testo. Crea un diagramma ASCII (con frecce -> e caselle [ ]) che mostra la struttura dei concetti principali. Poi scrivi una metafora cognitiva quotidiana vivida (2-3 frasi). Formato obbligatorio:\n---DIAGRAM---\n[diagramma ASCII qui]\n---METAPHOR---\n[metafora qui]',
-    2: 'Identifica 4-6 blocchi concettuali in questo testo. Usa ESATTAMENTE "---" (tre trattini) come separatore tra i blocchi. Formato obbligatorio:\n**Titolo blocco** | tema\nSintesi del blocco in 2-3 righe.\n---\n**Titolo blocco 2** | tema2\nSintesi del blocco 2.\n---',
+    1: 'Analizza questo testo. Identifica 3-5 aspetti principali (FEATURES), 2-3 casi nascosti o impliciti (HIDDEN LAYERS), 2-3 assunzioni che il testo presuppone (PRESUMPTIONS). Formato obbligatorio:\nFEATURES: [feature1] | [feature2] | [feature3]\nHIDDEN: [hidden1] | [hidden2]\nPRESUMPTIONS: [pres1] | [pres2]',
+    2: 'Analizza questo testo. Crea una sintesi Knowledge Synthesis con ESATTAMENTE questo formato:\nALGORITHM: [formula logica breve tipo: A → B ⊕ C o IF (condizione) THEN (risultato)]\nCONCEPT: [titolo concetto chiave]\nDEFINITION: [definizione in 2-3 frasi chiare]\nSTEP1: [primo step del processo]\nSTEP2: [secondo step del processo]\nSTEP3: [terzo step — risultato finale]',
     3: 'Scrivi una metafora originale e potente che spieghi visivamente l\'essenza di questo testo. Formato obbligatorio:\nTITOLO: [titolo evocativo della metafora]\nMETAFORA: [2-3 paragrafi ricchi e vividi — prima introduci l\'oggetto analogico, poi sviluppa il parallelo, poi collega al testo]\nANALOGIA: [una analogia quotidiana in max 15 parole]',
-    4: 'Crea 3 domande di Active Recall su questo testo. Ogni domanda ha 3 opzioni (A, B, C). Formato obbligatorio:\nDOMANDA: [testo domanda]\nA: [opzione A]\nB: [opzione B]\nC: [opzione C]\nCORRETTA: [A o B o C]\nSPIEGAZIONE: [2 frasi di spiegazione]\n---'
+    4: 'Crea 3 domande di Active Recall su questo testo. Ogni domanda ha 3 opzioni (A, B, C). Formato obbligatorio:\nDOMANDA: [testo domanda]\nA: [opzione A]\nB: [opzione B]\nC: [opzione C]\nCORRETTA: [A o B o C]\nSPIEGAZIONE: [2 frasi di spiegazione]\n---',
+    5: 'Analizza questo testo e crea una Visual Memory Map con 4-6 concetti chiave. Formato obbligatorio per ogni concetto:\nNODO: [emoji] [titolo breve]\nCOLORE: [uno tra: purple, cyan, green, orange, pink, yellow]\nSPIEGA: [spiegazione in max 15 parole]\nPILASTRO: [uno tra: Struttura, Processo, Impatto, Agenti, Principio, Contesto]\n---'
   };
 
   var loadingId = 'wbTool0' + toolNum + 'Loading';
@@ -19804,7 +19878,7 @@ async function wbRunTool(toolNum, overrideText) {
 
   try {
     // Token budgets per tool — tool 2 ha bisogno di più spazio per i blocchi multipli
-    var tokenBudget = { 1: 600, 2: 1100, 3: 700, 4: 800 };
+    var tokenBudget = { 1: 600, 2: 900, 3: 700, 4: 800, 5: 900 };
     var fullPrompt = prompts[toolNum] + '\n\nDOCUMENTO:\n' + docText.substring(0, 4000);
 
     var ctrl = new AbortController();
@@ -19839,10 +19913,11 @@ async function wbRunTool(toolNum, overrideText) {
       resultEl.style.boxSizing  = 'border-box';
     }
 
-    if (toolNum === 1) wbRenderTool01(aiText, resultEl); // FIX BUG 1: passa resultEl
+    if (toolNum === 1) wbRenderTool01(aiText, resultEl);
     else if (toolNum === 2) wbRenderTool02(aiText, resultEl);
     else if (toolNum === 3) wbRenderTool03(aiText, resultEl);
     else if (toolNum === 4) wbRenderTool04(aiText, resultEl);
+    else if (toolNum === 5) wbRenderTool05(aiText, resultEl);
 
   } catch(e) {
     if (loadingEl) { loadingEl.style.display = 'block'; loadingEl.textContent = '⚠️ ' + e.message; }
@@ -19850,73 +19925,159 @@ async function wbRunTool(toolNum, overrideText) {
   }
 }
 
-// FIX BUG 1: crea elementi fresh invece di cercare ID eliminati da innerHTML=''
 function wbRenderTool01(text, resultEl) {
-  var parts = text.split('---METAPHOR---');
-  var diagramPart = parts[0].replace('---DIAGRAM---','').trim();
-  var metaphorPart = parts[1] ? parts[1].trim() : '';
-  diagramPart = diagramPart.replace(/```mermaid\n?/gi,'').replace(/```\n?/gi,'').trim();
-
-  // resultEl è già visibile e vuoto — crea elementi fresh
   resultEl.style.flexDirection = 'column';
+  resultEl.style.gap = '14px';
 
-  var diagEl = document.createElement('div');
-  diagEl.id = 'wbTool01Diagram';
-  diagEl.style.cssText = 'background:#000000;border-radius:8px;padding:16px;border:1px solid rgba(211,148,255,.15);font-family:monospace;font-size:12px;color:#d394ff;white-space:pre-wrap;overflow-x:auto;margin-bottom:12px;word-break:break-word';
-  diagEl.textContent = diagramPart || text;
-  resultEl.appendChild(diagEl);
+  var featM = text.match(/FEATURES:\s*(.+?)(?=\nHIDDEN:|$)/s);
+  var hidM  = text.match(/HIDDEN:\s*(.+?)(?=\nPRESUMPTIONS:|$)/s);
+  var presM = text.match(/PRESUMPTIONS:\s*(.+?)$/s);
 
-  if (metaphorPart) {
-    var metaEl = document.createElement('div');
-    metaEl.id = 'wbTool01Metaphor';
-    metaEl.style.cssText = 'background:#262626;border-radius:8px;padding:14px;font-size:13px;color:#e0e0e0;font-style:italic;line-height:1.7;border-left:3px solid rgba(211,148,255,.4)';
-    metaEl.textContent = metaphorPart;
-    resultEl.appendChild(metaEl);
+  var sections = [
+    { label: 'Features', raw: featM ? featM[1].trim() : '', color: '#A855F7', bg: 'rgba(168,85,247,.12)', border: 'rgba(168,85,247,.3)' },
+    { label: 'Hidden Layers', raw: hidM  ? hidM[1].trim()  : '', color: '#22d3ee', bg: 'rgba(34,211,238,.10)', border: 'rgba(34,211,238,.25)' },
+    { label: 'Presumptions', raw: presM ? presM[1].trim() : '', color: '#f472b6', bg: 'rgba(244,114,182,.10)', border: 'rgba(244,114,182,.25)' }
+  ];
+
+  if (!featM && !hidM && !presM) {
+    // fallback: just show raw text
+    var raw = document.createElement('div');
+    raw.style.cssText = 'font-size:13px;color:#ccc;line-height:1.7;white-space:pre-wrap';
+    raw.textContent = text;
+    resultEl.appendChild(raw);
+    return;
   }
+
+  sections.forEach(function(sec) {
+    if (!sec.raw) return;
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'background:'+sec.bg+';border:1px solid '+sec.border+';border-radius:10px;padding:14px 16px';
+
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'font-size:9px;font-weight:800;color:'+sec.color+';text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;font-family:monospace';
+    lbl.textContent = sec.label;
+    wrap.appendChild(lbl);
+
+    var pillWrap = document.createElement('div');
+    pillWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:7px';
+
+    var items = sec.raw.split('|').map(function(s){return s.trim();}).filter(Boolean);
+    if (items.length === 0) items = sec.raw.split(',').map(function(s){return s.trim();}).filter(Boolean);
+    if (items.length === 0) items = [sec.raw];
+
+    items.forEach(function(item) {
+      var pill = document.createElement('span');
+      pill.style.cssText = 'display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;background:'+sec.bg+';border:1px solid '+sec.border+';color:'+sec.color+';font-size:12px;font-weight:600;line-height:1.4;max-width:100%;word-break:break-word';
+      pill.textContent = item;
+      pillWrap.appendChild(pill);
+    });
+
+    wrap.appendChild(pillWrap);
+    resultEl.appendChild(wrap);
+  });
 }
 
 function wbRenderTool02(text, resultEl) {
-  var chunks = text.split(/\n---+\n?|\n?---+\n/).filter(function(c) { return c.trim(); });
-  if (chunks.length < 2) {
-    chunks = text.split(/\n(?=\*\*)/).filter(function(c) { return c.trim(); });
-  }
-  if (chunks.length < 1) chunks = [text];
   resultEl.style.flexDirection = 'column';
+  resultEl.style.gap = '12px';
 
-  var colors = ['#A855F7','#22d3ee','#f472b6','#34d399','#f59e0b','#60a5fa'];
+  var algM  = text.match(/ALGORITHM:\s*(.+?)(?=\nCONCEPT:|$)/s);
+  var conM  = text.match(/CONCEPT:\s*(.+?)(?=\nDEFINITION:|$)/s);
+  var defM  = text.match(/DEFINITION:\s*(.+?)(?=\nSTEP1:|$)/s);
+  var s1M   = text.match(/STEP1:\s*(.+?)(?=\nSTEP2:|$)/s);
+  var s2M   = text.match(/STEP2:\s*(.+?)(?=\nSTEP3:|$)/s);
+  var s3M   = text.match(/STEP3:\s*(.+?)$/s);
 
-  chunks.forEach(function(chunk, i) {
-    chunk = chunk.trim();
-    if (!chunk) return;
-    var lines = chunk.split('\n').filter(Boolean);
-    var titleLine = lines[0] || '';
-    var tagMatch = titleLine.match(/\|\s*(.+)$/);
-    var tag   = tagMatch ? tagMatch[1].trim() : '';
-    var title = titleLine.replace(/\*\*/g,'').replace(/\|.*$/,'').trim();
-    var body  = lines.slice(1).join(' ').trim();
-    var col   = colors[i % colors.length];
+  var alg = algM ? algM[1].trim() : '';
+  var con = conM ? conM[1].trim() : '';
+  var def = defM ? defM[1].trim() : '';
+  var steps = [s1M ? s1M[1].trim() : '', s2M ? s2M[1].trim() : '', s3M ? s3M[1].trim() : ''].filter(Boolean);
 
-    var card = document.createElement('div');
-    card.style.cssText = [
-      'background:#131313;border-radius:10px;padding:14px 16px 14px 20px',
-      'border-left:3px solid ' + col,
-      'border:1px solid rgba(255,255,255,.06)',
-      'border-left:3px solid ' + col
-    ].join(';');
+  if (!alg && !con) {
+    var raw = document.createElement('div');
+    raw.style.cssText = 'font-size:13px;color:#ccc;line-height:1.7;white-space:pre-wrap';
+    raw.textContent = text;
+    resultEl.appendChild(raw);
+    return;
+  }
 
-    var topRow = document.createElement('div');
-    topRow.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px';
-    topRow.innerHTML = '<span style="font-size:13px;font-weight:700;color:#ffffff;line-height:1.4">' + (title || '—') + '</span>'
-      + (tag ? '<span style="font-size:9px;background:' + col.replace(')',', .12)').replace('rgb','rgba') + ';color:' + col + ';border:1px solid ' + col.replace(')',', .3)').replace('rgb','rgba') + ';border-radius:999px;padding:2px 9px;font-family:\'Space Grotesk\',monospace;font-weight:700;white-space:nowrap;flex-shrink:0">' + tag + '</span>' : '');
-    card.appendChild(topRow);
+  // Core Algorithm box (LaTeX-style)
+  if (alg) {
+    var algBox = document.createElement('div');
+    algBox.style.cssText = 'background:#0a0a0a;border:1px solid rgba(168,85,247,.35);border-radius:10px;padding:16px 20px;text-align:center';
+    var algLabel = document.createElement('div');
+    algLabel.style.cssText = 'font-size:9px;font-weight:800;color:rgba(168,85,247,.6);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;font-family:monospace';
+    algLabel.textContent = 'Core Algorithm';
+    algBox.appendChild(algLabel);
+    var algText = document.createElement('div');
+    algText.style.cssText = 'font-family:"Courier New",monospace;font-size:15px;color:#d394ff;font-weight:700;letter-spacing:.03em';
+    algText.textContent = alg;
+    algBox.appendChild(algText);
+    resultEl.appendChild(algBox);
+  }
 
-    var bodyEl = document.createElement('p');
-    bodyEl.style.cssText = 'font-size:12.5px;color:#999999;line-height:1.75;margin:0';
-    bodyEl.textContent = body;
-    card.appendChild(bodyEl);
+  // Key Concept box (neon border)
+  if (con || def) {
+    var kcBox = document.createElement('div');
+    kcBox.style.cssText = 'border:1px solid #22d3ee;border-radius:10px;padding:16px 18px;background:rgba(34,211,238,.05);box-shadow:0 0 18px rgba(34,211,238,.08)';
+    if (con) {
+      var conLabel = document.createElement('div');
+      conLabel.style.cssText = 'font-size:9px;font-weight:800;color:#22d3ee;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;font-family:monospace';
+      conLabel.textContent = 'Key Concept';
+      kcBox.appendChild(conLabel);
+      var conTitle = document.createElement('div');
+      conTitle.style.cssText = 'font-size:14px;font-weight:800;color:#ffffff;margin-bottom:8px';
+      conTitle.textContent = con;
+      kcBox.appendChild(conTitle);
+    }
+    if (def) {
+      var defText = document.createElement('div');
+      defText.style.cssText = 'font-size:12.5px;color:#a0aec0;line-height:1.75';
+      defText.textContent = def;
+      kcBox.appendChild(defText);
+    }
+    resultEl.appendChild(kcBox);
+  }
 
-    resultEl.appendChild(card);
-  });
+  // Learning Process timeline
+  if (steps.length > 0) {
+    var tlWrap = document.createElement('div');
+    tlWrap.style.cssText = 'background:#0d0d0d;border-radius:10px;padding:16px;border:1px solid rgba(255,255,255,.07)';
+    var tlLabel = document.createElement('div');
+    tlLabel.style.cssText = 'font-size:9px;font-weight:800;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;font-family:monospace';
+    tlLabel.textContent = 'Learning Process';
+    tlWrap.appendChild(tlLabel);
+
+    var tlRow = document.createElement('div');
+    tlRow.style.cssText = 'display:flex;gap:0;align-items:flex-start;position:relative';
+
+    var stepColors = ['#A855F7','#22d3ee','#34d399'];
+    steps.forEach(function(step, i) {
+      var stepEl = document.createElement('div');
+      stepEl.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:0 4px';
+
+      var dot = document.createElement('div');
+      dot.style.cssText = 'width:28px;height:28px;border-radius:50%;background:'+stepColors[i]+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;margin-bottom:8px;flex-shrink:0;z-index:1;position:relative';
+      dot.textContent = String(i+1);
+      stepEl.appendChild(dot);
+
+      if (i < steps.length - 1) {
+        var line = document.createElement('div');
+        line.style.cssText = 'position:absolute;top:14px;left:50%;width:100%;height:2px;background:rgba(255,255,255,.08);z-index:0';
+        stepEl.appendChild(line);
+      }
+
+      var txt = document.createElement('div');
+      txt.style.cssText = 'font-size:11.5px;color:#cccccc;line-height:1.5';
+      txt.textContent = step;
+      stepEl.appendChild(txt);
+
+      tlRow.appendChild(stepEl);
+    });
+
+    tlWrap.appendChild(tlRow);
+    resultEl.appendChild(tlWrap);
+  }
 }
 
 function wbRenderTool03(text, resultEl) {
@@ -20032,6 +20193,76 @@ function wbRenderTool04(text, resultEl) {
     card.appendChild(optWrap);
     resultEl.appendChild(card);
   });
+}
+
+function wbRenderTool05(text, resultEl) {
+  resultEl.style.flexDirection = 'column';
+  resultEl.style.gap = '10px';
+
+  var colorMap = {
+    purple:  { bg: 'rgba(168,85,247,.12)',  border: 'rgba(168,85,247,.35)',  text: '#c084fc' },
+    cyan:    { bg: 'rgba(34,211,238,.10)',   border: 'rgba(34,211,238,.3)',   text: '#22d3ee' },
+    green:   { bg: 'rgba(52,211,153,.10)',   border: 'rgba(52,211,153,.3)',   text: '#34d399' },
+    orange:  { bg: 'rgba(251,146,60,.10)',   border: 'rgba(251,146,60,.3)',   text: '#fb923c' },
+    pink:    { bg: 'rgba(244,114,182,.10)',  border: 'rgba(244,114,182,.3)',  text: '#f472b6' },
+    yellow:  { bg: 'rgba(250,204,21,.10)',   border: 'rgba(250,204,21,.3)',   text: '#facc15' }
+  };
+  var colorKeys = ['purple','cyan','green','orange','pink','yellow'];
+
+  var blocks = text.split(/\n---+\n?|\n?---+\n/).filter(function(b){return b.trim();});
+  if (blocks.length < 2) blocks = text.split(/\n(?=NODO:)/).filter(function(b){return b.trim();});
+
+  // Header
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'font-size:9px;font-weight:800;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.12em;font-family:monospace;margin-bottom:2px';
+  hdr.textContent = 'Visual Memory Map — ' + blocks.length + ' concetti chiave';
+  resultEl.appendChild(hdr);
+
+  // Grid
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px';
+
+  blocks.forEach(function(block, i) {
+    block = block.trim();
+    if (!block) return;
+
+    var nodoM   = block.match(/NODO:\s*(.+?)(?=\nCOLORE:|$)/s);
+    var coloreM = block.match(/COLORE:\s*(\w+)/);
+    var spiegaM = block.match(/SPIEGA:\s*(.+?)(?=\nPILASTRO:|$)/s);
+    var pilM    = block.match(/PILASTRO:\s*(.+?)$/s);
+
+    var nodo   = nodoM   ? nodoM[1].trim()   : block.split('\n')[0];
+    var colKey = coloreM ? coloreM[1].toLowerCase() : colorKeys[i % colorKeys.length];
+    var spiega = spiegaM ? spiegaM[1].trim() : '';
+    var pilar  = pilM    ? pilM[1].trim()    : '';
+    var col    = colorMap[colKey] || colorMap[colorKeys[i % colorKeys.length]];
+
+    var card = document.createElement('div');
+    card.style.cssText = 'background:'+col.bg+';border:1px solid '+col.border+';border-radius:12px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px';
+
+    var nodoEl = document.createElement('div');
+    nodoEl.style.cssText = 'font-size:15px;font-weight:800;color:'+col.text+';line-height:1.3';
+    nodoEl.textContent = nodo;
+    card.appendChild(nodoEl);
+
+    if (spiega) {
+      var spEl = document.createElement('div');
+      spEl.style.cssText = 'font-size:11.5px;color:#aaaaaa;line-height:1.55;flex:1';
+      spEl.textContent = spiega;
+      card.appendChild(spEl);
+    }
+
+    if (pilar) {
+      var pilEl = document.createElement('div');
+      pilEl.style.cssText = 'display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;align-self:flex-start;font-family:monospace';
+      pilEl.textContent = pilar;
+      card.appendChild(pilEl);
+    }
+
+    grid.appendChild(card);
+  });
+
+  resultEl.appendChild(grid);
 }
 
 function wbSaveFlashcards() {
@@ -20430,7 +20661,7 @@ function wbSelectSection(idx) {
   _wbActiveSelection = sectionText;
 
   // Tool girano automaticamente sulla sezione corrente
-  [1, 2, 3, 4].forEach(function(n) { wbRunTool(n); });
+  [1, 2, 3, 4, 5].forEach(function(n) { wbRunTool(n); });
 }
 
 // ═══════════════════════════════════════════════════════════════════
