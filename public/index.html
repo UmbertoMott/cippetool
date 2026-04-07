@@ -149,7 +149,7 @@
 
 /* LEFT: document panel */
 #screenWorkbench .wb-doc {
-  width: 60%; flex-shrink: 0; display: flex; flex-direction: column;
+  min-width: 0; flex-shrink: 0; display: flex; flex-direction: column;
   border-right: 1px solid var(--wb-border); background: #000; overflow: hidden;
 }
 #screenWorkbench.wb-layout-stack .wb-doc { width: 100%; height: 40vh; }
@@ -19431,12 +19431,12 @@ function _wbInitResize() {
   if (!handle || !main) return;
   var dragging = false, startX = 0, startCols = '';
   function getDocPct() {
-    var cols = main.style.gridTemplateColumns || '45% 6px 1fr';
+    var cols = main.style.gridTemplateColumns || '50% 6px 1fr';
     var m = cols.match(/^([\d.]+)%/);
     return m ? parseFloat(m[1]) : 45;
   }
   handle.addEventListener('mousedown', function(e) {
-    if (!main.classList.contains('wb-layout-split')) return;
+    if (main.style.display !== 'grid') return;
     dragging = true; startX = e.clientX;
     startCols = getDocPct();
     handle.classList.add('wb-dragging');
@@ -19499,7 +19499,7 @@ function wbToggleLayout(mode, silent) {
 
   var rh = document.getElementById('wbResizeHandle');
   if (mode === 'split') {
-    main.style.gridTemplateColumns = '45% 6px 1fr';
+    main.style.gridTemplateColumns = '50% 6px 1fr';
     main.style.display = 'grid';
     if (rh) rh.style.display = '';
     main.style.flexDirection = '';
