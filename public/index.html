@@ -19540,8 +19540,8 @@ function wbResetUpload() {
   document.getElementById('wbDocText').style.display = 'none';
   document.getElementById('wbPdfContainer').style.display = 'none';
   document.getElementById('wbPdfContainer').innerHTML = '';
-  var oldSec = document.getElementById('wbSectionsContainer');
-  if (oldSec) oldSec.remove();
+  var secEl = document.getElementById('wbSections');
+  if (secEl) { secEl.innerHTML = ''; secEl.style.display = 'none'; }
   _wbSections = [];
   _wbSelectedSection = -1;
   _wbActiveSelection = '';
@@ -20476,8 +20476,7 @@ async function wbChatSend() {
 // ── Auto-segmentazione con Gemini ──────────────────────────────────
 async function wbAutoSegment() {
   if (!_wbDocText || _wbDocText.trim().length < 100) return;
-  var wbDocContent = document.getElementById('wbDocContent');
-  if (!wbDocContent) return;
+  var wbDocPanel = document.getElementById('wbDocPanel');
 
   // Il testo raw resta VISIBILE — il banner di loading appare sopra
   var rawTxt = document.getElementById('wbDocText');
@@ -20485,7 +20484,7 @@ async function wbAutoSegment() {
   loadBanner.id = 'wbSegmentLoading';
   loadBanner.style.cssText = 'padding:6px 20px;background:rgba(211,148,255,.08);border-bottom:1px solid rgba(211,148,255,.15);font-size:11px;color:#d394ff;font-family:\'Space Grotesk\',monospace;flex-shrink:0';
   loadBanner.textContent = '✦ Strutturazione in sezioni in corso…';
-  wbDocContent.insertBefore(loadBanner, wbDocContent.firstChild);
+  if (wbDocPanel) wbDocPanel.insertBefore(loadBanner, wbDocPanel.firstChild);
 
   var prompt = 'Analizza il testo e dividilo in 5-8 sezioni concettuali significative (qualsiasi tipo di documento). Per ogni sezione riporta il testo originale VERBATIM (copiato dal documento senza riscrivere), 300-500 parole per sezione. Rispondi SOLO JSON valido:\n[{"titolo":"titolo chiaro max 60 chars","testo":"testo verbatim originale del documento 300-500 parole"},...]\n\nTESTO:\n';
   try {
@@ -20548,139 +20547,94 @@ function _wbSmartChunk(text) {
 }
 
 function wbRenderSections(sections) {
-  var wbDocContent = document.getElementById('wbDocContent');
-  if (!wbDocContent) return;
-
   // Nascondi contenuto grezzo
   ['wbDocPlaceholder','wbPdfContainer','wbDocText'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
-  var old = document.getElementById('wbSectionsContainer');
-  if (old) old.remove();
 
-  // Contenitore principale
-  var cont = document.createElement('div');
-  cont.id = 'wbSectionsContainer';
-  cont.style.cssText = 'flex:1;display:flex;flex-direction:column;background:#111111;overflow:hidden';
+  var container = document.getElementById('wbSections');
+  if (!container) return;
+  container.innerHTML = '';
+  container.style.display = 'block';
 
-  // ── Barra navigazione sezioni ──────────────────────────────────────────
-  var nav = document.createElement('div');
-  nav.id = 'wbSecNav';
-  nav.style.cssText = [
-    'display:flex;align-items:center;justify-content:space-between',
-    'padding:10px 18px;background:#171717',
-    'border-bottom:1px solid rgba(211,148,255,.14)',
-    'flex-shrink:0'
-  ].join(';');
+  sections.forEach(function(sec, idx) {
+    var words = (sec.testo || sec.text || '').split(/\s+/).filter(Boolean);
+    var wordCount = words.length;
+    var numLabel = 'Sezione ' + String(idx + 1).padStart(2, '0');
+    var title = sec.titolo || sec.title || numLabel;
+    var body = sec.testo || sec.text || '';
 
-  var btnStyle = [
-    'background:rgba(211,148,255,.1);border:1px solid rgba(211,148,255,.25)',
-    'border-radius:7px;color:#d394ff;font-size:16px;line-height:1',
-    'width:32px;height:32px;cursor:pointer;display:flex;align-items:center',
-    'justify-content:center;transition:all .15s;flex-shrink:0'
-  ].join(';');
+    var card = document.createElement('div');
+    card.className = 'wb-sec';
+    card.dataset.idx = idx;
+    card.onclick = function() { wbSelectSection(idx); };
 
-  var prevBtn = document.createElement('button');
-  prevBtn.id = 'wbSecPrev';
-  prevBtn.title = 'Sezione precedente';
-  prevBtn.style.cssText = btnStyle;
-  prevBtn.innerHTML = '&#8592;';
-  prevBtn.onclick = function() { wbNavSection(-1); };
+    // Head
+    var head = document.createElement('div');
+    head.className = 'wb-sec-head';
+    var numSpan = document.createElement('span');
+    numSpan.className = 'wb-sec-num';
+    numSpan.textContent = numLabel;
+    var badge = document.createElement('span');
+    badge.className = 'wb-sec-badge';
+    badge.textContent = '● Contesto Attivo';
+    head.appendChild(numSpan);
+    head.appendChild(badge);
 
-  var counter = document.createElement('div');
-  counter.id = 'wbSecCounter';
-  counter.style.cssText = 'flex:1;text-align:center;font-family:\'Space Grotesk\',monospace;font-size:11px;font-weight:700;color:rgba(211,148,255,.7);letter-spacing:.08em;text-transform:uppercase';
-  counter.textContent = '§ 1 DI ' + sections.length;
+    // Title
+    var titleEl = document.createElement('div');
+    titleEl.className = 'wb-sec-title';
+    titleEl.textContent = title;
 
-  var nextBtn = document.createElement('button');
-  nextBtn.id = 'wbSecNext';
-  nextBtn.title = 'Sezione successiva';
-  nextBtn.style.cssText = btnStyle;
-  nextBtn.innerHTML = '&#8594;';
-  nextBtn.onclick = function() { wbNavSection(1); };
+    // Body
+    var bodyEl = document.createElement('div');
+    bodyEl.className = 'wb-sec-body';
+    var p = document.createElement('p');
+    p.textContent = body;
+    bodyEl.appendChild(p);
 
-  nav.appendChild(prevBtn);
-  nav.appendChild(counter);
-  nav.appendChild(nextBtn);
-  cont.appendChild(nav);
+    // Footer
+    var footer = document.createElement('div');
+    footer.className = 'wb-sec-footer';
+    var wordsSpan = document.createElement('span');
+    wordsSpan.className = 'wb-sec-words';
+    wordsSpan.textContent = '~' + wordCount + ' parole';
+    var ctxSpan = document.createElement('span');
+    ctxSpan.className = 'wb-ctx-label';
+    ctxSpan.textContent = '→ Usato come contesto';
+    footer.appendChild(wordsSpan);
+    footer.appendChild(ctxSpan);
 
-  // ── Area contenuto sezione corrente ───────────────────────────────────
-  var view = document.createElement('div');
-  view.id = 'wbSecView';
-  view.style.cssText = [
-    'flex:1;overflow-y:auto;padding:30px 32px 40px',
-    'background:#111111',
-    'scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111'
-  ].join(';');
-  cont.appendChild(view);
+    card.appendChild(head);
+    card.appendChild(titleEl);
+    card.appendChild(bodyEl);
+    card.appendChild(footer);
+    container.appendChild(card);
+  });
 
-  wbDocContent.appendChild(cont);
-
-  // Seleziona la prima sezione — avvia tool automaticamente
+  // Seleziona la prima sezione
   wbSelectSection(0);
-}
-
-// Naviga avanti/indietro tra le sezioni
-function wbNavSection(delta) {
-  wbSelectSection((_wbSelectedSection || 0) + delta);
 }
 
 function wbSelectSection(idx) {
   if (!_wbSections || !_wbSections[idx]) return;
   _wbSelectedSection = idx;
-  var total = _wbSections.length;
   var sec = _wbSections[idx];
 
-  // Aggiorna counter
-  var counter = document.getElementById('wbSecCounter');
-  if (counter) counter.textContent = '§ ' + (idx + 1) + ' DI ' + total;
-
-  // Prev/Next disabled state
-  var prevBtn = document.getElementById('wbSecPrev');
-  var nextBtn = document.getElementById('wbSecNext');
-  if (prevBtn) { prevBtn.disabled = (idx === 0); prevBtn.style.opacity = idx === 0 ? '.3' : '1'; }
-  if (nextBtn) { nextBtn.disabled = (idx === total - 1); nextBtn.style.opacity = idx === total - 1 ? '.3' : '1'; }
-
-  // Renderizza testo nella view
-  var view = document.getElementById('wbSecView');
-  if (view) {
-    view.innerHTML = '';
-    view.scrollTop = 0;
-
-    // Num label
-    var numEl = document.createElement('div');
-    numEl.style.cssText = 'font-size:9px;font-weight:700;color:rgba(211,148,255,.55);text-transform:uppercase;letter-spacing:.15em;font-family:\'Space Grotesk\',monospace;margin-bottom:10px';
-    numEl.textContent = '§ ' + (idx + 1) + ' · ' + (sec.titolo || sec.title || 'Sezione');
-    view.appendChild(numEl);
-
-    // Gerarchia visiva: h1 se titolo è tutto MAIUSCOLO o inizia con keyword di capitolo
-    var rawTitle = sec.titolo || sec.title || ('Sezione ' + (idx + 1));
-    var isH1 = (rawTitle === rawTitle.toUpperCase() && rawTitle.replace(/[^a-zA-Z]/g,'').length > 3)
-      || /^(capitolo|chapter|parte|part|introduction|introduzione|abstract|sommario|premessa|preamble)\b/i.test(rawTitle)
-      || idx === 0;
-    var titleEl = document.createElement(isH1 ? 'h1' : 'h2');
-    titleEl.style.cssText = isH1
-      ? 'font-size:24px;font-weight:900;color:#ffffff;margin:0 0 20px;line-height:1.2;letter-spacing:-.02em'
-      : 'font-size:19px;font-weight:800;color:#e8e8f0;margin:0 0 20px;line-height:1.3;letter-spacing:-.01em';
-    titleEl.textContent = rawTitle;
-    view.appendChild(titleEl);
-
-    // Separator — neon violet
-    var sep = document.createElement('div');
-    sep.style.cssText = 'width:36px;height:3px;background:linear-gradient(90deg,#A855F7,#6d28d9);border-radius:2px;margin-bottom:22px';
-    view.appendChild(sep);
-
-    // Body text
-    var bodyEl = document.createElement('div');
-    bodyEl.style.cssText = 'font-size:13.5px;line-height:1.9;color:#c8c8d4;font-family:Georgia,\'Times New Roman\',serif;white-space:pre-wrap;word-break:break-word';
-    bodyEl.textContent = sec.testo || sec.text || '';
-    view.appendChild(bodyEl);
+  // Toggle active class on cards
+  var container = document.getElementById('wbSections');
+  if (container) {
+    var cards = container.querySelectorAll('.wb-sec');
+    cards.forEach(function(c) { c.classList.remove('active'); });
+    if (cards[idx]) {
+      cards[idx].classList.add('active');
+      cards[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
   // Imposta testo attivo per i tool
-  var sectionText = sec.testo || sec.text || '';
-  _wbActiveSelection = sectionText;
+  _wbActiveSelection = sec.testo || sec.text || '';
 
   // Tool girano automaticamente sulla sezione corrente
   [1, 2, 3, 4, 5].forEach(function(n) { wbRunTool(n); });
