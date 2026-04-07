@@ -4989,12 +4989,18 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="wb-file-icon">📄</div>
     <div>
       <div class="wb-file-name" id="wbFileName">—</div>
-      <div class="wb-file-sub" id="wbFileSub">—</div>
+      <div class="wb-file-sub" id="wbFileMeta">—</div>
     </div>
   </div>
   <input type="file" id="wbFilePicker" accept=".pdf,.doc,.docx" style="display:none">
   <button class="wb-btn-file" id="wbPickerBtn">📄 Scegli file</button>
   <button class="wb-btn-change" id="wbChangeBtn" style="display:none" onclick="wbResetUpload()">Cambia file</button>
+</div>
+<div id="wbProgressWrap" style="display:none;padding:6px 20px 6px;background:#0d0d0d;border-bottom:1px solid rgba(255,255,255,.06)">
+  <div style="background:rgba(255,255,255,.07);border-radius:999px;height:4px;overflow:hidden;margin-bottom:4px">
+    <div id="wbProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#d394ff,#aa30fa);border-radius:999px;transition:width .3s"></div>
+  </div>
+  <div id="wbProgressLabel" style="font-size:10px;color:rgba(255,255,255,.4);font-family:monospace"></div>
 </div>
 
 <div class="wb-body" id="wbMain">
@@ -5018,6 +5024,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Sections (populated by wbRenderSections) -->
     <div class="wb-sections" id="wbSections" style="display:none"></div>
   </div>
+
+  <!-- RESIZER -->
+  <div id="wbResizeHandle" style="width:6px;cursor:col-resize;background:rgba(255,255,255,.04);flex-shrink:0;transition:background .15s" onmouseover="this.style.background='rgba(168,85,247,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)'"></div>
 
   <!-- RIGHT: Tools -->
   <div class="wb-tools" id="wbToolsPanel">
@@ -5044,7 +5053,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <button class="wb-neon-btn" style="background:linear-gradient(135deg,#c084fc,#9333ea);color:#fff;box-shadow:0 0 16px rgba(168,85,247,0.35)" onclick="wbRunTool(1)">▶ GENERA</button>
         </div>
         <div class="wb-tool-desc">Mappa in 3 livelli: aspetti principali (Features), casi particolari (Hidden Layers), comportamenti derivati (Presumptions).</div>
-        <div class="wb-out" id="wbOut01" style="display:none"></div>
+        <div id="wbTool01Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-out" id="wbTool01Result" style="display:none"></div>
       </div>
 
       <!-- TOOL 02: Knowledge Synthesis -->
@@ -5058,7 +5068,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <button class="wb-neon-btn" style="background:linear-gradient(135deg,#67e8f9,#0891b2);color:#000;box-shadow:0 0 16px rgba(34,211,238,0.25)" onclick="wbRunTool(2)">▶ GENERA</button>
         </div>
         <div class="wb-tool-desc">Formula logica del concetto · Key Concept con bordo neon · Learning Process in 3 step progressivi.</div>
-        <div class="wb-out" id="wbOut02" style="display:none"></div>
+        <div id="wbTool02Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-out" id="wbTool02Result" style="display:none"></div>
       </div>
 
       <!-- TOOL 03: Scholar's Metaphor -->
@@ -5072,7 +5083,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <button class="wb-neon-btn" style="background:linear-gradient(135deg,#fcd34d,#d97706);color:#000;box-shadow:0 0 16px rgba(245,158,11,0.25)" onclick="wbRunTool(3)">▶ GENERA</button>
         </div>
         <div class="wb-tool-desc">Metafora cognitiva originale che cattura l'essenza del concetto in termini quotidiani e memorabili.</div>
-        <div class="wb-out" id="wbOut03" style="display:none"></div>
+        <div id="wbTool03Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-out" id="wbTool03Result" style="display:none"></div>
       </div>
 
       <!-- TOOL 04: Active Recall -->
@@ -5086,7 +5098,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <button class="wb-neon-btn" style="background:linear-gradient(135deg,#6ee7b7,#059669);color:#000;box-shadow:0 0 16px rgba(16,185,129,0.25)" onclick="wbRunTool(4)">▶ GENERA</button>
         </div>
         <div class="wb-tool-desc">3 domande a risposta multipla sulla sezione selezionata. Clicca un'opzione per rivelare la risposta corretta.</div>
-        <div class="wb-out" id="wbOut04" style="display:none"></div>
+        <div id="wbTool04Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-out" id="wbTool04Result" style="display:none"></div>
       </div>
 
       <!-- TOOL 05: Visual Memory Map -->
@@ -5100,7 +5113,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <button class="wb-neon-btn" style="background:linear-gradient(135deg,#f9a8d4,#db2777);color:#fff;box-shadow:0 0 16px rgba(219,39,119,0.3)" onclick="wbRunTool(5)">▶ GENERA</button>
         </div>
         <div class="wb-tool-desc">Mappa cognitiva visiva: ogni concetto chiave diventa un nodo colorato con emoji e micro-spiegazione per la memoria visiva.</div>
-        <div class="wb-out" id="wbOut05" style="display:none"></div>
+        <div id="wbTool05Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-out" id="wbTool05Result" style="display:none"></div>
       </div>
 
       <!-- TOOL 06: Chat Contestuale -->
@@ -5113,6 +5127,8 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
         <div class="wb-tool-desc">Fai domande libere sul contenuto della sezione selezionata. L'AI risponde usando solo il testo del documento.</div>
+        <div id="wbTool06Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-out" id="wbTool06Result" style="display:none"></div>
         <div class="wb-out" id="wbOut06" style="display:none">
           <div id="wbChatMessages" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
           <div style="display:flex;gap:8px">
@@ -19366,7 +19382,7 @@ var _wbActiveSelection = ''; // testo attivo: selezione mouse o sezione cliccata
 
 function wbInit() {
   // Collega file input + bottoni via JS (più affidabile di attributi onchange/onclick inline)
-  var fi = document.getElementById('wbFileInput');
+  var fi = document.getElementById('wbFilePicker');
   var pickerBtn = document.getElementById('wbPickerBtn');
   var changeBtn = document.getElementById('wbChangeBtn');
   if (fi && pickerBtn) {
@@ -19502,7 +19518,7 @@ function wbToggleLayout(mode, silent) {
 function wbResetUpload() {
   _wbPendingFile = null;
   _wbDocText = '';
-  var fi = document.getElementById('wbFileInput');
+  var fi = document.getElementById('wbFilePicker');
   if (fi) fi.value = '';
   document.getElementById('wbChangeBtn').style.display = 'none';
   document.getElementById('wbPickerBtn').style.display = 'inline-block';
@@ -19527,12 +19543,12 @@ function wbResetUpload() {
   // Riloca tool
   document.querySelectorAll('#screenWorkbench .wb-tool-card').forEach(function(c) { c.classList.add('wb-locked'); });
   // Reset tool results
-  ['wbTool01Result','wbTool02Result','wbTool03Result','wbTool04Result'].forEach(function(id) {
+  ['wbTool01Result','wbTool02Result','wbTool03Result','wbTool04Result','wbTool05Result'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) { el.style.display = 'none'; el.innerHTML = ''; }
   });
-  document.getElementById('wbDropZone').style.borderColor = 'rgba(72,72,72,.5)';
-  document.getElementById('wbDropZone').style.borderStyle = 'dashed';
+  document.getElementById('wbUploadBar').style.borderColor = 'rgba(72,72,72,.5)';
+  document.getElementById('wbUploadBar').style.borderStyle = 'dashed';
 }
 
 function wbOnFileSelect(input) {
@@ -19551,8 +19567,8 @@ function wbOnFileSelect(input) {
   document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + sizeMB + ' MB · Lettura in corso…';
   document.getElementById('wbPickerBtn').style.display = 'none';
   document.getElementById('wbChangeBtn').style.display = 'inline-block';
-  document.getElementById('wbDropZone').style.borderColor = 'rgba(211,148,255,.5)';
-  document.getElementById('wbDropZone').style.borderStyle = 'solid';
+  document.getElementById('wbUploadBar').style.borderColor = 'rgba(211,148,255,.5)';
+  document.getElementById('wbUploadBar').style.borderStyle = 'solid';
   _wbSetProgress(10, '📖 Lettura file…');
 
   // Legge il file come ArrayBuffer — tutto client-side, nessun server needed
