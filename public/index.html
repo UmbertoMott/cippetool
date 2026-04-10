@@ -237,9 +237,66 @@
   flex: 1; overflow-y: auto;
   background: #1c1c1e;
   display: none; flex-direction: column;
-  align-items: center; padding: 28px 16px 48px;
+  align-items: center; padding: 28px 48px 48px;
   scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.3) #1c1c1e;
 }
+/* Zoom + page counter toolbar */
+#wbViewerToolbar {
+  display: none; align-items: center; gap: 10px;
+  padding: 5px 10px; background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08); border-radius: 8px;
+}
+.wb-zoom-btn {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: rgba(168,85,247,.15); border: 1px solid rgba(168,85,247,.3);
+  color: #c084fc; font-size: 16px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  line-height: 1; transition: background .12s;
+}
+.wb-zoom-btn:hover { background: rgba(168,85,247,.3); }
+#wbZoomLevel {
+  font-size: 11px; color: #aaa; font-family: monospace;
+  min-width: 36px; text-align: center;
+}
+#wbPageCounter {
+  font-size: 11px; color: #888; font-family: monospace;
+  padding-left: 10px; border-left: 1px solid rgba(255,255,255,.1);
+}
+/* Checkmark blocco */
+#screenWorkbench .doc-block { overflow: visible; }
+#screenWorkbench .doc-block-chk {
+  position: absolute; right: -34px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid rgba(168,85,247,.45); background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: transparent;
+  cursor: pointer; opacity: 0; transition: opacity .15s, background .15s, border-color .15s;
+  flex-shrink: 0; z-index: 10;
+}
+#screenWorkbench .doc-block:hover .doc-block-chk { opacity: 1; }
+#screenWorkbench .doc-block-chk.chk-on {
+  opacity: 1; background: #A855F7; border-color: #A855F7; color: #fff;
+}
+/* Multi-block floating toolbar */
+#wbMultiBar {
+  position: fixed; z-index: 10000; display: none;
+  background: #1e1e24; border: 1px solid rgba(168,85,247,.4);
+  border-radius: 12px; padding: 10px 12px; box-shadow: 0 8px 32px rgba(0,0,0,.55);
+  min-width: 280px; flex-direction: column; gap: 8px;
+}
+#wbMultiBar .wmb-title {
+  font-size: 10px; color: rgba(168,85,247,.7); font-family: monospace;
+  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 2px;
+}
+#wbMultiBar .wmb-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.wmb-btn {
+  padding: 5px 11px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  cursor: pointer; border: 1px solid; transition: opacity .12s; white-space: nowrap;
+}
+.wmb-btn:hover { opacity: .8; }
+.wmb-btn-std  { background: rgba(168,85,247,.15); border-color: rgba(168,85,247,.4); color: #c084fc; }
+.wmb-btn-disc { background: rgba(251,146,60,.15); border-color: rgba(251,146,60,.45); color: #fb923c; font-size: 12px; }
+.wmb-btn-close{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.15); color: #888; font-size: 10px; }
 /* Pagina bianca — simula foglio Word */
 #screenWorkbench .doc-page {
   width: 100%; max-width: 760px;
@@ -5112,7 +5169,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="wb-doc-label">Step 02 · Document Viewer · Seleziona un blocco</span>
         <span class="wb-doc-sub" id="wbDocSub" style="margin-left:10px">Carica un documento per iniziare</span>
       </div>
-      <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="wbViewerToolbar">
+          <button class="wb-zoom-btn" onclick="wbZoomOut()" title="Riduci">−</button>
+          <span id="wbZoomLevel">100%</span>
+          <button class="wb-zoom-btn" onclick="wbZoomIn()" title="Ingrandisci">+</button>
+          <span id="wbPageCounter">1 / 1 pag.</span>
+        </div>
+        <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
+      </div>
     </div>
 
     <!-- Placeholder pre-upload -->
@@ -20845,18 +20910,35 @@ function wbRenderDocViewer(html) {
     var block = document.createElement('div');
     block.className = 'doc-block';
     block.innerHTML = group.map(function(n) { return n.outerHTML; }).join('');
-    if (totalText.length >= 20) {
-      (function(b, t) {
-        b.addEventListener('click', function(e) {
-          e.stopPropagation();
-          wbShowBlockTooltip(b, t);
-        });
-      })(block, totalText);
-    }
+
+    // Checkmark selezione (hover, sticky se selezionato)
+    var chk = document.createElement('div');
+    chk.className = 'doc-block-chk';
+    chk.innerHTML = '✓';
+    chk.title = 'Seleziona blocco (max 3)';
+    (function(b, t, c) {
+      c.addEventListener('click', function(e) {
+        e.stopPropagation();
+        wbToggleBlockSelect(b, t, c);
+      });
+      b.addEventListener('click', function(e) {
+        e.stopPropagation();
+        wbShowBlockTooltip(b, t);
+      });
+    })(block, totalText, chk);
+    block.appendChild(chk);
+
     page.appendChild(block);
   });
 
   viewer.appendChild(page);
+
+  viewer.onscroll = wbUpdatePageCounter;
+  var tb = document.getElementById('wbViewerToolbar');
+  if (tb) tb.style.display = 'flex';
+  _wbZoom = 1.0;
+  wbApplyZoom();
+  wbUpdatePageCounter();
 
   var sec = document.getElementById('wbSections');
   if (sec) sec.style.display = 'none';
@@ -20921,6 +21003,132 @@ function wbHideBlockTooltip() {
   if (tt) tt.classList.remove('wbt-visible');
   if (_wbActiveBlock) { _wbActiveBlock.classList.remove('db-active'); _wbActiveBlock = null; }
   _wbActiveBlockText = '';
+}
+
+// ── ZOOM (Word-style) ───────────────────────────────────────────────────────
+var _wbZoom = 1.0;
+function wbZoomIn()  { _wbZoom = Math.min(2.0, Math.round((_wbZoom + 0.1)*10)/10); wbApplyZoom(); }
+function wbZoomOut() { _wbZoom = Math.max(0.5, Math.round((_wbZoom - 0.1)*10)/10); wbApplyZoom(); }
+function wbApplyZoom() {
+  var page = document.querySelector('#wbDocViewer .doc-page');
+  if (!page) return;
+  page.style.zoom = _wbZoom;
+  var el = document.getElementById('wbZoomLevel');
+  if (el) el.textContent = Math.round(_wbZoom * 100) + '%';
+}
+
+// ── PAGE COUNTER ────────────────────────────────────────────────────────────
+function wbUpdatePageCounter() {
+  var viewer = document.getElementById('wbDocViewer');
+  if (!viewer) return;
+  var breaks = Array.from(viewer.querySelectorAll('.doc-page-break'));
+  var total  = breaks.length + 1;
+  var el     = document.getElementById('wbPageCounter');
+  if (!el) return;
+  if (total <= 1) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  var vRect   = viewer.getBoundingClientRect();
+  var current = 1;
+  breaks.forEach(function(pb) {
+    if (pb.getBoundingClientRect().top < vRect.top + vRect.height / 2) current++;
+  });
+  el.textContent = current + ' / ' + total + ' pag.';
+}
+
+// ── MULTI-BLOCK SELECTION ───────────────────────────────────────────────────
+var _wbSelectedBlocks = [];
+var MAX_BLOCK_SEL = 3;
+
+function wbToggleBlockSelect(blockEl, text, chkEl) {
+  var idx = _wbSelectedBlocks.findIndex(function(b) { return b.el === blockEl; });
+  if (idx >= 0) {
+    _wbSelectedBlocks.splice(idx, 1);
+    chkEl.classList.remove('chk-on');
+    blockEl.classList.remove('db-active');
+  } else {
+    if (_wbSelectedBlocks.length >= MAX_BLOCK_SEL) {
+      chkEl.style.border = '1.5px solid #fb923c';
+      setTimeout(function() { chkEl.style.border = ''; }, 600);
+      return;
+    }
+    _wbSelectedBlocks.push({ el: blockEl, text: text, chkEl: chkEl });
+    chkEl.classList.add('chk-on');
+    blockEl.classList.add('db-active');
+  }
+  wbUpdateMultiBar(chkEl);
+}
+
+function wbClearBlockSelection() {
+  _wbSelectedBlocks.forEach(function(b) {
+    b.chkEl.classList.remove('chk-on');
+    b.el.classList.remove('db-active');
+  });
+  _wbSelectedBlocks = [];
+  var bar = document.getElementById('wbMultiBar');
+  if (bar) bar.style.display = 'none';
+}
+
+function wbUpdateMultiBar(anchorEl) {
+  var n = _wbSelectedBlocks.length;
+  var bar = document.getElementById('wbMultiBar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'wbMultiBar';
+    bar.innerHTML =
+      '<div class="wmb-title" id="wmbTitle">2 blocchi selezionati</div>' +
+      '<div class="wmb-row">' +
+        '<button class="wmb-btn wmb-btn-std" onclick="wbMultiBlockAction(\'analizza\')">Analizza</button>' +
+        '<button class="wmb-btn wmb-btn-std" onclick="wbMultiBlockAction(\'approfondisci\')">Approfondisci</button>' +
+        '<button class="wmb-btn wmb-btn-std" onclick="wbMultiBlockAction(\'collega\')">Collega</button>' +
+        '<button class="wmb-btn wmb-btn-std" onclick="wbMultiBlockAction(\'tools\')">⚙ Tools</button>' +
+      '</div>' +
+      '<button class="wmb-btn wmb-btn-disc" style="width:100%;justify-content:center;display:flex" onclick="wbMultiBlockAction(\'discrimen\')">⚖ Trova il Discrimen</button>' +
+      '<button class="wmb-btn wmb-btn-close" style="width:100%;justify-content:center;display:flex" onclick="wbClearBlockSelection()">✕ Deseleziona tutto</button>';
+    document.body.appendChild(bar);
+  }
+  if (n < 2) { bar.style.display = 'none'; return; }
+  var title = document.getElementById('wmbTitle');
+  if (title) title.textContent = n + (n === 1 ? ' blocco selezionato' : ' blocchi selezionati');
+  bar.style.display = 'flex';
+  var rect = anchorEl ? anchorEl.getBoundingClientRect() : { bottom: 200, left: 200, top: 200 };
+  var barH = 160;
+  var top  = rect.bottom + 8;
+  if (top + barH > window.innerHeight) top = rect.top - barH - 8;
+  var left = rect.left - 260;
+  if (left < 8) left = 8;
+  if (left + 290 > window.innerWidth) left = window.innerWidth - 296;
+  bar.style.top  = top  + 'px';
+  bar.style.left = left + 'px';
+}
+
+function wbMultiBlockAction(action) {
+  if (_wbSelectedBlocks.length < 1) return;
+  var texts = _wbSelectedBlocks.map(function(b, i) {
+    return 'PASSAGGIO ' + (i+1) + ':\n"' + b.text.substring(0, 1200) + '"';
+  });
+  var combined = texts.join('\n\n');
+  var promptMap = {
+    'analizza':      'Analizza in profondità i seguenti ' + _wbSelectedBlocks.length + ' passaggi del documento.\n\n' + combined + '\n\n## Contenuto\n...\n## Concetti chiave\n...\n## Rilevanza\n...\n## Implicazioni pratiche\n...',
+    'approfondisci': 'Approfondisci i seguenti ' + _wbSelectedBlocks.length + ' passaggi.\n\n' + combined + '\n\n## Espansione concettuale\n...\n## Esempi concreti\n...\n## Riferimenti normativi\n...',
+    'collega':       'Trova le connessioni tra i seguenti passaggi.\n\n' + combined + '\n\n## Filo conduttore\n...\n## Connessioni dirette\n...\n## Schema delle relazioni\n...',
+    'tools':         'Spiega con tutti i tools disponibili i seguenti passaggi:\n\n' + combined,
+    'discrimen':     'Sei un giurista specializzato nell\'analisi testuale. Analizza i seguenti ' + _wbSelectedBlocks.length + ' passaggi e trova il DISCRIMEN — l\'elemento discriminante, la differenza sostanziale e specifica tra di essi.\n\n' + combined + '\n\n' +
+                     '## Il Discrimen\n[Definisci in 1-2 frasi l\'elemento discriminante principale]\n\n' +
+                     '## Differenze specifiche\n[Elenca punto per punto cosa cambia da un passaggio all\'altro]\n\n' +
+                     '## Elementi in comune\n[Cosa condividono i passaggi]\n\n' +
+                     '## Implicazione pratica\n[Come queste differenze incidono sull\'applicazione concreta della norma]'
+  };
+  var prompt = promptMap[action] || promptMap['analizza'];
+  var t6 = document.getElementById('wbTool06') || document.getElementById('wbOut06');
+  if (t6) t6.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  _wbActiveSelection = combined;
+  var ind = document.getElementById('wbChatBlockIndicator');
+  if (ind) ind.style.display = 'flex';
+  var snip = document.getElementById('wbChatBlockSnippet');
+  if (snip) snip.textContent = _wbSelectedBlocks.length + ' blocchi selezionati';
+  setTimeout(function() { wbChatSend(prompt); }, 400);
+  var bar = document.getElementById('wbMultiBar');
+  if (bar) bar.style.display = 'none';
 }
 
 function wbBlockAction(action) {
