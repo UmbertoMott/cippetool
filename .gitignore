@@ -64,3 +64,6 @@ logs/
 
 # Vercel
 .vercel/
+
+# Standalone file con chiave API embedded — NON pushare mai
+backend/cipp_e_IAPP_UmbertoMottolaSaas_v5_50_fix.html
