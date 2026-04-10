@@ -232,6 +232,58 @@
 }
 #screenWorkbench .wb-sec.active .wb-ctx-label { opacity: 1; }
 
+/* ── DOC VIEWER: blocchi interattivi ChatPDF-style ─────────── */
+#screenWorkbench #wbDocViewer {
+  flex: 1; overflow-y: auto; padding: 20px 28px;
+  background: #0c0c0f; font-family: Georgia,'Times New Roman',serif;
+  font-size: 13.5px; line-height: 1.9; color: #ccc;
+  scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.3) #111;
+  display: none; flex-direction: column;
+}
+#screenWorkbench #wbDocViewer h1,
+#screenWorkbench #wbDocViewer h2,
+#screenWorkbench #wbDocViewer h3,
+#screenWorkbench #wbDocViewer h4 {
+  color: #f0f0f4; font-family: 'Syne','DM Sans',sans-serif;
+  margin: 1.2em 0 0.3em; font-weight: 700; line-height: 1.3;
+}
+#screenWorkbench #wbDocViewer h1 { font-size: 1.25em; }
+#screenWorkbench #wbDocViewer h2 { font-size: 1.1em; }
+#screenWorkbench #wbDocViewer h3 { font-size: 1em; }
+#screenWorkbench #wbDocViewer strong,
+#screenWorkbench #wbDocViewer b { color: #f0f0f4; }
+#screenWorkbench #wbDocViewer table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+#screenWorkbench #wbDocViewer td,
+#screenWorkbench #wbDocViewer th {
+  border: 1px solid rgba(168,85,247,.18); padding: 6px 10px; font-size: 12.5px;
+}
+#screenWorkbench .doc-block {
+  border-radius: 5px; padding: 4px 8px; margin: 1px 0;
+  cursor: pointer; transition: background .12s;
+  border: 1px solid transparent;
+}
+#screenWorkbench .doc-block:hover { background: rgba(168,85,247,.07); border-color: rgba(168,85,247,.12); }
+#screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.14); border-color: rgba(168,85,247,.35); }
+
+/* Block Tooltip */
+#wbBlockTooltip {
+  position: fixed; display: none; z-index: 9999;
+  background: #16162a; border: 1px solid rgba(168,85,247,.45);
+  border-radius: 10px; padding: 8px 10px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.7), 0 0 0 1px rgba(168,85,247,.1);
+  flex-direction: column; gap: 6px; min-width: 240px;
+}
+#wbBlockTooltip.wbt-visible { display: flex; }
+.wbt-row { display: flex; gap: 6px; }
+.wbt-btn {
+  flex: 1; padding: 7px 10px; border-radius: 6px; border: none;
+  font-size: 11.5px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+  white-space: nowrap; font-family: 'DM Sans','Syne',sans-serif;
+}
+.wbt-btn:hover { opacity: .82; }
+.wbt-btn-chat { background: rgba(129,140,248,.15); color: #a5b4fc; border: 1px solid rgba(129,140,248,.25); }
+.wbt-btn-tools { background: linear-gradient(135deg,#c084fc,#7c3aed); color: #fff; width: 100%; }
+
 /* RIGHT: tools panel */
 #screenWorkbench .wb-tools {
   flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #050505;
@@ -5009,7 +5061,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="wb-doc" id="wbDocPanel">
     <div class="wb-doc-topbar">
       <div>
-        <span class="wb-doc-label">Step 02 · Full Document View · Semantic Parsing</span>
+        <span class="wb-doc-label">Step 02 · Document Viewer · Seleziona un blocco</span>
         <span class="wb-doc-sub" id="wbDocSub" style="margin-left:10px">Carica un documento per iniziare</span>
       </div>
       <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
@@ -5020,6 +5072,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="wb-doc-placeholder-icon">📄</div>
       <div>Il documento apparirà qui dopo il caricamento</div>
     </div>
+
+    <!-- Doc viewer con blocchi interattivi (ChatPDF-style) -->
+    <div id="wbDocViewer"></div>
 
     <!-- PDF container (populated by wbRenderClientSide for PDFs) -->
     <div id="wbPdfContainer" style="display:none;flex:1;overflow-y:auto;padding:16px;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111"></div>
@@ -19399,6 +19454,13 @@ function wbInit() {
     pickerBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); fiNew.click(); };
     if (changeBtn) changeBtn.onclick = function() { wbResetUpload(); };
   }
+  // Chiudi tooltip al click fuori
+  document.addEventListener('click', function(e) {
+    var tt = document.getElementById('wbBlockTooltip');
+    if (tt && tt.classList.contains('wbt-visible') && !tt.contains(e.target) && !e.target.closest('.doc-block')) {
+      wbHideBlockTooltip();
+    }
+  });
   // Restore layout preference
   var pref = localStorage.getItem('wb_layout_pref') || 'split';
   wbToggleLayout(pref, true);
@@ -19596,8 +19658,6 @@ function wbOnFileSelect(input) {
       wbUnlockTools();
       wbHistSave(file.name, sizeMB);
       setTimeout(function() { document.getElementById('wbProgressWrap').style.display = 'none'; }, 1500);
-      // Auto-segmenta con Gemini
-      wbAutoSegment();
     }).catch(function(err) {
       _wbSetProgress(0, '⚠️ ' + err.message);
       document.getElementById('wbProgressBar').style.background = '#ff6d8d';
@@ -19747,11 +19807,20 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
     }
 
   } else if (ext === 'docx') {
-    // ── DOCX: mammoth.js testo puro ──────────────────────────────
-    _wbSetProgress(40, '📝 Estrazione testo DOCX…');
+    // ── DOCX: mammoth.js HTML ricco → blocchi interattivi ──────
+    _wbSetProgress(40, '📝 Rendering DOCX…');
     if (typeof mammoth === 'undefined') throw new Error('mammoth.js non disponibile');
-    var res = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-    text = res.value || '';
+    var mmRes = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+    var mmHtml = mmRes.value || '';
+    text = mmHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    _wbDocText = text.substring(0, 40000);
+    _wbSetProgress(90, '📄 Rendering blocchi…');
+    placeholder.style.display = 'none';
+    container.style.display   = 'none';
+    docTextEl.style.display   = 'none';
+    wbRenderDocViewer(mmHtml);
+    _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri');
+    return;
 
   } else {
     // ── DOC: fallback TextDecoder (testo leggibile) ───────────────
@@ -19764,13 +19833,12 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
 
   if (!text || text.trim().length < 10) throw new Error('Nessun testo estratto dal documento');
 
-  // Mostra testo nel pannello — limite display 150K chars (~100+ pagine)
+  // Mostra documento come blocchi interattivi (PDF / DOC — DOCX ritorna prima)
   placeholder.style.display = 'none';
   container.style.display   = 'none';
-  docTextEl.style.display   = 'block';
-  docTextEl.style.cssText   = 'flex:1;padding:24px 28px;font-family:Georgia,serif;font-size:13px;line-height:1.85;color:#c8c8d0;white-space:pre-wrap;overflow-y:auto;background:#111111;word-break:break-word;scrollbar-width:thin;scrollbar-color:rgba(211,148,255,.3) #111111';
-  docTextEl.textContent     = text.substring(0, 150000);
-  if (ext !== 'pdf') _wbDocText = text.substring(0, 40000); // PDF già impostato sopra
+  docTextEl.style.display   = 'none';
+  if (ext !== 'pdf') _wbDocText = text.substring(0, 40000);
+  wbRenderDocViewerFromText(text.substring(0, 150000));
   _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
 }
 
@@ -20544,6 +20612,134 @@ function _wbSmartChunk(text) {
     var firstLine = c.trim().split('\n')[0].replace(/^[\d\.\)\s]+/, '').substring(0, 70).trim();
     return { titolo: firstLine || ('Sezione ' + (i + 1)), testo: c.trim() };
   });
+}
+
+// ── DOC VIEWER: blocchi interattivi ChatPDF-style ────────────────────────────
+
+function wbRenderDocViewer(html) {
+  var viewer = document.getElementById('wbDocViewer');
+  if (!viewer) return;
+  viewer.innerHTML = '';
+  viewer.style.display = 'flex';
+  viewer.style.flexDirection = 'column';
+
+  var parser = new DOMParser();
+  var parsed = parser.parseFromString('<body>' + html + '</body>', 'text/html');
+  var nodes = Array.from(parsed.body.childNodes);
+
+  nodes.forEach(function(node) {
+    if (node.nodeType !== 1) return;
+    var txt = (node.textContent || '').trim();
+    if (txt.length < 3) return;
+    var block = document.createElement('div');
+    block.className = 'doc-block';
+    block.innerHTML = node.outerHTML;
+    if (txt.length >= 10) {
+      (function(b, t) {
+        b.addEventListener('click', function(e) {
+          e.stopPropagation();
+          wbShowBlockTooltip(b, t);
+        });
+      })(block, txt);
+    }
+    viewer.appendChild(block);
+  });
+
+  var sec = document.getElementById('wbSections');
+  if (sec) sec.style.display = 'none';
+  var btn = document.getElementById('wbSegBtn');
+  if (btn) btn.style.display = 'none';
+  var sub = document.getElementById('wbDocSub');
+  if (sub) sub.textContent = 'Clicca un blocco per analizzarlo';
+}
+
+function wbRenderDocViewerFromText(text) {
+  var paras = text.split(/\n{2,}/).map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 15; });
+  if (paras.length < 3) {
+    paras = text.split(/\n/).map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 20; });
+  }
+  var html = paras.map(function(p) {
+    if (p.length < 100 && p === p.toUpperCase() && p.replace(/[^A-Z]/g,'').length > 3) {
+      return '<h3>' + p + '</h3>';
+    }
+    return '<p>' + p + '</p>';
+  }).join('');
+  wbRenderDocViewer(html);
+}
+
+var _wbActiveBlock = null;
+var _wbActiveBlockText = '';
+
+function wbShowBlockTooltip(blockEl, text) {
+  if (_wbActiveBlock && _wbActiveBlock !== blockEl) {
+    _wbActiveBlock.classList.remove('db-active');
+  }
+  _wbActiveBlock = blockEl;
+  _wbActiveBlockText = text;
+  blockEl.classList.add('db-active');
+
+  var tt = document.getElementById('wbBlockTooltip');
+  if (!tt) {
+    tt = document.createElement('div');
+    tt.id = 'wbBlockTooltip';
+    tt.innerHTML =
+      '<div class="wbt-row">' +
+        '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'analizza\')">Analizza</button>' +
+        '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'approfondisci\')">Approfondisci</button>' +
+        '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'collega\')">Collega</button>' +
+      '</div>' +
+      '<button class="wbt-btn wbt-btn-tools" onclick="wbBlockAction(\'tools\')">&#9654; Spiega con i Tools</button>';
+    document.body.appendChild(tt);
+  }
+
+  var rect = blockEl.getBoundingClientRect();
+  var ttTop = rect.bottom + 6;
+  var ttLeft = rect.left + 8;
+  if (ttTop + 90 > window.innerHeight) ttTop = rect.top - 96;
+  if (ttLeft + 268 > window.innerWidth) ttLeft = window.innerWidth - 276;
+  if (ttLeft < 8) ttLeft = 8;
+  tt.style.top  = ttTop  + 'px';
+  tt.style.left = ttLeft + 'px';
+  tt.classList.add('wbt-visible');
+}
+
+function wbHideBlockTooltip() {
+  var tt = document.getElementById('wbBlockTooltip');
+  if (tt) tt.classList.remove('wbt-visible');
+  if (_wbActiveBlock) { _wbActiveBlock.classList.remove('db-active'); _wbActiveBlock = null; }
+  _wbActiveBlockText = '';
+}
+
+function wbBlockAction(action) {
+  var text = _wbActiveBlockText;
+  wbHideBlockTooltip();
+  if (!text) return;
+
+  if (action === 'tools') {
+    _wbActiveSelection = text;
+    var ctxStrip = document.getElementById('wbCtxStrip');
+    var ctxText  = document.getElementById('wbCtxText');
+    if (ctxStrip) ctxStrip.style.display = 'flex';
+    if (ctxText)  ctxText.textContent = text.substring(0, 120) + (text.length > 120 ? '…' : '');
+    var toolsScroll = document.getElementById('wbToolsScroll');
+    if (toolsScroll) toolsScroll.scrollTop = 0;
+    [1, 2, 3, 4, 5].forEach(function(n) { wbRunTool(n); });
+  } else {
+    var prefixMap = {
+      'analizza':      'Analizza questo passaggio nel dettaglio',
+      'approfondisci': 'Approfondisci questo concetto con esempi e contesto aggiuntivo',
+      'collega':       'Collega questo passaggio agli altri concetti chiave del documento'
+    };
+    _wbActiveSelection = text;
+    var tool06 = document.getElementById('wbTool06');
+    var toolsScroll = document.getElementById('wbToolsScroll');
+    if (tool06 && toolsScroll) {
+      toolsScroll.scrollTop = tool06.offsetTop;
+    }
+    var input = document.getElementById('wbChatInput');
+    if (input) input.value = prefixMap[action] || action;
+    wbChatSend();
+  }
 }
 
 function wbRenderSections(sections) {
