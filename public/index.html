@@ -5215,6 +5215,15 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="wb-tool-n">Tool 06</div>
             <div class="wb-tool-name">Chat Contestuale</div>
           </div>
+          <!-- Web Search toggle -->
+          <div style="display:flex;align-items:center;gap:8px;margin-left:auto;padding-right:2px">
+            <span id="wbWebSearchLabel" style="font-size:10px;color:rgba(255,255,255,.35);transition:color .2s">🔍 Web</span>
+            <label title="Attiva ricerca web in tempo reale" style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer;flex-shrink:0">
+              <input type="checkbox" id="wbWebSearchToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnWebSearchToggle(this)">
+              <span id="wbWebSearchTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:20px;transition:background .25s"></span>
+              <span id="wbWebSearchKnob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
+            </label>
+          </div>
         </div>
         <!-- Indicatore blocco attivo -->
         <div id="wbChatBlockIndicator" style="display:none;margin:0 14px 8px;padding:7px 12px;background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.25);border-radius:8px;font-size:11px;color:#a5b4fc;line-height:1.5">
@@ -20025,15 +20034,14 @@ async function wbRunTool(toolNum, overrideText) {
 
     if (loadingEl) loadingEl.style.display = 'none';
     if (resultEl) {
-      resultEl.style.display    = (toolNum === 1) ? 'block' : 'flex';
-      resultEl.style.minHeight  = '530px';
-      resultEl.style.maxHeight  = '530px';
-      resultEl.style.overflowY  = 'scroll';
-      resultEl.style.scrollbarWidth = 'thin';
-      resultEl.style.scrollbarColor = '#666666 #1a1a1a';
+      resultEl.style.display    = 'flex';
+      resultEl.style.flexDirection = 'column';
+      resultEl.style.minHeight  = '';
+      resultEl.style.maxHeight  = '';
+      resultEl.style.overflowY  = 'visible';
       resultEl.style.borderRadius   = '6px';
-      resultEl.style.marginTop  = '6px';
-      resultEl.style.padding    = '8px 4px 8px 8px';
+      resultEl.style.marginTop  = '12px';
+      resultEl.style.padding    = '0';
       resultEl.style.gap        = '10px';
       resultEl.style.boxSizing  = 'border-box';
     }
@@ -20541,6 +20549,21 @@ function _wbMdToHtml(text) {
     .replace(/\n/g,'<br>');
 }
 
+function wbOnWebSearchToggle(cb) {
+  var track = document.getElementById('wbWebSearchTrack');
+  var knob = document.getElementById('wbWebSearchKnob');
+  var label = document.getElementById('wbWebSearchLabel');
+  if (cb.checked) {
+    if (track) track.style.background = 'rgba(99,102,241,.7)';
+    if (knob) { knob.style.left = '18px'; knob.style.background = '#a5b4fc'; }
+    if (label) label.style.color = '#a5b4fc';
+  } else {
+    if (track) track.style.background = 'rgba(255,255,255,.1)';
+    if (knob) { knob.style.left = '2px'; knob.style.background = '#888'; }
+    if (label) label.style.color = 'rgba(255,255,255,.35)';
+  }
+}
+
 async function wbChatSend(overridePrompt) {
   var input = document.getElementById('wbChatInput');
   var msg = overridePrompt || (input ? input.value.trim() : '');
@@ -20557,14 +20580,16 @@ async function wbChatSend(overridePrompt) {
   var messagesEl = document.getElementById('wbChatMessages');
   if (!messagesEl) return;
 
+  var webSearchOn = document.getElementById('wbWebSearchToggle') && document.getElementById('wbWebSearchToggle').checked;
+
   var userBubble = document.createElement('div');
   userBubble.className = 'wb-chat-bubble-user';
-  userBubble.textContent = msg;
+  userBubble.textContent = (webSearchOn ? '🔍 ' : '') + msg;
   messagesEl.appendChild(userBubble);
 
   var aiBubble = document.createElement('div');
   aiBubble.className = 'wb-chat-bubble-ai';
-  aiBubble.innerHTML = '<span style="opacity:.5">⟳ Elaborazione…</span>';
+  aiBubble.innerHTML = '<span style="opacity:.5">' + (webSearchOn ? '🔍 Ricerca web…' : '⟳ Elaborazione…') + '</span>';
   messagesEl.appendChild(aiBubble);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
@@ -20583,16 +20608,19 @@ async function wbChatSend(overridePrompt) {
         '\n\nRispondi in italiano in modo articolato e professionale.';
     }
 
+    var reqBody = {
+      contents: [{ role: 'user', parts: [{ text: contextMsg }] }],
+      generationConfig: { temperature: 0.5, maxOutputTokens: 4096 }
+    };
+    if (webSearchOn) reqBody.tools = [{ googleSearch: {} }];
+
     var ctrl = new AbortController();
     var tid = setTimeout(function() { ctrl.abort(); }, 90000);
     var resp = await fetch('/api/gemini', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: ctrl.signal,
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: contextMsg }] }],
-        generationConfig: { temperature: 0.5, maxOutputTokens: 4096 }
-      })
+      body: JSON.stringify(reqBody)
     });
     clearTimeout(tid);
     if (!resp.ok) throw new Error('API ' + resp.status);
