@@ -301,38 +301,50 @@ body.theme-light .fc-item{background:var(--sur2);border-color:var(--bdr)}
 }
 #screenWorkbench .wb-sec.active .wb-ctx-label { opacity: 1; }
 
-/* ── DOC VIEWER: blocchi interattivi ChatPDF-style ─────────── */
+/* ── DOC VIEWER: pagina bianca ChatPDF-style ─────────── */
 #screenWorkbench #wbDocViewer {
-  flex: 1; overflow-y: auto; padding: 20px 28px;
-  background: #0c0c0f; font-family: Georgia,'Times New Roman',serif;
-  font-size: 13.5px; line-height: 1.9; color: #ccc;
-  scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.3) #111;
+  flex: 1; overflow-y: auto;
+  background: #1c1c1e;
   display: none; flex-direction: column;
+  align-items: center; padding: 28px 16px 48px;
+  scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.3) #1c1c1e;
 }
-#screenWorkbench #wbDocViewer h1,
-#screenWorkbench #wbDocViewer h2,
-#screenWorkbench #wbDocViewer h3,
-#screenWorkbench #wbDocViewer h4 {
-  color: #f0f0f4; font-family: 'Syne','DM Sans',sans-serif;
-  margin: 1.2em 0 0.3em; font-weight: 700; line-height: 1.3;
+/* Pagina bianca — simula foglio Word */
+#screenWorkbench .doc-page {
+  width: 100%; max-width: 740px;
+  background: #ffffff; color: #1a1a1a;
+  border-radius: 6px; padding: 52px 60px;
+  box-shadow: 0 4px 40px rgba(0,0,0,.55), 0 1px 4px rgba(0,0,0,.3);
+  font-family: Georgia,'Times New Roman',serif;
+  font-size: 13.5px; line-height: 1.85;
 }
-#screenWorkbench #wbDocViewer h1 { font-size: 1.25em; }
-#screenWorkbench #wbDocViewer h2 { font-size: 1.1em; }
-#screenWorkbench #wbDocViewer h3 { font-size: 1em; }
-#screenWorkbench #wbDocViewer strong,
-#screenWorkbench #wbDocViewer b { color: #f0f0f4; }
-#screenWorkbench #wbDocViewer table { width: 100%; border-collapse: collapse; margin: 1em 0; }
-#screenWorkbench #wbDocViewer td,
-#screenWorkbench #wbDocViewer th {
-  border: 1px solid rgba(168,85,247,.18); padding: 6px 10px; font-size: 12.5px;
+#screenWorkbench .doc-page h1,
+#screenWorkbench .doc-page h2,
+#screenWorkbench .doc-page h3,
+#screenWorkbench .doc-page h4 {
+  color: #0a0a0a; font-family: inherit;
+  margin: 1.3em 0 0.3em; font-weight: 700; line-height: 1.3;
 }
+#screenWorkbench .doc-page h1 { font-size: 1.2em; }
+#screenWorkbench .doc-page h2 { font-size: 1.1em; }
+#screenWorkbench .doc-page h3 { font-size: 1em; }
+#screenWorkbench .doc-page strong,
+#screenWorkbench .doc-page b { color: #0a0a0a; }
+#screenWorkbench .doc-page table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+#screenWorkbench .doc-page td,
+#screenWorkbench .doc-page th {
+  border: 1px solid #ccc; padding: 6px 10px; font-size: 12.5px;
+}
+#screenWorkbench .doc-page p { margin-bottom: 0.6em; }
+#screenWorkbench .doc-page p:last-child { margin-bottom: 0; }
+/* Blocchi interattivi — hover leggero sulla pagina bianca */
 #screenWorkbench .doc-block {
-  border-radius: 5px; padding: 4px 8px; margin: 1px 0;
+  border-radius: 4px; padding: 5px 9px; margin: 0 -9px;
   cursor: pointer; transition: background .12s;
-  border: 1px solid transparent;
+  border: 1px solid transparent; position: relative;
 }
-#screenWorkbench .doc-block:hover { background: rgba(168,85,247,.07); border-color: rgba(168,85,247,.12); }
-#screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.14); border-color: rgba(168,85,247,.35); }
+#screenWorkbench .doc-block:hover { background: rgba(168,85,247,.08); border-color: rgba(168,85,247,.18); }
+#screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.13); border-color: rgba(168,85,247,.4); }
 
 /* Block Tooltip */
 #wbBlockTooltip {
@@ -20025,28 +20037,64 @@ function wbRenderDocViewer(html) {
   viewer.innerHTML = '';
   viewer.style.display = 'flex';
   viewer.style.flexDirection = 'column';
+  viewer.style.alignItems = 'center';
 
+  // Parse mammoth HTML
   var parser = new DOMParser();
   var parsed = parser.parseFromString('<body>' + html + '</body>', 'text/html');
-  var nodes = Array.from(parsed.body.childNodes);
+  var nodes = Array.from(parsed.body.childNodes).filter(function(n) {
+    return n.nodeType === 1 && (n.textContent || '').trim().length > 1;
+  });
+
+  // ── Smart block merging (ChatPDF-style) ──────────────────────
+  // Heading → always flushes previous group, starts fresh
+  // Paragraphs → aggregate until 80+ words, then flush
+  // Result: heading + its section content = one semantic block
+  var MIN_WORDS = 80;
+  var groups = [];
+  var cur = [];
+  var curWords = 0;
+
+  function flush() {
+    if (cur.length > 0) { groups.push(cur.slice()); cur = []; curWords = 0; }
+  }
 
   nodes.forEach(function(node) {
-    if (node.nodeType !== 1) return;
-    var txt = (node.textContent || '').trim();
-    if (txt.length < 3) return;
+    var tag = node.tagName.toLowerCase();
+    var isH = /^h[1-6]$/.test(tag);
+    var wc  = (node.textContent || '').trim().split(/\s+/).filter(Boolean).length;
+    if (isH) {
+      flush();
+      cur.push(node); curWords = wc;
+    } else {
+      cur.push(node); curWords += wc;
+      if (curWords >= MIN_WORDS) flush();
+    }
+  });
+  flush();
+
+  // ── Crea pagina bianca + blocchi ─────────────────────────────
+  var page = document.createElement('div');
+  page.className = 'doc-page';
+
+  groups.forEach(function(group) {
+    var totalText = group.map(function(n) { return (n.textContent || '').trim(); }).join('\n').trim();
+    if (totalText.length < 5) return;
     var block = document.createElement('div');
     block.className = 'doc-block';
-    block.innerHTML = node.outerHTML;
-    if (txt.length >= 10) {
+    block.innerHTML = group.map(function(n) { return n.outerHTML; }).join('');
+    if (totalText.length >= 20) {
       (function(b, t) {
         b.addEventListener('click', function(e) {
           e.stopPropagation();
           wbShowBlockTooltip(b, t);
         });
-      })(block, txt);
+      })(block, totalText);
     }
-    viewer.appendChild(block);
+    page.appendChild(block);
   });
+
+  viewer.appendChild(page);
 
   var sec = document.getElementById('wbSections');
   if (sec) sec.style.display = 'none';
