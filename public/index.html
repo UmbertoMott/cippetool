@@ -296,6 +296,23 @@
 .wbt-btn-chat { background: rgba(129,140,248,.15); color: #a5b4fc; border: 1px solid rgba(129,140,248,.25); }
 .wbt-btn-tools { background: linear-gradient(135deg,#c084fc,#7c3aed); color: #fff; width: 100%; }
 
+/* Chat Contestuale — bolle */
+#screenWorkbench .wb-chat-bubble-user {
+  align-self: flex-end; max-width: 85%;
+  background: rgba(129,140,248,.18); border: 1px solid rgba(129,140,248,.3);
+  color: #e0e0f0; border-radius: 12px 12px 3px 12px;
+  padding: 9px 13px; font-size: 12.5px; line-height: 1.55;
+}
+#screenWorkbench .wb-chat-bubble-ai {
+  align-self: flex-start; max-width: 95%;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  color: #d4d4d8; border-radius: 12px 12px 12px 3px;
+  padding: 11px 14px; font-size: 12.5px; line-height: 1.65;
+}
+#screenWorkbench .wb-chat-bubble-ai strong { color: #c084fc; }
+#screenWorkbench .wb-chat-bubble-ai p { margin: 0 0 6px; }
+#screenWorkbench .wb-chat-bubble-ai p:last-child { margin: 0; }
+
 /* RIGHT: tools panel */
 #screenWorkbench .wb-tools {
   flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #050505;
@@ -5191,7 +5208,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <!-- TOOL 06: Chat Contestuale -->
-      <div class="wb-tool wb-locked" id="wbTool06">
+      <div class="wb-tool wb-locked" id="wbTool06" style="flex-shrink:0">
         <div class="wb-tool-head">
           <div class="wb-glow-bar" style="background:linear-gradient(180deg,#818cf8,#4f46e5)"></div>
           <div class="wb-tool-info">
@@ -5199,15 +5216,21 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="wb-tool-name">Chat Contestuale</div>
           </div>
         </div>
-        <div class="wb-tool-desc">Fai domande libere sul contenuto della sezione selezionata. L'AI risponde usando solo il testo del documento.</div>
-        <div id="wbTool06Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
-        <div class="wb-out" id="wbTool06Result" style="display:none"></div>
-        <div class="wb-out" id="wbOut06" style="display:none">
-          <div id="wbChatMessages" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
-          <div style="display:flex;gap:8px">
-            <input id="wbChatInput" type="text" placeholder="Fai una domanda sul testo..." style="flex:1;background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#fff;font-size:12px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')wbChatSend()">
-            <button onclick="wbChatSend()" style="background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:0 14px;font:600 11px/1 Inter,sans-serif;cursor:pointer">Invia</button>
-          </div>
+        <!-- Indicatore blocco attivo -->
+        <div id="wbChatBlockIndicator" style="display:none;margin:0 14px 8px;padding:7px 12px;background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.25);border-radius:8px;font-size:11px;color:#a5b4fc;line-height:1.5">
+          <span style="opacity:.6;font-size:10px;display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Blocco selezionato</span>
+          <span id="wbChatBlockSnippet"></span>
+        </div>
+        <!-- Area messaggi -->
+        <div id="wbChatMessages" style="display:flex;flex-direction:column;gap:10px;padding:0 14px 12px;max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(129,140,248,.3) transparent"></div>
+        <!-- Placeholder vuoto -->
+        <div id="wbChatEmpty" style="padding:16px 14px;font-size:12px;color:rgba(255,255,255,.3);text-align:center;line-height:1.6">
+          Clicca <strong style="color:#818cf8">Analizza</strong>, <strong style="color:#818cf8">Approfondisci</strong> o <strong style="color:#818cf8">Collega</strong> su un blocco<br>oppure scrivi qui sotto una domanda libera.
+        </div>
+        <!-- Input -->
+        <div style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.06)">
+          <input id="wbChatInput" type="text" placeholder="Scrivi una domanda sul documento…" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='rgba(129,140,248,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'" onkeydown="if(event.key==='Enter')wbChatSend()">
+          <button onclick="wbChatSend()" style="background:linear-gradient(135deg,#818cf8,#4f46e5);color:#fff;border:none;border-radius:8px;padding:0 16px;font:600 12px/1 inherit;cursor:pointer;flex-shrink:0">Invia</button>
         </div>
       </div>
 
@@ -20524,7 +20547,9 @@ async function wbChatSend(overridePrompt) {
   if (!msg || !_wbDocText) return;
   if (input && !overridePrompt) input.value = '';
 
-  // Scrolla e mostra Tool 06
+  // Nascondi placeholder, mostra Tool 06
+  var emptyEl = document.getElementById('wbChatEmpty');
+  if (emptyEl) emptyEl.style.display = 'none';
   var tool06 = document.getElementById('wbTool06');
   var toolsScroll = document.getElementById('wbToolsScroll');
   if (tool06 && toolsScroll) toolsScroll.scrollTop = tool06.offsetTop - 10;
@@ -20804,6 +20829,17 @@ function wbBlockAction(action) {
   } else {
     // Imposta il blocco come contesto attivo (usato da wbChatSend)
     _wbActiveSelection = text;
+
+    // Mostra indicatore blocco attivo in Tool 06
+    var ind = document.getElementById('wbChatBlockIndicator');
+    var snip = document.getElementById('wbChatBlockSnippet');
+    if (ind) ind.style.display = 'block';
+    if (snip) snip.textContent = text.substring(0, 100) + (text.length > 100 ? '…' : '');
+
+    // Scrolla a Tool 06
+    var tool06 = document.getElementById('wbTool06');
+    var toolsScroll = document.getElementById('wbToolsScroll');
+    if (tool06 && toolsScroll) toolsScroll.scrollTop = tool06.offsetTop - 10;
 
     // Prompt dedicato per ogni azione — educato e strutturato
     var promptMap = {
