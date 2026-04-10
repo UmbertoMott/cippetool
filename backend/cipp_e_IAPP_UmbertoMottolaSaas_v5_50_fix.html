@@ -7921,6 +7921,7 @@ async function abandonExam(quizNumToAbandon){
 // ═══════════════════════════════════════════════════════════════════════════
 // ─── CONFIGURAZIONE API GEMINI ───────────────────────────────────────────────
 // Cambia solo questa riga per aggiornare la chiave API
+// ⚠️ CHIAVE SCADUTA AL 2026-04-10 — sostituire con una nuova chiave da Google AI Studio
 var GEMINI_KEY = 'AIzaSyAvnQf2_cGRzq-3S-JFVi6YeBNc9BYY7Sg';
 
 // ─── KNOWLEDGE BASE PDF (inline, sempre disponibile all'agente AI) ─────────────
@@ -19351,11 +19352,11 @@ async function wbRunTool(toolNum, overrideText) {
 
   // Prompts neutri — funzionano su qualsiasi tipo di documento
   var prompts = {
-    1: 'Analizza questo testo. Identifica 3-5 aspetti principali (FEATURES), 2-3 casi nascosti o impliciti (HIDDEN LAYERS), 2-3 assunzioni che il testo presuppone (PRESUMPTIONS). Formato obbligatorio:\nFEATURES: [feature1] | [feature2] | [feature3]\nHIDDEN: [hidden1] | [hidden2]\nPRESUMPTIONS: [pres1] | [pres2]',
-    2: 'Analizza questo testo. Crea una sintesi Knowledge Synthesis con ESATTAMENTE questo formato:\nALGORITHM: [formula logica breve tipo: A → B ⊕ C o IF (condizione) THEN (risultato)]\nCONCEPT: [titolo concetto chiave]\nDEFINITION: [definizione in 2-3 frasi chiare]\nSTEP1: [primo step del processo]\nSTEP2: [secondo step del processo]\nSTEP3: [terzo step — risultato finale]',
+    1: 'Analizza questo testo. Identifica 3-5 aspetti principali (FEATURES), 2-3 casi nascosti o impliciti (HIDDEN LAYERS), 2-3 assunzioni che il testo presuppone (PRESUMPTIONS). USA OBBLIGATORIAMENTE il separatore | tra gli elementi — NON usare liste numerate o trattini. Rispondi SOLO con le tre righe nel formato esatto:\nFEATURES: aspetto1 | aspetto2 | aspetto3\nHIDDEN: caso1 | caso2\nPRESUMPTIONS: assunzione1 | assunzione2',
+    2: 'Analizza questo testo. Crea una sintesi Knowledge Synthesis con ESATTAMENTE questo formato (6 righe, nulla di più):\nALGORITHM: [formula logica breve tipo: A → B ⊕ C o IF (condizione) THEN (risultato)]\nCONCEPT: [titolo concetto chiave]\nDEFINITION: [definizione in 2-3 frasi chiare]\nSTEP1: [primo step del processo]\nSTEP2: [secondo step del processo]\nSTEP3: [terzo step — risultato finale]\nNON aggiungere testo dopo STEP3.',
     3: 'Scrivi una metafora originale e potente che spieghi visivamente l\'essenza di questo testo. Formato obbligatorio:\nTITOLO: [titolo evocativo della metafora]\nMETAFORA: [2-3 paragrafi ricchi e vividi — prima introduci l\'oggetto analogico, poi sviluppa il parallelo, poi collega al testo]\nANALOGIA: [una analogia quotidiana in max 15 parole]',
-    4: 'Crea 3 domande di Active Recall su questo testo. Ogni domanda ha 3 opzioni (A, B, C). Formato obbligatorio:\nDOMANDA: [testo domanda]\nA: [opzione A]\nB: [opzione B]\nC: [opzione C]\nCORRETTA: [A o B o C]\nSPIEGAZIONE: [2 frasi di spiegazione]\n---',
-    5: 'Analizza questo testo e crea una Visual Memory Map con 4-6 concetti chiave. Formato obbligatorio per ogni concetto:\nNODO: [emoji] [titolo breve]\nCOLORE: [uno tra: purple, cyan, green, orange, pink, yellow]\nSPIEGA: [spiegazione in max 15 parole]\nPILASTRO: [uno tra: Struttura, Processo, Impatto, Agenti, Principio, Contesto]\n---'
+    4: 'Crea ESATTAMENTE 3 domande di Active Recall su questo testo. Ogni domanda ha 3 opzioni (A, B, C). Usa OBBLIGATORIAMENTE questo formato per ogni domanda, separando le domande con una riga contenente solo ---:\nDOMANDA: [testo domanda]\nA: [opzione A]\nB: [opzione B]\nC: [opzione C]\nCORRETTA: [scrivi solo A oppure B oppure C]\nSPIEGAZIONE: [due frasi di spiegazione]\n---',
+    5: 'Analizza questo testo e crea una Visual Memory Map con ESATTAMENTE 5 concetti chiave. Per ogni concetto scrivi ESATTAMENTE queste 4 righe nel formato indicato, poi una riga con solo ---. NON usare markdown, numerazione, asterischi o altri simboli.\nEsempio di formato corretto:\nNODO: 🏛️ Evidenza Pubblica\nCOLORE: purple\nSPIEGA: Procedura che impone trasparenza nella scelta del contraente pubblico\nPILASTRO: Principio\n---\nI valori di COLORE devono essere uno tra: purple, cyan, green, orange, pink, yellow\nI valori di PILASTRO devono essere uno tra: Struttura, Processo, Impatto, Agenti, Principio, Contesto'
   };
 
   var loadingId = 'wbTool0' + toolNum + 'Loading';
@@ -19366,8 +19367,8 @@ async function wbRunTool(toolNum, overrideText) {
   if (resultEl) { resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
   try {
-    // Token budgets per tool — tool 2 ha bisogno di più spazio per i blocchi multipli
-    var tokenBudget = { 1: 600, 2: 900, 3: 700, 4: 800, 5: 900 };
+    // Token budgets per tool — tool 3 aumentato a 900 per 2-3 paragrafi metafora; tool 5 a 1000 per 5 blocchi formattati
+    var tokenBudget = { 1: 600, 2: 900, 3: 900, 4: 800, 5: 1000 };
     var fullPrompt = prompts[toolNum] + '\n\nDOCUMENTO:\n' + docText.substring(0, 4000);
 
     var ctrl = new AbortController();
@@ -19476,7 +19477,7 @@ function wbRenderTool02(text, resultEl) {
   var defM  = text.match(/DEFINITION:\s*(.+?)(?=\nSTEP1:|$)/s);
   var s1M   = text.match(/STEP1:\s*(.+?)(?=\nSTEP2:|$)/s);
   var s2M   = text.match(/STEP2:\s*(.+?)(?=\nSTEP3:|$)/s);
-  var s3M   = text.match(/STEP3:\s*(.+?)$/s);
+  var s3M   = text.match(/STEP3:\s*(.+?)(?=\n\n|$)/s);
 
   var alg = algM ? algM[1].trim() : '';
   var con = conM ? conM[1].trim() : '';
