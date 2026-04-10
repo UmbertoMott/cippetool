@@ -242,40 +242,59 @@
 }
 /* Pagina bianca — simula foglio Word */
 #screenWorkbench .doc-page {
-  width: 100%; max-width: 740px;
+  width: 100%; max-width: 760px;
   background: #ffffff; color: #1a1a1a;
-  border-radius: 6px; padding: 52px 60px;
-  box-shadow: 0 4px 40px rgba(0,0,0,.55), 0 1px 4px rgba(0,0,0,.3);
-  font-family: Georgia,'Times New Roman',serif;
-  font-size: 13.5px; line-height: 1.85;
+  border-radius: 4px; padding: 60px 72px;
+  box-shadow: 0 4px 40px rgba(0,0,0,.6), 0 1px 4px rgba(0,0,0,.3);
+  font-family: Calibri,'Segoe UI',Arial,sans-serif;
+  font-size: 13px; line-height: 1.75;
+  margin-bottom: 0;
 }
 #screenWorkbench .doc-page h1,
 #screenWorkbench .doc-page h2,
 #screenWorkbench .doc-page h3,
 #screenWorkbench .doc-page h4 {
-  color: #0a0a0a; font-family: inherit;
-  margin: 1.3em 0 0.3em; font-weight: 700; line-height: 1.3;
+  color: #0a0a0a; font-family: 'Cambria','Georgia',serif;
+  margin: 1.4em 0 0.25em; font-weight: 700; line-height: 1.25;
 }
-#screenWorkbench .doc-page h1 { font-size: 1.2em; }
-#screenWorkbench .doc-page h2 { font-size: 1.1em; }
-#screenWorkbench .doc-page h3 { font-size: 1em; }
+#screenWorkbench .doc-page h1 { font-size: 1.3em; text-align: center; letter-spacing:.02em; }
+#screenWorkbench .doc-page h2 { font-size: 1.15em; }
+#screenWorkbench .doc-page h3 { font-size: 1.05em; }
+#screenWorkbench .doc-page h4 { font-size: 1em; }
 #screenWorkbench .doc-page strong,
-#screenWorkbench .doc-page b { color: #0a0a0a; }
+#screenWorkbench .doc-page b { color: #0a0a0a; font-weight: 700; }
+#screenWorkbench .doc-page em, #screenWorkbench .doc-page i { font-style: italic; }
 #screenWorkbench .doc-page table { width: 100%; border-collapse: collapse; margin: 1em 0; }
-#screenWorkbench .doc-page td,
-#screenWorkbench .doc-page th {
-  border: 1px solid #ccc; padding: 6px 10px; font-size: 12.5px;
+#screenWorkbench .doc-page td, #screenWorkbench .doc-page th {
+  border: 1px solid #bbb; padding: 6px 10px; font-size: 12px;
 }
-#screenWorkbench .doc-page p { margin-bottom: 0.6em; }
+#screenWorkbench .doc-page th { background: #f0f0f0; font-weight: 700; }
+#screenWorkbench .doc-page p { margin: 0 0 0.5em 0; text-align: justify; }
 #screenWorkbench .doc-page p:last-child { margin-bottom: 0; }
+#screenWorkbench .doc-page ul, #screenWorkbench .doc-page ol { margin: 0.2em 0 0.5em 1.4em; padding: 0; }
+#screenWorkbench .doc-page li { margin-bottom: 0.15em; }
+/* Separatore pagina con numero */
+#screenWorkbench .doc-page-break {
+  display: flex; align-items: center; gap: 14px;
+  margin: 24px -72px; padding: 0 72px;
+  pointer-events: none;
+}
+#screenWorkbench .doc-page-break::before,
+#screenWorkbench .doc-page-break::after {
+  content: ''; flex: 1; height: 1px; background: #d0d0d0;
+}
+#screenWorkbench .doc-page-num {
+  font-size: 10px; color: #aaa; font-family: Calibri,Arial,sans-serif;
+  white-space: nowrap; letter-spacing:.05em; user-select:none;
+}
 /* Blocchi interattivi — hover leggero sulla pagina bianca */
 #screenWorkbench .doc-block {
-  border-radius: 4px; padding: 5px 9px; margin: 0 -9px;
-  cursor: pointer; transition: background .12s;
-  border: 1px solid transparent; position: relative;
+  border-radius: 3px; padding: 4px 8px; margin: 0 -8px;
+  cursor: pointer; transition: background .12s, border-color .12s;
+  border: 1.5px solid transparent; position: relative;
 }
-#screenWorkbench .doc-block:hover { background: rgba(168,85,247,.08); border-color: rgba(168,85,247,.18); }
-#screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.13); border-color: rgba(168,85,247,.4); }
+#screenWorkbench .doc-block:hover { background: rgba(168,85,247,.07); border-color: rgba(168,85,247,.22); }
+#screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.45); }
 
 /* Block Tooltip */
 #wbBlockTooltip {
@@ -20725,40 +20744,104 @@ function wbRenderDocViewer(html) {
     return n.nodeType === 1 && (n.textContent || '').trim().length > 1;
   });
 
-  // ── Smart block merging (ChatPDF-style) ──────────────────────
-  // Heading → always flushes previous group, starts fresh
-  // Paragraphs → aggregate until 80+ words, then flush
-  // Result: heading + its section content = one semantic block
-  var MIN_WORDS = 80;
-  var groups = [];
-  var cur = [];
-  var curWords = 0;
+  // ── Algoritmo semantico di block-merging ──────────────────────────────────
+  // Regole (derivate dall'analisi del documento Word):
+  //  1. Heading sempre insieme al primo paragrafo che segue (mai da solo)
+  //  2. Liste (ul/ol oppure righe •/- /numerate) restano col paragrafo intro
+  //  3. "Esempio:" / "Es." / "N.B." si appendono al blocco precedente
+  //  4. Paragrafi brevi (<28 parole) si fondono col successivo o col precedente
+  //  5. Nuovo blocco parte quando: nuovo heading, oppure >=150 parole accumulate
+  //     e il nodo corrente non è una lista né un esempio
+  var MAX_WORDS = 150;
+  var groups    = [];
+  var cur       = [];
+  var curWords  = 0;
+  var afterH    = false;
+  var inList    = false;
 
+  function wcOf(n) {
+    return (n.textContent || '').trim().split(/\s+/).filter(Boolean).length;
+  }
+  function isListNode(n) {
+    var tag = n.tagName.toLowerCase();
+    if (tag === 'ul' || tag === 'ol') return true;
+    var t = (n.textContent || '').trim();
+    return /^([•·\-\*]\s|[0-9]+[.)]\s|[a-z][.)]\s)/i.test(t);
+  }
+  function isExampleNode(n) {
+    var t = (n.textContent || '').trim();
+    return /^(esempio|es\.\s|n\.b\.|nota bene|nota:|attenzione:|si noti)/i.test(t);
+  }
   function flush() {
-    if (cur.length > 0) { groups.push(cur.slice()); cur = []; curWords = 0; }
+    if (cur.length > 0) {
+      groups.push(cur.slice());
+      cur = []; curWords = 0; afterH = false; inList = false;
+    }
   }
 
   nodes.forEach(function(node) {
-    var tag = node.tagName.toLowerCase();
-    var isH = /^h[1-6]$/.test(tag);
-    var wc  = (node.textContent || '').trim().split(/\s+/).filter(Boolean).length;
+    var tag  = node.tagName.toLowerCase();
+    var isH  = /^h[1-6]$/.test(tag);
+    var wc   = wcOf(node);
+    var isList = isListNode(node);
+    var isEx   = isExampleNode(node);
+
     if (isH) {
       flush();
       cur.push(node); curWords = wc;
+      afterH = true;
+    } else if (isEx) {
+      cur.push(node); curWords += wc;
+    } else if (afterH) {
+      cur.push(node); curWords += wc;
+      afterH = false;
+      inList = isList;
+      if (!isList && curWords >= MAX_WORDS) flush();
+    } else if (isList) {
+      cur.push(node); curWords += wc;
+      inList = true;
+    } else if (inList) {
+      flush();
+      cur.push(node); curWords = wc;
+      inList = false;
+      if (curWords >= MAX_WORDS) flush();
+    } else if (wc < 28 && cur.length > 0) {
+      cur.push(node); curWords += wc;
     } else {
       cur.push(node); curWords += wc;
-      if (curWords >= MIN_WORDS) flush();
+      if (curWords >= MAX_WORDS) flush();
     }
   });
   flush();
 
-  // ── Crea pagina bianca + blocchi ─────────────────────────────
+  // ── Crea pagina bianca + blocchi + numeri di pagina ──────────────────────
   var page = document.createElement('div');
   page.className = 'doc-page';
+
+  var WORDS_PER_PAGE = 550;
+  var pageWordCount  = 0;
+  var pageNum        = 1;
+
+  function maybeInsertPageBreak(wordsInBlock) {
+    pageWordCount += wordsInBlock;
+    if (pageWordCount >= WORDS_PER_PAGE) {
+      pageNum++;
+      pageWordCount = pageWordCount % WORDS_PER_PAGE;
+      var pb = document.createElement('div');
+      pb.className = 'doc-page-break';
+      var pn = document.createElement('span');
+      pn.className = 'doc-page-num';
+      pn.textContent = '— ' + pageNum + ' —';
+      pb.appendChild(pn);
+      page.appendChild(pb);
+    }
+  }
 
   groups.forEach(function(group) {
     var totalText = group.map(function(n) { return (n.textContent || '').trim(); }).join('\n').trim();
     if (totalText.length < 5) return;
+    var blockWords = group.reduce(function(s, n) { return s + wcOf(n); }, 0);
+    maybeInsertPageBreak(blockWords);
     var block = document.createElement('div');
     block.className = 'doc-block';
     block.innerHTML = group.map(function(n) { return n.outerHTML; }).join('');
