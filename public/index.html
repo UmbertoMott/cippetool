@@ -267,16 +267,55 @@
 #screenWorkbench .doc-block-chk {
   position: absolute; right: -34px; top: 50%; transform: translateY(-50%);
   width: 22px; height: 22px; border-radius: 50%;
-  border: 1.5px solid rgba(168,85,247,.45); background: #fff;
+  border: 1.5px solid #555; background: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 11px; font-weight: 800; color: transparent;
   cursor: pointer; opacity: 0; transition: opacity .15s, background .15s, border-color .15s;
   flex-shrink: 0; z-index: 10;
 }
-#screenWorkbench .doc-block:hover .doc-block-chk { opacity: 1; }
+#screenWorkbench .doc-block:hover .doc-block-chk { opacity: 1; border-color: #d394ff; background: rgba(211,148,255,0.12); }
 #screenWorkbench .doc-block-chk.chk-on {
-  opacity: 1; background: #A855F7; border-color: #A855F7; color: #fff;
+  opacity: 1 !important; background: #d394ff; border-color: #d394ff; color: #fff;
 }
+/* Pill blocchi in memoria */
+#wbPinPill {
+  display: none; position: absolute; bottom: 10px; left: 10px; right: 10px;
+  background: rgba(211,148,255,0.1); border: 1px solid rgba(211,148,255,0.35);
+  border-radius: 20px; padding: 6px 10px 6px 14px;
+  align-items: center; gap: 8px; font-size: 10px; z-index: 20;
+  font-family: 'Space Grotesk', sans-serif;
+}
+#wbPinPill .wp-dot { width: 7px; height: 7px; border-radius: 50%; background: #d394ff; flex-shrink: 0; }
+#wbPinPill .wp-count { color: #d394ff; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+#wbPinPill .wp-items { color: #999; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 9px; }
+#wbPinPill .wp-discrimen {
+  display: none; align-items: center; gap: 4px;
+  background: rgba(211,148,255,0.2); border: 1px solid rgba(211,148,255,0.5);
+  border-radius: 12px; padding: 3px 9px; font-size: 9px;
+  color: #d394ff; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+#wbPinPill .wp-discrimen:hover { background: rgba(211,148,255,0.35); }
+#wbPinPill .wp-reset { color: #666; cursor: pointer; font-size: 14px; flex-shrink: 0; padding: 0 2px; }
+#wbPinPill .wp-reset:hover { color: #d394ff; }
+/* Popup max 3 blocchi */
+#wbMaxPinsPopup {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 99999;
+  flex-direction: column; align-items: center; justify-content: center;
+}
+#wbMaxPinsPopup .wmp-box {
+  background: #1a1528; border: 1px solid rgba(211,148,255,0.45);
+  border-radius: 12px; padding: 24px 28px; max-width: 260px; text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+#wbMaxPinsPopup .wmp-title { color: #d394ff; font-size: 13px; font-weight: 700; margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; }
+#wbMaxPinsPopup .wmp-body { color: #aaa; font-size: 11px; line-height: 1.6; margin-bottom: 16px; font-family: 'Space Grotesk', sans-serif; }
+#wbMaxPinsPopup .wmp-btn {
+  background: rgba(211,148,255,0.15); border: 1px solid rgba(211,148,255,0.4);
+  color: #d394ff; border-radius: 8px; padding: 7px 20px;
+  font-size: 11px; cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+}
+#wbMaxPinsPopup .wmp-btn:hover { background: rgba(211,148,255,0.28); }
 /* Multi-block floating toolbar */
 #wbMultiBar {
   position: fixed; z-index: 10000; display: none;
@@ -5240,6 +5279,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Sections (populated by wbRenderSections) -->
     <div class="wb-sections" id="wbSections" style="display:none"></div>
+
+    <!-- Pill blocchi in memoria -->
+    <div id="wbPinPill">
+      <span class="wp-dot"></span>
+      <span class="wp-count" id="wbPinCount">0/3 blocchi in memoria</span>
+      <span class="wp-items" id="wbPinItems"></span>
+      <button class="wp-discrimen" id="wbPillDiscrimen" onclick="wbMultiBlockAction('discrimen')">⚖ Trova il Discrimen</button>
+      <span class="wp-reset" onclick="wbClearBlockSelection()" title="Cancella selezione">✕</span>
+    </div>
   </div>
 
   <!-- RESIZER -->
@@ -20117,8 +20165,8 @@ function wbUnlockTools() {
 }
 
 async function wbRunTool(toolNum, overrideText) {
-  // Priorità: override (da sezione) > selezione attiva > full doc
-  var docText = overrideText || _wbActiveSelection || _wbDocText;
+  // Priorità: override (da sezione) > blocchi pinnati > selezione attiva > full doc
+  var docText = overrideText || wbGetPinContext() || _wbActiveSelection || _wbDocText;
   if (!docText || docText.trim().length < 20) return;
 
   // Prompts neutri — funzionano su qualsiasi tipo di documento
@@ -21107,36 +21155,79 @@ function wbUpdatePageCounter() {
 }
 
 // ── MULTI-BLOCK SELECTION ───────────────────────────────────────────────────
-var _wbSelectedBlocks = [];
+var _wbSelectedBlocks = []; // [{el, text, chkEl}]
 var MAX_BLOCK_SEL = 3;
+
+// Restituisce testo concatenato dei blocchi pinnati (contesto per wbRunTool)
+function wbGetPinContext() {
+  if (_wbSelectedBlocks.length === 0) return '';
+  return _wbSelectedBlocks.map(function(b, i) {
+    return 'BLOCCO ' + (i + 1) + ':\n' + b.text.substring(0, 3000);
+  }).join('\n\n---\n\n');
+}
+
+// Aggiorna numeri sui dot, pill, e pulsante Discrimen
+function wbRenderPinUI() {
+  var n = _wbSelectedBlocks.length;
+
+  // Aggiorna testo nei dot (numero d'ordine)
+  _wbSelectedBlocks.forEach(function(b, i) {
+    b.chkEl.textContent = i + 1;
+  });
+
+  // Pill
+  var pill = document.getElementById('wbPinPill');
+  if (!pill) return;
+  if (n === 0) {
+    pill.style.display = 'none';
+  } else {
+    pill.style.display = 'flex';
+    var countEl = document.getElementById('wbPinCount');
+    var itemsEl = document.getElementById('wbPinItems');
+    if (countEl) countEl.textContent = n + '/3 blocchi in memoria';
+    if (itemsEl) itemsEl.textContent = _wbSelectedBlocks.map(function(b) {
+      return b.text.substring(0, 40).replace(/\n/g, ' ');
+    }).join(' · ');
+  }
+
+  // Pulsante Trova il Discrimen nella pill
+  var discBtn = document.getElementById('wbPillDiscrimen');
+  if (discBtn) discBtn.style.display = n >= 2 ? 'inline-flex' : 'none';
+}
 
 function wbToggleBlockSelect(blockEl, text, chkEl) {
   var idx = _wbSelectedBlocks.findIndex(function(b) { return b.el === blockEl; });
   if (idx >= 0) {
+    // Deseleziona
     _wbSelectedBlocks.splice(idx, 1);
     chkEl.classList.remove('chk-on');
+    chkEl.textContent = '';
     blockEl.classList.remove('db-active');
   } else {
     if (_wbSelectedBlocks.length >= MAX_BLOCK_SEL) {
-      chkEl.style.border = '1.5px solid #fb923c';
-      setTimeout(function() { chkEl.style.border = ''; }, 600);
+      // Popup invece di shake
+      var popup = document.getElementById('wbMaxPinsPopup');
+      if (popup) popup.style.display = 'flex';
       return;
     }
     _wbSelectedBlocks.push({ el: blockEl, text: text, chkEl: chkEl });
     chkEl.classList.add('chk-on');
     blockEl.classList.add('db-active');
   }
+  wbRenderPinUI();
   wbUpdateMultiBar(chkEl);
 }
 
 function wbClearBlockSelection() {
   _wbSelectedBlocks.forEach(function(b) {
     b.chkEl.classList.remove('chk-on');
+    b.chkEl.textContent = '';
     b.el.classList.remove('db-active');
   });
   _wbSelectedBlocks = [];
   var bar = document.getElementById('wbMultiBar');
   if (bar) bar.style.display = 'none';
+  wbRenderPinUI();
 }
 
 function wbUpdateMultiBar(anchorEl) {
@@ -21804,6 +21895,14 @@ function wbSelectSection(idx) {
   <div class="rpt-gallery-grid" id="rptGalleryGrid"></div>
 </div></div>
 <div id="rptViewerModal"><div id="rptViewerInner"></div></div>
+<!-- Popup max 3 blocchi pinnati -->
+<div id="wbMaxPinsPopup" onclick="this.style.display='none'">
+  <div class="wmp-box" onclick="event.stopPropagation()">
+    <div class="wmp-title">Massimo 3 blocchi</div>
+    <div class="wmp-body">Hai già 3 blocchi in memoria. Deseleziona uno dei blocchi attivi prima di aggiungerne un altro.</div>
+    <button class="wmp-btn" onclick="document.getElementById('wbMaxPinsPopup').style.display='none'">Ho capito</button>
+  </div>
+</div>
 </body>
 </html>
 
