@@ -20926,7 +20926,8 @@ function wbRenderDocViewer(html) {
   var page = document.createElement('div');
   page.className = 'doc-page';
 
-  var WORDS_PER_PAGE = 550;
+  // Numero di pagina: ~320 parole (testi legali italiani, capoversi brevi)
+  var WORDS_PER_PAGE = 320;
   var pageWordCount  = 0;
   var pageNum        = 1;
 
@@ -20945,16 +20946,15 @@ function wbRenderDocViewer(html) {
     }
   }
 
-  groups.forEach(function(group) {
+  // ── Rendering asincrono a chunk (evita freeze su documenti grandi) ───────
+  function makeBlock(group) {
     var totalText = group.map(function(n) { return (n.textContent || '').trim(); }).join('\n').trim();
-    if (totalText.length < 5) return;
+    if (totalText.length < 5) return null;
     var blockWords = group.reduce(function(s, n) { return s + wcOf(n); }, 0);
     maybeInsertPageBreak(blockWords);
     var block = document.createElement('div');
     block.className = 'doc-block';
     block.innerHTML = group.map(function(n) { return n.outerHTML; }).join('');
-
-    // Checkmark selezione (hover, sticky se selezionato)
     var chk = document.createElement('div');
     chk.className = 'doc-block-chk';
     chk.innerHTML = '✓';
@@ -20966,39 +20966,56 @@ function wbRenderDocViewer(html) {
       });
       b.addEventListener('click', function(e) {
         e.stopPropagation();
+        // Non mostrare tooltip blocco se l'utente sta selezionando del testo
+        var sel = window.getSelection();
+        if (sel && !sel.isCollapsed && sel.toString().trim().length > 2) return;
         wbShowBlockTooltip(b, t);
       });
     })(block, totalText, chk);
     block.appendChild(chk);
-
-    page.appendChild(block);
-  });
+    return block;
+  }
 
   viewer.appendChild(page);
 
-  viewer.onscroll = wbUpdatePageCounter;
-  // Selezione testo → mini-toolbar Word-style
-  var docPage = page;
-  docPage.addEventListener('mouseup', wbDocPageMouseUp);
-  // Chiudi al click fuori
-  document.addEventListener('mousedown', function(ev) {
-    var bar = document.getElementById('wbTextSelBar');
-    if (bar && bar.classList.contains('tsb-visible') && !bar.contains(ev.target)) {
-      wbHideTextSelBar();
-    }
-  });
-  var tb = document.getElementById('wbViewerToolbar');
-  if (tb) tb.style.display = 'flex';
-  _wbZoom = 1.0;
-  wbApplyZoom();
-  wbUpdatePageCounter();
+  function wbPostRender() {
+    viewer.onscroll = wbUpdatePageCounter;
+    var docPage = page;
+    docPage.addEventListener('mouseup', wbDocPageMouseUp);
+    document.addEventListener('mousedown', function(ev) {
+      var bar = document.getElementById('wbTextSelBar');
+      if (bar && bar.classList.contains('tsb-visible') && !bar.contains(ev.target)) {
+        wbHideTextSelBar();
+      }
+    });
+    var tb = document.getElementById('wbViewerToolbar');
+    if (tb) tb.style.display = 'flex';
+    _wbZoom = 1.0;
+    wbApplyZoom();
+    wbUpdatePageCounter();
+    var sec = document.getElementById('wbSections');
+    if (sec) sec.style.display = 'none';
+    var btn = document.getElementById('wbSegBtn');
+    if (btn) btn.style.display = 'none';
+    var sub = document.getElementById('wbDocSub');
+    if (sub) sub.textContent = 'Clicca un blocco per analizzarlo';
+  }
 
-  var sec = document.getElementById('wbSections');
-  if (sec) sec.style.display = 'none';
-  var btn = document.getElementById('wbSegBtn');
-  if (btn) btn.style.display = 'none';
-  var sub = document.getElementById('wbDocSub');
-  if (sub) sub.textContent = 'Clicca un blocco per analizzarlo';
+  var CHUNK = 30;
+  var gi    = 0;
+  function renderChunk() {
+    var end = Math.min(gi + CHUNK, groups.length);
+    for (; gi < end; gi++) {
+      var bl = makeBlock(groups[gi]);
+      if (bl) page.appendChild(bl);
+    }
+    if (gi < groups.length) {
+      requestAnimationFrame(renderChunk);
+    } else {
+      wbPostRender();
+    }
+  }
+  requestAnimationFrame(renderChunk);
 }
 
 function wbRenderDocViewerFromText(text) {
