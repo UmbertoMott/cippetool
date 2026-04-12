@@ -696,13 +696,14 @@
 }
 </style>
 <style>
+/* ── DEFAULT = DARK MODE ──────────────────────────────────────── */
 :root{
-  --d1:#FF6B35;--d1l:#fff0eb;
-  --d2:#2563EB;--d2l:#eff6ff;
-  --d3:#059669;--d3l:#ecfdf5;
-  --bg:#F4F0EB;--sur:#FFFFFF;--sur2:#F2ECE4;
-  --bdr:#E2D8CC;--txt:#1C1612;--muted:#7A6A58;
-  --ok:#1a7a3e;--err:#c0392b;--acc:#7c3aed;
+  --d1:#FF6B35;--d1l:rgba(255,107,53,.13);
+  --d2:#2563EB;--d2l:rgba(37,99,235,.13);
+  --d3:#059669;--d3l:rgba(5,150,105,.13);
+  --bg:#111111;--sur:#1c1c1e;--sur2:#2a2a2c;
+  --bdr:rgba(255,255,255,.1);--txt:#f5f5f7;--muted:rgba(255,255,255,.48);
+  --ok:#30d158;--err:#ff453a;--acc:#9B72F8;
 }
 /* ── BANCA DOMANDE FULL PANEL ── */
 .bd-overlay{display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.65);backdrop-filter:blur(3px)}
@@ -743,29 +744,52 @@
 body.theme-light .bd-panel{background:var(--sur)}
 body.theme-light .bd-item{background:var(--sur2)}
 /* ── Light / warm theme ── */
+/* ── LIGHT MODE (off-white caldo) ─────────────────────────────── */
 body.theme-light{
-  --bg:#FAE6D1;--sur:#fff4ea;--sur2:#fdebd8;
-  --bdr:#e8cdb5;--txt:#2c1a0e;--muted:#8a6a52;
+  --d1:#FF6B35;--d1l:#fff0eb;
+  --d2:#2563EB;--d2l:#eff6ff;
+  --d3:#059669;--d3l:#ecfdf5;
+  --bg:#F4F0EB;--sur:#FFFFFF;--sur2:#F2ECE4;
+  --bdr:#E2D8CC;--txt:#1C1612;--muted:#5A4A3A;
   --ok:#1a7a3e;--err:#c0392b;--acc:#7c3aed;
 }
-body.theme-light .hdr{background:#f5d9be;border-bottom-color:#e8cdb5}
+/* Superfici e layout */
+body.theme-light .hdr{background:#EDE8E0;border-bottom-color:#E2D8CC}
 body.theme-light .wrap{background:transparent}
-body.theme-light #fcGenSection{background:#f5d9be;border-top-color:#e0b899}
-body.theme-light .fcgen-hdr{background:rgba(124,58,237,.06)}
+/* Rimuove glow viola – sostituisce con ombre sottili su fondo chiaro */
+body.theme-light *{box-shadow:none!important}
+body.theme-light .btn-primary,body.theme-light .ld-btn-nav,body.theme-light .btn-acc{
+  box-shadow:0 2px 8px rgba(124,58,237,.2)!important}
+body.theme-light .quiz-card,body.theme-light .q-card,
+body.theme-light .modal-card,body.theme-light .modal-content,
+body.theme-light .bd-panel,body.theme-light #fcPanel{
+  background:var(--sur);border-color:var(--bdr);
+  box-shadow:0 2px 12px rgba(0,0,0,.08)!important}
+body.theme-light .bd-item{background:var(--sur2);border-color:var(--bdr)}
+body.theme-light .eap-bubble{background:var(--sur);color:var(--txt)}
+body.theme-light #leftTracker{background:var(--sur);border-color:var(--bdr)}
+body.theme-light .lt-num{color:var(--txt)}
+body.theme-light .fc-item{background:var(--sur2);border-color:var(--bdr)}
+body.theme-light #fcGenSection{background:#EDE8E0;border-top-color:#E2D8CC}
+body.theme-light .fcgen-hdr{background:rgba(124,58,237,.05)}
 body.theme-light .fcg-card{border-color:rgba(0,0,0,.1)}
 body.theme-light .fcg-pal-0{background:linear-gradient(145deg,#ddeeff,#cce0f5);color:#1a2f4a}
 body.theme-light .fcg-pal-1{background:linear-gradient(145deg,#ddf5e8,#c8edd8);color:#0e2a1a}
 body.theme-light .fcg-pal-2{background:linear-gradient(145deg,#ede0f8,#e0ccf5);color:#2a1040}
 body.theme-light .fcg-pal-3{background:linear-gradient(145deg,#fef3e0,#fde8c0);color:#3a2000}
 body.theme-light .fcg-pal-4{background:linear-gradient(145deg,#deeef8,#cce4f5);color:#0a2535}
-body.theme-light .quiz-card,
-body.theme-light .q-card{background:var(--sur);border-color:var(--bdr)}
-body.theme-light .eap-bubble{background:var(--sur);color:var(--txt)}
-body.theme-light #leftTracker{background:var(--sur);border-color:var(--bdr)}
-body.theme-light .lt-num{color:var(--txt)}
-body.theme-light .modal-card,body.theme-light .modal-content{background:var(--sur)}
-body.theme-light #fcPanel{background:var(--sur);border-color:var(--bdr)}
-body.theme-light .fc-item{background:var(--sur2);border-color:var(--bdr)}
+/* Badge domande: colori abbastanza scuri per contrasto su fondo chiaro */
+body.theme-light .bd-d1{background:rgba(255,107,53,.12);color:#b83800;border-color:rgba(255,107,53,.25)}
+body.theme-light .bd-d2{background:rgba(37,99,235,.1);color:#1a3fa8;border-color:rgba(37,99,235,.2)}
+body.theme-light .bd-d3{background:rgba(5,150,105,.1);color:#065f46;border-color:rgba(5,150,105,.2)}
+/* Input, select, textarea */
+body.theme-light input,body.theme-light select,body.theme-light textarea{
+  background:var(--sur);color:var(--txt);border-color:var(--bdr)}
+body.theme-light input::placeholder,body.theme-light textarea::placeholder{color:var(--muted)}
+/* Score/result screen */
+body.theme-light .score-ring-text,.theme-light .score-label{color:var(--txt)}
+/* Navbar header dell'app */
+body.theme-light .hdr-right .user-badge{background:var(--sur2);border-color:var(--bdr)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")}
 .wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px}
@@ -4345,12 +4369,12 @@ var SUPA_REDIRECT = (window.location.hostname === 'localhost' || window.location
     _supaShowApp();
     _supaTrackLogin();
   } else {
-    // Auth gate: nessun accesso anonimo — mostra sempre il login
+    // Nessuna sessione → mostra la landing page (home)
     if (typeof showScreen === 'function') {
-      showScreen('screenLogin');
+      showScreen('screenLanding');
     } else {
       document.addEventListener('DOMContentLoaded', function() {
-        if (typeof showScreen === 'function') showScreen('screenLogin');
+        if (typeof showScreen === 'function') showScreen('screenLanding');
       });
     }
   }
@@ -4545,7 +4569,7 @@ document.addEventListener('DOMContentLoaded', function() {
       width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:15px;
       display:flex;align-items:center;justify-content:center;
       transition:all .2s;flex-shrink:0;
-    ">🌙</button>
+    ">☀️</button>
     <button class="btn-hamburger" id="btnSettings" style="display:none" onclick="openSettings()" title="Impostazioni">
       <span></span><span></span><span></span>
     </button>
@@ -18926,7 +18950,9 @@ function toggleTheme() {
   var body = document.body;
   var btn  = document.getElementById('themeToggleBtn');
   var isLight = body.classList.toggle('theme-light');
-  if (btn) btn.textContent = isLight ? '🌑' : '🌙';
+  // ☀️ = "sei in dark, clicca per andare in light"
+  // 🌙 = "sei in light, clicca per tornare al dark"
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
   try { localStorage.setItem('cippe_theme', isLight ? 'light' : 'dark'); } catch(e){}
 }
 (function initTheme() {
@@ -18934,8 +18960,9 @@ function toggleTheme() {
     if (localStorage.getItem('cippe_theme') === 'light') {
       document.body.classList.add('theme-light');
       var btn = document.getElementById('themeToggleBtn');
-      if (btn) btn.textContent = '🌑';
+      if (btn) btn.textContent = '🌙';
     }
+    // default dark: bottone rimane ☀️ come da HTML
   } catch(e){}
 })();
 
