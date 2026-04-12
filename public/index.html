@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://generativelanguage.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; worker-src blob: 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://generativelanguage.googleapis.com https://*.supabase.co wss://*.supabase.co https://cipp-legal-api.onrender.com https://storage.googleapis.com https://*.storage.googleapis.com; img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com; frame-src https://accounts.google.com; object-src 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CIPP/E Training Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style id="wb-theme">
 /* ═══════════════════════════════════════════════════════════════
@@ -700,9 +700,9 @@
   --d1:#FF6B35;--d1l:#fff0eb;
   --d2:#2563EB;--d2l:#eff6ff;
   --d3:#059669;--d3l:#ecfdf5;
-  --bg:#0f0f13;--sur:#1a1a22;--sur2:#24242f;
-  --bdr:#2e2e3e;--txt:#f0f0f5;--muted:#888899;
-  --ok:#22c55e;--err:#ef4444;--acc:#a78bfa;
+  --bg:#F4F0EB;--sur:#FFFFFF;--sur2:#F2ECE4;
+  --bdr:#E2D8CC;--txt:#1C1612;--muted:#7A6A58;
+  --ok:#1a7a3e;--err:#c0392b;--acc:#7c3aed;
 }
 /* ── BANCA DOMANDE FULL PANEL ── */
 .bd-overlay{display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.65);backdrop-filter:blur(3px)}
@@ -767,7 +767,7 @@ body.theme-light .modal-card,body.theme-light .modal-content{background:var(--su
 body.theme-light #fcPanel{background:var(--sur);border-color:var(--bdr)}
 body.theme-light .fc-item{background:var(--sur2);border-color:var(--bdr)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")}
 .wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px}
 
 /* HEADER */
@@ -868,7 +868,7 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 .dash-greeting{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px}
 .dash-sub{color:var(--muted);margin-bottom:28px}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:28px}
-.stat-card{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:18px}
+.stat-card{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:18px;box-shadow:0 1px 6px rgba(28,22,18,0.06)}
 .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:6px}
 .stat-value{font-family:'Playfair Display',serif;font-size:28px;font-weight:700}
 .stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
@@ -879,7 +879,7 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 
 /* HISTORY TABLE */
 .history-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
-.hist-item{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;cursor:pointer;transition:border-color 0.18s}
+.hist-item{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;cursor:pointer;transition:border-color 0.18s;box-shadow:0 1px 4px rgba(28,22,18,0.05)}
 .hist-item:hover{border-color:var(--acc)}
 .hist-date{font-size:12px;color:var(--muted)}
 .hist-name{font-weight:500;font-size:14px}
@@ -955,7 +955,7 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 .lb-badge.no{background:rgba(239,68,68,0.15);color:var(--err);border:1px solid rgba(239,68,68,0.3)}
 
 /* QUESTION CARD */
-.q-card{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:28px;margin-bottom:18px;position:relative;overflow:hidden;animation:slideIn 0.3s ease}
+.q-card{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:28px;margin-bottom:18px;position:relative;overflow:hidden;animation:slideIn 0.3s ease;box-shadow:0 2px 10px rgba(28,22,18,0.07)}
 @keyframes slideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
 .q-card.d1::before{background:var(--d1)}
@@ -988,16 +988,16 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 .q-text{font-size:16px;line-height:1.7;margin-bottom:22px}
 .options{display:flex;flex-direction:column;gap:9px}
 .opt{background:var(--sur2);border:1.5px solid var(--bdr);border-radius:11px;padding:13px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:13px;font-size:14px;line-height:1.55;transition:all 0.18s;color:var(--txt)}
-.opt:hover:not(.dis){border-color:var(--acc);background:#1e1e2e;transform:translateX(3px)}
+.opt:hover:not(.dis){border-color:var(--acc);background:rgba(124,58,237,0.05);transform:translateX(3px)}
 .opt-ltr{font-family:'Inter',sans-serif;font-weight:700;font-size:12px;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--bdr);color:var(--muted);margin-top:1px;flex-shrink:0;transition:all 0.18s}
-.opt.sel{border-color:var(--acc);background:#1e1e2e}
+.opt.sel{border-color:var(--acc);background:rgba(124,58,237,0.08)}
 .opt.sel .opt-ltr{background:var(--acc);color:white}
-.opt.cor{border-color:var(--ok)!important;background:#052e16!important}
+.opt.cor{border-color:var(--ok)!important;background:rgba(26,122,62,0.09)!important}
 .opt.cor .opt-ltr{background:var(--ok)!important;color:white!important}
-.opt.wrg{border-color:var(--err)!important;background:#2d0a0a!important}
+.opt.wrg{border-color:var(--err)!important;background:rgba(192,57,43,0.07)!important}
 .opt.wrg .opt-ltr{background:var(--err)!important;color:white!important}
 .opt.dis{cursor:not-allowed}
-.rationale{background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:16px 18px;margin-top:14px;font-size:13px;line-height:1.7;color:#b0b0c0;display:none}
+.rationale{background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:16px 18px;margin-top:14px;font-size:13px;line-height:1.7;color:var(--muted);display:none}
 .rationale.show{display:block;animation:fadeIn 0.3s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .rat-title{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px;color:var(--acc)}
@@ -1014,8 +1014,8 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 /* SCORE SCREEN */
 .score-wrap{text-align:center;padding:32px 16px}
 .score-circle{width:170px;height:170px;border-radius:50%;margin:0 auto 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:6px solid}
-.score-circle.pass{border-color:var(--ok);background:#052e16}
-.score-circle.fail{border-color:var(--err);background:#2d0a0a}
+.score-circle.pass{border-color:var(--ok);background:rgba(26,122,62,0.08)}
+.score-circle.fail{border-color:var(--err);background:rgba(192,57,43,0.07)}
 .sc-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;line-height:1}
 .pass .sc-num{color:var(--ok)}.fail .sc-num{color:var(--err)}
 .sc-lbl{font-size:12px;color:var(--muted);margin-top:3px}
@@ -1024,9 +1024,9 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 .pf-badge.fail{background:var(--err);color:white}
 .sc-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:6px}
 .sc-sub{color:var(--muted);font-size:15px;margin-bottom:28px}
-.iapp-box{background:linear-gradient(135deg,#1e1e2e,#2a1a4e);border:1px solid var(--acc);border-radius:15px;padding:22px 26px;margin-bottom:24px;text-align:left}
+.iapp-box{background:linear-gradient(135deg,#f3f0ff,#ede8ff);border:1px solid rgba(124,58,237,0.35);border-radius:15px;padding:22px 26px;margin-bottom:24px;text-align:left}
 .iapp-title{font-family:'Inter',sans-serif;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--acc);margin-bottom:7px}
-.iapp-main{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:white}
+.iapp-main{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--acc)}
 .iapp-sub{font-size:13px;color:var(--muted);margin-top:3px}
 .iapp-note{font-size:11px;color:var(--muted);margin-top:8px}
 .iapp-thr{display:inline-block;background:rgba(167,139,250,0.2);border-radius:6px;padding:2px 8px;font-size:12px;color:var(--acc);margin-top:5px}
@@ -1808,7 +1808,7 @@ body.agent-open.esb-open #eapHamburgerOuter { right:388px; }
 .hist-item:hover{border-color:#a78bfa !important}
 
 /* ── LANGUAGE SWITCHER ──────────────────────────────────────────────────── */
-.lang-switch{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:3px;flex-shrink:0}
+.lang-switch{display:flex;align-items:center;gap:2px;background:var(--sur2);border:1px solid var(--bdr);border-radius:20px;padding:3px;flex-shrink:0}
 .lang-btn{background:none;border:none;border-radius:16px;padding:3px 10px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;letter-spacing:0.3px;cursor:pointer;color:#888899;transition:all 0.15s;line-height:1.4}
 .lang-btn.active{background:var(--acc);color:white;box-shadow:0 1px 6px rgba(167,139,250,0.4)}
 .lang-btn:hover:not(.active){color:var(--txt)}
@@ -19809,6 +19809,8 @@ function wbResetUpload() {
   if (fi) fi.value = '';
   document.getElementById('wbChangeBtn').style.display = 'none';
   document.getElementById('wbPickerBtn').style.display = 'inline-block';
+  document.getElementById('wbFileInfo').style.display = 'none';
+  document.getElementById('wbNoFile').style.display = 'flex';
   document.getElementById('wbFileName').textContent = 'Nessun documento selezionato';
   document.getElementById('wbFileMeta').textContent = 'Formati supportati: PDF · DOC · DOCX — visualizzazione immediata';
   document.getElementById('wbProgressWrap').style.display = 'none';
@@ -19838,6 +19840,17 @@ function wbResetUpload() {
   document.getElementById('wbUploadBar').style.borderStyle = 'dashed';
 }
 
+// Legge il numero reale di pagine dal file DOCX (scansiona docProps/app.xml nel ZIP)
+// Funziona quando app.xml è non compresso nel ZIP (caso tipico per file piccoli)
+function _wbExtractDocxPageCount(arrayBuffer) {
+  try {
+    var decoder = new TextDecoder('latin1'); // latin1 = mapping 1:1 byte→char, binary-safe
+    var str = decoder.decode(new Uint8Array(arrayBuffer));
+    var m = str.match(/<Pages>(\d+)<\/Pages>/);
+    return m ? parseInt(m[1], 10) : null;
+  } catch(e) { return null; }
+}
+
 function wbOnFileSelect(input) {
   var file = input.files && input.files[0];
   if (!file) return;
@@ -19852,6 +19865,8 @@ function wbOnFileSelect(input) {
   // Aggiorna UI immediatamente
   document.getElementById('wbFileName').textContent = '📄 ' + file.name;
   document.getElementById('wbFileMeta').textContent = typeLabel + ' · ' + sizeMB + ' MB · Lettura in corso…';
+  document.getElementById('wbNoFile').style.display = 'none';
+  document.getElementById('wbFileInfo').style.display = 'flex';
   document.getElementById('wbPickerBtn').style.display = 'none';
   document.getElementById('wbChangeBtn').style.display = 'inline-block';
   document.getElementById('wbUploadBar').style.borderColor = 'rgba(211,148,255,.5)';
@@ -19981,6 +19996,7 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
   var placeholder = document.getElementById('wbDocPlaceholder');
   var docTextEl   = document.getElementById('wbDocText');
   var text = '';
+  var _docActualPageCount = null; // pagine reali per calibrare il viewer
 
   if (ext === 'pdf') {
     // ── PDF: mostra prime pagine subito, resto in background ─────
@@ -20000,6 +20016,8 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
       return tc.items.map(function(i){ return i.str; }).join(' ');
     }));
     text = previewParts.join('\n\n');
+    // Calibra pagine viewer sulle pagine preview estratte (text copre solo PREVIEW pag)
+    _docActualPageCount = PREVIEW;
     // Imposta _wbDocText subito con preview (wbAutoSegment lo legge dopo .then())
     _wbDocText = text.substring(0, 40000);
     _wbSetProgress(90, '✅ Anteprima pronta · ' + totalPages + ' pag totali');
@@ -20037,7 +20055,9 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
     placeholder.style.display = 'none';
     container.style.display   = 'none';
     docTextEl.style.display   = 'none';
-    wbRenderDocViewer(mmHtml);
+    // Leggi numero pagine reale dal DOCX ZIP (docProps/app.xml)
+    var docxPageCount = _wbExtractDocxPageCount(arrayBuffer);
+    wbRenderDocViewer(mmHtml, docxPageCount);
     _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri');
     return;
 
@@ -20057,7 +20077,7 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
   container.style.display   = 'none';
   docTextEl.style.display   = 'none';
   if (ext !== 'pdf') _wbDocText = text.substring(0, 40000);
-  wbRenderDocViewerFromText(text.substring(0, 150000));
+  wbRenderDocViewerFromText(text.substring(0, 150000), _docActualPageCount);
   _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
 }
 
@@ -20885,7 +20905,7 @@ function _wbSmartChunk(text) {
 
 // ── DOC VIEWER: blocchi interattivi ChatPDF-style ────────────────────────────
 
-function wbRenderDocViewer(html) {
+function wbRenderDocViewer(html, actualPageCount) {
   var viewer = document.getElementById('wbDocViewer');
   if (!viewer) return;
   viewer.innerHTML = '';
@@ -20974,8 +20994,18 @@ function wbRenderDocViewer(html) {
   var page = document.createElement('div');
   page.className = 'doc-page';
 
-  // Numero di pagina: ~320 parole (testi legali italiani, capoversi brevi)
-  var WORDS_PER_PAGE = 320;
+  // Calibra WORDS_PER_PAGE sul numero reale di pagine del documento originale.
+  // Se actualPageCount è noto: WORDS_PER_PAGE = totalWords / pageCount (con floor 200 / cap 800).
+  // Altrimenti fallback a 450 (Calibri 11pt A4 standard — più accurato di 320).
+  var _totalDocWords = groups.reduce(function(s, g) {
+    return s + g.reduce(function(gs, n) { return gs + (n.textContent || '').trim().split(/\s+/).filter(Boolean).length; }, 0);
+  }, 0);
+  var WORDS_PER_PAGE;
+  if (actualPageCount && actualPageCount > 1 && _totalDocWords > 0) {
+    WORDS_PER_PAGE = Math.max(200, Math.min(800, Math.round(_totalDocWords / actualPageCount)));
+  } else {
+    WORDS_PER_PAGE = 450;
+  }
   var pageWordCount  = 0;
   var pageNum        = 1;
 
@@ -21066,7 +21096,7 @@ function wbRenderDocViewer(html) {
   requestAnimationFrame(renderChunk);
 }
 
-function wbRenderDocViewerFromText(text) {
+function wbRenderDocViewerFromText(text, actualPageCount) {
   var paras = text.split(/\n{2,}/).map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 15; });
   if (paras.length < 3) {
     paras = text.split(/\n/).map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 20; });
@@ -21077,7 +21107,7 @@ function wbRenderDocViewerFromText(text) {
     }
     return '<p>' + p + '</p>';
   }).join('');
-  wbRenderDocViewer(html);
+  wbRenderDocViewer(html, actualPageCount);
 }
 
 var _wbActiveBlock = null;
