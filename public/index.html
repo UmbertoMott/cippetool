@@ -2110,7 +2110,50 @@ body.agent-open.esb-open #eapHamburgerOuter { right:388px; }
   --ld-r2:       20px;
 }
 
-#screenLanding { background: #000 !important; }
+/* Dark mode: forza nero */
+#screenLanding { background: #000; }
+/* ── Landing LIGHT MODE ─────────────────────────────────────────── */
+body.theme-light #screenLanding { background: #F4F0EB; }
+body.theme-light #screenLanding,
+body.theme-light .ld-root {
+  --ld-bg:      #F4F0EB;
+  --ld-bg2:     #EDE8E0;
+  --ld-surf:    #FFFFFF;
+  --ld-surf2:   #F2EDE6;
+  --ld-border:  rgba(0,0,0,0.08);
+  --ld-border2: rgba(0,0,0,0.13);
+  --ld-violet:  #6D28D9;
+  --ld-violet2: #5B21B6;
+  --ld-violet3: #7C3AED;
+  --ld-text:    #1C1612;
+  --ld-text2:   rgba(28,22,18,0.60);
+  --ld-text3:   rgba(28,22,18,0.38);
+}
+/* Hardcoded nav background */
+body.theme-light .ld-nav {
+  background: rgba(244,240,235,0.95) !important;
+  border-bottom-color: rgba(0,0,0,0.08) !important;
+}
+/* Hover states che usano rgba bianco → invertili */
+body.theme-light .ld-nav-link:hover { background: rgba(0,0,0,0.05) !important; }
+body.theme-light .ld-btn-ghost { color: rgba(28,22,18,0.60) !important; }
+body.theme-light .ld-btn-ghost:hover { background: rgba(0,0,0,0.05) !important; color: #1C1612 !important; }
+body.theme-light .ld-btn-outline { border-color: rgba(0,0,0,0.15) !important; }
+body.theme-light .ld-btn-outline:hover { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.25) !important; }
+/* Hero visual shadow: alleggerisci su sfondo chiaro */
+body.theme-light .ld-hero-visual {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.07) !important;
+}
+/* Hero glow: inverted per essere visibile su beige */
+body.theme-light .ld-hero-glow {
+  background: radial-gradient(ellipse at center, rgba(109,40,217,0.08) 0%, transparent 70%) !important;
+}
+/* Features/sections background */
+body.theme-light .ld-features { background: var(--ld-bg) !important; }
+body.theme-light .ld-feat-card:hover { background: var(--ld-surf) !important; }
+/* Footer */
+body.theme-light .ld-footer { border-top-color: rgba(0,0,0,0.08) !important; }
+body.theme-light .ld-footer-link:hover { color: rgba(28,22,18,0.75) !important; }
 .ld-root {
   font-family: 'Geist', 'Inter', -apple-system, sans-serif;
   background: var(--ld-bg);
