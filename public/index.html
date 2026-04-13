@@ -756,10 +756,10 @@ body.theme-light{
 /* Superfici e layout */
 body.theme-light .hdr{background:#EDE8E0;border-bottom-color:#E2D8CC}
 body.theme-light .wrap{background:transparent}
-/* Rimuove glow viola – sostituisce con ombre sottili su fondo chiaro */
-body.theme-light *{box-shadow:none!important}
-body.theme-light .btn-primary,body.theme-light .ld-btn-nav,body.theme-light .btn-acc{
-  box-shadow:0 2px 8px rgba(124,58,237,.2)!important}
+/* Rimuove glow viola solo sugli elementi che lo usano come effetto decorativo */
+body.theme-light .ai-panel,
+body.theme-light .score-ring,
+body.theme-light .prog-bar-fill { box-shadow: none !important; }
 body.theme-light .quiz-card,body.theme-light .q-card,
 body.theme-light .modal-card,body.theme-light .modal-content,
 body.theme-light .bd-panel,body.theme-light #fcPanel{
@@ -3623,12 +3623,21 @@ body {
 
 /* ── HEADER BAR ─────────────────────────────────────────────── */
 .hdr {
-  background: rgba(12,12,16,0.94) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.055) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.035), 0 6px 32px rgba(0,0,0,0.45) !important;
+  background: rgba(12,12,16,0.94);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.055);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.035), 0 6px 32px rgba(0,0,0,0.45);
 }
+body.theme-light .hdr {
+  background: rgba(244,240,235,0.97) !important;
+  backdrop-filter: blur(24px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.95), 0 2px 20px rgba(0,0,0,0.06) !important;
+}
+body.theme-light .logo { color: var(--txt) !important; }
+body.theme-light .logo span { color: var(--acc) !important; }
 
 /* ── BUTTONS ────────────────────────────────────────────────── */
 .btn {
@@ -3655,6 +3664,15 @@ body {
   border-color: rgba(255,255,255,0.16) !important;
   color: var(--txt) !important;
 }
+body.theme-light .btn-sec {
+  background: rgba(0,0,0,0.04) !important;
+  border: 1px solid rgba(0,0,0,0.11) !important;
+  color: var(--txt) !important;
+}
+body.theme-light .btn-sec:hover:not(:disabled) {
+  background: rgba(0,0,0,0.08) !important;
+  border-color: rgba(0,0,0,0.18) !important;
+}
 .btn-new-exam {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
   box-shadow: 0 2px 14px rgba(124,58,237,0.38) !important;
@@ -3673,6 +3691,16 @@ body {
   border-radius: 20px !important;
   box-shadow: 0 2px 24px rgba(0,0,0,0.32), 0 0 0 1px rgba(255,255,255,0.025) inset !important;
   transition: border-color 0.22s ease, box-shadow 0.22s ease !important;
+}
+body.theme-light .q-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07) !important;
+  color: var(--txt) !important;
+}
+body.theme-light .q-card:hover {
+  border-color: rgba(124,58,237,0.25) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10) !important;
 }
 .q-card:hover {
   border-color: rgba(139,92,246,0.22) !important;
@@ -3916,6 +3944,11 @@ body {
   border-radius: 22px !important;
   box-shadow: 0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.05) !important;
 }
+body.theme-light .login-box {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.9) !important;
+}
 
 /* ── INPUTS GLOBAL ──────────────────────────────────────────── */
 input[type="text"], input[type="email"], input[type="password"], textarea {
@@ -3924,6 +3957,20 @@ input[type="text"], input[type="email"], input[type="password"], textarea {
 }
 input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(139,92,246,0.14) !important;
+}
+/* Fix autofill browser override (elimina il blu) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--sur2) inset !important;
+  -webkit-text-fill-color: var(--txt) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+body.theme-light input:-webkit-autofill,
+body.theme-light input:-webkit-autofill:hover,
+body.theme-light input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #F2ECE4 inset !important;
+  -webkit-text-fill-color: #1C1612 !important;
 }
 
 /* ── SCROLLBARS ─────────────────────────────────────────────── */
