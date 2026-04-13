@@ -104,6 +104,40 @@ body.theme-light #wbProgressWrap                       { background: rgba(244,24
 /* pdf container scrollbar */
 body.theme-light #wbPdfContainer                       { scrollbar-color: rgba(91,33,182,0.3) #F4F0EB; }
 
+/* ── WB LIGHT MODE: document viewer + zoom + chat ───────────────── */
+body.theme-light #wbDocViewer        { background: #ffffff !important; }
+body.theme-light #wbPdfContainer     { background: #ebebeb !important; }
+body.theme-light #wbDocText          { background: #ffffff !important; color: #1C1612 !important; }
+body.theme-light #wbViewerToolbar    { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.12) !important; }
+body.theme-light .wb-zoom-btn        { background: rgba(91,33,182,0.08) !important; border-color: rgba(91,33,182,0.25) !important; color: #5B21B6 !important; }
+body.theme-light .wb-zoom-btn:hover  { background: rgba(91,33,182,0.18) !important; }
+body.theme-light #wbZoomLevel        { color: #5A4A3A !important; }
+body.theme-light #wbPageCounter      { color: #3D2B1F !important; border-left-color: rgba(0,0,0,0.12) !important; }
+body.theme-light #wbPageInput        { color: #3D2B1F !important; border-bottom-color: rgba(0,0,0,0.25) !important; }
+body.theme-light #wbPageTotal        { color: #5A4A3A !important; }
+body.theme-light #wbWebSearchLabel   { color: #5A4A3A !important; }
+body.theme-light #wbWebSearchTrack   { background: rgba(0,0,0,0.12) !important; }
+body.theme-light #wbWebSearchKnob    { background: #777 !important; }
+body.theme-light #wbChatInput        { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.15) !important; color: #1C1612 !important; }
+body.theme-light #wbChatEmpty        { color: rgba(0,0,0,0.38) !important; }
+body.theme-light #wbChatEmpty strong { color: #5B21B6 !important; }
+body.theme-light #wbChatBlockIndicator { background: rgba(91,33,182,0.06) !important; border-color: rgba(91,33,182,0.2) !important; color: #5B21B6 !important; }
+body.theme-light #screenWorkbench .wb-chat-bubble-user { background: rgba(91,33,182,0.09) !important; border-color: rgba(91,33,182,0.22) !important; color: #1C1612 !important; }
+body.theme-light #screenWorkbench .wb-chat-bubble-ai   { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.09) !important; color: #1C1612 !important; }
+body.theme-light #screenWorkbench .wb-chat-bubble-ai strong { color: #5B21B6 !important; }
+body.theme-light #wbChatInputRow { border-top-color: rgba(0,0,0,0.08) !important; }
+body.theme-light #screenWorkbench [id$="Loading"] { color: rgba(0,0,0,0.42) !important; }
+body.theme-light #wbResizeHandle     { background: rgba(91,33,182,0.07) !important; }
+body.theme-light #wbResizeHandle:hover { background: rgba(91,33,182,0.18) !important; }
+body.theme-light #wbResizeHandle > div { background: rgba(91,33,182,0.28) !important; }
+body.theme-light #screenWorkbench .wb-tool-n { color: #7C5CBF !important; }
+body.theme-light #screenWorkbench .wb-tool-desc { color: #5A4A3A !important; }
+body.theme-light #screenWorkbench .wb-tools-label { color: #5B21B6 !important; }
+body.theme-light #screenWorkbench .wb-tool-card   { background: rgba(0,0,0,0.03) !important; border-color: rgba(0,0,0,0.08) !important; }
+/* doc blocks in light mode */
+body.theme-light #screenWorkbench .doc-block   { color: #1C1612 !important; background: #fff !important; }
+body.theme-light #screenWorkbench .doc-page    { color: #1C1612 !important; }
+
 /* ── LRL LIGHT MODE ──────────────────────────────────────────────── */
 body.theme-light #screenLRL.active {
   background: #F4F0EB !important;
@@ -523,6 +557,10 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
   font-size: 11px; color: #888; font-family: monospace;
   padding-left: 10px; border-left: 1px solid rgba(255,255,255,.1);
 }
+/* hide number input arrows */
+#wbPageInput::-webkit-outer-spin-button,
+#wbPageInput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+#wbPageInput[type=number] { -moz-appearance: textfield; }
 /* Checkmark blocco */
 #screenWorkbench .doc-block { overflow: visible; }
 #screenWorkbench .doc-block-chk {
@@ -5673,7 +5711,14 @@ document.addEventListener('DOMContentLoaded', function() {
           <button class="wb-zoom-btn" onclick="wbZoomOut()" title="Riduci">−</button>
           <span id="wbZoomLevel">100%</span>
           <button class="wb-zoom-btn" onclick="wbZoomIn()" title="Ingrandisci">+</button>
-          <span id="wbPageCounter">1 / 1 pag.</span>
+          <span id="wbPageCounter" style="font-size:11px;color:#888;font-family:monospace;padding-left:10px;border-left:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:3px">
+            <input id="wbPageInput" type="number" min="1" value="1"
+              title="Inserisci numero pagina e premi Invio"
+              style="width:32px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.2);color:#888;font-family:monospace;font-size:11px;text-align:center;outline:none;padding:1px 0;-moz-appearance:textfield"
+              onkeydown="if(event.key==='Enter'){wbGoToPage(parseInt(this.value));this.blur();}"
+              onchange="wbGoToPage(parseInt(this.value))">
+            <span id="wbPageTotal">/ 1 pag.</span>
+          </span>
         </div>
         <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
       </div>
@@ -5832,7 +5877,7 @@ document.addEventListener('DOMContentLoaded', function() {
           Clicca <strong style="color:#818cf8">Analizza</strong>, <strong style="color:#818cf8">Approfondisci</strong> o <strong style="color:#818cf8">Collega</strong> su un blocco<br>oppure scrivi qui sotto una domanda libera.
         </div>
         <!-- Input -->
-        <div style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.06)">
+        <div id="wbChatInputRow" style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.06)">
           <input id="wbChatInput" type="text" placeholder="Scrivi una domanda sul documento…" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='rgba(129,140,248,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'" onkeydown="if(event.key==='Enter')wbChatSend()">
           <button onclick="wbChatSend()" style="background:linear-gradient(135deg,#818cf8,#4f46e5);color:#fff;border:none;border-radius:8px;padding:0 16px;font:600 12px/1 inherit;cursor:pointer;flex-shrink:0">Invia</button>
         </div>
@@ -21856,20 +21901,65 @@ function wbApplyZoom() {
 
 // ── PAGE COUNTER ────────────────────────────────────────────────────────────
 function wbUpdatePageCounter() {
+  var ctr    = document.getElementById('wbPageCounter');
+  var inp    = document.getElementById('wbPageInput');
+  var tot    = document.getElementById('wbPageTotal');
+  if (!ctr || !inp || !tot) return;
+
+  // PDF mode: pages are .wb-pdf-page inside #wbPdfContainer
+  var pdfContainer = document.getElementById('wbPdfContainer');
+  if (pdfContainer && pdfContainer.style.display !== 'none') {
+    var pdfPages = Array.from(pdfContainer.querySelectorAll('.wb-pdf-page'));
+    var total = pdfPages.length;
+    if (total <= 1) { ctr.style.display = 'none'; return; }
+    ctr.style.display = '';
+    inp.max = total;
+    tot.textContent = '/ ' + total + ' pag.';
+    var pRect = pdfContainer.getBoundingClientRect();
+    var current = 1;
+    pdfPages.forEach(function(pg, i) {
+      if (pg.getBoundingClientRect().top < pRect.top + pRect.height / 2) current = i + 1;
+    });
+    if (document.activeElement !== inp) inp.value = current;
+    return;
+  }
+
+  // DOCX mode: pages separated by .doc-page-break in #wbDocViewer
   var viewer = document.getElementById('wbDocViewer');
   if (!viewer) return;
   var breaks = Array.from(viewer.querySelectorAll('.doc-page-break'));
   var total  = breaks.length + 1;
-  var el     = document.getElementById('wbPageCounter');
-  if (!el) return;
-  if (total <= 1) { el.style.display = 'none'; return; }
-  el.style.display = '';
+  if (total <= 1) { ctr.style.display = 'none'; return; }
+  ctr.style.display = '';
+  inp.max = total;
+  tot.textContent = '/ ' + total + ' pag.';
   var vRect   = viewer.getBoundingClientRect();
   var current = 1;
-  breaks.forEach(function(pb) {
-    if (pb.getBoundingClientRect().top < vRect.top + vRect.height / 2) current++;
+  breaks.forEach(function(pb, i) {
+    if (pb.getBoundingClientRect().top < vRect.top + vRect.height / 2) current = i + 2;
   });
-  el.textContent = current + ' / ' + total + ' pag.';
+  if (document.activeElement !== inp) inp.value = current;
+}
+
+function wbGoToPage(n) {
+  if (!n || isNaN(n) || n < 1) return;
+
+  // PDF mode
+  var pdfContainer = document.getElementById('wbPdfContainer');
+  if (pdfContainer && pdfContainer.style.display !== 'none') {
+    var pdfPages = Array.from(pdfContainer.querySelectorAll('.wb-pdf-page'));
+    var target = pdfPages[n - 1];
+    if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    return;
+  }
+
+  // DOCX mode: page 1 → top of viewer; page N → (N-1)th page-break
+  var viewer = document.getElementById('wbDocViewer');
+  if (!viewer) return;
+  if (n === 1) { viewer.scrollTop = 0; return; }
+  var breaks = Array.from(viewer.querySelectorAll('.doc-page-break'));
+  var target = breaks[n - 2];
+  if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 
 // ── MULTI-BLOCK SELECTION ───────────────────────────────────────────────────
