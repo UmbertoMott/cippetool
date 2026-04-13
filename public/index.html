@@ -2816,6 +2816,8 @@ body.theme-light .fcgen-close:hover{background:#000;color:#fff}
 
 body.theme-light #themeToggleBtn{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
 body.theme-light #themeToggleBtn:hover{background:#000}
+/* landing toggle — beige bg → dark button */
+body.theme-light #themeToggleBtnLanding{border-color:rgba(0,0,0,0.25)!important;color:#1C1612!important;}
 
 body.theme-light #fcToggleBtn{background:#1a1a1a !important;
   box-shadow:0 3px 14px rgba(0,0,0,.25)}
@@ -4935,6 +4937,11 @@ document.addEventListener('DOMContentLoaded', function() {
     <a class="ld-nav-link" href="#reviews">Recensioni</a>
   </div>
   <div class="ld-nav-cta">
+    <button id="themeToggleBtnLanding" onclick="toggleTheme()" title="Cambia tema" style="
+      background:none;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.8);
+      width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:15px;
+      display:flex;align-items:center;justify-content:center;
+      transition:all .2s;flex-shrink:0;">☀️</button>
     <button class="ld-btn-ghost" onclick="showScreen('screenLogin')">Accedi</button>
     <button class="ld-btn-nav" onclick="showScreen('screenLogin')">Inizia gratis →</button>
   </div>
@@ -7479,26 +7486,72 @@ function renderQuizBank(ud) {
   const el = document.getElementById('quizBankSection');
   if (!el) return;
 
+  const isLight = document.body.classList.contains('theme-light');
+
+  // Color palette — dark vs light
+  const C = isLight ? {
+    labelColor:   '#5B21B6',
+    labelColor2:  'rgba(91,33,182,0.65)',
+    progressBg:   'rgba(0,0,0,0.08)',
+    numColor:     '#1C1612',
+    titleColor:   '#1C1612',
+    metaColor:    '#7A6A58',
+    badgeTxtColor:'#1C1612',
+    cardBg:       'rgba(0,0,0,0.03)',
+    chipBg:       'rgba(91,33,182,0.09)',
+    chipColor:    '#5B21B6',
+    chipBorder:   'rgba(91,33,182,0.20)',
+    scenLabel:    '#7A6A58',
+    borderDone:   'rgba(22,101,52,0.5)',
+    borderActive: 'rgba(161,98,7,0.55)',
+    borderTodo:   'rgba(91,33,182,0.35)',
+    badgeDone:    'rgba(22,101,52,0.12)',
+    badgeActive:  'rgba(161,98,7,0.15)',
+    badgeTodo:    'rgba(91,33,182,0.10)',
+    btnActive:    'background:rgba(161,98,7,0.12);border:1px solid rgba(161,98,7,0.45);color:#92400e',
+    btnDone:      'background:rgba(22,101,52,0.10);border:1px solid rgba(22,101,52,0.35);color:#166534',
+    btnTodo:      'background:linear-gradient(135deg,rgba(91,33,182,0.15),rgba(109,40,217,0.10));border:1px solid rgba(91,33,182,0.45);color:#5B21B6',
+  } : {
+    labelColor:   'rgba(167,139,250,0.7)',
+    labelColor2:  'rgba(167,139,250,0.6)',
+    progressBg:   'rgba(255,255,255,0.07)',
+    numColor:     '#e2e0ff',
+    titleColor:   '#ddd8ff',
+    metaColor:    'rgba(167,139,250,0.55)',
+    badgeTxtColor:'#e2e0ff',
+    cardBg:       'rgba(255,255,255,0.025)',
+    chipBg:       'rgba(124,58,237,0.12)',
+    chipColor:    '#c4b5fd',
+    chipBorder:   'rgba(124,58,237,0.18)',
+    scenLabel:    'rgba(167,139,250,0.45)',
+    borderDone:   'rgba(34,197,94,0.4)',
+    borderActive: 'rgba(251,191,36,0.55)',
+    borderTodo:   'rgba(124,58,237,0.35)',
+    badgeDone:    'rgba(34,197,94,0.15)',
+    badgeActive:  'rgba(251,191,36,0.18)',
+    badgeTodo:    'rgba(124,58,237,0.12)',
+    btnActive:    'background:rgba(251,191,36,0.18);border:1px solid rgba(251,191,36,0.45);color:#fcd34d',
+    btnDone:      'background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#6ee7b7',
+    btnTodo:      'background:linear-gradient(135deg,rgba(124,58,237,0.28),rgba(139,92,246,0.18));border:1px solid rgba(124,58,237,0.55);color:#c4b5fd',
+  };
+
   const done     = ud.completedQuizNums || [];
-  // Read sessions map synchronously from localStorage for renderQuizBank
   var _sessKey = 'cippe_' + currentUser + ':sessions';
   var _sessRaw = {};
   try { _sessRaw = JSON.parse(localStorage.getItem(_sessKey) || '{}'); } catch(e) {}
   const activeNums = Object.keys(_sessRaw).map(Number).filter(n => n > 0);
-  // Only use actual sessions for "in corso" badge — not ud.activeQuizNum which may be stale
   const active = activeNums.length > 0 ? activeNums[0] : null;
   const doneCount = done.length;
   const totalQuizzes = QUIZ_CATALOG.length;
 
-  // Progress bar
   const pct = Math.round(doneCount / totalQuizzes * 100);
   let html = `
   <div style="margin-bottom:14px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <span style="font-size:11px;font-weight:700;color:rgba(167,139,250,0.7);text-transform:uppercase;letter-spacing:0.5px">Percorso Quiz</span>
-      <span style="font-size:11px;color:rgba(167,139,250,0.6)">${doneCount} / ${totalQuizzes} completati</span>
+      <span style="font-size:11px;font-weight:700;color:${C.labelColor};text-transform:uppercase;letter-spacing:0.5px">Percorso Quiz</span>
+      <span style="font-size:11px;color:${C.labelColor2}">${doneCount} / ${totalQuizzes} completati</span>
     </div>
-    <div style="height:6px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden">
+    <div style="height:6px;background:${C.progressBg};border-radius:4px;overflow:hidden">
       <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#7c3aed,#22c55e);border-radius:4px;transition:width .4s"></div>
     </div>
   </div>
@@ -7508,58 +7561,47 @@ function renderQuizBank(ud) {
     const isDone   = done.includes(qi.num);
     const isActive = activeNums.includes(qi.num) || qi.num === active;
 
-    // Style by state — but ALL are accessible
-    let borderColor, badgeText, badgeBg;
+    let borderColor, badgeText, badgeBg, btnStyle;
     if (isDone) {
-      borderColor = 'rgba(34,197,94,0.4)';   badgeText = '✅ Completato'; badgeBg = 'rgba(34,197,94,0.15)';
+      borderColor = C.borderDone;  badgeText = '✅ Completato'; badgeBg = C.badgeDone;  btnStyle = C.btnDone;
     } else if (isActive) {
-      borderColor = 'rgba(251,191,36,0.55)'; badgeText = '⏱ In corso';   badgeBg = 'rgba(251,191,36,0.18)';
+      borderColor = C.borderActive; badgeText = '⏱ In corso';  badgeBg = C.badgeActive; btnStyle = C.btnActive;
     } else {
-      borderColor = 'rgba(124,58,237,0.35)'; badgeText = '🎯 Disponibile'; badgeBg = 'rgba(124,58,237,0.12)';
+      borderColor = C.borderTodo;  badgeText = '🎯 Disponibile'; badgeBg = C.badgeTodo; btnStyle = C.btnTodo;
     }
 
-    // Scenarios chips
     const scList = qi.scenarios.map(s =>
-      `<span style="font-size:10px;background:rgba(124,58,237,0.12);color:#c4b5fd;border-radius:5px;padding:2px 7px;border:1px solid rgba(124,58,237,0.18)">${s}</span>`
+      `<span style="font-size:10px;background:${C.chipBg};color:${C.chipColor};border-radius:5px;padding:2px 7px;border:1px solid ${C.chipBorder}">${s}</span>`
     ).join(' ');
 
-    // Score tag for completed quizzes
     let scoreTag = '';
     if (isDone) {
       const exams = ud.exams || [];
       const lastEx = exams.filter(e => e.quizNum === qi.num && e.status === 'done').slice(-1)[0];
-      if (lastEx) scoreTag = `<span style="font-size:10px;color:${lastEx.pass?'#4ade80':'#f87171'};font-weight:700;margin-left:6px">IAPP ${lastEx.iapp} · ${lastEx.pass?'PASS':'FAIL'}</span>`;
+      if (lastEx) {
+        const sColor = isLight ? (lastEx.pass ? '#166534' : '#991b1b') : (lastEx.pass ? '#4ade80' : '#f87171');
+        scoreTag = `<span style="font-size:10px;color:${sColor};font-weight:700;margin-left:6px">IAPP ${lastEx.iapp} · ${lastEx.pass?'PASS':'FAIL'}</span>`;
+      }
     }
 
-    // Action button — always shown, label changes by state
-    let btnLabel, btnStyle;
-    if (isActive) {
-      btnLabel = '▶ Riprendi Quiz N.' + qi.num;
-      btnStyle = 'background:rgba(251,191,36,0.18);border:1px solid rgba(251,191,36,0.45);color:#fcd34d';
-    } else if (isDone) {
-      btnLabel = '🔄 Ripeti Quiz N.' + qi.num;
-      btnStyle = 'background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#6ee7b7';
-    } else {
-      btnLabel = '▶ Inizia Quiz N.' + qi.num;
-      btnStyle = 'background:linear-gradient(135deg,rgba(124,58,237,0.28),rgba(139,92,246,0.18));border:1px solid rgba(124,58,237,0.55);color:#c4b5fd';
-    }
     const btnOnclick = isActive ? `resumeExam(${qi.num})` : `startQuizN(${qi.num})`;
+    const btnLabel   = isActive ? '▶ Riprendi Quiz N.' + qi.num : isDone ? '🔄 Ripeti Quiz N.' + qi.num : '▶ Inizia Quiz N.' + qi.num;
 
     html += `
-    <div style="background:rgba(255,255,255,0.025);border:1px solid ${borderColor};border-radius:12px;padding:14px 16px;transition:all .2s">
+    <div style="background:${C.cardBg};border:1px solid ${borderColor};border-radius:12px;padding:14px 16px;transition:all .2s">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-        <div style="font-size:20px;font-weight:900;color:#e2e0ff;font-family:'Syne',sans-serif;min-width:32px">N.${qi.num}</div>
+        <div style="font-size:20px;font-weight:900;color:${C.numColor};font-family:'Syne',sans-serif;min-width:32px">N.${qi.num}</div>
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:13px;font-weight:700;color:#ddd8ff">Quiz CIPP/E N.${qi.num}</span>
+            <span style="font-size:13px;font-weight:700;color:${C.titleColor}">Quiz CIPP/E N.${qi.num}</span>
             ${scoreTag}
           </div>
-          <div style="font-size:11px;color:rgba(167,139,250,0.55);margin-top:1px">90 domande · ${qi.scenarios.length} scenari · 150 min</div>
+          <div style="font-size:11px;color:${C.metaColor};margin-top:1px">90 domande · ${qi.scenarios.length} scenari · 150 min</div>
         </div>
-        <div style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;background:${badgeBg};color:#e2e0ff;white-space:nowrap">${badgeText}</div>
+        <div style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;background:${badgeBg};color:${C.badgeTxtColor};white-space:nowrap">${badgeText}</div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
-        <span style="font-size:10px;color:rgba(167,139,250,0.45);margin-right:4px">Scenari:</span>
+        <span style="font-size:10px;color:${C.scenLabel};margin-right:4px">Scenari:</span>
         ${scList}
       </div>
       <button onclick="${btnOnclick}" style="margin-top:10px;width:100%;${btnStyle};font-size:11px;font-weight:700;padding:9px 14px;border-radius:9px;cursor:pointer;font-family:inherit;letter-spacing:0.3px;transition:all .15s"
@@ -19163,23 +19205,33 @@ async function startQuizN(num) {
 }
 
 // ── Theme toggle ─────────────────────────────────────────────────
+function _syncThemeBtns(isLight) {
+  var emoji = isLight ? '🌙' : '☀️';
+  var b1 = document.getElementById('themeToggleBtn');
+  var b2 = document.getElementById('themeToggleBtnLanding');
+  if (b1) b1.textContent = emoji;
+  if (b2) b2.textContent = emoji;
+}
 function toggleTheme() {
-  var body = document.body;
-  var btn  = document.getElementById('themeToggleBtn');
-  var isLight = body.classList.toggle('theme-light');
+  var isLight = document.body.classList.toggle('theme-light');
   // ☀️ = "sei in dark, clicca per andare in light"
   // 🌙 = "sei in light, clicca per tornare al dark"
-  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+  _syncThemeBtns(isLight);
   try { localStorage.setItem('cippe_theme', isLight ? 'light' : 'dark'); } catch(e){}
+  // Re-render quiz bank se visibile (inline styles cambiano col tema)
+  try {
+    if (typeof currentUser !== 'undefined' && currentUser && typeof getUserData === 'function') {
+      getUserData(currentUser).then(function(ud){ if(ud) renderQuizBank(ud); }).catch(function(){});
+    }
+  } catch(e){}
 }
 (function initTheme() {
   try {
     if (localStorage.getItem('cippe_theme') === 'light') {
       document.body.classList.add('theme-light');
-      var btn = document.getElementById('themeToggleBtn');
-      if (btn) btn.textContent = '🌙';
+      _syncThemeBtns(true);
     }
-    // default dark: bottone rimane ☀️ come da HTML
+    // default dark: bottoni rimangono ☀️ come da HTML
   } catch(e){}
 })();
 
