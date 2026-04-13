@@ -359,8 +359,7 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 }
 #screenWorkbench .wb-brand-tag {
   font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--wb-acc); background: var(--wb-acc-dim);
-  padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(168,85,247,0.2);
+  color: var(--wb-acc);
 }
 #screenWorkbench .wb-recenti {
   display: flex; align-items: center; gap: 6px; margin-left: 16px;
@@ -790,6 +789,32 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
   flex: 1; overflow-y: auto; padding: 16px;
   display: flex; flex-direction: column; gap: 12px;
 }
+/* Collapse button in tools topbar */
+#wbCollapseToolsBtn {
+  width: 26px; height: 22px; border-radius: 5px; cursor: pointer;
+  background: rgba(168,85,247,.1); border: 1px solid rgba(168,85,247,.25);
+  color: #c084fc; font-size: 13px; display: flex; align-items: center;
+  justify-content: center; transition: background .15s; flex-shrink: 0;
+}
+#wbCollapseToolsBtn:hover { background: rgba(168,85,247,.25); }
+body.theme-light #wbCollapseToolsBtn { background: rgba(91,33,182,.07) !important; border-color: rgba(91,33,182,.22) !important; color: #5B21B6 !important; }
+/* Mini toolbar shown when tools 01-05 are collapsed */
+#wbMiniToolBar {
+  display: none; gap: 8px; flex-wrap: wrap; padding: 4px 0 8px;
+  animation: wbMiniFadeIn 0.25s ease;
+}
+@keyframes wbMiniFadeIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+.wb-mini-btn {
+  flex: 1; min-width: 44px; height: 36px; border-radius: 8px; border: none;
+  cursor: pointer; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  gap: 4px; transition: opacity .15s, transform .15s; opacity: .85;
+}
+.wb-mini-btn:hover { opacity: 1; transform: translateY(-1px); }
+/* Animated collapse of tool cards */
+.wb-tool { transition: max-height 0.32s ease, opacity 0.22s ease, margin-bottom 0.28s ease, padding 0.28s ease; overflow: hidden; }
+.wb-tools-mini .wb-tool.wb-collapsible { max-height: 0 !important; opacity: 0 !important; margin-bottom: 0 !important; pointer-events: none; }
+.wb-tools-mini #wbTool06 { flex: 1; display: flex; flex-direction: column; }
 
 /* context strip */
 #screenWorkbench .wb-ctx-strip {
@@ -5760,9 +5785,18 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="wb-tools-topbar">
       <span class="wb-tools-label">Step 03 · AI Analysis &amp; Tools</span>
       <span class="wb-tools-ctx" id="wbCtxLabel">Contesto: <span>nessuno</span></span>
+      <button id="wbCollapseToolsBtn" onclick="wbToggleToolsCollapse()" title="Comprimi/espandi tool">⊟</button>
     </div>
     <div class="wb-tools-scroll" id="wbToolsScroll">
 
+      <!-- Mini toolbar shown when tools 01-05 are collapsed -->
+      <div id="wbMiniToolBar">
+        <button class="wb-mini-btn" style="background:linear-gradient(135deg,#c084fc,#9333ea)" onclick="wbExpandTool(1)" title="Visual Storytelling">① VS</button>
+        <button class="wb-mini-btn" style="background:linear-gradient(135deg,#67e8f9,#0891b2);color:#000" onclick="wbExpandTool(2)" title="Knowledge Synthesis">② KS</button>
+        <button class="wb-mini-btn" style="background:linear-gradient(135deg,#fcd34d,#d97706);color:#000" onclick="wbExpandTool(3)" title="Scholar's Metaphor">③ SM</button>
+        <button class="wb-mini-btn" style="background:linear-gradient(135deg,#6ee7b7,#059669);color:#000" onclick="wbExpandTool(4)" title="Active Recall">④ AR</button>
+        <button class="wb-mini-btn" style="background:linear-gradient(135deg,#f9a8d4,#db2777)" onclick="wbExpandTool(5)" title="Visual Memory Map">⑤ VM</button>
+      </div>
       <!-- Context strip -->
       <div class="wb-ctx-strip" id="wbCtxStrip" style="display:none">
         <div class="wb-ctx-dot"></div>
@@ -5770,7 +5804,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <!-- TOOL 01: Visual Storytelling -->
-      <div class="wb-tool wb-locked" id="wbTool01">
+      <div class="wb-tool wb-locked wb-collapsible" id="wbTool01">
         <div class="wb-tool-head">
           <div class="wb-glow-bar" style="background:linear-gradient(180deg,#c084fc,#7c3aed)"></div>
           <div class="wb-tool-info">
@@ -5785,7 +5819,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <!-- TOOL 02: Knowledge Synthesis -->
-      <div class="wb-tool wb-locked" id="wbTool02">
+      <div class="wb-tool wb-locked wb-collapsible" id="wbTool02">
         <div class="wb-tool-head">
           <div class="wb-glow-bar" style="background:linear-gradient(180deg,#67e8f9,#0891b2)"></div>
           <div class="wb-tool-info">
@@ -5800,7 +5834,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <!-- TOOL 03: Scholar's Metaphor -->
-      <div class="wb-tool wb-locked" id="wbTool03">
+      <div class="wb-tool wb-locked wb-collapsible" id="wbTool03">
         <div class="wb-tool-head">
           <div class="wb-glow-bar" style="background:linear-gradient(180deg,#fcd34d,#b45309)"></div>
           <div class="wb-tool-info">
@@ -5815,7 +5849,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <!-- TOOL 04: Active Recall -->
-      <div class="wb-tool wb-locked" id="wbTool04">
+      <div class="wb-tool wb-locked wb-collapsible" id="wbTool04">
         <div class="wb-tool-head">
           <div class="wb-glow-bar" style="background:linear-gradient(180deg,#6ee7b7,#059669)"></div>
           <div class="wb-tool-info">
@@ -5830,7 +5864,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <!-- TOOL 05: Visual Memory Map -->
-      <div class="wb-tool wb-locked" id="wbTool05">
+      <div class="wb-tool wb-locked wb-collapsible" id="wbTool05">
         <div class="wb-tool-head">
           <div class="wb-glow-bar" style="background:linear-gradient(180deg,#f472b6,#db2777)"></div>
           <div class="wb-tool-info">
@@ -10194,25 +10228,14 @@ async function llcInit() {
   var badge = document.getElementById('llcApiBadge');
   LLC.docs = [];
 
-  // ── Backend warmup: sveglia Render in background (cold start ~40s) ───────────
-  // Il ping parte subito così quando l'utente usa la chat il server è già caldo.
-  LLC._backendReady = false;
-  LLC._backendWarmup = (async function() {
-    try {
-      if (badge) { badge.style.color = '#fbbf24'; badge.textContent = '⏳ Avvio…'; }
-      var t0 = Date.now();
-      var hResp = await fetch('/api/health');
-      var elapsed = Math.round((Date.now() - t0) / 1000);
-      LLC._backendReady = true;
-      if (badge && hResp.ok) {
-        badge.style.background = 'rgba(34,197,94,.15)';
-        badge.style.color      = '#4ade80';
-        badge.textContent      = '● Connesso' + (elapsed > 5 ? ' (' + elapsed + 's)' : '');
-      }
-    } catch(e) {
-      if (badge) { badge.style.color = '#f87171'; badge.textContent = '✕ Offline'; }
-    }
-  })();
+  // Mark backend as immediately available (Vercel serverless — no cold start)
+  LLC._backendReady = true;
+  if (badge) {
+    badge.style.background = 'rgba(34,197,94,.15)';
+    badge.style.color      = '#4ade80';
+    badge.textContent      = '● Disponibile';
+  }
+  LLC._backendWarmup = Promise.resolve();
 
   // ── Carica file caricati dall'utente — aspetta che il warmup finisca ─────────
   await LLC._backendWarmup;
@@ -19529,6 +19552,24 @@ function wbPickerOpen(sessionId) {
   var fileInfo = document.getElementById('wbFileInfo');
   if (noFile) noFile.style.display = 'none';
   if (fileInfo) fileInfo.style.display = 'flex';
+  // Restore document viewer HTML
+  if (s.docViewerHTML && s.docViewerHTML.length > 20) {
+    var viewer = document.getElementById('wbDocViewer');
+    var placeholder = document.getElementById('wbDocPlaceholder');
+    var tb = document.getElementById('wbViewerToolbar');
+    if (viewer) {
+      viewer.innerHTML = s.docViewerHTML;
+      if (placeholder) placeholder.style.display = 'none';
+      if (tb) tb.style.display = 'flex';
+      viewer.style.display = '';
+      // Re-attach click handlers on restored blocks
+      wbReattachDocBlocks(viewer);
+      // Bind scroll → page counter
+      viewer.onscroll = wbUpdatePageCounter;
+      wbUpdatePageCounter();
+    }
+    if (fmEl) fmEl.textContent = '✅ Sessione ripristinata · visualizzazione documento disponibile · ricarica il file per analisi AI';
+  }
 }
 
 function wbPickerDelete(sessionId) {
@@ -19564,8 +19605,13 @@ function wbSaveSession(manual) {
     var el = document.getElementById('wbTool0' + n + 'Result');
     toolOutputs[n] = el ? el.innerHTML : '';
   });
+  // Save document viewer HTML (truncated to 120KB to stay within localStorage limits)
+  var docViewerEl = document.getElementById('wbDocViewer');
+  var docViewerHTML = '';
+  try { docViewerHTML = (docViewerEl ? docViewerEl.innerHTML : '').substring(0, 120000); } catch(e) {}
   sessions[idx].chat = chat;
   sessions[idx].toolOutputs = toolOutputs;
+  sessions[idx].docViewerHTML = docViewerHTML;
   sessions[idx].savedAt = new Date().toISOString();
   sessions[idx].chatCount = chat.filter(function(m){ return m.role==='user'; }).length;
   sessions[idx].toolsGenerated = [1,2,3,4,5].filter(function(n){ return (toolOutputs[n]||'').length > 10; }).length;
@@ -19620,6 +19666,56 @@ function _wbInjectClearBtns() {
     btn.style.display = 'none';
     btn.onclick = function(){ wbClearTool(n); };
     head.appendChild(btn);
+  });
+}
+
+// ── TOOLS COLLAPSE (Task 4) ─────────────────────────────────────────────────
+var _wbToolsCollapsed = false;
+function wbToggleToolsCollapse() {
+  var scroll = document.getElementById('wbToolsScroll');
+  var btn = document.getElementById('wbCollapseToolsBtn');
+  var mini = document.getElementById('wbMiniToolBar');
+  if (!scroll) return;
+  _wbToolsCollapsed = !_wbToolsCollapsed;
+  if (_wbToolsCollapsed) {
+    scroll.classList.add('wb-tools-mini');
+    if (mini) mini.style.display = 'flex';
+    if (btn) btn.textContent = '⊞';
+  } else {
+    scroll.classList.remove('wb-tools-mini');
+    if (mini) mini.style.display = 'none';
+    if (btn) btn.textContent = '⊟';
+  }
+}
+function wbExpandTool(n) {
+  // Expand all and scroll to target tool
+  if (_wbToolsCollapsed) wbToggleToolsCollapse();
+  setTimeout(function() {
+    var el = document.getElementById('wbTool0' + n);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 350);
+}
+
+function wbReattachDocBlocks(viewer) {
+  var blocks = Array.from(viewer.querySelectorAll('.doc-block'));
+  blocks.forEach(function(block) {
+    // Remove old inline handlers
+    var fresh = block.cloneNode(true);
+    block.parentNode.replaceChild(fresh, block);
+    var text = (fresh.textContent || '').trim();
+    var chk = fresh.querySelector('.doc-block-chk');
+    if (chk) {
+      chk.addEventListener('click', function(e) {
+        e.stopPropagation();
+        wbToggleBlockSelect(fresh, text, chk);
+      });
+    }
+    fresh.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var sel = window.getSelection();
+      if (sel && !sel.isCollapsed && sel.toString().trim().length > 2) return;
+      wbShowBlockTooltip(fresh, text);
+    });
   });
 }
 
