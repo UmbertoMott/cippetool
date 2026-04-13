@@ -185,6 +185,39 @@ body.theme-light .llc-root.deep-work .llc-dw-chat-host .llc-viewer-chatbar {
   background: rgba(244,240,235,0.97) !important;
   border-top-color: rgba(0,0,0,0.08) !important;
 }
+/* ── LRL sezioni sinistra/destra: testi viola → scuri ─────────── */
+body.theme-light .llc-section-title   { color: #3D2B1F !important; }
+body.theme-light .llc-section-badge   { color: #5B21B6 !important; background: rgba(91,33,182,0.08) !important; border-color: rgba(91,33,182,0.18) !important; }
+body.theme-light .llc-section-chevron { color: rgba(91,33,182,0.5) !important; }
+body.theme-light .llc-section-hdr:hover { background: rgba(91,33,182,0.05) !important; }
+body.theme-light .llc-col-hdr:hover   { background: rgba(91,33,182,0.04) !important; }
+/* Cornell notes borders */
+body.theme-light .llc-sec-cornell-inner .llc-cornell-notes,
+body.theme-light .llc-sec-cornell-inner .llc-cornell-cues-wrap,
+body.theme-light .llc-sec-cornell-inner .llc-cornell-summary-wrap { border-bottom-color: rgba(0,0,0,0.08) !important; }
+/* Tutor / Recall chat bubbles */
+body.theme-light .llc-recall-msg.ai  { background: rgba(91,33,182,0.08) !important; color: #1C1612 !important; border-color: rgba(91,33,182,0.18) !important; }
+body.theme-light .llc-recall-msg.user { background: rgba(234,88,12,0.08) !important; color: #1C1612 !important; border-color: rgba(234,88,12,0.2) !important; }
+body.theme-light .llc-recall-input   { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.10) !important; color: #1C1612 !important; }
+body.theme-light .llc-recall-input-row { background: rgba(0,0,0,0.02) !important; border-top-color: rgba(0,0,0,0.07) !important; }
+/* Feynman */
+body.theme-light .llc-feynman-prompt { color: #5B21B6 !important; background: rgba(91,33,182,0.06) !important; }
+body.theme-light .llc-feynman-area   { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.10) !important; color: #1C1612 !important; }
+body.theme-light .llc-feynman-result { background: rgba(22,101,52,0.06) !important; color: #1C1612 !important; }
+/* Flashcard */
+body.theme-light .llc-fc-gen-input   { background: rgba(0,0,0,0.04) !important; border-color: rgba(91,33,182,0.25) !important; color: #1C1612 !important; }
+body.theme-light .llc-fc-card        { background: rgba(0,0,0,0.03) !important; border-color: rgba(0,0,0,0.09) !important; color: #1C1612 !important; }
+body.theme-light .llc-fc-count       { color: rgba(91,33,182,0.55) !important; }
+/* center placeholder */
+body.theme-light .llc-placeholder-sub { color: #7A6A58 !important; }
+body.theme-light .llc-placeholder-title { color: #3D2B1F !important; }
+/* jump links */
+body.theme-light .llc-jump-link { background: rgba(91,33,182,0.10) !important; border-color: rgba(91,33,182,0.28) !important; color: #5B21B6 !important; }
+/* api badge */
+body.theme-light .llc-api-badge { background: rgba(22,101,52,0.12) !important; border-color: rgba(22,101,52,0.3) !important; color: #166534 !important; }
+/* D3 graph */
+body.theme-light .llc-graph-node text { fill: rgba(28,22,18,0.75) !important; }
+
 /* viewer (document reading area) */
 body.theme-light .llc-viewer {
   background: #F4F0EB !important;
@@ -2843,6 +2876,14 @@ body.theme-light #themeToggleBtn:hover{background:#000}
 body.theme-light #themeToggleBtnLanding{border-color:rgba(0,0,0,0.25)!important;color:#1C1612!important;}
 body.theme-light #themeToggleBtnLRL{border-color:rgba(0,0,0,0.22)!important;color:#1C1612!important;}
 body.theme-light #themeToggleBtnWB{border-color:rgba(0,0,0,0.20)!important;color:#1C1612!important;}
+/* LRL topbar pulsanti e testi in light mode */
+body.theme-light .llc-topbar-domains { color: rgba(28,22,18,0.45) !important; }
+body.theme-light .llc-btn { background: rgba(0,0,0,0.05) !important; border-color: rgba(0,0,0,0.12) !important; color: #3D2B1F !important; }
+body.theme-light .llc-btn:hover { background: rgba(91,33,182,0.08) !important; border-color: rgba(91,33,182,0.3) !important; color: #5B21B6 !important; }
+body.theme-light .llc-btn.active { background: rgba(91,33,182,0.15) !important; border-color: rgba(91,33,182,0.4) !important; color: #5B21B6 !important; }
+/* App header (dark mode): semplifica shadow pesante */
+.hdr { box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 2px 16px rgba(0,0,0,0.28) !important; }
+body.theme-light .hdr { box-shadow: 0 1px 0 rgba(0,0,0,0.06) !important; }
 
 body.theme-light #fcToggleBtn{background:#1a1a1a !important;
   box-shadow:0 3px 14px rgba(0,0,0,.25)}
@@ -4801,7 +4842,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="logo">CIPP/<span>E</span> · Training</div>
+  <div class="logo" onclick="showScreen('screenLanding')" style="cursor:pointer" title="Home">CIPP/<span>E</span> · Training</div>
   <div class="hdr-right">
     <div class="user-badge" id="userBadge" style="display:none">
       <div class="user-dot"></div>
@@ -5739,7 +5780,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <button onclick="lrlGoMode('choice')" class="llc-btn" style="flex-shrink:0;font-size:11px">&larr; Back</button>
     <div style="width:1px;height:22px;background:rgba(255,255,255,.08);margin:0 4px"></div>
     <div class="llc-topbar-brand">&#x2696;&#xFE0F; Legal Learning Lab <span class="llc-topbar-sub">V.Core</span></div>
-    <div style="font-size:10px;color:rgba(167,139,250,.3);margin-left:2px">GDPR &middot; EDPB &middot; CJEU &middot; AI Act</div>
+    <div class="llc-topbar-domains" style="font-size:10px;color:rgba(167,139,250,.3);margin-left:2px">GDPR &middot; EDPB &middot; CJEU &middot; AI Act</div>
     <div style="flex:1"></div>
     <button id="themeToggleBtnLRL" onclick="toggleTheme()" title="Cambia tema" style="
       background:none;border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.75);
