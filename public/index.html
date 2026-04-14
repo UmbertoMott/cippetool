@@ -105,7 +105,7 @@ body.theme-light #wbProgressWrap                       { background: rgba(244,24
 body.theme-light #wbPdfContainer                       { scrollbar-color: rgba(91,33,182,0.3) #F4F0EB; }
 
 /* ── WB LIGHT MODE: document viewer + zoom + chat ───────────────── */
-body.theme-light #wbDocViewer        { background: #DDD6CC !important; scrollbar-color: #8B7B6B #DDD6CC !important; }
+body.theme-light #wbDocViewer        { background: #ffffff !important; scrollbar-color: #C0B4A8 #ffffff !important; }
 body.theme-light #wbPdfContainer     { background: #ebebeb !important; }
 body.theme-light #wbDocText          { background: #ffffff !important; color: #1C1612 !important; }
 body.theme-light #wbViewerToolbar    { background: transparent !important; border: none !important; }
@@ -402,13 +402,11 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 #screenWorkbench ::-webkit-scrollbar { width: 4px; height: 4px; }
 #screenWorkbench ::-webkit-scrollbar-track { background: transparent; }
 #screenWorkbench ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
-/* doc viewer scrollbar: beige track + warm dark thumb */
+/* doc viewer scrollbar: white track + warm gray thumb */
 #wbDocViewer::-webkit-scrollbar { width: 8px; }
-#wbDocViewer::-webkit-scrollbar-track { background: #DDD6CC; }
-#wbDocViewer::-webkit-scrollbar-thumb { background: #7a6a5a; border-radius: 4px; }
-#wbDocViewer::-webkit-scrollbar-thumb:hover { background: #5A4A3A; }
-body.theme-light #wbDocViewer::-webkit-scrollbar-track { background: #DDD6CC; }
-body.theme-light #wbDocViewer::-webkit-scrollbar-thumb { background: #8B7B6B; }
+#wbDocViewer::-webkit-scrollbar-track { background: #ffffff; }
+#wbDocViewer::-webkit-scrollbar-thumb { background: #C0B4A8; border-radius: 4px; }
+#wbDocViewer::-webkit-scrollbar-thumb:hover { background: #8B7B6B; }
 
 /* header */
 #screenWorkbench .wb-header {
@@ -603,10 +601,10 @@ body.theme-light #wbDocViewer::-webkit-scrollbar-thumb { background: #8B7B6B; }
 /* ── DOC VIEWER: pagina bianca ChatPDF-style ─────────── */
 #screenWorkbench #wbDocViewer {
   flex: 1; overflow-y: auto;
-  background: #2a2219;
+  background: #ffffff;
   display: none; flex-direction: column;
-  align-items: center; padding: 28px 48px 48px;
-  scrollbar-width: thin; scrollbar-color: #7a6a5a #2a2219;
+  align-items: center; padding: 28px 32px 48px;
+  scrollbar-width: thin; scrollbar-color: #C0B4A8 #ffffff;
 }
 /* Zoom + page counter toolbar */
 #wbViewerToolbar {
@@ -709,59 +707,62 @@ body.theme-light #wbDocViewer::-webkit-scrollbar-thumb { background: #8B7B6B; }
 .wmb-btn-close{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.15); color: #888; font-size: 10px; }
 /* Pagina bianca — simula foglio Word */
 #screenWorkbench .doc-page {
-  width: 100%; max-width: 760px;
+  width: 100%; max-width: 790px;
   background: #F4F0EB; color: #1a1a1a;
-  border-radius: 4px; padding: 60px 72px;
-  box-shadow: none;
+  border-radius: 3px; padding: 72px 96px 80px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.10);
   font-family: Calibri,'Segoe UI',Arial,sans-serif;
-  font-size: 13px; line-height: 1.75;
+  font-size: 11pt; line-height: 1.5;
   margin-bottom: 0;
 }
 #screenWorkbench .doc-page h1,
 #screenWorkbench .doc-page h2,
 #screenWorkbench .doc-page h3,
 #screenWorkbench .doc-page h4 {
-  color: #0a0a0a; font-family: 'Cambria','Georgia',serif;
-  margin: 1.4em 0 0.25em; font-weight: 700; line-height: 1.25;
+  color: #1C1612; font-family: Calibri,'Segoe UI',Arial,sans-serif;
+  margin: 0.9em 0 0.2em; font-weight: 700; line-height: 1.3;
 }
-#screenWorkbench .doc-page h1 { font-size: 1.3em; text-align: center; letter-spacing:.02em; }
-#screenWorkbench .doc-page h2 { font-size: 1.15em; }
-#screenWorkbench .doc-page h3 { font-size: 1.05em; }
-#screenWorkbench .doc-page h4 { font-size: 1em; }
+#screenWorkbench .doc-page h1 { font-size: 14pt; color: #1F3864; }
+#screenWorkbench .doc-page h2 { font-size: 12pt; color: #2F5496; }
+#screenWorkbench .doc-page h3 { font-size: 11pt; }
+#screenWorkbench .doc-page h4 { font-size: 11pt; font-weight: 600; }
 #screenWorkbench .doc-page strong,
-#screenWorkbench .doc-page b { color: #0a0a0a; font-weight: 700; }
+#screenWorkbench .doc-page b { color: #1C1612; font-weight: 700; }
 #screenWorkbench .doc-page em, #screenWorkbench .doc-page i { font-style: italic; }
-#screenWorkbench .doc-page table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+#screenWorkbench .doc-page table { width: 100%; border-collapse: collapse; margin: 0.8em 0; }
 #screenWorkbench .doc-page td, #screenWorkbench .doc-page th {
-  border: 1px solid #bbb; padding: 6px 10px; font-size: 12px;
+  border: 1px solid #C0B8B0; padding: 5px 10px; font-size: 10.5pt;
 }
-#screenWorkbench .doc-page th { background: #f0f0f0; font-weight: 700; }
-#screenWorkbench .doc-page p { margin: 0 0 0.5em 0; text-align: justify; }
+#screenWorkbench .doc-page th { background: rgba(0,0,0,0.05); font-weight: 700; }
+#screenWorkbench .doc-page p { margin: 0 0 0.4em 0; text-align: justify; }
 #screenWorkbench .doc-page p:last-child { margin-bottom: 0; }
 #screenWorkbench .doc-page ul, #screenWorkbench .doc-page ol { margin: 0.2em 0 0.5em 1.4em; padding: 0; }
 #screenWorkbench .doc-page li { margin-bottom: 0.15em; }
-/* Separatore pagina con numero */
+/* Separatore pagina — simula il bordo tra pagine come in Word Print Layout */
 #screenWorkbench .doc-page-break {
-  display: flex; align-items: center; gap: 14px;
-  margin: 24px -72px; padding: 0 72px;
+  display: flex; align-items: center;
+  margin: 20px -96px;
+  height: 28px;
+  background: #e8e0d6;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
   pointer-events: none;
 }
 #screenWorkbench .doc-page-break::before,
-#screenWorkbench .doc-page-break::after {
-  content: ''; flex: 1; height: 1px; background: rgba(0,0,0,.1);
-}
+#screenWorkbench .doc-page-break::after { display: none; }
 #screenWorkbench .doc-page-num {
-  font-size: 10px; color: #5A4A3A; font-family: Calibri,Arial,sans-serif;
-  white-space: nowrap; letter-spacing:.05em; user-select:none; font-weight:600;
+  font-size: 9px; color: rgba(90,74,58,.45); font-family: Calibri,Arial,sans-serif;
+  white-space: nowrap; letter-spacing:.08em; user-select:none;
+  position: absolute; left: 50%; transform: translateX(-50%);
 }
-/* Blocchi interattivi — hover leggero sulla pagina bianca */
+/* Blocchi interattivi — layout-neutral, outline non sposta il contenuto */
 #screenWorkbench .doc-block {
-  border-radius: 3px; padding: 4px 8px; margin: 0 -8px;
-  cursor: pointer; transition: background .12s, border-color .12s;
-  border: 1.5px solid transparent; position: relative;
+  cursor: pointer; position: relative;
+  outline: 1.5px solid transparent; outline-offset: 0px;
+  border-radius: 2px; transition: background .1s, outline-color .1s;
 }
-#screenWorkbench .doc-block:hover { background: rgba(168,85,247,.07); border-color: rgba(168,85,247,.22); }
-#screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.45); }
+#screenWorkbench .doc-block:hover { background: rgba(168,85,247,.04); outline-color: rgba(168,85,247,.15); }
+#screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.09); outline-color: rgba(168,85,247,.35); }
 
 /* note badge — appare sui blocchi con risultati AI salvati */
 #screenWorkbench .wb-note-badge {
@@ -5978,13 +5979,13 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="display:flex;align-items:center;gap:7px;margin-left:auto;padding-right:2px;flex-wrap:nowrap">
             <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.65);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap">📄 Integrale</button>
             <span style="width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0"></span>
-            <span id="wbGiurisLabel" title="Giurisprudenza Cassazione" style="font-size:11px;color:rgba(251,191,36,.45);transition:color .2s;cursor:default;flex-shrink:0">⚖️</span>
+            <span id="wbGiurisLabel" title="Giurisprudenza Cassazione" style="font-size:10px;color:rgba(251,191,36,.45);transition:color .2s;cursor:default;flex-shrink:0;display:flex;align-items:center;gap:2px">⚖️<span style="font-size:8.5px;font-weight:600;letter-spacing:0.02em;white-space:nowrap">Giurisp.</span></span>
             <label title="Cerca sentenze Cassazione Sezioni Unite" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbGiurisToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnGiurisToggle(this)">
               <span id="wbGiurisTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
               <span id="wbGiurisKnob" style="position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
             </label>
-            <span id="wbDottrinaLabel" title="Dottrina giuridica accademica" style="font-size:11px;color:rgba(94,234,212,.45);transition:color .2s;cursor:default;flex-shrink:0">📚</span>
+            <span id="wbDottrinaLabel" title="Dottrina giuridica accademica" style="font-size:10px;color:rgba(94,234,212,.45);transition:color .2s;cursor:default;flex-shrink:0;display:flex;align-items:center;gap:2px">📚<span style="font-size:8.5px;font-weight:600;letter-spacing:0.02em;white-space:nowrap">Dottrina</span></span>
             <label title="Cerca dottrina giuridica accademica" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbDottrinaToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnDottrinaToggle(this)">
               <span id="wbDottrinaTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
@@ -22056,7 +22057,7 @@ function _wbSmartChunk(text) {
   });
 }
 
-// ── DOC VIEWER: blocchi interattivi ChatPDF-style ────────────────────────────
+// ── DOC VIEWER: rendering fedele al documento Word originale ─────────────────
 
 function wbRenderDocViewer(html, actualPageCount) {
   var viewer = document.getElementById('wbDocViewer');
@@ -22066,154 +22067,102 @@ function wbRenderDocViewer(html, actualPageCount) {
   viewer.style.flexDirection = 'column';
   viewer.style.alignItems = 'center';
 
-  // Parse mammoth HTML
+  // Parse mammoth HTML → preserva la struttura originale del documento Word
   var parser = new DOMParser();
   var parsed = parser.parseFromString('<body>' + html + '</body>', 'text/html');
-  var nodes = Array.from(parsed.body.childNodes).filter(function(n) {
-    return n.nodeType === 1 && (n.textContent || '').trim().length > 1;
+  var nodes  = Array.from(parsed.body.childNodes).filter(function(n) {
+    return n.nodeType === 1 && (n.textContent || '').trim().length > 0;
   });
-
-  // ── Algoritmo semantico di block-merging ──────────────────────────────────
-  // Regole (derivate dall'analisi del documento Word):
-  //  1. Heading sempre insieme al primo paragrafo che segue (mai da solo)
-  //  2. Liste (ul/ol oppure righe •/- /numerate) restano col paragrafo intro
-  //  3. "Esempio:" / "Es." / "N.B." si appendono al blocco precedente
-  //  4. Paragrafi brevi (<28 parole) si fondono col successivo o col precedente
-  //  5. Nuovo blocco parte quando: nuovo heading, oppure >=150 parole accumulate
-  //     e il nodo corrente non è una lista né un esempio
-  var MAX_WORDS = 150;
-  var groups    = [];
-  var cur       = [];
-  var curWords  = 0;
-  var afterH    = false;
-  var inList    = false;
 
   function wcOf(n) {
     return (n.textContent || '').trim().split(/\s+/).filter(Boolean).length;
   }
-  function isListNode(n) {
-    var tag = n.tagName.toLowerCase();
-    if (tag === 'ul' || tag === 'ol') return true;
-    var t = (n.textContent || '').trim();
-    return /^([•·\-\*]\s|[0-9]+[.)]\s|[a-z][.)]\s)/i.test(t);
-  }
-  function isExampleNode(n) {
-    var t = (n.textContent || '').trim();
-    return /^(esempio|es\.\s|n\.b\.|nota bene|nota:|attenzione:|si noti)/i.test(t);
-  }
-  function flush() {
-    if (cur.length > 0) {
-      groups.push(cur.slice());
-      cur = []; curWords = 0; afterH = false; inList = false;
-    }
-  }
 
-  nodes.forEach(function(node) {
-    var tag  = node.tagName.toLowerCase();
-    var isH  = /^h[1-6]$/.test(tag);
-    var wc   = wcOf(node);
-    var isList = isListNode(node);
-    var isEx   = isExampleNode(node);
+  // ── Ogni nodo top-level = un blocco interattivo separato (1:1 con Word) ──
+  // Per l'AI: se il blocco è troppo corto (<40 parole), la funzione di analisi
+  // raccoglierà automaticamente i blocchi adiacenti dal DOM per avere contesto.
+  var blocks = nodes.map(function(n) {
+    return { node: n, words: wcOf(n), text: (n.textContent || '').trim() };
+  }).filter(function(b) { return b.text.length > 0; });
 
-    if (isH) {
-      flush();
-      cur.push(node); curWords = wc;
-      afterH = true;
-    } else if (isEx) {
-      cur.push(node); curWords += wc;
-    } else if (afterH) {
-      cur.push(node); curWords += wc;
-      afterH = false;
-      inList = isList;
-      if (!isList && curWords >= MAX_WORDS) flush();
-    } else if (isList) {
-      cur.push(node); curWords += wc;
-      inList = true;
-    } else if (inList) {
-      flush();
-      cur.push(node); curWords = wc;
-      inList = false;
-      if (curWords >= MAX_WORDS) flush();
-    } else if (wc < 28 && cur.length > 0) {
-      cur.push(node); curWords += wc;
-    } else {
-      cur.push(node); curWords += wc;
-      if (curWords >= MAX_WORDS) flush();
-    }
-  });
-  flush();
+  // ── Calcola quante parole per pagina per i separatori ────────────────────
+  var _totalDocWords = blocks.reduce(function(s, b) { return s + b.words; }, 0);
+  var WORDS_PER_PAGE = (actualPageCount && actualPageCount > 1 && _totalDocWords > 0)
+    ? Math.max(180, Math.min(900, Math.round(_totalDocWords / actualPageCount)))
+    : 450;
 
-  // ── Crea pagina bianca + blocchi + numeri di pagina ──────────────────────
+  // ── Crea la pagina (un singolo div, scroll continuo come Word Web Layout) ─
   var page = document.createElement('div');
   page.className = 'doc-page';
+  viewer.appendChild(page);
 
-  // Calibra WORDS_PER_PAGE sul numero reale di pagine del documento originale.
-  // Se actualPageCount è noto: WORDS_PER_PAGE = totalWords / pageCount (con floor 200 / cap 800).
-  // Altrimenti fallback a 450 (Calibri 11pt A4 standard — più accurato di 320).
-  var _totalDocWords = groups.reduce(function(s, g) {
-    return s + g.reduce(function(gs, n) { return gs + (n.textContent || '').trim().split(/\s+/).filter(Boolean).length; }, 0);
-  }, 0);
-  var WORDS_PER_PAGE;
-  if (actualPageCount && actualPageCount > 1 && _totalDocWords > 0) {
-    WORDS_PER_PAGE = Math.max(200, Math.min(800, Math.round(_totalDocWords / actualPageCount)));
-  } else {
-    WORDS_PER_PAGE = 450;
-  }
-  var pageWordCount  = 0;
-  var pageNum        = 1;
+  var pageWordCount = 0;
+  var pageNum       = 1;
 
-  function maybeInsertPageBreak(wordsInBlock) {
-    pageWordCount += wordsInBlock;
-    if (pageWordCount >= WORDS_PER_PAGE) {
+  function maybeInsertPageBreak(wc) {
+    pageWordCount += wc;
+    if (pageWordCount >= WORDS_PER_PAGE && pageNum < (actualPageCount || 9999)) {
       pageNum++;
       pageWordCount = pageWordCount % WORDS_PER_PAGE;
       var pb = document.createElement('div');
       pb.className = 'doc-page-break';
       var pn = document.createElement('span');
       pn.className = 'doc-page-num';
-      pn.textContent = '— ' + pageNum + ' —';
+      pn.textContent = 'pag. ' + pageNum;
       pb.appendChild(pn);
       page.appendChild(pb);
     }
   }
 
-  // ── Rendering asincrono a chunk (evita freeze su documenti grandi) ───────
-  function makeBlock(group) {
-    var totalText = group.map(function(n) { return (n.textContent || '').trim(); }).join('\n').trim();
-    if (totalText.length < 5) return null;
-    var blockWords = group.reduce(function(s, n) { return s + wcOf(n); }, 0);
-    maybeInsertPageBreak(blockWords);
+  // ── Crea un blocco interattivo per ogni nodo, preservando l'HTML originale ─
+  function makeBlock(b, idx) {
+    if (!b.text) return null;
+    maybeInsertPageBreak(b.words);
     var block = document.createElement('div');
     block.className = 'doc-block';
-    block.innerHTML = group.map(function(n) { return n.outerHTML; }).join('');
+    block.appendChild(b.node.cloneNode(true)); // preserva HTML/CSS del nodo originale
+
+    // Per l'AI: raccogli testo del blocco + contesto adiacente (window 200 parole)
+    function getAiText() {
+      var collected = b.text;
+      var extra = 0;
+      // aggiungi blocchi precedenti finché non supero 200 parole totali
+      for (var i = idx - 1; i >= 0 && extra < 200; i--) {
+        collected = blocks[i].text + '\n' + collected;
+        extra += blocks[i].words;
+      }
+      // aggiungi blocchi successivi
+      for (var j = idx + 1; j < blocks.length && extra < 200; j++) {
+        collected = collected + '\n' + blocks[j].text;
+        extra += blocks[j].words;
+      }
+      return collected;
+    }
+
     var chk = document.createElement('div');
     chk.className = 'doc-block-chk';
     chk.innerHTML = '✓';
     chk.title = 'Seleziona blocco (max 3)';
-    (function(b, t, c) {
+    (function(bl, t, c, aiT) {
       c.addEventListener('click', function(e) {
         e.stopPropagation();
-        wbToggleBlockSelect(b, t, c);
+        wbToggleBlockSelect(bl, t, c);
       });
-      b.addEventListener('click', function(e) {
+      bl.addEventListener('click', function(e) {
         e.stopPropagation();
-        // Non mostrare tooltip blocco se l'utente sta selezionando del testo
         var sel = window.getSelection();
         if (sel && !sel.isCollapsed && sel.toString().trim().length > 2) return;
-        wbShowBlockTooltip(b, t);
+        wbShowBlockTooltip(bl, aiT);
       });
-    })(block, totalText, chk);
+    })(block, b.text, chk, getAiText());
     block.appendChild(chk);
-    wbNoteAddBadge(block, totalText);
+    wbNoteAddBadge(block, b.text);
     return block;
   }
 
-  viewer.appendChild(page);
-
   function wbPostRender() {
     viewer.onscroll = wbUpdatePageCounter;
-    var docPage = page;
-    docPage.addEventListener('mouseup', wbDocPageMouseUp);
+    page.addEventListener('mouseup', wbDocPageMouseUp);
     document.addEventListener('mousedown', function(ev) {
       var bar = document.getElementById('wbTextSelBar');
       if (bar && bar.classList.contains('tsb-visible') && !bar.contains(ev.target)) {
@@ -22233,15 +22182,16 @@ function wbRenderDocViewer(html, actualPageCount) {
     if (sub) sub.textContent = 'Clicca un blocco per analizzarlo';
   }
 
-  var CHUNK = 30;
-  var gi    = 0;
+  // Rendering asincrono a chunk per evitare freeze su documenti grandi
+  var CHUNK = 40;
+  var bi = 0;
   function renderChunk() {
-    var end = Math.min(gi + CHUNK, groups.length);
-    for (; gi < end; gi++) {
-      var bl = makeBlock(groups[gi]);
+    var end = Math.min(bi + CHUNK, blocks.length);
+    for (; bi < end; bi++) {
+      var bl = makeBlock(blocks[bi], bi);
       if (bl) page.appendChild(bl);
     }
-    if (gi < groups.length) {
+    if (bi < blocks.length) {
       requestAnimationFrame(renderChunk);
     } else {
       wbPostRender();
