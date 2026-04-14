@@ -151,6 +151,12 @@ body.theme-light #screenWorkbench .doc-page    { color: #1C1612 !important; }
 body.theme-light #screenWorkbench .wb-audio-btn { color:#5A4A3A;background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12); }
 #wbFullDocBtn.wbfd-active { color:#818cf8 !important;border-color:rgba(129,140,248,.55) !important;background:rgba(129,140,248,.15) !important; }
 body.theme-light #wbFullDocBtn.wbfd-active { color:#5B21B6 !important;border-color:rgba(91,33,182,.4) !important;background:rgba(91,33,182,.1) !important; }
+/* legal toggle row light mode */
+body.theme-light #wbLegalTogglesRow { border-bottom-color:rgba(0,0,0,.06) !important; }
+body.theme-light #wbGiurisLabel  { color:rgba(180,120,0,.55) !important; }
+body.theme-light #wbDottrinaLabel { color:rgba(0,130,110,.55) !important; }
+body.theme-light #wbGiurisTrack, body.theme-light #wbDottrinaTrack { background:rgba(0,0,0,.1) !important; }
+body.theme-light #wbGiurisKnob,  body.theme-light #wbDottrinaKnob  { background:#999 !important; }
 
 /* ── WB LIGHT MODE: tool output cards ───────────────────────────── */
 /* output container */
@@ -5964,6 +5970,28 @@ document.addEventListener('DOMContentLoaded', function() {
               <input type="checkbox" id="wbWebSearchToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnWebSearchToggle(this)">
               <span id="wbWebSearchTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:20px;transition:background .25s"></span>
               <span id="wbWebSearchKnob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
+            </label>
+          </div>
+        </div>
+        <!-- Riga toggle Giurisprudenza + Dottrina -->
+        <div id="wbLegalTogglesRow" style="display:flex;align-items:center;gap:10px;padding:4px 12px 6px;border-bottom:1px solid rgba(255,255,255,.04);flex-wrap:wrap">
+          <span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.22);flex-shrink:0">Cerca anche:</span>
+          <!-- Giurisprudenza -->
+          <div style="display:flex;align-items:center;gap:5px">
+            <span id="wbGiurisLabel" style="font-size:9.5px;font-weight:600;color:rgba(251,191,36,.4);transition:color .2s">⚖️ Giurisprudenza</span>
+            <label title="Cerca sentenze Cassazione Sezioni Unite" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
+              <input type="checkbox" id="wbGiurisToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnGiurisToggle(this)">
+              <span id="wbGiurisTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
+              <span id="wbGiurisKnob" style="position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
+            </label>
+          </div>
+          <!-- Dottrina -->
+          <div style="display:flex;align-items:center;gap:5px">
+            <span id="wbDottrinaLabel" style="font-size:9.5px;font-weight:600;color:rgba(94,234,212,.4);transition:color .2s">📚 Dottrina</span>
+            <label title="Cerca dottrina giuridica accademica" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
+              <input type="checkbox" id="wbDottrinaToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnDottrinaToggle(this)">
+              <span id="wbDottrinaTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
+              <span id="wbDottrinaKnob" style="position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
             </label>
           </div>
         </div>
@@ -21766,6 +21794,36 @@ function wbOnWebSearchToggle(cb) {
   }
 }
 
+function wbOnGiurisToggle(cb) {
+  var track = document.getElementById('wbGiurisTrack');
+  var knob  = document.getElementById('wbGiurisKnob');
+  var label = document.getElementById('wbGiurisLabel');
+  if (cb.checked) {
+    if (track) track.style.background = 'rgba(251,191,36,.6)';
+    if (knob)  { knob.style.left = '15px'; knob.style.background = '#fcd34d'; }
+    if (label) label.style.color = '#fcd34d';
+  } else {
+    if (track) track.style.background = 'rgba(255,255,255,.08)';
+    if (knob)  { knob.style.left = '1.5px'; knob.style.background = '#888'; }
+    if (label) label.style.color = 'rgba(251,191,36,.4)';
+  }
+}
+
+function wbOnDottrinaToggle(cb) {
+  var track = document.getElementById('wbDottrinaTrack');
+  var knob  = document.getElementById('wbDottrinaKnob');
+  var label = document.getElementById('wbDottrinaLabel');
+  if (cb.checked) {
+    if (track) track.style.background = 'rgba(94,234,212,.55)';
+    if (knob)  { knob.style.left = '15px'; knob.style.background = '#5eead4'; }
+    if (label) label.style.color = '#5eead4';
+  } else {
+    if (track) track.style.background = 'rgba(255,255,255,.08)';
+    if (knob)  { knob.style.left = '1.5px'; knob.style.background = '#888'; }
+    if (label) label.style.color = 'rgba(94,234,212,.4)';
+  }
+}
+
 var _wbChatFullDoc = false;
 
 function wbToggleFullDoc() {
@@ -21809,17 +21867,26 @@ async function wbChatSend(overridePrompt, opts) {
   var messagesEl = document.getElementById('wbChatMessages');
   if (!messagesEl) return;
 
-  var webSearchOn = document.getElementById('wbWebSearchToggle') && document.getElementById('wbWebSearchToggle').checked;
-  var fullDocMode = _wbChatFullDoc || !!opts.fullDoc;
+  var webSearchOn  = document.getElementById('wbWebSearchToggle')  && document.getElementById('wbWebSearchToggle').checked;
+  var giurisOn     = document.getElementById('wbGiurisToggle')     && document.getElementById('wbGiurisToggle').checked;
+  var dottrinaOn   = document.getElementById('wbDottrinaToggle')   && document.getElementById('wbDottrinaToggle').checked;
+  var anyLegalSearch = giurisOn || dottrinaOn;
+  var fullDocMode  = _wbChatFullDoc || !!opts.fullDoc;
 
   var userBubble = document.createElement('div');
   userBubble.className = 'wb-chat-bubble-user';
-  userBubble.textContent = (webSearchOn ? '🔍 ' : '') + (fullDocMode ? '📄 ' : '') + msg;
+  var prefixIcons = (webSearchOn ? '🔍 ' : '') + (fullDocMode ? '📄 ' : '') + (giurisOn ? '⚖️ ' : '') + (dottrinaOn ? '📚 ' : '');
+  userBubble.textContent = prefixIcons + msg;
   messagesEl.appendChild(userBubble);
 
   var aiBubble = document.createElement('div');
   aiBubble.className = 'wb-chat-bubble-ai';
-  aiBubble.innerHTML = '<span style="opacity:.5">' + (webSearchOn ? '🔍 Ricerca web…' : fullDocMode ? '📄 Documento integrale…' : '⟳ Elaborazione…') + '</span>';
+  var loadingLabel = giurisOn && dottrinaOn ? '⚖️📚 Ricerca giurisprudenza e dottrina…'
+    : giurisOn ? '⚖️ Ricerca sentenze Cassazione…'
+    : dottrinaOn ? '📚 Ricerca dottrina giuridica…'
+    : webSearchOn ? '🔍 Ricerca web…'
+    : fullDocMode ? '📄 Documento integrale…' : '⟳ Elaborazione…';
+  aiBubble.innerHTML = '<span style="opacity:.5">' + loadingLabel + '</span>';
   messagesEl.appendChild(aiBubble);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
@@ -21842,11 +21909,19 @@ async function wbChatSend(overridePrompt, opts) {
         '\n\nRispondi in italiano in modo articolato e professionale.';
     }
 
+    // Aggiunge istruzioni ricerca legale al fondo del contextMsg
+    if (giurisOn) {
+      contextMsg += '\n\n━━━ RICERCA GIURISPRUDENZA ━━━\nCerca sentenze rilevanti della Corte di Cassazione, preferibilmente Sezioni Unite, in risposta alla domanda. Fonti preferite (in ordine): cortedicassazione.it, altalex.com, diritto.it. Per ogni sentenza trovata indica: numero, sezione, anno e massima principale in 1-2 righe. Sezione titolata **⚖️ Giurisprudenza**.';
+    }
+    if (dottrinaOn) {
+      contextMsg += '\n\n━━━ RICERCA DOTTRINA ━━━\nCerca articoli di dottrina giuridica accademica autorevole in risposta alla domanda. Fonti preferite (in ordine): sistemapenale.it, questionegiustizia.it, judicium.it, federalismi.it, garanteprivacy.it, altalex.com. Per ogni fonte indica: autore, titolo, rivista/sito e anno. Sezione titolata **📚 Dottrina**.';
+    }
+
     var reqBody = {
       contents: [{ role: 'user', parts: [{ text: contextMsg }] }],
       generationConfig: { temperature: 0.5, maxOutputTokens: 4096 }
     };
-    if (webSearchOn) reqBody.tools = [{ googleSearch: {} }];
+    if (webSearchOn || anyLegalSearch) reqBody.tools = [{ googleSearch: {} }];
 
     var ctrl = new AbortController();
     var tid = setTimeout(function() { ctrl.abort(); }, 90000);
