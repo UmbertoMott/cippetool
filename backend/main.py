@@ -1277,7 +1277,10 @@ async def confirm_upload(req: UploadConfirmBody, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-LOCAL_UPLOADS_DIR = os.path.join(os.path.dirname(__file__), "local_uploads")
+LOCAL_UPLOADS_DIR = os.getenv(
+    "LOCAL_UPLOADS_DIR",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "local_uploads")
+)
 os.makedirs(LOCAL_UPLOADS_DIR, exist_ok=True)
 
 @app.post("/api/upload/direct")
