@@ -814,7 +814,9 @@ body.theme-light #wbCollapseToolsBtn { background: rgba(91,33,182,.07) !importan
 /* Animated collapse of tool cards */
 .wb-tool { transition: max-height 0.32s ease, opacity 0.22s ease, margin-bottom 0.28s ease, padding 0.28s ease; overflow: hidden; }
 .wb-tools-mini .wb-tool.wb-collapsible { max-height: 0 !important; opacity: 0 !important; margin-bottom: 0 !important; pointer-events: none; }
-.wb-tools-mini #wbTool06 { flex: 1; display: flex; flex-direction: column; }
+.wb-tools-mini #wbTool06 { flex: 1 !important; flex-shrink: 1 !important; min-height: 0; display: flex; flex-direction: column; }
+.wb-tools-mini #wbChatMessages { flex: 1 !important; max-height: none !important; min-height: 0; overflow-y: auto; }
+.wb-tools-mini#wbToolsScroll { overflow-y: hidden !important; }
 
 /* context strip */
 #screenWorkbench .wb-ctx-strip {
@@ -19561,7 +19563,9 @@ function wbPickerOpen(sessionId) {
       viewer.innerHTML = s.docViewerHTML;
       if (placeholder) placeholder.style.display = 'none';
       if (tb) tb.style.display = 'flex';
-      viewer.style.display = '';
+      viewer.style.display = 'flex';
+      viewer.style.flexDirection = 'column';
+      viewer.style.alignItems = 'center';
       // Re-attach click handlers on restored blocks
       wbReattachDocBlocks(viewer);
       // Bind scroll → page counter
