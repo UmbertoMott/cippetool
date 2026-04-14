@@ -19545,7 +19545,7 @@ function wbPickerRender() {
     return '<div class="wbp-card">'
       + '<div class="wbp-card-icon">' + icon + '</div>'
       + '<div class="wbp-card-body">'
-      + '<div class="wbp-card-name">' + (s.docName||'Sessione senza documento') + '</div>'
+      + '<div class="wbp-card-name">' + (s.docName||'Sessione senza documento').replace(/^\d+\)\s*/,'') + '</div>'
       + '<div class="wbp-card-meta">' + date + ' ' + (chatBadge||'') + ' ' + (toolsBadge||'') + '</div>'
       + '</div>'
       + '<div class="wbp-card-actions">'
@@ -19693,6 +19693,19 @@ function wbResetState() {
   if (emptyEl) emptyEl.style.display = '';
   var clearChatBtn = document.getElementById('wbChatClearBtn');
   if (clearChatBtn) clearChatBtn.style.display = 'none';
+  // Pulisci blocchi selezionati e stato attivo
+  _wbSelectedBlocks = [];
+  _wbActiveBlock = null;
+  _wbActiveBlockText = '';
+  _wbActiveSelection = '';
+  try { wbRenderPinUI(); } catch(e) {}
+  // Pulisci doc viewer (potrebbe essere popolato da sessione precedente)
+  var viewer = document.getElementById('wbDocViewer');
+  if (viewer) { viewer.style.display = ''; viewer.innerHTML = ''; }
+  var placeholder = document.getElementById('wbDocPlaceholder');
+  if (placeholder) placeholder.style.display = 'flex';
+  var tb = document.getElementById('wbViewerToolbar');
+  if (tb) tb.style.display = 'none';
   try { wbResetUpload(); } catch(e){}
 }
 
@@ -22439,31 +22452,46 @@ function wbHideTextSelBar() {
   _wbSelRange = null;
 }
 
-function wbApplySelFormat(type, colorVal) {
-  // Ripristina la range salvata
-  var sel = window.getSelection();
-  if (_wbSelRange) {
-    sel.removeAllRanges();
-    sel.addRange(_wbSelRange);
+// Restituisce tutti i text-node che rientrano nel range (per highlight multi-riga)
+function _wbRangeTextNodes(range) {
+  var root = range.commonAncestorContainer;
+  if (root.nodeType === 3) return [root];
+  var nodes = [];
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  var node;
+  while ((node = walker.nextNode())) {
+    if (range.intersectsNode(node)) nodes.push(node);
   }
+  return nodes;
+}
+
+function wbApplySelFormat(type, colorVal) {
+  var sel = window.getSelection();
+  if (_wbSelRange) { sel.removeAllRanges(); sel.addRange(_wbSelRange); }
   if (!sel || sel.isCollapsed) { wbHideTextSelBar(); return; }
 
   var range = sel.getRangeAt(0);
-  var span  = document.createElement('span');
 
   if (type === 'highlight') {
-    span.style.cssText = 'background:' + colorVal + ';border-radius:2px;padding:0 1px';
-  } else if (type === 'bold')      { span.style.fontWeight     = '700'; }
-  else if (type === 'italic')      { span.style.fontStyle      = 'italic'; }
-  else if (type === 'underline')   { span.style.textDecoration = 'underline'; }
-
-  try {
-    range.surroundContents(span);
-  } catch(e) {
-    // Selezione cross-node: usa extractContents
-    var frag = range.extractContents();
-    span.appendChild(frag);
-    range.insertNode(span);
+    // Wrap ogni text-node singolarmente: evita artefatti su selezioni cross-elemento
+    var nodes = _wbRangeTextNodes(range);
+    nodes.forEach(function(tn) {
+      var r = document.createRange();
+      r.selectNode(tn);
+      if (tn === range.startContainer) r.setStart(tn, range.startOffset);
+      if (tn === range.endContainer)   r.setEnd(tn,   range.endOffset);
+      if (r.collapsed) return;
+      var sp = document.createElement('span');
+      sp.style.cssText = 'background:' + colorVal + ';border-radius:2px;padding:0 1px';
+      r.surroundContents(sp);
+    });
+  } else {
+    var span = document.createElement('span');
+    if (type === 'bold')      span.style.fontWeight     = '700';
+    else if (type === 'italic')    span.style.fontStyle      = 'italic';
+    else if (type === 'underline') span.style.textDecoration = 'underline';
+    try { range.surroundContents(span); }
+    catch(e) { var frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); }
   }
 
   sel.removeAllRanges();
