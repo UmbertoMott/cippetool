@@ -731,6 +731,19 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 #screenWorkbench .doc-block:hover { background: rgba(168,85,247,.07); border-color: rgba(168,85,247,.22); }
 #screenWorkbench .doc-block.db-active { background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.45); }
 
+/* note badge — appare sui blocchi con risultati AI salvati */
+#screenWorkbench .wb-note-badge {
+  position: absolute; top: 50%; right: 4px; transform: translateY(-50%);
+  font-size: 7.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #b37ff5; background: rgba(168,85,247,0.13); border: 1px solid rgba(168,85,247,0.28);
+  border-radius: 3px; padding: 1px 5px; cursor: pointer; user-select: none;
+  opacity: 0; transition: opacity 0.15s, background 0.15s; z-index: 5; line-height: 1.5;
+}
+#screenWorkbench .doc-block:hover .wb-note-badge { opacity: 1; }
+#screenWorkbench .doc-block.db-active .wb-note-badge { opacity: 1; }
+#screenWorkbench .wb-note-badge:hover { background: rgba(168,85,247,0.28) !important; }
+body.theme-light #screenWorkbench .wb-note-badge { color: #5B21B6 !important; background: rgba(91,33,182,0.08) !important; border-color: rgba(91,33,182,0.3) !important; }
+
 /* ── Text Selection Mini-Toolbar (Word-style) ──────────────── */
 #wbTextSelBar {
   position: fixed; z-index: 10002; display: none;
@@ -19741,6 +19754,99 @@ function wbExpandTool(n) {
   }, 350);
 }
 
+// ── Block Notes System ────────────────────────────────────────────
+var _WB_NOTES_KEY = 'wb_block_notes_v1';
+var _wbBlockNotes = null;
+
+function wbBlockHash(text) {
+  var s = (text || '').substring(0, 120);
+  var h = 5381;
+  for (var i = 0; i < s.length; i++) { h = ((h << 5) + h) + s.charCodeAt(i); h |= 0; }
+  return 'n' + Math.abs(h).toString(36);
+}
+
+function wbNotesLoad() {
+  if (_wbBlockNotes !== null) return _wbBlockNotes;
+  try { _wbBlockNotes = JSON.parse(localStorage.getItem(_WB_NOTES_KEY) || '{}'); }
+  catch(e) { _wbBlockNotes = {}; }
+  return _wbBlockNotes;
+}
+
+function wbNotesPersist() {
+  try {
+    var str = JSON.stringify(_wbBlockNotes);
+    if (str.length < 500000) localStorage.setItem(_WB_NOTES_KEY, str);
+  } catch(e) {}
+}
+
+// Chiamata dopo ogni render tool — salva innerHTML per ogni blocco pinnato
+function wbNoteAutoSave(toolNum, resultEl) {
+  if (!resultEl || !resultEl.innerHTML || _wbSelectedBlocks.length === 0) return;
+  var html = resultEl.innerHTML;
+  if (html.length < 10) return;
+  var notes = wbNotesLoad();
+  _wbSelectedBlocks.forEach(function(b) {
+    var hash = wbBlockHash(b.text);
+    if (!notes[hash]) notes[hash] = { text: b.text.substring(0, 100), results: {}, ts: Date.now() };
+    notes[hash].results['t' + toolNum] = html.substring(0, 80000);
+    notes[hash].ts = Date.now();
+    wbNoteAddBadge(b.el, b.text);
+  });
+  wbNotesPersist();
+}
+
+// Aggiunge il badge "note" al blocco se esistono risultati salvati
+function wbNoteAddBadge(blockEl, text) {
+  if (!blockEl || !text) return;
+  if (blockEl.querySelector('.wb-note-badge')) return;
+  var hash = wbBlockHash(text);
+  var notes = wbNotesLoad();
+  if (!notes[hash] || Object.keys(notes[hash].results || {}).length === 0) return;
+  var badge = document.createElement('span');
+  badge.className = 'wb-note-badge';
+  badge.title = 'Note AI salvate — clicca per ripristinare i risultati';
+  badge.textContent = 'note';
+  badge.addEventListener('click', function(e) {
+    e.stopPropagation();
+    wbNoteOpen(hash);
+  });
+  blockEl.appendChild(badge);
+}
+
+// Ripristina i risultati salvati di un blocco nei pannelli Tool 01-05
+function wbNoteOpen(hash) {
+  var notes = wbNotesLoad();
+  var entry = notes[hash];
+  if (!entry || !entry.results) return;
+  var hadAny = false;
+  [1,2,3,4,5].forEach(function(n) {
+    var html = entry.results['t' + n];
+    if (!html) return;
+    hadAny = true;
+    var resultEl  = document.getElementById('wbTool0' + n + 'Result');
+    var loadingEl = document.getElementById('wbTool0' + n + 'Loading');
+    if (!resultEl) return;
+    resultEl.innerHTML = html;
+    resultEl.style.display = 'flex'; resultEl.style.flexDirection = 'column';
+    resultEl.style.minHeight = ''; resultEl.style.maxHeight = '';
+    resultEl.style.overflowY = 'visible'; resultEl.style.borderRadius = '6px';
+    resultEl.style.marginTop = '12px'; resultEl.style.padding = '0';
+    resultEl.style.gap = '10px'; resultEl.style.boxSizing = 'border-box';
+    if (loadingEl) loadingEl.style.display = 'none';
+    var cb = document.getElementById('wbClearTool' + n + 'Btn');
+    if (cb) cb.style.display = 'flex';
+  });
+  if (hadAny) {
+    document.querySelectorAll('#screenWorkbench .wb-tool-card').forEach(function(c){ c.classList.remove('wb-locked'); });
+    var fm = document.getElementById('wbUploadFeedback');
+    if (fm) {
+      fm.textContent = '📎 Note AI ripristinate per questo blocco';
+      setTimeout(function(){ if (fm.textContent.startsWith('📎')) fm.textContent = ''; }, 3000);
+    }
+  }
+}
+// ─────────────────────────────────────────────────────────────────
+
 function wbReattachDocBlocks(viewer) {
   var blocks = Array.from(viewer.querySelectorAll('.doc-block'));
   blocks.forEach(function(block) {
@@ -19761,6 +19867,7 @@ function wbReattachDocBlocks(viewer) {
       if (sel && !sel.isCollapsed && sel.toString().trim().length > 2) return;
       wbShowBlockTooltip(fresh, text);
     });
+    wbNoteAddBadge(fresh, text);
   });
 }
 
@@ -21112,6 +21219,8 @@ async function wbRunTool(toolNum, overrideText) {
     else if (toolNum === 4) wbRenderTool04(aiText, resultEl);
     else if (toolNum === 5) wbRenderTool05(aiText, resultEl);
 
+    wbNoteAutoSave(toolNum, resultEl);
+
     // Show clear button + auto-save
     var cb = document.getElementById('wbClearTool' + toolNum + 'Btn');
     if (cb) cb.style.display = 'flex';
@@ -21925,6 +22034,7 @@ function wbRenderDocViewer(html, actualPageCount) {
       });
     })(block, totalText, chk);
     block.appendChild(chk);
+    wbNoteAddBadge(block, totalText);
     return block;
   }
 
