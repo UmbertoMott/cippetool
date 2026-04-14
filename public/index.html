@@ -138,6 +138,20 @@ body.theme-light #screenWorkbench .wb-tool-card   { background: rgba(0,0,0,0.03)
 body.theme-light #screenWorkbench .doc-block   { color: #1C1612 !important; background: #fff !important; }
 body.theme-light #screenWorkbench .doc-page    { color: #1C1612 !important; }
 
+/* ── Audio btn + Chat Integrale active ──────────────────────────── */
+#screenWorkbench .wb-audio-btn {
+  display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;
+  font-size:10px;font-weight:600;letter-spacing:.04em;color:rgba(255,255,255,.42);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;cursor:pointer;transition:all .15s;
+}
+#screenWorkbench .wb-audio-btn:hover { color:#c084fc;border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.08); }
+#screenWorkbench .wb-audio-btn.speaking { color:#4ade80;border-color:rgba(74,222,128,.4);animation:wbAudioPulse 1s infinite; }
+@keyframes wbAudioPulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+body.theme-light #screenWorkbench .wb-audio-btn { color:#5A4A3A;background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12); }
+#wbFullDocBtn.wbfd-active { color:#818cf8 !important;border-color:rgba(129,140,248,.55) !important;background:rgba(129,140,248,.15) !important; }
+body.theme-light #wbFullDocBtn.wbfd-active { color:#5B21B6 !important;border-color:rgba(91,33,182,.4) !important;background:rgba(91,33,182,.1) !important; }
+
 /* ── WB LIGHT MODE: tool output cards ───────────────────────────── */
 /* output container */
 body.theme-light #screenWorkbench .wb-out { background: #F4F0EB !important; border-top-color: rgba(0,0,0,0.07) !important; }
@@ -5944,6 +5958,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <!-- Web Search toggle -->
           <div style="display:flex;align-items:center;gap:8px;margin-left:auto;padding-right:2px">
+            <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.38);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap">📄 Integrale</button>
             <span id="wbWebSearchLabel" style="font-size:10px;color:rgba(255,255,255,.35);transition:color .2s">🔍 Web</span>
             <label title="Attiva ricerca web in tempo reale" style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbWebSearchToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnWebSearchToggle(this)">
@@ -21751,13 +21766,40 @@ function wbOnWebSearchToggle(cb) {
   }
 }
 
-async function wbChatSend(overridePrompt) {
+var _wbChatFullDoc = false;
+
+function wbToggleFullDoc() {
+  _wbChatFullDoc = !_wbChatFullDoc;
+  var btn = document.getElementById('wbFullDocBtn');
+  if (btn) btn.classList.toggle('wbfd-active', _wbChatFullDoc);
+}
+
+function wbSpeakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var clean = text.replace(/<[^>]*>/g, '').replace(/#{1,6}\s/g, '').replace(/\*\*/g, '').trim();
+  var utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = 'it-IT'; utt.rate = 0.88; utt.pitch = 0.92; utt.volume = 1;
+  var setVoice = function() {
+    var voices = window.speechSynthesis.getVoices();
+    var male = voices.find(function(v) {
+      var n = v.name.toLowerCase();
+      return v.lang.startsWith('it') && (n.includes('luca') || n.includes('cosimo') || n.includes('mario') || n.includes('male'));
+    }) || voices.find(function(v) { return v.lang.startsWith('it'); });
+    if (male) utt.voice = male;
+  };
+  if (window.speechSynthesis.getVoices().length) { setVoice(); }
+  else { window.speechSynthesis.onvoiceschanged = setVoice; }
+  window.speechSynthesis.speak(utt);
+}
+
+async function wbChatSend(overridePrompt, opts) {
+  opts = opts || {};
   var input = document.getElementById('wbChatInput');
   var msg = overridePrompt || (input ? input.value.trim() : '');
   if (!msg || !_wbDocText) return;
   if (input && !overridePrompt) input.value = '';
 
-  // Nascondi placeholder, mostra Tool 06
   var emptyEl = document.getElementById('wbChatEmpty');
   if (emptyEl) emptyEl.style.display = 'none';
   var tool06 = document.getElementById('wbTool06');
@@ -21768,23 +21810,28 @@ async function wbChatSend(overridePrompt) {
   if (!messagesEl) return;
 
   var webSearchOn = document.getElementById('wbWebSearchToggle') && document.getElementById('wbWebSearchToggle').checked;
+  var fullDocMode = _wbChatFullDoc || !!opts.fullDoc;
 
   var userBubble = document.createElement('div');
   userBubble.className = 'wb-chat-bubble-user';
-  userBubble.textContent = (webSearchOn ? '🔍 ' : '') + msg;
+  userBubble.textContent = (webSearchOn ? '🔍 ' : '') + (fullDocMode ? '📄 ' : '') + msg;
   messagesEl.appendChild(userBubble);
 
   var aiBubble = document.createElement('div');
   aiBubble.className = 'wb-chat-bubble-ai';
-  aiBubble.innerHTML = '<span style="opacity:.5">' + (webSearchOn ? '🔍 Ricerca web…' : '⟳ Elaborazione…') + '</span>';
+  aiBubble.innerHTML = '<span style="opacity:.5">' + (webSearchOn ? '🔍 Ricerca web…' : fullDocMode ? '📄 Documento integrale…' : '⟳ Elaborazione…') + '</span>';
   messagesEl.appendChild(aiBubble);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
-    var docCtx = _wbDocText.substring(0, 6000);
-    var blockCtx = _wbActiveSelection && _wbActiveSelection !== _wbDocText ? _wbActiveSelection : '';
+    var docCtx = _wbDocText.substring(0, fullDocMode ? 22000 : 6000);
+    var blockCtx = (!fullDocMode && _wbActiveSelection && _wbActiveSelection !== _wbDocText) ? _wbActiveSelection : '';
     var contextMsg;
-    if (blockCtx) {
+    if (fullDocMode) {
+      contextMsg = 'Sei un assistente legale esperto con CONOSCENZA COMPLETA di questo documento:\n\n' + docCtx +
+        '\n\n---\nDomanda: ' + msg +
+        '\n\nRispondi in italiano in modo articolato e professionale, sfruttando tutto il documento. Usa **grassetto** per i concetti chiave e ## per i titoli.';
+    } else if (blockCtx) {
       contextMsg = 'Sei un assistente di studio. Hai a disposizione questo documento:\n\n' + docCtx +
         '\n\n━━━ PASSAGGIO SELEZIONATO (focus) ━━━\n' + blockCtx +
         '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDomanda: ' + msg +
@@ -21804,10 +21851,8 @@ async function wbChatSend(overridePrompt) {
     var ctrl = new AbortController();
     var tid = setTimeout(function() { ctrl.abort(); }, 90000);
     var resp = await fetch('/api/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: ctrl.signal,
-      body: JSON.stringify(reqBody)
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      signal: ctrl.signal, body: JSON.stringify(reqBody)
     });
     clearTimeout(tid);
     if (!resp.ok) throw new Error('API ' + resp.status);
@@ -21815,12 +21860,27 @@ async function wbChatSend(overridePrompt) {
     var aiText = data.text || data.reply || data.response || '';
     aiBubble.innerHTML = '<p style="margin:0 0 8px 0">' + _wbMdToHtml(aiText || '(nessuna risposta)') + '</p>';
     aiBubble.style.color = '#e0e0e0';
+    // Pulsante audio
+    var audioBtn = document.createElement('button');
+    audioBtn.className = 'wb-audio-btn';
+    audioBtn.title = 'Ascolta la risposta (voce italiana)';
+    audioBtn.textContent = '🔊 Ascolta';
+    (function(t, btn) {
+      btn.addEventListener('click', function() {
+        btn.classList.add('speaking');
+        wbSpeakText(t);
+        window.speechSynthesis.addEventListener('end', function onEnd() {
+          btn.classList.remove('speaking');
+          window.speechSynthesis.removeEventListener('end', onEnd);
+        });
+      });
+    })(aiText, audioBtn);
+    aiBubble.appendChild(audioBtn);
   } catch(e) {
     aiBubble.textContent = '⚠️ ' + e.message;
     aiBubble.style.color = '#ff6d8d';
   }
   messagesEl.scrollTop = messagesEl.scrollHeight;
-  // Show chat clear btn + auto-save
   var ccb = document.getElementById('wbChatClearBtn');
   if (ccb) ccb.style.display = 'flex';
   _wbAutoSave();
@@ -22128,6 +22188,7 @@ function wbShowBlockTooltip(blockEl, text) {
         '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'analizza\')">Analizza</button>' +
         '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'approfondisci\')">Approfondisci</button>' +
         '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'collega\')">Collega</button>' +
+        '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'esempio\')">Indica esempio</button>' +
       '</div>' +
       '<button class="wbt-btn wbt-btn-tools" onclick="wbBlockAction(\'tools\')">&#9654; Spiega con i Tools</button>';
     document.body.appendChild(tt);
@@ -22418,6 +22479,7 @@ function _wbGetOrCreateTextSelBar() {
     { label: 'Analizza',      action: 'analizza'      },
     { label: 'Approfondisci', action: 'approfondisci' },
     { label: 'Collega',       action: 'collega'       },
+    { label: 'Indica esempio', action: 'esempio'      },
     { label: '⚙ Tools',      action: 'tools', extra: 'tsb-ai-tools' }
   ];
   aiActions.forEach(function(a) {
@@ -22427,6 +22489,30 @@ function _wbGetOrCreateTextSelBar() {
     btn.addEventListener('mousedown', function(e) { e.preventDefault(); wbSelTextAction(a.action); });
     bar.appendChild(btn);
   });
+
+  // ── Separatore + → Chat ──
+  var sep3 = document.createElement('div'); sep3.className = 'tsb-sep'; bar.appendChild(sep3);
+  var chatBtn = document.createElement('button');
+  chatBtn.className = 'tsb-ai';
+  chatBtn.title = 'Porta la selezione nella chat (senza inviare)';
+  chatBtn.textContent = '→ Chat';
+  chatBtn.style.cssText = 'background:rgba(129,140,248,.18);color:#a5b4fc;border-color:rgba(129,140,248,.3)';
+  chatBtn.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    var txt = _wbSelText || '';
+    if (!txt) return;
+    var inp = document.getElementById('wbChatInput');
+    if (inp) {
+      inp.value = (inp.value ? inp.value + '\n' : '') + '📎 Testo selezionato: "' + txt.substring(0, 400) + (txt.length > 400 ? '…' : '') + '"\n';
+      inp.focus();
+      inp.setSelectionRange(inp.value.length, inp.value.length);
+    }
+    var tool06 = document.getElementById('wbTool06');
+    var scroll = document.getElementById('wbToolsScroll');
+    if (tool06 && scroll) scroll.scrollTop = tool06.offsetTop - 10;
+    wbHideTextSelBar();
+  });
+  bar.appendChild(chatBtn);
 
   document.body.appendChild(bar);
   return bar;
@@ -22504,7 +22590,8 @@ function wbSelTextAction(action) {
   var promptMap = {
     'analizza':      'Analizza in profondità questo testo selezionato dal documento.\n\nTESTO:\n"' + text + '"\n\n## Contenuto\n...\n## Concetti chiave\n...\n## Rilevanza\n...\n## Implicazioni pratiche\n...',
     'approfondisci': 'Approfondisci questo testo selezionato.\n\nTESTO:\n"' + text + '"\n\n## Espansione concettuale\n...\n## Esempi concreti\n...\n## Riferimenti normativi\n...\n## Per approfondire\n...',
-    'collega':       'Trova le connessioni di questo testo con il resto del documento.\n\nTESTO:\n"' + text + '"\n\n## Filo conduttore\n...\n## Connessioni dirette\n...\n## Schema delle relazioni\n...',
+    'collega':       'Mappa le connessioni tra questo testo e il resto del documento.\n\nTESTO:\n"' + text + '"\n\n## Filo conduttore\n...\n## Connessioni dirette\n...\n## Dipendenze logiche\n...\n## Schema delle relazioni\n...',
+    'esempio':       'Fornisci un esempio chiaro, preciso e rigoroso a livello accademico del concetto espresso in questo testo.\n\nTESTO:\n"' + text + '"\n\n## Concetto di riferimento\n...\n## Esempio concreto\n...\n## Analisi dell\'esempio\n...\n## Variante o contrario\n...',
     'tools':         'Spiega con tutti i tools disponibili il seguente testo:\n\nTESTO:\n"' + text + '"'
   };
   var prompt = promptMap[action] || promptMap['analizza'];
@@ -22516,7 +22603,7 @@ function wbSelTextAction(action) {
   var snip = document.getElementById('wbChatBlockSnippet');
   if (snip) snip.textContent = '"' + text.substring(0, 60) + (text.length > 60 ? '…' : '') + '"';
   wbHideTextSelBar();
-  setTimeout(function() { wbChatSend(prompt); }, 300);
+  setTimeout(function() { wbChatSend(prompt, action === 'collega' ? { fullDoc: true } : null); }, 300);
 }
 
 function wbDocPageMouseUp(e) {
@@ -22612,11 +22699,25 @@ function wbBlockAction(action) {
         'Cosa presuppone questo passaggio e cosa implica per i concetti successivi?',
         '## Schema delle relazioni',
         'Descrivi sinteticamente la struttura logica delle connessioni identificate.'
+      ].join('\n'),
+
+      'esempio': [
+        'Fornisci un esempio chiaro, preciso e rigoroso a livello accademico del concetto espresso in questo passaggio.',
+        '',
+        'Struttura la risposta così:',
+        '## Concetto di riferimento',
+        'Sintetizza in una frase il principio o istituto giuridico trattato.',
+        '## Esempio concreto',
+        'Descrivi un caso reale o paradigmatico — sentenza, fattispecie, situazione di fatto — che illustri esattamente questo principio.',
+        '## Analisi dell\'esempio',
+        'Spiega passo per passo come il principio si applica al caso, con rigore giuridico.',
+        '## Variante o contrario',
+        'Presenta un caso in cui il principio NON si applica o funziona diversamente, per delimitarne la portata.'
       ].join('\n')
     };
 
     var prompt = promptMap[action] || action;
-    wbChatSend(prompt);
+    wbChatSend(prompt, action === 'collega' ? { fullDoc: true } : null);
   }
 }
 
