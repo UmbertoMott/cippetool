@@ -77,7 +77,7 @@ body.theme-light #screenWorkbench .doc-block:hover {
   background: rgba(109,40,217,0.06);
 }
 body.theme-light #screenWorkbench .doc-page {
-  background: #FFFFFF;
+  background: #F4F0EB;
   color: #1C1612;
 }
 /* ── Workbench: tutte le barre/sfondi hardcoded → beige/white ─── */
@@ -105,7 +105,7 @@ body.theme-light #wbProgressWrap                       { background: rgba(244,24
 body.theme-light #wbPdfContainer                       { scrollbar-color: rgba(91,33,182,0.3) #F4F0EB; }
 
 /* ── WB LIGHT MODE: document viewer + zoom + chat ───────────────── */
-body.theme-light #wbDocViewer        { background: #ffffff !important; }
+body.theme-light #wbDocViewer        { background: #DDD6CC !important; scrollbar-color: #8B7B6B #DDD6CC !important; }
 body.theme-light #wbPdfContainer     { background: #ebebeb !important; }
 body.theme-light #wbDocText          { background: #ffffff !important; color: #1C1612 !important; }
 body.theme-light #wbViewerToolbar    { background: transparent !important; border: none !important; }
@@ -402,6 +402,13 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 #screenWorkbench ::-webkit-scrollbar { width: 4px; height: 4px; }
 #screenWorkbench ::-webkit-scrollbar-track { background: transparent; }
 #screenWorkbench ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+/* doc viewer scrollbar: beige track + warm dark thumb */
+#wbDocViewer::-webkit-scrollbar { width: 8px; }
+#wbDocViewer::-webkit-scrollbar-track { background: #DDD6CC; }
+#wbDocViewer::-webkit-scrollbar-thumb { background: #7a6a5a; border-radius: 4px; }
+#wbDocViewer::-webkit-scrollbar-thumb:hover { background: #5A4A3A; }
+body.theme-light #wbDocViewer::-webkit-scrollbar-track { background: #DDD6CC; }
+body.theme-light #wbDocViewer::-webkit-scrollbar-thumb { background: #8B7B6B; }
 
 /* header */
 #screenWorkbench .wb-header {
@@ -596,10 +603,10 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 /* ── DOC VIEWER: pagina bianca ChatPDF-style ─────────── */
 #screenWorkbench #wbDocViewer {
   flex: 1; overflow-y: auto;
-  background: #1c1c1e;
+  background: #2a2219;
   display: none; flex-direction: column;
   align-items: center; padding: 28px 48px 48px;
-  scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.3) #1c1c1e;
+  scrollbar-width: thin; scrollbar-color: #7a6a5a #2a2219;
 }
 /* Zoom + page counter toolbar */
 #wbViewerToolbar {
@@ -703,7 +710,7 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 /* Pagina bianca — simula foglio Word */
 #screenWorkbench .doc-page {
   width: 100%; max-width: 760px;
-  background: #ffffff; color: #1a1a1a;
+  background: #F4F0EB; color: #1a1a1a;
   border-radius: 4px; padding: 60px 72px;
   box-shadow: none;
   font-family: Calibri,'Segoe UI',Arial,sans-serif;
@@ -20871,8 +20878,22 @@ function _wbExtractDocxPageCount(arrayBuffer) {
   try {
     var decoder = new TextDecoder('latin1'); // latin1 = mapping 1:1 byte→char, binary-safe
     var str = decoder.decode(new Uint8Array(arrayBuffer));
-    var m = str.match(/<Pages>(\d+)<\/Pages>/);
-    return m ? parseInt(m[1], 10) : null;
+    var mPages = str.match(/<Pages>(\d+)<\/Pages>/);
+    var mLines = str.match(/<Lines>(\d+)<\/Lines>/);
+    var mWords = str.match(/<Words>(\d+)<\/Words>/);
+    var pages = mPages ? parseInt(mPages[1], 10) : null;
+    var lines = mLines ? parseInt(mLines[1], 10) : null;
+    var words = mWords ? parseInt(mWords[1], 10) : null;
+    // Sanity-check pages: if it's ≤ 2 but we have many lines/words, metadata is stale
+    if (pages && pages > 2) {
+      // If words-per-page would exceed 700 (clearly wrong), ignore pages
+      if (!words || words / pages <= 700) return pages;
+    }
+    // Use lines ÷ 46 (≈ A4 legal doc: ~46 lines per page)
+    if (lines && lines > 20) return Math.max(1, Math.round(lines / 46));
+    // Use words ÷ 450 (A4 legal doc: ~450 words per page)
+    if (words && words > 100) return Math.max(1, Math.round(words / 450));
+    return null;
   } catch(e) { return null; }
 }
 
@@ -21080,11 +21101,11 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
     placeholder.style.display = 'none';
     container.style.display   = 'none';
     docTextEl.style.display   = 'none';
-    // Conta pagine: prova prima dal metadata ZIP, poi stima da parole (250 parole/pag A4 standard denso)
+    // Conta pagine: prova prima dal metadata ZIP (Pages/Lines/Words), poi stima da parole
     var docxPageCount = _wbExtractDocxPageCount(arrayBuffer);
     if (!docxPageCount || docxPageCount < 1) {
       var wordCount = text.split(/\s+/).filter(Boolean).length;
-      docxPageCount = Math.max(1, Math.round(wordCount / 250));
+      docxPageCount = Math.max(1, Math.round(wordCount / 420)); // ~420 parole/pag A4 legale
     }
     wbRenderDocViewer(mmHtml, docxPageCount);
     _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri · ~' + docxPageCount + ' pag.');
