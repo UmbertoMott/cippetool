@@ -108,7 +108,7 @@ body.theme-light #wbPdfContainer                       { scrollbar-color: rgba(9
 body.theme-light #wbDocViewer        { background: #ffffff !important; }
 body.theme-light #wbPdfContainer     { background: #ebebeb !important; }
 body.theme-light #wbDocText          { background: #ffffff !important; color: #1C1612 !important; }
-body.theme-light #wbViewerToolbar    { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.12) !important; }
+body.theme-light #wbViewerToolbar    { background: transparent !important; border: none !important; }
 body.theme-light .wb-zoom-btn        { background: rgba(91,33,182,0.08) !important; border-color: rgba(91,33,182,0.25) !important; color: #5B21B6 !important; }
 body.theme-light .wb-zoom-btn:hover  { background: rgba(91,33,182,0.18) !important; }
 body.theme-light #wbZoomLevel        { color: #5A4A3A !important; }
@@ -151,10 +151,10 @@ body.theme-light #screenWorkbench .doc-page    { color: #1C1612 !important; }
 body.theme-light #screenWorkbench .wb-audio-btn { color:#5A4A3A;background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12); }
 #wbFullDocBtn.wbfd-active { color:#818cf8 !important;border-color:rgba(129,140,248,.55) !important;background:rgba(129,140,248,.15) !important; }
 body.theme-light #wbFullDocBtn.wbfd-active { color:#5B21B6 !important;border-color:rgba(91,33,182,.4) !important;background:rgba(91,33,182,.1) !important; }
-/* legal toggle row light mode */
-body.theme-light #wbLegalTogglesRow { border-bottom-color:rgba(0,0,0,.06) !important; }
-body.theme-light #wbGiurisLabel  { color:rgba(180,120,0,.55) !important; }
-body.theme-light #wbDottrinaLabel { color:rgba(0,130,110,.55) !important; }
+/* legal toggle + integrale light mode */
+body.theme-light #wbFullDocBtn { color:#3D2B1F !important; border-color:rgba(0,0,0,.22) !important; background:rgba(0,0,0,.05) !important; }
+body.theme-light #wbGiurisLabel  { color:rgba(150,100,0,.7) !important; }
+body.theme-light #wbDottrinaLabel { color:rgba(0,110,95,.7) !important; }
 body.theme-light #wbGiurisTrack, body.theme-light #wbDottrinaTrack { background:rgba(0,0,0,.1) !important; }
 body.theme-light #wbGiurisKnob,  body.theme-light #wbDottrinaKnob  { background:#999 !important; }
 
@@ -598,8 +598,7 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 /* Zoom + page counter toolbar */
 #wbViewerToolbar {
   display: none; align-items: center; gap: 10px;
-  padding: 5px 10px; background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08); border-radius: 8px;
+  padding: 5px 10px;
 }
 .wb-zoom-btn {
   width: 26px; height: 26px; border-radius: 6px;
@@ -700,7 +699,7 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
   width: 100%; max-width: 760px;
   background: #ffffff; color: #1a1a1a;
   border-radius: 4px; padding: 60px 72px;
-  box-shadow: 0 4px 40px rgba(0,0,0,.6), 0 1px 4px rgba(0,0,0,.3);
+  box-shadow: none;
   font-family: Calibri,'Segoe UI',Arial,sans-serif;
   font-size: 13px; line-height: 1.75;
   margin-bottom: 0;
@@ -736,11 +735,11 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 }
 #screenWorkbench .doc-page-break::before,
 #screenWorkbench .doc-page-break::after {
-  content: ''; flex: 1; height: 1px; background: #d0d0d0;
+  content: ''; flex: 1; height: 1px; background: rgba(0,0,0,.1);
 }
 #screenWorkbench .doc-page-num {
-  font-size: 10px; color: #aaa; font-family: Calibri,Arial,sans-serif;
-  white-space: nowrap; letter-spacing:.05em; user-select:none;
+  font-size: 10px; color: #5A4A3A; font-family: Calibri,Arial,sans-serif;
+  white-space: nowrap; letter-spacing:.05em; user-select:none; font-weight:600;
 }
 /* Blocchi interattivi — hover leggero sulla pagina bianca */
 #screenWorkbench .doc-block {
@@ -5962,36 +5961,28 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="wb-tool-n">Tool 06</div>
             <div class="wb-tool-name">Chat Contestuale</div>
           </div>
-          <!-- Web Search toggle -->
-          <div style="display:flex;align-items:center;gap:8px;margin-left:auto;padding-right:2px">
-            <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.38);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap">📄 Integrale</button>
-            <span id="wbWebSearchLabel" style="font-size:10px;color:rgba(255,255,255,.35);transition:color .2s">🔍 Web</span>
-            <label title="Attiva ricerca web in tempo reale" style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer;flex-shrink:0">
-              <input type="checkbox" id="wbWebSearchToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnWebSearchToggle(this)">
-              <span id="wbWebSearchTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:20px;transition:background .25s"></span>
-              <span id="wbWebSearchKnob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
-            </label>
-          </div>
-        </div>
-        <!-- Riga toggle Giurisprudenza + Dottrina -->
-        <div id="wbLegalTogglesRow" style="display:flex;align-items:center;gap:10px;padding:4px 12px 6px;border-bottom:1px solid rgba(255,255,255,.04);flex-wrap:wrap">
-          <span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.22);flex-shrink:0">Cerca anche:</span>
-          <!-- Giurisprudenza -->
-          <div style="display:flex;align-items:center;gap:5px">
-            <span id="wbGiurisLabel" style="font-size:9.5px;font-weight:600;color:rgba(251,191,36,.4);transition:color .2s">⚖️ Giurisprudenza</span>
+          <!-- Tutti i toggle sulla stessa riga -->
+          <div style="display:flex;align-items:center;gap:7px;margin-left:auto;padding-right:2px;flex-wrap:nowrap">
+            <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.65);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap">📄 Integrale</button>
+            <span style="width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0"></span>
+            <span id="wbGiurisLabel" title="Giurisprudenza Cassazione" style="font-size:11px;color:rgba(251,191,36,.45);transition:color .2s;cursor:default;flex-shrink:0">⚖️</span>
             <label title="Cerca sentenze Cassazione Sezioni Unite" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbGiurisToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnGiurisToggle(this)">
               <span id="wbGiurisTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
               <span id="wbGiurisKnob" style="position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
             </label>
-          </div>
-          <!-- Dottrina -->
-          <div style="display:flex;align-items:center;gap:5px">
-            <span id="wbDottrinaLabel" style="font-size:9.5px;font-weight:600;color:rgba(94,234,212,.4);transition:color .2s">📚 Dottrina</span>
+            <span id="wbDottrinaLabel" title="Dottrina giuridica accademica" style="font-size:11px;color:rgba(94,234,212,.45);transition:color .2s;cursor:default;flex-shrink:0">📚</span>
             <label title="Cerca dottrina giuridica accademica" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbDottrinaToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnDottrinaToggle(this)">
               <span id="wbDottrinaTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
               <span id="wbDottrinaKnob" style="position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
+            </label>
+            <span style="width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0"></span>
+            <span id="wbWebSearchLabel" style="font-size:10px;color:rgba(255,255,255,.35);transition:color .2s">🔍 Web</span>
+            <label title="Attiva ricerca web in tempo reale" style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer;flex-shrink:0">
+              <input type="checkbox" id="wbWebSearchToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnWebSearchToggle(this)">
+              <span id="wbWebSearchTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:20px;transition:background .25s"></span>
+              <span id="wbWebSearchKnob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
             </label>
           </div>
         </div>
