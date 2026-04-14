@@ -21038,7 +21038,7 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
     // Calibra pagine viewer sulle pagine preview estratte (text copre solo PREVIEW pag)
     _docActualPageCount = PREVIEW;
     // Imposta _wbDocText subito con preview (wbAutoSegment lo legge dopo .then())
-    _wbDocText = text.substring(0, 40000);
+    _wbDocText = text.substring(0, 200000);
     _wbSetProgress(90, '✅ Anteprima pronta · ' + totalPages + ' pag totali');
     // Carica TUTTE le pagine rimanenti in background (fino a 200 pag)
     if (totalPages > PREVIEW) {
@@ -21053,7 +21053,7 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
           } catch(e) { return ''; }
         }));
         var fullText = text + '\n\n' + restParts.join('\n\n');
-        _wbDocText = fullText.substring(0, 40000);
+        _wbDocText = fullText.substring(0, 200000);
         // Aggiorna il pannello visivo con il testo completo (fino a 150K chars)
         var dtEl = document.getElementById('wbDocText');
         if (dtEl && dtEl.style.display !== 'none') {
@@ -21069,15 +21069,19 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
     var mmRes = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
     var mmHtml = mmRes.value || '';
     text = mmHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    _wbDocText = text.substring(0, 40000);
+    _wbDocText = text.substring(0, 200000);
     _wbSetProgress(90, '📄 Rendering blocchi…');
     placeholder.style.display = 'none';
     container.style.display   = 'none';
     docTextEl.style.display   = 'none';
-    // Leggi numero pagine reale dal DOCX ZIP (docProps/app.xml)
+    // Conta pagine: prova prima dal metadata ZIP, poi stima da parole (250 parole/pag A4 standard denso)
     var docxPageCount = _wbExtractDocxPageCount(arrayBuffer);
+    if (!docxPageCount || docxPageCount < 1) {
+      var wordCount = text.split(/\s+/).filter(Boolean).length;
+      docxPageCount = Math.max(1, Math.round(wordCount / 250));
+    }
     wbRenderDocViewer(mmHtml, docxPageCount);
-    _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri');
+    _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri · ~' + docxPageCount + ' pag.');
     return;
 
   } else {
@@ -21095,7 +21099,7 @@ async function wbRenderClientSide(file, arrayBuffer, ext) {
   placeholder.style.display = 'none';
   container.style.display   = 'none';
   docTextEl.style.display   = 'none';
-  if (ext !== 'pdf') _wbDocText = text.substring(0, 40000);
+  if (ext !== 'pdf') _wbDocText = text.substring(0, 200000);
   wbRenderDocViewerFromText(text.substring(0, 150000), _docActualPageCount);
   _wbSetProgress(98, '✅ ' + (text.length / 1000).toFixed(1) + 'K caratteri estratti');
 }
