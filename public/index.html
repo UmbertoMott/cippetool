@@ -517,6 +517,53 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 #screenWorkbench .wb-doc {
   min-width: 0; flex-shrink: 0; display: flex; flex-direction: column;
   border-right: 1px solid var(--wb-border); background: #000; overflow: hidden;
+  position: relative;
+}
+
+/* ── Block Map Preview ──────────────────────────────────────────────── */
+#wbBlockMap {
+  display: none; position: absolute; top: 38px; right: 0; bottom: 0;
+  width: 270px; z-index: 200;
+  background: rgba(12,12,18,.97); backdrop-filter: blur(18px);
+  border-left: 1px solid rgba(168,85,247,.35);
+  flex-direction: column; overflow: hidden;
+  box-shadow: -6px 0 24px rgba(0,0,0,.5);
+}
+#wbBlockMap.bm-open { display: flex; }
+#wbBlockMapHead {
+  padding: 9px 14px 8px; border-bottom: 1px solid rgba(168,85,247,.2);
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+#wbBlockMapHead span.bm-title {
+  font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: #d394ff; flex: 1;
+}
+#wbBlockMapHead span.bm-count {
+  font-size: 10px; color: #666; font-family: monospace;
+}
+#wbBlockMapHead button {
+  background: none; border: none; color: #555; cursor: pointer;
+  font-size: 13px; line-height: 1; padding: 2px 4px; border-radius: 4px;
+  transition: color .12s;
+}
+#wbBlockMapHead button:hover { color: #d394ff; }
+#wbBlockMapList {
+  overflow-y: auto; flex: 1;
+  scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.3) transparent;
+}
+.bm-item {
+  padding: 7px 14px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background .12s;
+}
+.bm-item:hover { background: rgba(168,85,247,.1); }
+.bm-item-num {
+  font-size: 9px; color: #a78bfa; font-weight: 700;
+  font-family: 'Space Grotesk', monospace; letter-spacing: .04em;
+}
+.bm-item-text {
+  font-size: 11px; color: rgba(255,255,255,.55); line-height: 1.45;
+  margin-top: 2px; font-family: Calibri, Arial, sans-serif;
 }
 #screenWorkbench.wb-layout-stack .wb-doc { width: 100%; height: 40vh; }
 #screenWorkbench .wb-doc-topbar {
@@ -5835,7 +5882,18 @@ document.addEventListener('DOMContentLoaded', function() {
           </span>
         </div>
         <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
+        <button class="wb-segment-btn" id="wbBlockMapBtn" onclick="wbToggleBlockMap()" style="display:none;background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.4)">☰ Blocchi</button>
       </div>
+    </div>
+
+    <!-- Block Map Preview panel -->
+    <div id="wbBlockMap">
+      <div id="wbBlockMapHead">
+        <span class="bm-title">Mappa blocchi</span>
+        <span class="bm-count" id="wbBlockMapCount"></span>
+        <button onclick="wbToggleBlockMap()" title="Chiudi">✕</button>
+      </div>
+      <div id="wbBlockMapList"></div>
     </div>
 
     <!-- Placeholder pre-upload -->
@@ -22104,11 +22162,25 @@ function wbRenderDocViewer(html, actualPageCount) {
     var tag = n.tagName.toLowerCase();
     if (tag === 'ul' || tag === 'ol') return true;
     var t = (n.textContent || '').trim();
-    return /^([•·\-\*]\s|[0-9]+[.)]\s|[a-z][.)]\s)/i.test(t);
+    return /^([•·\*]\s|[0-9]+[.)]\s)/i.test(t);
   }
   function isEmptyNode(n) {
-    // Paragrafo vuoto o solo spazi/nbsp → doppio spazio Word
     return (n.textContent || '').replace(/[\s\u00a0]/g, '').length === 0;
+  }
+  // Paragrafo che inizia un nuovo sotto-tipo/argomento nei testi legali:
+  //  — contratto di brokerage:    (trattino em/en + nome)
+  //  — contratto di sponsorizzazione: ...
+  //  <em>Nome tipo</em>: ...      (corsivo iniziale seguito da :)
+  function isBlockStarterNode(n) {
+    var t = (n.textContent || '').trim();
+    // Inizia con — o – (trattino-sezione tipico del diritto italiano)
+    if (/^[—–]\s+\S/.test(t)) return true;
+    // Primo figlio è <em> o <strong> e c'è un : entro i primi 80 caratteri
+    var first = n.firstElementChild;
+    if (first && (first.tagName === 'EM' || first.tagName === 'STRONG')) {
+      if (t.substring(0, 80).indexOf(':') !== -1) return true;
+    }
+    return false;
   }
   function flush() {
     if (cur.length > 0) {
@@ -22118,26 +22190,32 @@ function wbRenderDocViewer(html, actualPageCount) {
   }
 
   nodes.forEach(function(node) {
-    var tag    = node.tagName.toLowerCase();
-    var isH    = /^h[1-6]$/.test(tag);
-    var wc     = wcOf(node);
-    var isList = isListNode(node);
-    var isEmpty = isEmptyNode(node);
+    var tag      = node.tagName.toLowerCase();
+    var isH      = /^h[1-6]$/.test(tag);
+    var wc       = wcOf(node);
+    var isList   = isListNode(node);
+    var isEmpty  = isEmptyNode(node);
+    var isStarter = !isH && !isEmpty && !isList && isBlockStarterNode(node);
 
     if (isH) {
-      // Titolo → chiude blocco corrente, apre nuovo blocco col titolo
+      // Titolo → chiude blocco corrente, apre nuovo
       flush();
       cur.push(node); curWords = wc;
 
     } else if (isEmpty) {
-      // Riga vuota = separatore semantico Word (doppio spazio)
-      // Flush solo se abbiamo già abbastanza contenuto, altrimenti ignora
+      // Riga vuota (doppio spazio Word) → flush se contenuto sufficiente
       if (curWords >= MIN_FLUSH) flush();
 
+    } else if (isStarter && curWords >= MIN_FLUSH) {
+      // Nuovo sotto-tipo/argomento (— nome: oppure <em>nome</em>:)
+      // Flush solo se abbiamo già abbastanza nel blocco corrente
+      flush();
+      cur.push(node); curWords = wc;
+
     } else {
-      // Tutto il resto (paragrafi, liste, esempi, note) → accumula
+      // Tutto il resto accumula nel blocco corrente
       cur.push(node); curWords += wc;
-      // Rete di sicurezza: taglia solo se non siamo in mezzo a una lista
+      // Rete di sicurezza: mai superare MAX_WORDS (escluse liste)
       if (!isList && curWords >= MAX_WORDS) flush();
     }
   });
@@ -22224,6 +22302,7 @@ function wbRenderDocViewer(html, actualPageCount) {
     if (btn) btn.style.display = 'none';
     var sub = document.getElementById('wbDocSub');
     if (sub) sub.textContent = 'Clicca un blocco per analizzarlo';
+    wbBuildBlockMap();
   }
 
   var CHUNK = 30;
@@ -22255,6 +22334,43 @@ function wbRenderDocViewerFromText(text, actualPageCount) {
     return '<p>' + p + '</p>';
   }).join('');
   wbRenderDocViewer(html, actualPageCount);
+}
+
+// ── Block Map Preview ────────────────────────────────────────────────────────
+function wbToggleBlockMap() {
+  var panel = document.getElementById('wbBlockMap');
+  if (panel) panel.classList.toggle('bm-open');
+}
+
+function wbBuildBlockMap() {
+  var list  = document.getElementById('wbBlockMapList');
+  var count = document.getElementById('wbBlockMapCount');
+  var btn   = document.getElementById('wbBlockMapBtn');
+  if (!list) return;
+
+  var blocks = document.querySelectorAll('#wbDocViewer .doc-block');
+  list.innerHTML = '';
+
+  blocks.forEach(function(block, i) {
+    var raw  = (block.textContent || '').trim().replace(/\s+/g, ' ');
+    var excerpt = raw.substring(0, 85) + (raw.length > 85 ? '…' : '');
+    var item = document.createElement('div');
+    item.className = 'bm-item';
+    item.innerHTML =
+      '<div class="bm-item-num">Blocco ' + (i + 1) + '</div>' +
+      '<div class="bm-item-text">' + excerpt + '</div>';
+    (function(b) {
+      item.addEventListener('click', function() {
+        b.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        b.classList.add('db-active');
+        setTimeout(function() { b.classList.remove('db-active'); }, 1800);
+      });
+    })(block);
+    list.appendChild(item);
+  });
+
+  if (count) count.textContent = blocks.length + ' blocchi';
+  if (btn)   btn.style.display = 'inline-flex';
 }
 
 var _wbActiveBlock = null;
