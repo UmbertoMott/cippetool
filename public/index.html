@@ -23971,20 +23971,23 @@ var _prof = {
   domain:      null,
   docText:     '',
   docName:     '',
-  history:     [],   // [{role:'user'|'model', parts:[{text}]}]
-  recog:       null,
-  recognizing: false,
-  speaking:    false,
-  thinking:    false,
-  audioCtx:    null,
+  ws:          null,   // WebSocket to /ws/voice
+  audioCtx:    null,   // AudioContext for mic visualization
   analyser:    null,
   micStream:   null,
   volRaf:      null,
-  utterance:   null
+  workletNode: null,   // AudioWorkletNode for PCM capture
+  pbCtx:       null,   // AudioContext for playback (24 kHz)
+  pbNextTime:  0,      // next scheduled playback start time
+  pbPlaying:   false,  // Gemini is currently sending audio
+  wsReady:     false   // Gemini session is open (received "connected")
 };
-var _profAutoMode        = false;
-var _profVadInterrupt    = false;   // allow mic interrupt during TTS
-var _profRestartTimer    = null;
+var _profAutoMode = false;
+
+// ── WebSocket URL ─────────────────────────────────────────────────────
+var _PROF_WS_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'ws://localhost:8000/ws/voice'
+  : 'wss://cipp-legal-api.onrender.com/ws/voice';
 
 // ── Open / Close ──────────────────────────────────────────────────────
 window.profOpen = function() {
@@ -24010,7 +24013,7 @@ function _profSetState(state) {
   if (icon)  icon.textContent  = icons[state]  || '🎙️';
 }
 
-// ── Toggle conversation (single button) ──────────────────────────────
+// ── Toggle conversation ───────────────────────────────────────────────
 window.profToggleConversation = function() {
   if (_profAutoMode) { _profStopAll(); }
   else               { _profBeginConversation(); }
@@ -24018,29 +24021,45 @@ window.profToggleConversation = function() {
 
 function _profBeginConversation() {
   _profAutoMode = true;
-  var btn   = document.getElementById('profStartBtn');
-  var icon  = document.getElementById('profStartIcon');
-  var lbl   = document.getElementById('profStartLabel');
+  var btn  = document.getElementById('profStartBtn');
+  var icon = document.getElementById('profStartIcon');
+  var lbl  = document.getElementById('profStartLabel');
   if (btn)  btn.classList.add('active');
   if (icon) icon.textContent = '■';
   if (lbl)  lbl.textContent  = 'Termina';
-  _profInitMic(function() { _profListenCycle(); });
+  _profSetState('listening');
+  _profStartAudio();
 }
 
 function _profStopAll() {
-  _profAutoMode     = false;
-  _profVadInterrupt = false;
-  clearTimeout(_profRestartTimer);
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-  if (_prof.recog && _prof.recognizing) {
-    try { _prof.recog.abort(); } catch(e){}
+  _profAutoMode = false;
+  // Close WebSocket
+  if (_prof.ws) {
+    try { _prof.ws.close(); } catch(e){}
+    _prof.ws = null;
   }
-  _prof.recognizing = false;
-  _prof.speaking    = false;
-  _prof.thinking    = false;
+  _prof.wsReady = false;
+  // Stop AudioWorklet
+  if (_prof.workletNode) {
+    try { _prof.workletNode.disconnect(); } catch(e){}
+    _prof.workletNode = null;
+  }
+  // Stop viz RAF
   if (_prof.volRaf) { cancelAnimationFrame(_prof.volRaf); _prof.volRaf = null; }
-  if (_prof.micStream) { _prof.micStream.getTracks().forEach(function(t){t.stop();}); _prof.micStream = null; }
-  if (_prof.audioCtx)  { try{_prof.audioCtx.close();}catch(e){} _prof.audioCtx = null; _prof.analyser = null; }
+  // Stop mic stream
+  if (_prof.micStream) {
+    _prof.micStream.getTracks().forEach(function(t){ t.stop(); });
+    _prof.micStream = null;
+  }
+  // Close mic AudioContext
+  if (_prof.audioCtx) {
+    try { _prof.audioCtx.close(); } catch(e){}
+    _prof.audioCtx = null;
+    _prof.analyser = null;
+  }
+  // Stop playback
+  _profStopPlayback();
+  // Reset UI
   var fill = document.getElementById('profVolFill');
   if (fill) fill.style.width = '0%';
   var core = document.getElementById('profOrbCore');
@@ -24054,10 +24073,13 @@ function _profStopAll() {
   _profSetState('idle');
 }
 
-// ── Microphone init (single stream, reused throughout) ────────────────
-function _profInitMic(cb) {
-  if (_prof.analyser) { if (cb) cb(); return; } // already open
-  if (!navigator.mediaDevices) { if (cb) cb(); return; }
+// ── Audio pipeline init ───────────────────────────────────────────────
+function _profStartAudio() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    _profAddBubble('ai', '⚠️ Microfono non supportato in questo browser (usa Chrome/Edge).');
+    _profStopAll();
+    return;
+  }
   navigator.mediaDevices.getUserMedia({
     audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     video: false
@@ -24066,17 +24088,212 @@ function _profInitMic(cb) {
     _prof.audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
     _prof.analyser  = _prof.audioCtx.createAnalyser();
     _prof.analyser.fftSize = 256;
-    var src = _prof.audioCtx.createMediaStreamSource(stream);
-    src.connect(_prof.analyser);
+    var vizSrc = _prof.audioCtx.createMediaStreamSource(stream);
+    vizSrc.connect(_prof.analyser);
     _profVolLoop();
-    if (cb) cb();
+    _profConnectWS();
   }).catch(function(err) {
-    console.warn('[Prof] Mic access denied:', err.message);
-    if (cb) cb(); // continue without mic viz
+    console.error('[Prof] Mic denied:', err);
+    _profAddBubble('ai', '⚠️ Accesso microfono negato: ' + err.message);
+    _profStopAll();
   });
 }
 
-// ── Volume loop (visualization + interrupt detection) ─────────────────
+// ── AudioWorklet PCM capture code (inline blob) ───────────────────────
+var _PROF_WORKLET_CODE = [
+  'class ProfPCM extends AudioWorkletProcessor {',
+  '  constructor() {',
+  '    super();',
+  '    this._ratio = sampleRate / 16000;',
+  '    this._buf = [];',
+  '  }',
+  '  process(inputs) {',
+  '    var ch = inputs[0] && inputs[0][0];',
+  '    if (!ch || !ch.length) return true;',
+  '    var ratio = this._ratio;',
+  '    var n = Math.floor(ch.length / ratio);',
+  '    for (var i = 0; i < n; i++) {',
+  '      var j = Math.min(Math.round(i * ratio), ch.length - 1);',
+  '      var v = ch[j];',
+  '      this._buf.push(v < 0 ? (v * 32768) | 0 : (v * 32767) | 0);',
+  '    }',
+  '    if (this._buf.length >= 1600) {',
+  '      var arr = new Int16Array(this._buf.splice(0, 1600));',
+  '      this.port.postMessage(arr.buffer, [arr.buffer]);',
+  '    }',
+  '    return true;',
+  '  }',
+  '}',
+  'registerProcessor("prof-pcm", ProfPCM);'
+].join('\n');
+
+// ── WebSocket connection ──────────────────────────────────────────────
+function _profConnectWS() {
+  if (_prof.ws) { try { _prof.ws.close(); } catch(e){} }
+
+  var ws = new WebSocket(_PROF_WS_URL);
+  ws.binaryType = 'arraybuffer';
+  _prof.ws = ws;
+  _prof.wsReady = false;
+
+  ws.onopen = function() {
+    console.log('[Prof] WS open — sending system_prompt');
+    ws.send(JSON.stringify({
+      type: 'system_prompt',
+      text: _profBuildSystemPrompt()
+    }));
+  };
+
+  ws.onmessage = function(evt) {
+    if (typeof evt.data === 'string') {
+      try { _profHandleWsMsg(JSON.parse(evt.data)); } catch(e) {}
+    }
+  };
+
+  ws.onerror = function(e) {
+    console.error('[Prof] WS error', e);
+    _profAddBubble('ai', '⚠️ Errore connessione vocale. Riprova.');
+  };
+
+  ws.onclose = function(e) {
+    console.log('[Prof] WS closed', e.code);
+    _prof.wsReady = false;
+    if (_profAutoMode) {
+      _profAddBubble('ai', '⚠️ Connessione persa (cod ' + e.code + '). Premi ▶ per ricominciare.');
+      _profStopAll();
+    }
+  };
+}
+
+// ── AudioWorklet start (called after "connected" from server) ─────────
+function _profStartWorklet() {
+  if (!_prof.audioCtx || !_prof.micStream) return;
+  var blob = new Blob([_PROF_WORKLET_CODE], { type: 'application/javascript' });
+  var url  = URL.createObjectURL(blob);
+  _prof.audioCtx.audioWorklet.addModule(url).then(function() {
+    URL.revokeObjectURL(url);
+    var node = new AudioWorkletNode(_prof.audioCtx, 'prof-pcm');
+    node.port.onmessage = function(e) {
+      if (_prof.ws && _prof.ws.readyState === WebSocket.OPEN && _prof.wsReady) {
+        _prof.ws.send(e.data); // raw Int16 LE binary
+      }
+    };
+    var src = _prof.audioCtx.createMediaStreamSource(_prof.micStream);
+    src.connect(node);
+    _prof.workletNode = node;
+    console.log('[Prof] AudioWorklet running at 16 kHz');
+  }).catch(function(err) {
+    console.error('[Prof] AudioWorklet failed:', err);
+    _profAddBubble('ai', '⚠️ AudioWorklet non supportato. Prova Chrome/Edge.');
+  });
+}
+
+// ── WebSocket message handler ─────────────────────────────────────────
+function _profHandleWsMsg(msg) {
+  switch (msg.type) {
+
+    case 'connected':
+      console.log('[Prof] Gemini Live ready (' + (msg.model || '') + ')');
+      _prof.wsReady = true;
+      _profStartWorklet();
+      _profSetState('listening');
+      // If a document is already loaded, trigger intro immediately
+      if (_prof.docText && _prof.ws && _prof.ws.readyState === WebSocket.OPEN) {
+        var intro = 'Il documento "' + _prof.docName + '" è stato caricato. '
+          + 'In una sola frase presentati come Prof. Lex, poi dimmi in 3 punti sintetici: '
+          + 'di cosa tratta, il tema principale, e un punto chiave pratico. '
+          + 'Sii conciso, max 80 parole totali.';
+        _prof.ws.send(JSON.stringify({ type: 'text', text: intro }));
+        _profSetState('thinking');
+      }
+      break;
+
+    case 'audio':
+      _profSetState('speaking');
+      _prof.pbPlaying = true;
+      try {
+        var pcm = _profB64ToBuffer(msg.data);
+        _profEnqueueAudio(pcm);
+      } catch(e) { console.warn('[Prof] audio decode err:', e); }
+      break;
+
+    case 'transcript':
+      if (msg.text && msg.text.trim()) {
+        _profAddBubble(msg.role === 'user' ? 'user' : 'ai', msg.text);
+        if (msg.role === 'user') {
+          var det = profDetectDomain(msg.text);
+          if (det) _profUpdateDomainBadge(det);
+        }
+      }
+      break;
+
+    case 'turn_complete':
+      _prof.pbPlaying = false;
+      if (_profAutoMode) _profSetState('listening');
+      break;
+
+    case 'interrupted':
+      _profStopPlayback();
+      _prof.pbPlaying = false;
+      if (_profAutoMode) _profSetState('listening');
+      break;
+
+    case 'error':
+      console.error('[Prof] Gemini error:', msg.message);
+      _profAddBubble('ai', '⚠️ ' + (msg.message || 'Errore sconosciuto'));
+      if (_profAutoMode) _profSetState('listening');
+      break;
+  }
+}
+
+// ── PCM Playback (24 kHz Int16 LE from Gemini) ────────────────────────
+function _profGetPbCtx() {
+  if (!_prof.pbCtx || _prof.pbCtx.state === 'closed') {
+    _prof.pbCtx = new AudioContext({ sampleRate: 24000 });
+    _prof.pbNextTime = _prof.pbCtx.currentTime + 0.1;
+  }
+  return _prof.pbCtx;
+}
+
+function _profEnqueueAudio(pcmArrayBuffer) {
+  var ctx = _profGetPbCtx();
+  var pcm = new Int16Array(pcmArrayBuffer);
+  if (!pcm.length) return;
+  var f32 = new Float32Array(pcm.length);
+  for (var i = 0; i < pcm.length; i++) {
+    f32[i] = pcm[i] / 32768.0;
+  }
+  var buf = ctx.createBuffer(1, f32.length, 24000);
+  buf.getChannelData(0).set(f32);
+  var src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.connect(ctx.destination);
+  var now = ctx.currentTime;
+  if (_prof.pbNextTime < now + 0.02) {
+    _prof.pbNextTime = now + 0.05;
+  }
+  src.start(_prof.pbNextTime);
+  _prof.pbNextTime += buf.duration;
+}
+
+function _profStopPlayback() {
+  if (_prof.pbCtx) {
+    try { _prof.pbCtx.close(); } catch(e){}
+    _prof.pbCtx = null;
+  }
+  _prof.pbNextTime = 0;
+  _prof.pbPlaying  = false;
+}
+
+function _profB64ToBuffer(b64) {
+  var bin = atob(b64);
+  var buf = new ArrayBuffer(bin.length);
+  var view = new Uint8Array(buf);
+  for (var i = 0; i < bin.length; i++) view[i] = bin.charCodeAt(i);
+  return buf;
+}
+
+// ── Volume visualization loop ─────────────────────────────────────────
 function _profVolLoop() {
   if (!_prof.analyser) return;
   var buf = new Uint8Array(_prof.analyser.frequencyBinCount);
@@ -24089,29 +24306,13 @@ function _profVolLoop() {
   var fill = document.getElementById('profVolFill');
   if (fill) fill.style.width = pct + '%';
 
-  // Scale orb when listening
   var core = document.getElementById('profOrbCore');
-  if (core && _prof.recognizing) {
+  if (core && !_prof.pbPlaying) {
     var s = 1 + (Math.min(pct, 70) / 70) * 0.30;
     core.style.transform = 'scale(' + s.toFixed(2) + ')';
   }
 
-  // Interrupt professor speech if user voice detected — very sensitive (avg > 7)
-  if (_profVadInterrupt && _prof.speaking && avg > 7) {
-    _profInterruptSpeech();
-  }
-
   _prof.volRaf = requestAnimationFrame(_profVolLoop);
-}
-
-// ── Interrupt professor mid-speech ────────────────────────────────────
-function _profInterruptSpeech() {
-  _profVadInterrupt = false;
-  _prof.speaking    = false;
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-  clearTimeout(_profRestartTimer);
-  _profSetState('listening');
-  _profRestartTimer = setTimeout(_profListenCycle, 200);
 }
 
 // ── Domain detection ──────────────────────────────────────────────────
@@ -24156,207 +24357,47 @@ function _profBuildSystemPrompt() {
   var domain = _prof.domain || 'europeo';
   var auth   = PROF_AUTHORITIES[domain] || PROF_AUTHORITIES['europeo'];
   var docCtx = _prof.docText
-    ? '\n\n## Documento caricato dall\'utente:\n' + _prof.docText.substring(0, 6000) + (_prof.docText.length > 6000 ? '\n[...documento troncato per lunghezza...]' : '')
+    ? '\n\n## Documento caricato:\n' + _prof.docText.substring(0, 6000)
+      + (_prof.docText.length > 6000 ? '\n[...troncato per lunghezza...]' : '')
     : '';
 
   return 'Sei Prof. Lex, un docente universitario di diritto di alto profilo, esperto in ' + auth.label + '.\n'
-    + 'Rispondi in italiano, con linguaggio autorevole ma accessibile, come un professore che spiega ad un dottorando o a un avvocato.\n'
-    + 'Usa fonti normative precise. Le autorità e fonti principali per questo dominio sono:\n'
+    + 'Rispondi ESCLUSIVAMENTE in italiano, con linguaggio autorevole ma accessibile.\n'
+    + 'Usa fonti normative precise. Le autorità principali per questo dominio sono:\n'
     + auth.sources + '\n'
-    + 'Struttura le risposte in modo chiaro: definizione, normativa di riferimento, casi pratici/giurisprudenza, implicazioni.\n'
-    + 'Se non sai qualcosa con certezza, dillo esplicitamente invece di inventare.\n'
-    + 'Risposte moderate in lunghezza: complete ma non eccessivamente lunghe per essere lette ad alta voce.'
+    + 'Risposte moderate: complete ma concise per l\'ascolto vocale, max 100 parole.'
     + docCtx;
 }
 
-// ── Auto-listen cycle ─────────────────────────────────────────────────
-function _profListenCycle() {
-  if (!_profAutoMode) return;
-  _profSetState('listening');
-
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { _profAutoMode = false; return; }
-
-  _prof.recog = new SR();
-  _prof.recog.lang            = 'it-IT';
-  _prof.recog.continuous      = false;
-  _prof.recog.interimResults  = false;
-  _prof.recog.maxAlternatives = 1;
-
-  _prof.recog.onstart = function() {
-    _prof.recognizing = true;
-  };
-
-  _prof.recog.onresult = function(e) {
-    _prof.recognizing = false;
-    var transcript = '';
-    for (var i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) transcript += e.results[i][0].transcript;
-    }
-    transcript = transcript.trim();
-    if (transcript) _profAskVoice(transcript);
-  };
-
-  _prof.recog.onerror = function(e) {
-    _prof.recognizing = false;
-    var core = document.getElementById('profOrbCore');
-    if (core) core.style.transform = '';
-    if (!_profAutoMode) return;
-    if (e.error === 'no-speech') {
-      _profRestartTimer = setTimeout(_profListenCycle, 600);
-    } else if (e.error === 'aborted') {
-      // intentional — do nothing
-    } else {
-      console.warn('[Prof] Speech recognition error:', e.error);
-      _profRestartTimer = setTimeout(_profListenCycle, 1200);
-    }
-  };
-
-  _prof.recog.onend = function() {
-    _prof.recognizing = false;
-    var core = document.getElementById('profOrbCore');
-    if (core) core.style.transform = '';
-    // Restart only if auto mode AND not currently processing
-    if (_profAutoMode && !_prof.thinking && !_prof.speaking) {
-      _profRestartTimer = setTimeout(_profListenCycle, 500);
-    }
-  };
-
-  try { _prof.recog.start(); } catch(e) {
-    console.warn('[Prof] start recognition error:', e);
-    if (_profAutoMode) _profRestartTimer = setTimeout(_profListenCycle, 1000);
-  }
-}
-
-// ── Voice-triggered ask (no user bubble) ─────────────────────────────
-function _profAskVoice(question) {
-  var detected = profDetectDomain(question + ' ' + _prof.docText.substring(0, 2000));
-  if (detected) _profUpdateDomainBadge(detected);
-  _prof.history.push({ role: 'user', parts: [{ text: question }] });
-  _prof.thinking = true; // block listen restart while API is running
-  _profCallGemini();
-}
-
-// ── Text-triggered ask (shows user bubble) ────────────────────────────
+// ── Text-triggered ask (typed input) ─────────────────────────────────
 window.profAsk = function() {
   var input = document.getElementById('profTextInput');
   var question = input ? input.value.trim() : '';
   if (!question) return;
   if (input) input.value = '';
-
-  var detected = profDetectDomain(question + ' ' + _prof.docText.substring(0, 2000));
-  if (detected) _profUpdateDomainBadge(detected);
+  var det = profDetectDomain(question);
+  if (det) _profUpdateDomainBadge(det);
   _profAddBubble('user', question);
-  _prof.history.push({ role: 'user', parts: [{ text: question }] });
-  _prof.thinking = true;
-  _profCallGemini();
+  if (_profAutoMode && _prof.ws && _prof.ws.readyState === WebSocket.OPEN && _prof.wsReady) {
+    _prof.ws.send(JSON.stringify({ type: 'text', text: question }));
+    _profSetState('thinking');
+  } else {
+    // Start conversation then send
+    _profBeginConversation();
+    var _q = question;
+    var _attempts = 0;
+    var _waitAndSend = setInterval(function() {
+      _attempts++;
+      if (_prof.wsReady && _prof.ws && _prof.ws.readyState === WebSocket.OPEN) {
+        clearInterval(_waitAndSend);
+        _prof.ws.send(JSON.stringify({ type: 'text', text: _q }));
+        _profSetState('thinking');
+      } else if (_attempts > 30) {
+        clearInterval(_waitAndSend); // timeout after 3s
+      }
+    }, 100);
+  }
 };
-
-// ── Gemini call (shared) ──────────────────────────────────────────────
-function _profCallGemini() {
-  var sysPrompt = _profBuildSystemPrompt();
-  var contents  = _prof.history.slice(-14);
-
-  fetch('/api/gemini', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'gemini-2.0-flash',
-      system_instruction: { parts: [{ text: sysPrompt }] },
-      contents: contents,
-      generationConfig: { temperature: 0.62, maxOutputTokens: 900 }
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    _prof.thinking = false;
-    var answer = data.text || '';
-    if (!answer) {
-      try { answer = data.candidates[0].content.parts[0].text || ''; } catch(e) {}
-    }
-    if (!answer) answer = 'Non ho ricevuto risposta. Può ripetere?';
-    _prof.history.push({ role: 'model', parts: [{ text: answer }] });
-    _profAddBubble('ai', answer);
-    _profSpeakAnswer(answer);
-  })
-  .catch(function(err) {
-    _prof.thinking = false;
-    _profAddBubble('ai', '⚠️ ' + err.message);
-    _profSetState(_profAutoMode ? 'listening' : 'idle');
-    if (_profAutoMode) _profRestartTimer = setTimeout(_profListenCycle, 1000);
-  });
-}
-
-// ── TTS speak answer ──────────────────────────────────────────────────
-function _profSpeakAnswer(text) {
-  if (!window.speechSynthesis) {
-    _profSetState(_profAutoMode ? 'listening' : 'idle');
-    if (_profAutoMode) _profRestartTimer = setTimeout(_profListenCycle, 400);
-    return;
-  }
-  window.speechSynthesis.cancel();
-  _profSetState('speaking');
-  _prof.speaking = true;
-
-  var clean = text
-    .replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1')
-    .replace(/<[^>]+>/g, '').replace(/#{1,6}\s/g, '').replace(/\n+/g, '. ')
-    .replace(/\s{2,}/g, ' ').trim();
-
-  var utter = new SpeechSynthesisUtterance(clean);
-  utter.lang  = 'it-IT';
-  utter.rate  = 0.88;   // natural pace — slower rates sound robotic
-  utter.pitch = 1.0;    // default pitch — modified pitch = robotic
-
-  var voice = _profPickMaleVoice();
-  if (voice) {
-    utter.voice = voice;
-  } else if (window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = function() {
-      var v = _profPickMaleVoice(); if (v) utter.voice = v;
-    };
-  }
-  _prof.utterance = utter;
-
-  // Enable VAD interrupt after 500ms to avoid feedback on TTS start
-  var vadTimer = setTimeout(function() {
-    if (_prof.speaking) _profVadInterrupt = true;
-  }, 500);
-
-  function _onEnd() {
-    clearTimeout(vadTimer);
-    _profVadInterrupt = false;
-    _prof.speaking    = false;
-    var core = document.getElementById('profOrbCore');
-    if (core) core.style.transform = '';
-    if (_profAutoMode) {
-      _profSetState('listening');
-      _profRestartTimer = setTimeout(_profListenCycle, 450);
-    } else {
-      _profSetState('idle');
-    }
-  }
-  utter.onend   = _onEnd;
-  utter.onerror = _onEnd;
-  window.speechSynthesis.speak(utter);
-}
-
-function _profPickMaleVoice() {
-  var voices = window.speechSynthesis.getVoices();
-  var maleNames = ['luca', 'cosimo', 'reed', 'google italiano'];
-  // 1st: explicit male Italian
-  for (var i = 0; i < voices.length; i++) {
-    var n = voices[i].name.toLowerCase();
-    var l = voices[i].lang.toLowerCase();
-    if (l.indexOf('it') === 0 && maleNames.some(function(m){ return n.indexOf(m) !== -1; }))
-      return voices[i];
-  }
-  // 2nd: any Italian voice
-  for (var i = 0; i < voices.length; i++) {
-    if (voices[i].lang.toLowerCase().indexOf('it') === 0) return voices[i];
-  }
-  return null;
-}
 
 // ── Stop (public API) ─────────────────────────────────────────────────
 window.profStop = function() { _profStopAll(); };
@@ -24419,20 +24460,35 @@ window.profHandleFile = function(file) {
   var ext = file.name.split('.').pop().toLowerCase();
 
   function _onDocReady(text, pages) {
-    _prof.docText  = text;
-    _prof.history  = []; // fresh conversation for new document
+    _prof.docText = text;
     var detected = profDetectDomain(text.substring(0, 3000));
     if (detected) _profUpdateDomainBadge(detected);
 
-    // Immediate auto-analysis — professor presents the document right away
     var intro = 'Il documento "' + file.name + '" è stato caricato'
       + (pages ? ' (' + pages + ' pagine)' : '') + '. '
-      + 'In una sola frase presentati, poi in 3 punti sintetici dimmi: '
+      + 'In una sola frase presentati come Prof. Lex, poi in 3 punti sintetici dimmi: '
       + 'di cosa tratta, il tema principale, e un punto chiave pratico. '
       + 'Sii conciso e diretto, max 80 parole totali.';
-    _prof.thinking = true;
-    _prof.history.push({ role: 'user', parts: [{ text: intro }] });
-    _profCallGemini();
+
+    function _sendIntro() {
+      _prof.ws.send(JSON.stringify({ type: 'system_prompt', text: _profBuildSystemPrompt() }));
+      _prof.ws.send(JSON.stringify({ type: 'text', text: intro }));
+      _profSetState('thinking');
+    }
+
+    if (_profAutoMode && _prof.wsReady && _prof.ws && _prof.ws.readyState === WebSocket.OPEN) {
+      _sendIntro();
+    } else {
+      _profBeginConversation();
+      var _a = 0;
+      var _t = setInterval(function() {
+        _a++;
+        if (_prof.wsReady && _prof.ws && _prof.ws.readyState === WebSocket.OPEN) {
+          clearInterval(_t);
+          _sendIntro();
+        } else if (_a > 50) { clearInterval(_t); }
+      }, 100);
+    }
   }
 
   if (ext === 'docx' || ext === 'doc') {
@@ -24475,10 +24531,9 @@ window.profHandleFile = function(file) {
 // ── Clear chat ────────────────────────────────────────────────────────
 window.profClear = function() {
   _profStopAll();
-  _prof.history  = [];
-  _prof.docText  = '';
-  _prof.docName  = '';
-  _prof.domain   = null;
+  _prof.docText = '';
+  _prof.docName = '';
+  _prof.domain  = null;
   var chat    = document.getElementById('profChat');
   var welcome = document.getElementById('profWelcome');
   var nameEl  = document.getElementById('profFileName');

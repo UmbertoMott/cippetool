@@ -16,7 +16,7 @@ from contextlib import asynccontextmanager
 from typing import Optional, List
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query, Request, Depends, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Query, Request, Depends, UploadFile, File, Form, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, HTMLResponse, FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -1536,6 +1536,258 @@ async def get_preview_url(
         "viewer_type":  viewer_type,
         "expires_in_minutes": expiration,
     }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# PROF. LEX — Gemini Live Voice WebSocket
+# ═══════════════════════════════════════════════════════════════════
+
+PROF_LEX_LIVE_MODEL = "gemini-2.0-flash-live-001"
+PROF_LEX_LIVE_MODEL_FALLBACK = "gemini-2.0-flash-live-preview-04-09"
+
+PROF_LEX_DEFAULT_PROMPT = (
+    "Sei Prof. Lex, un docente universitario di diritto di alto profilo, "
+    "esperto in diritto europeo e privacy/data protection. "
+    "Rispondi ESCLUSIVAMENTE in italiano, con linguaggio autorevole ma accessibile, "
+    "come un professore che spiega ad un avvocato o dottorando. "
+    "Risposte moderate: complete ma concise per l'ascolto vocale, max 100 parole."
+)
+
+
+@app.websocket("/ws/voice")
+async def voice_websocket(websocket: WebSocket):
+    """
+    Prof. Lex — Gemini Live API WebSocket proxy.
+    Protocol:
+      Browser → Server:
+        {type:"system_prompt", text:"..."} — set system instruction (sent first, before audio)
+        {type:"text", text:"..."}          — text turn (e.g. doc intro, typed question)
+        {type:"activity_start"}            — explicit VAD: user started speaking
+        {type:"activity_end"}              — explicit VAD: user stopped speaking
+        <binary>                           — raw Int16 LE PCM at 16kHz (mic audio)
+      Server → Browser:
+        {type:"connected"}                 — Gemini session ready, start sending audio
+        {type:"audio", data:"<base64>"}    — PCM Int16 LE 24kHz from Gemini
+        {type:"transcript", role:"user"|"model", text:"..."}
+        {type:"turn_complete"}             — Gemini finished this turn
+        {type:"interrupted"}              — Gemini interrupted (user barged in)
+        {type:"error", message:"..."}
+    """
+    await websocket.accept()
+    logger.info("[VoiceWS] Client connected")
+
+    if not _VERTEX_AI_AVAILABLE:
+        await websocket.send_json({"type": "error", "message": "google-genai SDK not installed"})
+        await websocket.close(1011)
+        return
+    if not GEMINI_API_KEY:
+        await websocket.send_json({"type": "error", "message": "GEMINI_API_KEY not configured"})
+        await websocket.close(1011)
+        return
+
+    # ── Wait for system_prompt message (first thing browser sends) ───────
+    sys_prompt_text = PROF_LEX_DEFAULT_PROMPT
+    try:
+        raw = await asyncio.wait_for(websocket.receive(), timeout=6.0)
+        if raw.get("type") == "websocket.disconnect":
+            return
+        if "text" in raw:
+            msg = json.loads(raw["text"])
+            if msg.get("type") == "system_prompt":
+                sys_prompt_text = msg.get("text") or PROF_LEX_DEFAULT_PROMPT
+                logger.info("[VoiceWS] Got system_prompt (%d chars)", len(sys_prompt_text))
+    except asyncio.TimeoutError:
+        logger.info("[VoiceWS] No system_prompt in 6s, using default")
+    except Exception as e:
+        logger.warning("[VoiceWS] system_prompt recv error: %s", e)
+
+    # ── Build LiveConnectConfig ───────────────────────────────────────────
+    import base64 as _b64
+
+    try:
+        live_config = _genai_types.LiveConnectConfig(
+            response_modalities=["AUDIO"],
+            speech_config=_genai_types.SpeechConfig(
+                language_code="it-IT",
+            ),
+            system_instruction=sys_prompt_text,
+            realtime_input_config=_genai_types.RealtimeInputConfig(
+                automatic_activity_detection=_genai_types.AutomaticActivityDetection(
+                    disabled=False,
+                    silence_duration_ms=1000,
+                    prefix_padding_ms=200,
+                )
+            ),
+            input_audio_transcription=_genai_types.AudioTranscriptionConfig(),
+            output_audio_transcription=_genai_types.AudioTranscriptionConfig(),
+        )
+    except Exception as e:
+        # Older SDK version may not support all fields — fall back to minimal config
+        logger.warning("[VoiceWS] LiveConnectConfig full build failed (%s), using minimal", e)
+        try:
+            live_config = _genai_types.LiveConnectConfig(
+                response_modalities=["AUDIO"],
+                system_instruction=sys_prompt_text,
+            )
+        except Exception as e2:
+            await websocket.send_json({"type": "error", "message": f"Config error: {e2}"})
+            await websocket.close(1011)
+            return
+
+    client = _genai.Client(api_key=GEMINI_API_KEY)
+
+    # Try primary model, fall back to preview if not found
+    for live_model in (PROF_LEX_LIVE_MODEL, PROF_LEX_LIVE_MODEL_FALLBACK):
+        try:
+            async with client.aio.live.connect(model=live_model, config=live_config) as session:
+                logger.info("[VoiceWS] Gemini Live connected (%s)", live_model)
+                # Notify browser: session ready
+                await websocket.send_json({"type": "connected", "model": live_model})
+
+                # ── Task: browser → Gemini ────────────────────────────────
+                async def _from_browser():
+                    try:
+                        while True:
+                            msg = await websocket.receive()
+                            mtype = msg.get("type")
+
+                            if mtype == "websocket.disconnect":
+                                return
+
+                            if "bytes" in msg:
+                                # Raw binary PCM Int16 LE at 16kHz
+                                pcm_bytes = msg["bytes"]
+                                await session.send_realtime_input(
+                                    audio=_genai_types.Blob(
+                                        data=pcm_bytes,
+                                        mime_type="audio/pcm;rate=16000"
+                                    )
+                                )
+
+                            elif "text" in msg:
+                                try:
+                                    data = json.loads(msg["text"])
+                                except Exception:
+                                    continue
+                                t = data.get("type")
+
+                                if t == "text":
+                                    text = (data.get("text") or "").strip()
+                                    if text:
+                                        await session.send_client_content(
+                                            turns=[_genai_types.Content(
+                                                parts=[_genai_types.Part(text=text)],
+                                                role="user"
+                                            )],
+                                            turn_complete=True
+                                        )
+                                        logger.info("[VoiceWS] Text turn sent: %.60s", text)
+
+                                elif t == "activity_start":
+                                    try:
+                                        await session.send_realtime_input(
+                                            activity_start=_genai_types.ActivityStart()
+                                        )
+                                    except Exception as ae:
+                                        logger.debug("[VoiceWS] activity_start not supported: %s", ae)
+
+                                elif t == "activity_end":
+                                    try:
+                                        await session.send_realtime_input(
+                                            activity_end=_genai_types.ActivityEnd()
+                                        )
+                                    except Exception as ae:
+                                        logger.debug("[VoiceWS] activity_end not supported: %s", ae)
+
+                    except WebSocketDisconnect:
+                        logger.info("[VoiceWS] Browser disconnected (from_browser)")
+                    except Exception as e:
+                        logger.error("[VoiceWS] from_browser error: %s", e)
+
+                # ── Task: Gemini → browser ────────────────────────────────
+                async def _from_gemini():
+                    try:
+                        async for response in session.receive():
+                            sc = response.server_content
+                            if not sc:
+                                continue
+
+                            if sc.interrupted:
+                                await websocket.send_json({"type": "interrupted"})
+
+                            if sc.model_turn:
+                                for part in sc.model_turn.parts:
+                                    if part.inline_data and part.inline_data.data:
+                                        audio_b64 = _b64.b64encode(part.inline_data.data).decode()
+                                        await websocket.send_json({
+                                            "type": "audio",
+                                            "data": audio_b64
+                                        })
+                                    if part.text:
+                                        await websocket.send_json({
+                                            "type": "transcript",
+                                            "role": "model",
+                                            "text": part.text
+                                        })
+
+                            # Transcription events
+                            try:
+                                if sc.input_transcription and sc.input_transcription.text:
+                                    await websocket.send_json({
+                                        "type": "transcript",
+                                        "role": "user",
+                                        "text": sc.input_transcription.text
+                                    })
+                            except AttributeError:
+                                pass
+
+                            try:
+                                if sc.output_transcription and sc.output_transcription.text:
+                                    await websocket.send_json({
+                                        "type": "transcript",
+                                        "role": "model",
+                                        "text": sc.output_transcription.text
+                                    })
+                            except AttributeError:
+                                pass
+
+                            if sc.turn_complete:
+                                await websocket.send_json({"type": "turn_complete"})
+
+                    except WebSocketDisconnect:
+                        logger.info("[VoiceWS] Browser disconnected (from_gemini)")
+                    except Exception as e:
+                        logger.error("[VoiceWS] from_gemini error: %s", e)
+                        try:
+                            await websocket.send_json({"type": "error", "message": str(e)})
+                        except Exception:
+                            pass
+
+                await asyncio.gather(_from_browser(), _from_gemini(), return_exceptions=True)
+            break  # success — don't try fallback
+
+        except Exception as e:
+            err_str = str(e).lower()
+            is_model_err = any(k in err_str for k in [
+                "not found", "404", "invalid", "does not exist",
+                "unknown model", "model_not_found", "not supported",
+                "not a valid", "unsupported model", "deprecated",
+            ])
+            if is_model_err:
+                logger.warning("[VoiceWS] model '%s' unavailable, trying fallback: %s", live_model, e)
+                continue
+            logger.error("[VoiceWS] Gemini Live error: %s", e)
+            try:
+                await websocket.send_json({"type": "error", "message": str(e)})
+            except Exception:
+                pass
+            break
+
+    logger.info("[VoiceWS] Session ended")
+    try:
+        await websocket.close()
+    except Exception:
+        pass
 
 
 # ── Serve Frontend (optional) ──────────────────────────────────────
