@@ -553,51 +553,95 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
   position: relative;
 }
 
-/* ── Block Map Preview ──────────────────────────────────────────────── */
+/* ── Block Map — slide panel ────────────────────────────────────────── */
 #wbBlockMap {
-  display: none; position: absolute; top: 38px; right: 0; bottom: 0;
-  width: 270px; z-index: 200;
-  background: rgba(12,12,18,.97); backdrop-filter: blur(18px);
-  border-left: 1px solid rgba(168,85,247,.35);
-  flex-direction: column; overflow: hidden;
-  box-shadow: -6px 0 24px rgba(0,0,0,.5);
+  position: absolute; top: 38px; right: 0; bottom: 0;
+  width: 262px; z-index: 200;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: rgba(10,10,16,.98); backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(168,85,247,.28);
+  box-shadow: -8px 0 32px rgba(0,0,0,.55);
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
 }
-#wbBlockMap.bm-open { display: flex; }
+#wbBlockMap.bm-open { transform: translateX(0); pointer-events: auto; }
+
+/* Trigger badge nella topbar */
+#wbBlockMapToggle {
+  display: none; align-items: center; gap: 5px;
+  background: transparent; border: 1px solid rgba(168,85,247,.25);
+  color: rgba(168,85,247,.7); border-radius: 6px;
+  padding: 2px 9px 2px 7px; cursor: pointer; font-size: 10px;
+  font-family: 'Space Grotesk', monospace; font-weight: 600; letter-spacing: .04em;
+  transition: all .15s; flex-shrink: 0;
+}
+#wbBlockMapToggle:hover,
+#wbBlockMapToggle.bm-active {
+  background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.55);
+  color: #d394ff;
+}
+#wbBlockMapToggle .bm-tog-icon { font-size: 11px; line-height: 1; }
+#wbBlockMapToggle .bm-tog-count {
+  background: rgba(168,85,247,.18); border-radius: 4px;
+  padding: 1px 5px; font-variant-numeric: tabular-nums;
+}
+body.theme-light #wbBlockMapToggle {
+  border-color: rgba(109,40,217,.22); color: rgba(109,40,217,.6);
+}
+body.theme-light #wbBlockMapToggle:hover,
+body.theme-light #wbBlockMapToggle.bm-active {
+  background: rgba(109,40,217,.08); border-color: rgba(109,40,217,.45); color: #6d28d9;
+}
+body.theme-light #wbBlockMap {
+  background: rgba(252,251,255,.98); border-left-color: rgba(109,40,217,.2);
+}
+
+/* Panel head */
 #wbBlockMapHead {
-  padding: 9px 14px 8px; border-bottom: 1px solid rgba(168,85,247,.2);
+  padding: 10px 14px 9px; border-bottom: 1px solid rgba(168,85,247,.15);
   display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
 #wbBlockMapHead span.bm-title {
-  font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
-  color: #d394ff; flex: 1;
+  font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(168,85,247,.65); flex: 1;
 }
 #wbBlockMapHead span.bm-count {
-  font-size: 10px; color: #666; font-family: monospace;
+  font-size: 10px; color: rgba(255,255,255,.25); font-family: monospace;
 }
+body.theme-light #wbBlockMapHead span.bm-count { color: rgba(0,0,0,.3); }
 #wbBlockMapHead button {
-  background: none; border: none; color: #555; cursor: pointer;
-  font-size: 13px; line-height: 1; padding: 2px 4px; border-radius: 4px;
-  transition: color .12s;
+  background: none; border: none; color: rgba(255,255,255,.25); cursor: pointer;
+  font-size: 12px; line-height: 1; padding: 2px 5px; border-radius: 4px;
+  transition: color .12s, background .12s;
 }
-#wbBlockMapHead button:hover { color: #d394ff; }
+#wbBlockMapHead button:hover { color: #d394ff; background: rgba(168,85,247,.1); }
+body.theme-light #wbBlockMapHead button { color: rgba(0,0,0,.25); }
+body.theme-light #wbBlockMapHead button:hover { color: #6d28d9; background: rgba(109,40,217,.08); }
+
+/* Items */
 #wbBlockMapList {
   overflow-y: auto; flex: 1;
-  scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.3) transparent;
+  scrollbar-width: thin; scrollbar-color: rgba(168,85,247,.22) transparent;
 }
 .bm-item {
-  padding: 7px 14px; cursor: pointer;
-  border-bottom: 1px solid rgba(255,255,255,.04);
-  transition: background .12s;
+  padding: 8px 14px 7px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.035);
+  transition: background .1s;
 }
-.bm-item:hover { background: rgba(168,85,247,.1); }
+.bm-item:hover { background: rgba(168,85,247,.09); }
 .bm-item-num {
-  font-size: 9px; color: #a78bfa; font-weight: 700;
-  font-family: 'Space Grotesk', monospace; letter-spacing: .04em;
+  font-size: 8.5px; color: rgba(168,85,247,.55); font-weight: 700;
+  font-family: monospace; letter-spacing: .06em; text-transform: uppercase;
 }
 .bm-item-text {
-  font-size: 11px; color: rgba(255,255,255,.55); line-height: 1.45;
-  margin-top: 2px; font-family: Calibri, Arial, sans-serif;
+  font-size: 11px; color: rgba(255,255,255,.5); line-height: 1.45;
+  margin-top: 2px; font-family: Georgia, serif;
 }
+body.theme-light .bm-item { border-bottom-color: rgba(0,0,0,.05); }
+body.theme-light .bm-item:hover { background: rgba(109,40,217,.05); }
+body.theme-light .bm-item-num { color: rgba(109,40,217,.45); }
+body.theme-light .bm-item-text { color: rgba(0,0,0,.5); }
 #screenWorkbench.wb-layout-stack .wb-doc { width: 100%; height: 40vh; }
 #screenWorkbench .wb-doc-topbar {
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
@@ -5915,6 +5959,10 @@ document.addEventListener('DOMContentLoaded', function() {
           </span>
         </div>
         <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
+        <button id="wbBlockMapToggle" onclick="wbToggleBlockMap()" title="Mappa blocchi del documento">
+          <span class="bm-tog-icon">☰</span>
+          <span class="bm-tog-count" id="wbBlockMapToggleCount">0</span>
+        </button>
       </div>
     </div>
 
@@ -22534,8 +22582,11 @@ function wbRenderDocViewerFromText(text, actualPageCount) {
 
 // ── Block Map Preview ────────────────────────────────────────────────────────
 function wbToggleBlockMap() {
-  var panel = document.getElementById('wbBlockMap');
-  if (panel) panel.classList.toggle('bm-open');
+  var panel  = document.getElementById('wbBlockMap');
+  var toggle = document.getElementById('wbBlockMapToggle');
+  if (!panel) return;
+  var open = panel.classList.toggle('bm-open');
+  if (toggle) toggle.classList.toggle('bm-active', open);
 }
 
 function wbBuildBlockMap() {
@@ -22565,10 +22616,13 @@ function wbBuildBlockMap() {
     list.appendChild(item);
   });
 
-  if (count) count.textContent = blocks.length + ' blocchi';
-  // Apri automaticamente il pannello appena il documento è caricato
-  var panel = document.getElementById('wbBlockMap');
-  if (panel) panel.classList.add('bm-open');
+  if (count) count.textContent = blocks.length + ' bl.';
+  // Aggiorna badge nel topbar e rendilo visibile
+  var togCount  = document.getElementById('wbBlockMapToggleCount');
+  var togBtn    = document.getElementById('wbBlockMapToggle');
+  if (togCount) togCount.textContent = blocks.length;
+  if (togBtn)   togBtn.style.display = 'inline-flex';
+  // NON aprire automaticamente — l'utente decide quando aprire
 }
 
 var _wbActiveBlock = null;
