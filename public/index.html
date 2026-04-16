@@ -24096,8 +24096,8 @@ function _profVolLoop() {
     core.style.transform = 'scale(' + s.toFixed(2) + ')';
   }
 
-  // Interrupt professor speech if user voice detected
-  if (_profVadInterrupt && _prof.speaking && avg > 20) {
+  // Interrupt professor speech if user voice detected — very sensitive (avg > 7)
+  if (_profVadInterrupt && _prof.speaking && avg > 7) {
     _profInterruptSpeech();
   }
 
@@ -24233,10 +24233,8 @@ function _profAskVoice(question) {
   var detected = profDetectDomain(question + ' ' + _prof.docText.substring(0, 2000));
   if (detected) _profUpdateDomainBadge(detected);
   _prof.history.push({ role: 'user', parts: [{ text: question }] });
-  _profSetState('thinking');
-  _prof.thinking = true;
-  var thinkEl = _profAddThinking();
-  _profCallGemini(thinkEl);
+  _prof.thinking = true; // block listen restart while API is running
+  _profCallGemini();
 }
 
 // ── Text-triggered ask (shows user bubble) ────────────────────────────
@@ -24250,14 +24248,12 @@ window.profAsk = function() {
   if (detected) _profUpdateDomainBadge(detected);
   _profAddBubble('user', question);
   _prof.history.push({ role: 'user', parts: [{ text: question }] });
-  _profSetState('thinking');
   _prof.thinking = true;
-  var thinkEl = _profAddThinking();
-  _profCallGemini(thinkEl);
+  _profCallGemini();
 };
 
 // ── Gemini call (shared) ──────────────────────────────────────────────
-function _profCallGemini(thinkEl) {
+function _profCallGemini() {
   var sysPrompt = _profBuildSystemPrompt();
   var contents  = _prof.history.slice(-14);
 
@@ -24273,21 +24269,19 @@ function _profCallGemini(thinkEl) {
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
-    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
     _prof.thinking = false;
     var answer = data.text || '';
     if (!answer) {
       try { answer = data.candidates[0].content.parts[0].text || ''; } catch(e) {}
     }
-    if (!answer) answer = 'Mi scuso, non ho ricevuto risposta. Può ripetere la domanda?';
+    if (!answer) answer = 'Non ho ricevuto risposta. Può ripetere?';
     _prof.history.push({ role: 'model', parts: [{ text: answer }] });
     _profAddBubble('ai', answer);
     _profSpeakAnswer(answer);
   })
   .catch(function(err) {
-    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
     _prof.thinking = false;
-    _profAddBubble('ai', '⚠️ Errore: ' + err.message);
+    _profAddBubble('ai', '⚠️ ' + err.message);
     _profSetState(_profAutoMode ? 'listening' : 'idle');
     if (_profAutoMode) _profRestartTimer = setTimeout(_profListenCycle, 1000);
   });
@@ -24311,8 +24305,8 @@ function _profSpeakAnswer(text) {
 
   var utter = new SpeechSynthesisUtterance(clean);
   utter.lang  = 'it-IT';
-  utter.rate  = 0.76;
-  utter.pitch = 0.85;
+  utter.rate  = 0.88;   // natural pace — slower rates sound robotic
+  utter.pitch = 1.0;    // default pitch — modified pitch = robotic
 
   var voice = _profPickMaleVoice();
   if (voice) {
@@ -24424,35 +24418,39 @@ window.profHandleFile = function(file) {
 
   var ext = file.name.split('.').pop().toLowerCase();
 
+  function _onDocReady(text, pages) {
+    _prof.docText  = text;
+    _prof.history  = []; // fresh conversation for new document
+    var detected = profDetectDomain(text.substring(0, 3000));
+    if (detected) _profUpdateDomainBadge(detected);
+
+    // Immediate auto-analysis — professor presents the document right away
+    var intro = 'Il documento "' + file.name + '" è stato caricato'
+      + (pages ? ' (' + pages + ' pagine)' : '') + '. '
+      + 'In una sola frase presentati, poi in 3 punti sintetici dimmi: '
+      + 'di cosa tratta, il tema principale, e un punto chiave pratico. '
+      + 'Sii conciso e diretto, max 80 parole totali.';
+    _prof.thinking = true;
+    _prof.history.push({ role: 'user', parts: [{ text: intro }] });
+    _profCallGemini();
+  }
+
   if (ext === 'docx' || ext === 'doc') {
-    if (!window.mammoth) {
-      _profAddBubble('ai', '⚠️ Libreria mammoth non disponibile per leggere DOCX.');
-      return;
-    }
+    if (!window.mammoth) { _profAddBubble('ai', '⚠️ mammoth non disponibile.'); return; }
     var reader = new FileReader();
     reader.onload = function(ev) {
       mammoth.extractRawValue({ arrayBuffer: ev.target.result })
-        .then(function(res) {
-          _prof.docText = res.value || '';
-          var detected = profDetectDomain(_prof.docText.substring(0, 3000));
-          if (detected) _profUpdateDomainBadge(detected);
-          _profAddBubble('ai', '📄 Documento caricato: **' + file.name + '**\n' + _prof.docText.length + ' caratteri estratti. Ora puoi farmi domande su questo testo.');
-        })
-        .catch(function(err) {
-          _profAddBubble('ai', '⚠️ Errore lettura DOCX: ' + err.message);
-        });
+        .then(function(res) { _onDocReady(res.value || '', null); })
+        .catch(function(err) { _profAddBubble('ai', '⚠️ Errore DOCX: ' + err.message); });
     };
     reader.readAsArrayBuffer(file);
+
   } else if (ext === 'pdf') {
-    if (!window.pdfjsLib) {
-      _profAddBubble('ai', '⚠️ Libreria PDF.js non disponibile.');
-      return;
-    }
+    if (!window.pdfjsLib) { _profAddBubble('ai', '⚠️ PDF.js non disponibile.'); return; }
     var reader2 = new FileReader();
     reader2.onload = function(ev) {
       pdfjsLib.getDocument({ data: ev.target.result }).promise.then(function(pdf) {
         var pages = pdf.numPages;
-        var texts = [];
         var promises = [];
         for (var p = 1; p <= Math.min(pages, 30); p++) {
           promises.push(pdf.getPage(p).then(function(page) {
@@ -24462,18 +24460,14 @@ window.profHandleFile = function(file) {
           }));
         }
         Promise.all(promises).then(function(results) {
-          _prof.docText = results.join('\n');
-          var detected = profDetectDomain(_prof.docText.substring(0, 3000));
-          if (detected) _profUpdateDomainBadge(detected);
-          _profAddBubble('ai', '📄 PDF caricato: **' + file.name + '**\n' + pages + ' pagine, ' + _prof.docText.length + ' caratteri estratti. Pronto per domande.');
+          _onDocReady(results.join('\n'), pages);
         });
-      }).catch(function(err) {
-        _profAddBubble('ai', '⚠️ Errore lettura PDF: ' + err.message);
-      });
+      }).catch(function(err) { _profAddBubble('ai', '⚠️ Errore PDF: ' + err.message); });
     };
     reader2.readAsArrayBuffer(file);
+
   } else {
-    _profAddBubble('ai', '⚠️ Formato non supportato. Carica un PDF o DOCX.');
+    _profAddBubble('ai', '⚠️ Formato non supportato. Carica PDF o DOCX.');
     if (zone) zone.classList.remove('has-file');
   }
 };
