@@ -22166,15 +22166,38 @@ function wbRenderDocViewer(html, actualPageCount) {
   function isEmptyNode(n) {
     return (n.textContent || '').replace(/[\s\u00a0]/g, '').length === 0;
   }
+  // Pseudo-heading: paragrafo Word in grassetto che funge da titolo di sezione.
+  // Mammoth lo rende come <p><strong>Testo.</strong></p> (non come h1-h6).
+  // Casi: "Profili di identità con istituti simili.", "Tutele.", "ESEMPIO", ecc.
+  function isPseudoHeading(n) {
+    var tag = n.tagName.toLowerCase();
+    if (tag !== 'p') return false;
+    var t = (n.textContent || '').trim();
+    if (t.length === 0) return false;
+    var wc = t.split(/\s+/).filter(Boolean).length;
+    // Tutto maiuscolo e corto → titolo (es. "TUTELE", "ESEMPIO", "NOTA BENE")
+    if (wc <= 6 && t === t.toUpperCase() && /[A-Z]/.test(t)) return true;
+    // L'intero contenuto visibile è in un unico <strong> o <b>
+    var nonEmpty = Array.from(n.childNodes).filter(function(c) {
+      return !(c.nodeType === 3 && c.textContent.trim() === '');
+    });
+    if (nonEmpty.length === 1) {
+      var nn = nonEmpty[0].nodeName;
+      if (nn === 'STRONG' || nn === 'B') return true;
+    }
+    // Paragrafo breve (≤ 12 parole) che inizia con <strong>/<b> e finisce con punto/due punti
+    var first = n.firstElementChild;
+    if (first && (first.tagName === 'STRONG' || first.tagName === 'B')) {
+      if (wc <= 12 && /[.:]\s*$/.test(t)) return true;
+    }
+    return false;
+  }
   // Paragrafo che inizia un nuovo sotto-tipo/argomento nei testi legali:
   //  — contratto di brokerage:    (trattino em/en + nome)
-  //  — contratto di sponsorizzazione: ...
   //  <em>Nome tipo</em>: ...      (corsivo iniziale seguito da :)
   function isBlockStarterNode(n) {
     var t = (n.textContent || '').trim();
-    // Inizia con — o – (trattino-sezione tipico del diritto italiano)
     if (/^[—–]\s+\S/.test(t)) return true;
-    // Primo figlio è <em> o <strong> e c'è un : entro i primi 80 caratteri
     var first = n.firstElementChild;
     if (first && (first.tagName === 'EM' || first.tagName === 'STRONG')) {
       if (t.substring(0, 80).indexOf(':') !== -1) return true;
@@ -22189,15 +22212,16 @@ function wbRenderDocViewer(html, actualPageCount) {
   }
 
   nodes.forEach(function(node) {
-    var tag      = node.tagName.toLowerCase();
-    var isH      = /^h[1-6]$/.test(tag);
-    var wc       = wcOf(node);
-    var isList   = isListNode(node);
-    var isEmpty  = isEmptyNode(node);
-    var isStarter = !isH && !isEmpty && !isList && isBlockStarterNode(node);
+    var tag        = node.tagName.toLowerCase();
+    var isH        = /^h[1-6]$/.test(tag);
+    var wc         = wcOf(node);
+    var isList     = isListNode(node);
+    var isEmpty    = isEmptyNode(node);
+    var isPseudoH  = !isH && !isEmpty && isPseudoHeading(node);
+    var isStarter  = !isH && !isPseudoH && !isEmpty && !isList && isBlockStarterNode(node);
 
-    if (isH) {
-      // Titolo → chiude blocco corrente, apre nuovo
+    if (isH || isPseudoH) {
+      // Titolo reale o paragrafo-grassetto-titolo → chiude blocco, apre nuovo
       flush();
       cur.push(node); curWords = wc;
 
@@ -22207,7 +22231,6 @@ function wbRenderDocViewer(html, actualPageCount) {
 
     } else if (isStarter && curWords >= MIN_FLUSH) {
       // Nuovo sotto-tipo/argomento (— nome: oppure <em>nome</em>:)
-      // Flush solo se abbiamo già abbastanza nel blocco corrente
       flush();
       cur.push(node); curWords = wc;
 
