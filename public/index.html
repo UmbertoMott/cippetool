@@ -22166,18 +22166,28 @@ function wbRenderDocViewer(html, actualPageCount) {
   function isEmptyNode(n) {
     return (n.textContent || '').replace(/[\s\u00a0]/g, '').length === 0;
   }
-  // Pseudo-heading: paragrafo Word in grassetto che funge da titolo di sezione.
-  // Mammoth lo rende come <p><strong>Testo.</strong></p> (non come h1-h6).
-  // Casi: "Profili di identità con istituti simili.", "Tutele.", "ESEMPIO", ecc.
+  // Separatore visivo tipo "***" o "* * *" → trattato come riga vuota
+  function isSeparatorNode(n) {
+    var t = (n.textContent || '').trim().replace(/\s+/g, '');
+    return /^\*{2,}$|^\*(\s*\*){1,}$/.test(t) || /^[─—\-]{3,}$/.test(t);
+  }
+  // Pseudo-heading: paragrafo Word che funge da titolo ma non è h1-h6.
+  // Mammoth rende i titoli bold come <p><strong>Testo.</strong></p>.
   function isPseudoHeading(n) {
     var tag = n.tagName.toLowerCase();
     if (tag !== 'p') return false;
     var t = (n.textContent || '').trim();
     if (t.length === 0) return false;
     var wc = t.split(/\s+/).filter(Boolean).length;
-    // Tutto maiuscolo e corto → titolo (es. "TUTELE", "ESEMPIO", "NOTA BENE")
-    if (wc <= 6 && t === t.toUpperCase() && /[A-Z]/.test(t)) return true;
-    // L'intero contenuto visibile è in un unico <strong> o <b>
+    // "Art. 71 LA PROCEDURA APERTA" / "Art. 73 …" → articolo numerato
+    if (/^Art\.\s*\d+/i.test(t)) return true;
+    // "Sezione I", "Sezione II" → sezione numerata romana
+    if (/^Sezione\s+[IVX0-9]/i.test(t)) return true;
+    // "A) BANDO DI GARA", "B) PRESENTAZIONE OFFERTE" → lettera+) in caps
+    if (/^[A-Z]\)\s+[A-Z]/.test(t) && wc <= 10) return true;
+    // Tutto maiuscolo e corto → titolo (es. "TUTELE", "ESEMPIO")
+    if (wc <= 6 && t === t.toUpperCase() && /[A-ZÀÈÌÒÙ]{2,}/.test(t)) return true;
+    // L'intero contenuto è in un unico <strong> o <b>
     var nonEmpty = Array.from(n.childNodes).filter(function(c) {
       return !(c.nodeType === 3 && c.textContent.trim() === '');
     });
@@ -22217,16 +22227,17 @@ function wbRenderDocViewer(html, actualPageCount) {
     var wc         = wcOf(node);
     var isList     = isListNode(node);
     var isEmpty    = isEmptyNode(node);
-    var isPseudoH  = !isH && !isEmpty && isPseudoHeading(node);
-    var isStarter  = !isH && !isPseudoH && !isEmpty && !isList && isBlockStarterNode(node);
+    var isSep      = !isEmpty && isSeparatorNode(node);
+    var isPseudoH  = !isH && !isEmpty && !isSep && isPseudoHeading(node);
+    var isStarter  = !isH && !isPseudoH && !isEmpty && !isSep && !isList && isBlockStarterNode(node);
 
     if (isH || isPseudoH) {
       // Titolo reale o paragrafo-grassetto-titolo → chiude blocco, apre nuovo
       flush();
       cur.push(node); curWords = wc;
 
-    } else if (isEmpty) {
-      // Riga vuota (doppio spazio Word) → flush se contenuto sufficiente
+    } else if (isEmpty || isSep) {
+      // Riga vuota o *** → flush se contenuto sufficiente
       if (curWords >= MIN_FLUSH) flush();
 
     } else if (isStarter && curWords >= MIN_FLUSH) {
