@@ -24121,7 +24121,7 @@ window.profAsk = function(questionOverride) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'gemini-2.0-flash',
-      system_instruction: sysPrompt,
+      system_instruction: { parts: [{ text: sysPrompt }] },
       contents: contents,
       generationConfig: { temperature: 0.65, maxOutputTokens: 1024 }
     })

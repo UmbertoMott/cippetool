@@ -1162,17 +1162,26 @@ async def gemini_proxy(req: GeminiProxyRequest):
     last_err: Exception = Exception("No models available")
     use_tools = bool(gemini_tools)
 
+    def _safe_text(resp) -> str:
+        """Access response.text safely — raises ValueError when safety-blocked."""
+        try:
+            return resp.text or ""
+        except (ValueError, AttributeError):
+            return ""
+
     for model_id in models_to_try:
         try:
             response = await asyncio.to_thread(_make_call(model_id, use_tools))
             if model_id != primary_model:
                 logger.info(f"[GeminiProxy] fallback OK → {model_id}")
-            return {"text": response.text or ""}
+            return {"text": _safe_text(response)}
         except Exception as e:
             err_str = str(e).lower()
             is_model_err = any(k in err_str for k in [
                 "not found", "404", "invalid", "does not exist",
-                "unknown model", "model_not_found", "not supported"
+                "unknown model", "model_not_found", "not supported",
+                "not a valid", "bad request", "400", "unsupported model",
+                "precondition failed", "deprecated", "no longer supported",
             ])
             is_tools_err = use_tools and any(k in err_str for k in [
                 "tool", "grounding", "google_search", "unsupported"
@@ -1183,12 +1192,12 @@ async def gemini_proxy(req: GeminiProxyRequest):
                 use_tools = False
                 try:
                     response = await asyncio.to_thread(_make_call(model_id, False))
-                    return {"text": response.text or ""}
+                    return {"text": _safe_text(response)}
                 except Exception as e2:
                     last_err = e2
                     continue
             if is_model_err:
-                logger.warning(f"[GeminiProxy] model '{model_id}' unavailable, trying next…")
+                logger.warning(f"[GeminiProxy] model '{model_id}' unavailable, trying next… ({e})")
                 last_err = e
                 continue
             # Non-model error (auth, quota, network…) — fail fast
