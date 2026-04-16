@@ -1609,6 +1609,11 @@ async def voice_websocket(websocket: WebSocket):
             response_modalities=["AUDIO"],
             speech_config=_genai_types.SpeechConfig(
                 language_code="it-IT",
+                voice_config=_genai_types.VoiceConfig(
+                    prebuilt_voice_config=_genai_types.PrebuiltVoiceConfig(
+                        voice_name="Charon"  # deep informative male voice
+                    )
+                ),
             ),
             system_instruction=sys_prompt_text,
             realtime_input_config=_genai_types.RealtimeInputConfig(

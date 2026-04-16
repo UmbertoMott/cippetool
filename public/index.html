@@ -5048,6 +5048,33 @@ body.theme-light #screenProfessor .prof-controls    { background: rgba(248,246,2
   transition: all .15s; flex-shrink: 0;
 }
 .prof-clear-btn:hover { border-color: rgba(239,68,68,.4); color: #f87171; }
+/* ── Prof: response-mode selector ──────────────────────────────── */
+.prof-mode-row {
+  flex-shrink: 0; display: flex; align-items: center; gap: 5px;
+  padding: 8px 16px 0;
+}
+.prof-mode-label {
+  font: 600 9px/1 inherit; color: var(--prof-meta);
+  letter-spacing: .06em; text-transform: uppercase; flex-shrink: 0;
+  margin-right: 4px;
+}
+.prof-mode-btn {
+  height: 26px; padding: 0 11px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 20px; color: var(--prof-meta);
+  font: 600 9px/1 inherit; letter-spacing: .04em;
+  cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.prof-mode-btn:hover { border-color: var(--prof-acc); color: var(--prof-acc); }
+.prof-mode-btn.active {
+  background: var(--prof-acc); border-color: var(--prof-acc);
+  color: #fff; box-shadow: 0 0 10px var(--prof-acc-glow);
+}
+body.theme-light .prof-mode-btn {
+  background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.12); color: #666;
+}
+body.theme-light .prof-mode-btn.active { background: var(--prof-acc); color: #fff; }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -6218,6 +6245,12 @@ document.addEventListener('DOMContentLoaded', function() {
         <button class="prof-send-btn" onclick="profAsk()" title="Invia">↑</button>
       </div>
 
+      <div class="prof-mode-row">
+        <span class="prof-mode-label">Risposta:</span>
+        <button class="prof-mode-btn" data-mode="breve" onclick="profSetMode('breve')">Breve</button>
+        <button class="prof-mode-btn active" data-mode="normale" onclick="profSetMode('normale')">Normale</button>
+        <button class="prof-mode-btn" data-mode="approfondita" onclick="profSetMode('approfondita')">Approfondita</button>
+      </div>
       <div class="prof-controls">
         <button class="prof-start-btn" id="profStartBtn" onclick="profToggleConversation()">
           <span class="prof-start-icon" id="profStartIcon">▶</span>
@@ -23983,6 +24016,8 @@ var _prof = {
   wsReady:     false   // Gemini session is open (received "connected")
 };
 var _profAutoMode = false;
+var _profMode     = 'normale';   // 'breve' | 'normale' | 'approfondita'
+var _profVadFrames = 0;          // consecutive loud frames while Gemini is speaking
 
 // ── WebSocket URL ─────────────────────────────────────────────────────
 var _PROF_WS_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -24312,6 +24347,22 @@ function _profVolLoop() {
     core.style.transform = 'scale(' + s.toFixed(2) + ')';
   }
 
+  // Fix 2: interrupt Gemini playback when user speaks
+  if (_prof.pbPlaying && avg > 12) {
+    _profVadFrames++;
+    if (_profVadFrames >= 3) {   // 3 loud frames ≈ 150ms sustained speech
+      _profVadFrames = 0;
+      _profStopPlayback();
+      _prof.pbPlaying = false;
+      if (_prof.ws && _prof.ws.readyState === WebSocket.OPEN && _prof.wsReady) {
+        _prof.ws.send(JSON.stringify({ type: 'activity_start' }));
+      }
+      _profSetState('listening');
+    }
+  } else {
+    _profVadFrames = 0;
+  }
+
   _prof.volRaf = requestAnimationFrame(_profVolLoop);
 }
 
@@ -24361,11 +24412,17 @@ function _profBuildSystemPrompt() {
       + (_prof.docText.length > 6000 ? '\n[...troncato per lunghezza...]' : '')
     : '';
 
+  var modeInstr = {
+    breve:        'Rispondi in modo MOLTO BREVE: max 25 parole, solo il dato essenziale.',
+    normale:      'Rispondi in modo chiaro e completo, max 100 parole, adatto all\'ascolto vocale.',
+    approfondita: 'Rispondi in modo APPROFONDITO e strutturato: definizione, normativa di riferimento, giurisprudenza, implicazioni pratiche. Puoi usare fino a 300 parole.'
+  }[_profMode] || 'Rispondi in modo chiaro e completo, max 100 parole.';
+
   return 'Sei Prof. Lex, un docente universitario di diritto di alto profilo, esperto in ' + auth.label + '.\n'
     + 'Rispondi ESCLUSIVAMENTE in italiano, con linguaggio autorevole ma accessibile.\n'
     + 'Usa fonti normative precise. Le autorità principali per questo dominio sono:\n'
     + auth.sources + '\n'
-    + 'Risposte moderate: complete ma concise per l\'ascolto vocale, max 100 parole.'
+    + modeInstr
     + docCtx;
 }
 
@@ -24401,6 +24458,25 @@ window.profAsk = function() {
 
 // ── Stop (public API) ─────────────────────────────────────────────────
 window.profStop = function() { _profStopAll(); };
+
+// ── Response mode selector ────────────────────────────────────────────
+window.profSetMode = function(mode) {
+  if (mode === _profMode) return;
+  _profMode = mode;
+  // Update button UI
+  document.querySelectorAll('.prof-mode-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  // If session active, send instruction directly into conversation
+  if (_prof.wsReady && _prof.ws && _prof.ws.readyState === WebSocket.OPEN) {
+    var instr = {
+      breve:        'ISTRUZIONE SISTEMA: d\'ora in poi rispondi in modo MOLTO BREVE, massimo 25 parole, solo il dato essenziale.',
+      normale:      'ISTRUZIONE SISTEMA: d\'ora in poi rispondi in modo normale, max 100 parole, chiaro e completo.',
+      approfondita: 'ISTRUZIONE SISTEMA: d\'ora in poi rispondi in modo APPROFONDITO — definizione, normativa, giurisprudenza, implicazioni pratiche. Puoi usare fino a 300 parole.'
+    }[mode];
+    if (instr) _prof.ws.send(JSON.stringify({ type: 'text', text: instr }));
+  }
+};
 
 // ── Chat bubble helpers ───────────────────────────────────────────────
 function _profAddBubble(role, text) {
