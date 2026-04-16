@@ -4787,10 +4787,10 @@ body.theme-light input:-webkit-autofill:focus {
 <style>
 /* ── Prof: screen shell ───────────────────────────────────────── */
 #screenProfessor {
-  --prof-acc:     #f59e0b;
-  --prof-acc-lt:  #fbbf24;
-  --prof-acc-dim: rgba(245,158,11,.13);
-  --prof-acc-glow:rgba(245,158,11,.28);
+  --prof-acc:     #a855f7;
+  --prof-acc-lt:  #c084fc;
+  --prof-acc-dim: rgba(168,85,247,.13);
+  --prof-acc-glow:rgba(168,85,247,.28);
   --prof-bg:      #07060a;
   --prof-card:    #0f0e14;
   --prof-border:  rgba(245,158,11,.18);
@@ -4807,22 +4807,22 @@ body.theme-light input:-webkit-autofill:focus {
 
 /* light mode overrides */
 body.theme-light #screenProfessor {
-  --prof-bg:     #faf8f4;
+  --prof-bg:     #f8f6ff;
   --prof-card:   #ffffff;
-  --prof-border: rgba(180,120,10,.22);
-  --prof-text:   #1a1208;
-  --prof-meta:   rgba(26,18,8,.42);
+  --prof-border: rgba(109,40,217,.22);
+  --prof-text:   #120a1f;
+  --prof-meta:   rgba(18,10,31,.42);
 }
-body.theme-light #screenProfessor .prof-header      { background: rgba(250,248,244,.97) !important; border-bottom-color: rgba(0,0,0,.08) !important; }
-body.theme-light #screenProfessor .prof-left        { background: #f3f0ea !important; border-right-color: rgba(0,0,0,.08) !important; }
+body.theme-light #screenProfessor .prof-header      { background: rgba(248,246,255,.97) !important; border-bottom-color: rgba(0,0,0,.08) !important; }
+body.theme-light #screenProfessor .prof-left        { background: #f1eeff !important; border-right-color: rgba(0,0,0,.08) !important; }
 body.theme-light #screenProfessor .prof-right       { background: #ffffff !important; }
-body.theme-light #screenProfessor .prof-upload-zone { background: rgba(245,158,11,.06) !important; border-color: rgba(180,120,10,.22) !important; }
-body.theme-light #screenProfessor .prof-upload-text { color: #6b4a12 !important; }
-body.theme-light #screenProfessor .prof-upload-sub  { color: rgba(107,74,18,.55) !important; }
-body.theme-light #screenProfessor .prof-chat-bubble-user { background: rgba(245,158,11,.12) !important; border-color: rgba(180,120,10,.28) !important; color: #1a1208 !important; }
-body.theme-light #screenProfessor .prof-chat-bubble-ai   { background: rgba(0,0,0,.04) !important;  border-color: rgba(0,0,0,.09) !important;  color: #1a1208 !important; }
-body.theme-light #screenProfessor .prof-text-input  { background: #f3f0ea !important; border-color: rgba(0,0,0,.12) !important; color: #1a1208 !important; }
-body.theme-light #screenProfessor .prof-controls    { background: rgba(243,240,234,.97) !important; border-top-color: rgba(0,0,0,.07) !important; }
+body.theme-light #screenProfessor .prof-upload-zone { background: rgba(168,85,247,.06) !important; border-color: rgba(109,40,217,.22) !important; }
+body.theme-light #screenProfessor .prof-upload-text { color: #5b21b6 !important; }
+body.theme-light #screenProfessor .prof-upload-sub  { color: rgba(91,33,182,.55) !important; }
+body.theme-light #screenProfessor .prof-chat-bubble-user { background: rgba(168,85,247,.10) !important; border-color: rgba(109,40,217,.25) !important; color: #120a1f !important; }
+body.theme-light #screenProfessor .prof-chat-bubble-ai   { background: rgba(0,0,0,.04) !important;  border-color: rgba(0,0,0,.09) !important;  color: #120a1f !important; }
+body.theme-light #screenProfessor .prof-text-input  { background: #f1eeff !important; border-color: rgba(0,0,0,.12) !important; color: #120a1f !important; }
+body.theme-light #screenProfessor .prof-controls    { background: rgba(248,246,255,.97) !important; border-top-color: rgba(0,0,0,.07) !important; }
 
 /* ── Prof: header ─────────────────────────────────────────────── */
 .prof-header {
@@ -4894,15 +4894,15 @@ body.theme-light #screenProfessor .prof-controls    { background: rgba(243,240,2
 
 .prof-orb-core {
   width: 72px; height: 72px; border-radius: 50%; position: relative;
-  background: radial-gradient(circle at 38% 38%, #fde68a 0%, #f59e0b 55%, #b45309 100%);
-  box-shadow: 0 0 24px var(--prof-acc-glow), 0 0 60px rgba(245,158,11,.14);
+  background: radial-gradient(circle at 38% 38%, #e9d5ff 0%, #a855f7 55%, #6b21a8 100%);
+  box-shadow: 0 0 24px var(--prof-acc-glow), 0 0 60px rgba(168,85,247,.14);
   display: flex; align-items: center; justify-content: center;
   font-size: 28px; transition: transform .2s, box-shadow .2s;
   animation: profCoreIdle 4s ease-in-out infinite;
 }
 @keyframes profCoreIdle {
-  0%,100% { box-shadow: 0 0 24px rgba(245,158,11,.28), 0 0 60px rgba(245,158,11,.12); }
-  50%     { box-shadow: 0 0 36px rgba(245,158,11,.55), 0 0 80px rgba(245,158,11,.22); }
+  0%,100% { box-shadow: 0 0 24px rgba(168,85,247,.28), 0 0 60px rgba(168,85,247,.12); }
+  50%     { box-shadow: 0 0 36px rgba(168,85,247,.55), 0 0 80px rgba(168,85,247,.22); }
 }
 /* state overrides */
 #screenProfessor.prof-state-listening .prof-orb-core {
@@ -4915,8 +4915,8 @@ body.theme-light #screenProfessor .prof-controls    { background: rgba(243,240,2
   50%     { transform: scale(1.08); }
 }
 #screenProfessor.prof-state-thinking .prof-orb-core {
-  background: radial-gradient(circle at 38% 38%, #e9d5ff 0%, #a855f7 55%, #6b21a8 100%);
-  box-shadow: 0 0 36px rgba(168,85,247,.6), 0 0 80px rgba(168,85,247,.22);
+  background: radial-gradient(circle at 38% 38%, #c4b5fd 0%, #7c3aed 55%, #3b0764 100%);
+  box-shadow: 0 0 36px rgba(124,58,237,.7), 0 0 80px rgba(124,58,237,.25);
   animation: profCoreThinking 0.6s ease-in-out infinite alternate;
 }
 @keyframes profCoreThinking {
@@ -4924,8 +4924,8 @@ body.theme-light #screenProfessor .prof-controls    { background: rgba(243,240,2
   to   { transform: scale(1.04) rotate(2deg);  }
 }
 #screenProfessor.prof-state-speaking .prof-orb-core {
-  background: radial-gradient(circle at 38% 38%, #fde68a 0%, #f59e0b 55%, #92400e 100%);
-  box-shadow: 0 0 48px rgba(245,158,11,.75), 0 0 90px rgba(245,158,11,.30);
+  background: radial-gradient(circle at 38% 38%, #f0abfc 0%, #d946ef 55%, #86198f 100%);
+  box-shadow: 0 0 48px rgba(217,70,239,.75), 0 0 90px rgba(217,70,239,.30);
   animation: profCoreSpeaking .35s ease-in-out infinite alternate;
 }
 @keyframes profCoreSpeaking {
@@ -5009,7 +5009,7 @@ body.theme-light #screenProfessor .prof-controls    { background: rgba(243,240,2
 .prof-text-input::placeholder { color: var(--prof-meta); }
 .prof-send-btn {
   width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-  background: var(--prof-acc); border: none; color: #1a0f00;
+  background: var(--prof-acc); border: none; color: #fff;
   font-size: 16px; font-weight: 900; cursor: pointer; transition: opacity .15s;
 }
 .prof-send-btn:hover { opacity: .85; }
@@ -5019,26 +5019,28 @@ body.theme-light #screenProfessor .prof-controls    { background: rgba(243,240,2
   padding: 10px 16px 14px;
   background: rgba(7,6,10,.95); border-top: 1px solid rgba(255,255,255,.06);
 }
-.prof-mic-btn {
-  display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 18px;
-  background: var(--prof-acc); border: none; border-radius: 10px;
-  color: #1a0f00; font: 700 12px/1 inherit; letter-spacing: .04em;
-  cursor: pointer; transition: all .15s; flex-shrink: 0;
-  box-shadow: 0 0 16px var(--prof-acc-glow);
+/* main start/stop button */
+.prof-start-btn {
+  display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 22px;
+  background: var(--prof-acc); border: none; border-radius: 12px;
+  color: #fff; font: 700 12px/1 inherit; letter-spacing: .04em;
+  cursor: pointer; transition: all .2s; flex-shrink: 0;
+  box-shadow: 0 0 18px var(--prof-acc-glow);
 }
-.prof-mic-btn.active { background: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,.4); color: #fff; }
-.prof-mic-btn:hover:not(.active) { opacity: .85; }
-.prof-stop-btn {
-  height: 40px; padding: 0 16px; background: rgba(239,68,68,.12);
-  border: 1px solid rgba(239,68,68,.3); border-radius: 10px;
-  color: #f87171; font: 600 11px/1 inherit; cursor: pointer;
-  transition: all .15s; flex-shrink: 0;
+.prof-start-btn.active {
+  background: #ef4444; box-shadow: 0 0 22px rgba(239,68,68,.45);
+  animation: profStartBtnPulse 2s ease-in-out infinite;
 }
-.prof-stop-btn:hover { background: rgba(239,68,68,.22); }
+@keyframes profStartBtnPulse {
+  0%,100% { box-shadow: 0 0 22px rgba(239,68,68,.45); }
+  50%     { box-shadow: 0 0 32px rgba(239,68,68,.70); }
+}
+.prof-start-btn:hover:not(.active) { opacity: .85; }
+.prof-start-icon { font-size: 13px; }
 .prof-vol-bar {
   flex: 1; height: 5px; background: rgba(255,255,255,.07); border-radius: 999px; overflow: hidden;
 }
-.prof-vol-fill { height: 100%; width: 0%; background: var(--prof-acc); border-radius: 999px; transition: width .1s; }
+.prof-vol-fill { height: 100%; width: 0%; background: var(--prof-acc); border-radius: 999px; transition: width .08s; }
 .prof-clear-btn {
   height: 32px; padding: 0 12px; background: transparent;
   border: 1px solid var(--prof-border2); border-radius: 8px;
@@ -6135,14 +6137,14 @@ document.addEventListener('DOMContentLoaded', function() {
         padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
         color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
         display:flex;flex-direction:column;gap:14px;
-      " onmouseover="this.style.borderColor='#f59e0b';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(245,158,11,.18)'"
+      " onmouseover="this.style.borderColor='#a855f7';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(168,85,247,.20)'"
          onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
         <div style="font-size:40px">🎙️</div>
         <div>
           <div style="font-size:18px;font-weight:800;margin-bottom:6px">Prof. Lex — AI Docente Vocale</div>
           <div style="font-size:13px;color:var(--muted);line-height:1.6">Interazione 100% vocale · Analisi documenti · Privacy · Penale · Civile · Lavoro · AI con web search · Fonte autorevole per ogni dominio</div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
           Parla con il professore <span style="font-size:16px">→</span>
         </div>
       </button>
@@ -6217,11 +6219,10 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <div class="prof-controls">
-        <button class="prof-mic-btn" id="profMicBtn" onclick="profToggleMic()">
-          <span id="profMicIcon">🎤</span>
-          <span id="profMicLabel">Parla</span>
+        <button class="prof-start-btn" id="profStartBtn" onclick="profToggleConversation()">
+          <span class="prof-start-icon" id="profStartIcon">▶</span>
+          <span id="profStartLabel">Avvia conversazione</span>
         </button>
-        <button class="prof-stop-btn" id="profStopBtn" onclick="profStop()">⏹ Stop</button>
         <div class="prof-vol-bar">
           <div class="prof-vol-fill" id="profVolFill"></div>
         </div>
@@ -23923,7 +23924,7 @@ function wbSelectSection(idx) {
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
-     AI PROFESSOR — JAVASCRIPT MODULE
+     AI PROFESSOR — JAVASCRIPT MODULE  v2 (voice loop)
      ═══════════════════════════════════════════════════════════════════ -->
 <script>
 (function() {
@@ -23967,19 +23968,23 @@ var PROF_AUTHORITIES = {
 
 // ── State ─────────────────────────────────────────────────────────────
 var _prof = {
-  domain: null,
-  docText: '',
-  docName: '',
-  history: [],          // [{role:'user'|'model', parts:[{text}]}]
-  recog: null,
+  domain:      null,
+  docText:     '',
+  docName:     '',
+  history:     [],   // [{role:'user'|'model', parts:[{text}]}]
+  recog:       null,
   recognizing: false,
-  speaking: false,
-  audioCtx: null,
-  analyser: null,
-  micStream: null,
-  volRaf: null,
-  utterance: null
+  speaking:    false,
+  thinking:    false,
+  audioCtx:    null,
+  analyser:    null,
+  micStream:   null,
+  volRaf:      null,
+  utterance:   null
 };
+var _profAutoMode        = false;
+var _profVadInterrupt    = false;   // allow mic interrupt during TTS
+var _profRestartTimer    = null;
 
 // ── Open / Close ──────────────────────────────────────────────────────
 window.profOpen = function() {
@@ -23987,22 +23992,126 @@ window.profOpen = function() {
   _profSetState('idle');
 };
 window.profClose = function() {
-  profStop();
+  _profStopAll();
   showScreen('screenMode');
 };
 
 // ── State machine ─────────────────────────────────────────────────────
 function _profSetState(state) {
-  var sc = document.getElementById('screenProfessor');
+  var sc    = document.getElementById('screenProfessor');
   var label = document.getElementById('profStateLabel');
   var icon  = document.getElementById('profOrbIcon');
   if (!sc) return;
   sc.classList.remove('prof-state-listening','prof-state-thinking','prof-state-speaking');
-  var labels = { idle:'In attesa…', listening:'In ascolto…', thinking:'Sto elaborando…', speaking:'Sto parlando…' };
+  var labels = { idle:'In attesa…', listening:'In ascolto…', thinking:'Elaboro…', speaking:'Sto parlando…' };
   var icons  = { idle:'🎙️', listening:'👂', thinking:'💭', speaking:'🔊' };
   if (state !== 'idle') sc.classList.add('prof-state-' + state);
   if (label) label.textContent = labels[state] || 'In attesa…';
   if (icon)  icon.textContent  = icons[state]  || '🎙️';
+}
+
+// ── Toggle conversation (single button) ──────────────────────────────
+window.profToggleConversation = function() {
+  if (_profAutoMode) { _profStopAll(); }
+  else               { _profBeginConversation(); }
+};
+
+function _profBeginConversation() {
+  _profAutoMode = true;
+  var btn   = document.getElementById('profStartBtn');
+  var icon  = document.getElementById('profStartIcon');
+  var lbl   = document.getElementById('profStartLabel');
+  if (btn)  btn.classList.add('active');
+  if (icon) icon.textContent = '■';
+  if (lbl)  lbl.textContent  = 'Termina';
+  _profInitMic(function() { _profListenCycle(); });
+}
+
+function _profStopAll() {
+  _profAutoMode     = false;
+  _profVadInterrupt = false;
+  clearTimeout(_profRestartTimer);
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (_prof.recog && _prof.recognizing) {
+    try { _prof.recog.abort(); } catch(e){}
+  }
+  _prof.recognizing = false;
+  _prof.speaking    = false;
+  _prof.thinking    = false;
+  if (_prof.volRaf) { cancelAnimationFrame(_prof.volRaf); _prof.volRaf = null; }
+  if (_prof.micStream) { _prof.micStream.getTracks().forEach(function(t){t.stop();}); _prof.micStream = null; }
+  if (_prof.audioCtx)  { try{_prof.audioCtx.close();}catch(e){} _prof.audioCtx = null; _prof.analyser = null; }
+  var fill = document.getElementById('profVolFill');
+  if (fill) fill.style.width = '0%';
+  var core = document.getElementById('profOrbCore');
+  if (core) core.style.transform = '';
+  var btn  = document.getElementById('profStartBtn');
+  var icon = document.getElementById('profStartIcon');
+  var lbl  = document.getElementById('profStartLabel');
+  if (btn)  btn.classList.remove('active');
+  if (icon) icon.textContent = '▶';
+  if (lbl)  lbl.textContent  = 'Avvia conversazione';
+  _profSetState('idle');
+}
+
+// ── Microphone init (single stream, reused throughout) ────────────────
+function _profInitMic(cb) {
+  if (_prof.analyser) { if (cb) cb(); return; } // already open
+  if (!navigator.mediaDevices) { if (cb) cb(); return; }
+  navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    video: false
+  }).then(function(stream) {
+    _prof.micStream = stream;
+    _prof.audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+    _prof.analyser  = _prof.audioCtx.createAnalyser();
+    _prof.analyser.fftSize = 256;
+    var src = _prof.audioCtx.createMediaStreamSource(stream);
+    src.connect(_prof.analyser);
+    _profVolLoop();
+    if (cb) cb();
+  }).catch(function(err) {
+    console.warn('[Prof] Mic access denied:', err.message);
+    if (cb) cb(); // continue without mic viz
+  });
+}
+
+// ── Volume loop (visualization + interrupt detection) ─────────────────
+function _profVolLoop() {
+  if (!_prof.analyser) return;
+  var buf = new Uint8Array(_prof.analyser.frequencyBinCount);
+  _prof.analyser.getByteFrequencyData(buf);
+  var sum = 0;
+  for (var i = 0; i < buf.length; i++) sum += buf[i];
+  var avg = sum / buf.length;
+  var pct = Math.min(100, (avg / 90) * 200);
+
+  var fill = document.getElementById('profVolFill');
+  if (fill) fill.style.width = pct + '%';
+
+  // Scale orb when listening
+  var core = document.getElementById('profOrbCore');
+  if (core && _prof.recognizing) {
+    var s = 1 + (Math.min(pct, 70) / 70) * 0.30;
+    core.style.transform = 'scale(' + s.toFixed(2) + ')';
+  }
+
+  // Interrupt professor speech if user voice detected
+  if (_profVadInterrupt && _prof.speaking && avg > 20) {
+    _profInterruptSpeech();
+  }
+
+  _prof.volRaf = requestAnimationFrame(_profVolLoop);
+}
+
+// ── Interrupt professor mid-speech ────────────────────────────────────
+function _profInterruptSpeech() {
+  _profVadInterrupt = false;
+  _prof.speaking    = false;
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  clearTimeout(_profRestartTimer);
+  _profSetState('listening');
+  _profRestartTimer = setTimeout(_profListenCycle, 200);
 }
 
 // ── Domain detection ──────────────────────────────────────────────────
@@ -24060,6 +24169,204 @@ function _profBuildSystemPrompt() {
     + docCtx;
 }
 
+// ── Auto-listen cycle ─────────────────────────────────────────────────
+function _profListenCycle() {
+  if (!_profAutoMode) return;
+  _profSetState('listening');
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { _profAutoMode = false; return; }
+
+  _prof.recog = new SR();
+  _prof.recog.lang            = 'it-IT';
+  _prof.recog.continuous      = false;
+  _prof.recog.interimResults  = false;
+  _prof.recog.maxAlternatives = 1;
+
+  _prof.recog.onstart = function() {
+    _prof.recognizing = true;
+  };
+
+  _prof.recog.onresult = function(e) {
+    _prof.recognizing = false;
+    var transcript = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) transcript += e.results[i][0].transcript;
+    }
+    transcript = transcript.trim();
+    if (transcript) _profAskVoice(transcript);
+  };
+
+  _prof.recog.onerror = function(e) {
+    _prof.recognizing = false;
+    var core = document.getElementById('profOrbCore');
+    if (core) core.style.transform = '';
+    if (!_profAutoMode) return;
+    if (e.error === 'no-speech') {
+      _profRestartTimer = setTimeout(_profListenCycle, 600);
+    } else if (e.error === 'aborted') {
+      // intentional — do nothing
+    } else {
+      console.warn('[Prof] Speech recognition error:', e.error);
+      _profRestartTimer = setTimeout(_profListenCycle, 1200);
+    }
+  };
+
+  _prof.recog.onend = function() {
+    _prof.recognizing = false;
+    var core = document.getElementById('profOrbCore');
+    if (core) core.style.transform = '';
+    // Restart only if auto mode AND not currently processing
+    if (_profAutoMode && !_prof.thinking && !_prof.speaking) {
+      _profRestartTimer = setTimeout(_profListenCycle, 500);
+    }
+  };
+
+  try { _prof.recog.start(); } catch(e) {
+    console.warn('[Prof] start recognition error:', e);
+    if (_profAutoMode) _profRestartTimer = setTimeout(_profListenCycle, 1000);
+  }
+}
+
+// ── Voice-triggered ask (no user bubble) ─────────────────────────────
+function _profAskVoice(question) {
+  var detected = profDetectDomain(question + ' ' + _prof.docText.substring(0, 2000));
+  if (detected) _profUpdateDomainBadge(detected);
+  _prof.history.push({ role: 'user', parts: [{ text: question }] });
+  _profSetState('thinking');
+  _prof.thinking = true;
+  var thinkEl = _profAddThinking();
+  _profCallGemini(thinkEl);
+}
+
+// ── Text-triggered ask (shows user bubble) ────────────────────────────
+window.profAsk = function() {
+  var input = document.getElementById('profTextInput');
+  var question = input ? input.value.trim() : '';
+  if (!question) return;
+  if (input) input.value = '';
+
+  var detected = profDetectDomain(question + ' ' + _prof.docText.substring(0, 2000));
+  if (detected) _profUpdateDomainBadge(detected);
+  _profAddBubble('user', question);
+  _prof.history.push({ role: 'user', parts: [{ text: question }] });
+  _profSetState('thinking');
+  _prof.thinking = true;
+  var thinkEl = _profAddThinking();
+  _profCallGemini(thinkEl);
+};
+
+// ── Gemini call (shared) ──────────────────────────────────────────────
+function _profCallGemini(thinkEl) {
+  var sysPrompt = _profBuildSystemPrompt();
+  var contents  = _prof.history.slice(-14);
+
+  fetch('/api/gemini', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gemini-2.0-flash',
+      system_instruction: { parts: [{ text: sysPrompt }] },
+      contents: contents,
+      generationConfig: { temperature: 0.62, maxOutputTokens: 900 }
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
+    _prof.thinking = false;
+    var answer = data.text || '';
+    if (!answer) {
+      try { answer = data.candidates[0].content.parts[0].text || ''; } catch(e) {}
+    }
+    if (!answer) answer = 'Mi scuso, non ho ricevuto risposta. Può ripetere la domanda?';
+    _prof.history.push({ role: 'model', parts: [{ text: answer }] });
+    _profAddBubble('ai', answer);
+    _profSpeakAnswer(answer);
+  })
+  .catch(function(err) {
+    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
+    _prof.thinking = false;
+    _profAddBubble('ai', '⚠️ Errore: ' + err.message);
+    _profSetState(_profAutoMode ? 'listening' : 'idle');
+    if (_profAutoMode) _profRestartTimer = setTimeout(_profListenCycle, 1000);
+  });
+}
+
+// ── TTS speak answer ──────────────────────────────────────────────────
+function _profSpeakAnswer(text) {
+  if (!window.speechSynthesis) {
+    _profSetState(_profAutoMode ? 'listening' : 'idle');
+    if (_profAutoMode) _profRestartTimer = setTimeout(_profListenCycle, 400);
+    return;
+  }
+  window.speechSynthesis.cancel();
+  _profSetState('speaking');
+  _prof.speaking = true;
+
+  var clean = text
+    .replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1')
+    .replace(/<[^>]+>/g, '').replace(/#{1,6}\s/g, '').replace(/\n+/g, '. ')
+    .replace(/\s{2,}/g, ' ').trim();
+
+  var utter = new SpeechSynthesisUtterance(clean);
+  utter.lang  = 'it-IT';
+  utter.rate  = 0.76;
+  utter.pitch = 0.85;
+
+  var voice = _profPickMaleVoice();
+  if (voice) {
+    utter.voice = voice;
+  } else if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = function() {
+      var v = _profPickMaleVoice(); if (v) utter.voice = v;
+    };
+  }
+  _prof.utterance = utter;
+
+  // Enable VAD interrupt after 500ms to avoid feedback on TTS start
+  var vadTimer = setTimeout(function() {
+    if (_prof.speaking) _profVadInterrupt = true;
+  }, 500);
+
+  function _onEnd() {
+    clearTimeout(vadTimer);
+    _profVadInterrupt = false;
+    _prof.speaking    = false;
+    var core = document.getElementById('profOrbCore');
+    if (core) core.style.transform = '';
+    if (_profAutoMode) {
+      _profSetState('listening');
+      _profRestartTimer = setTimeout(_profListenCycle, 450);
+    } else {
+      _profSetState('idle');
+    }
+  }
+  utter.onend   = _onEnd;
+  utter.onerror = _onEnd;
+  window.speechSynthesis.speak(utter);
+}
+
+function _profPickMaleVoice() {
+  var voices = window.speechSynthesis.getVoices();
+  var maleNames = ['luca', 'cosimo', 'reed', 'google italiano'];
+  // 1st: explicit male Italian
+  for (var i = 0; i < voices.length; i++) {
+    var n = voices[i].name.toLowerCase();
+    var l = voices[i].lang.toLowerCase();
+    if (l.indexOf('it') === 0 && maleNames.some(function(m){ return n.indexOf(m) !== -1; }))
+      return voices[i];
+  }
+  // 2nd: any Italian voice
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].lang.toLowerCase().indexOf('it') === 0) return voices[i];
+  }
+  return null;
+}
+
+// ── Stop (public API) ─────────────────────────────────────────────────
+window.profStop = function() { _profStopAll(); };
+
 // ── Chat bubble helpers ───────────────────────────────────────────────
 function _profAddBubble(role, text) {
   var chat = document.getElementById('profChat');
@@ -24089,277 +24396,6 @@ function _profAddThinking() {
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
   return div;
-}
-
-// ── Ask (core) ────────────────────────────────────────────────────────
-window.profAsk = function(questionOverride) {
-  var input = document.getElementById('profTextInput');
-  var question = questionOverride || (input ? input.value.trim() : '');
-  if (!question) return;
-  if (input) input.value = '';
-
-  // detect domain from question + doc
-  var combined = question + ' ' + _prof.docText.substring(0, 2000);
-  var detected = profDetectDomain(combined);
-  if (detected) _profUpdateDomainBadge(detected);
-
-  _profAddBubble('user', question);
-  _prof.history.push({ role: 'user', parts: [{ text: question }] });
-
-  _profSetState('thinking');
-  var stopBtn = document.getElementById('profStopBtn');
-  if (stopBtn) stopBtn.style.display = 'inline-flex';
-
-  var thinkEl = _profAddThinking();
-
-  // Build Gemini payload
-  var sysPrompt = _profBuildSystemPrompt();
-  var contents = _prof.history.slice(-12); // last 12 turns
-
-  fetch('/api/gemini', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'gemini-2.0-flash',
-      system_instruction: { parts: [{ text: sysPrompt }] },
-      contents: contents,
-      generationConfig: { temperature: 0.65, maxOutputTokens: 1024 }
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
-    var answer = '';
-    try {
-      answer = data.candidates[0].content.parts[0].text || '';
-    } catch(e) {
-      answer = data.text || data.error || 'Errore nella risposta.';
-    }
-    _prof.history.push({ role: 'model', parts: [{ text: answer }] });
-    _profAddBubble('ai', answer);
-    _profSpeak(answer);
-  })
-  .catch(function(err) {
-    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
-    _profSetState('idle');
-    if (stopBtn) stopBtn.style.display = 'none';
-    _profAddBubble('ai', '⚠️ Errore di connessione: ' + err.message);
-    console.error('[Prof] API error:', err);
-  });
-};
-
-// ── TTS speak ─────────────────────────────────────────────────────────
-function _profSpeak(text) {
-  if (!window.speechSynthesis) {
-    _profSetState('idle');
-    var stopBtn = document.getElementById('profStopBtn');
-    if (stopBtn) stopBtn.style.display = 'none';
-    return;
-  }
-  window.speechSynthesis.cancel();
-  _profSetState('speaking');
-
-  // strip markdown for TTS
-  var clean = text
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/<[^>]+>/g, '')
-    .replace(/\n+/g, ' ')
-    .trim();
-
-  var utter = new SpeechSynthesisUtterance(clean);
-  utter.lang   = 'it-IT';
-  utter.rate   = 0.82;
-  utter.pitch  = 0.70;
-
-  // pick best Italian male voice
-  function _pickVoice() {
-    var voices = window.speechSynthesis.getVoices();
-    var prefs = ['Luca','Cosimo','Google italiano','it-IT'];
-    for (var i = 0; i < prefs.length; i++) {
-      for (var j = 0; j < voices.length; j++) {
-        if (voices[j].name.toLowerCase().indexOf(prefs[i].toLowerCase()) !== -1
-            || voices[j].lang.toLowerCase().indexOf(prefs[i].toLowerCase()) !== -1) {
-          return voices[j];
-        }
-      }
-    }
-    return null;
-  }
-
-  var voice = _pickVoice();
-  if (!voice && window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = function() {
-      utter.voice = _pickVoice();
-    };
-  } else if (voice) {
-    utter.voice = voice;
-  }
-
-  utter.onend = function() {
-    _profSetState('idle');
-    var stopBtn = document.getElementById('profStopBtn');
-    if (stopBtn) stopBtn.style.display = 'none';
-    _prof.speaking = false;
-  };
-  utter.onerror = function() {
-    _profSetState('idle');
-    var stopBtn = document.getElementById('profStopBtn');
-    if (stopBtn) stopBtn.style.display = 'none';
-    _prof.speaking = false;
-  };
-
-  _prof.utterance = utter;
-  _prof.speaking = true;
-  window.speechSynthesis.speak(utter);
-}
-
-// ── Stop (both speech + recognition) ─────────────────────────────────
-window.profStop = function() {
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-  if (_prof.recog && _prof.recognizing) {
-    try { _prof.recog.stop(); } catch(e) {}
-    _prof.recognizing = false;
-  }
-  _profStopAudioViz();
-  _prof.speaking = false;
-  _profSetState('idle');
-  var micBtn  = document.getElementById('profMicBtn');
-  var micIcon = document.getElementById('profMicIcon');
-  var micLbl  = document.getElementById('profMicLabel');
-  var stopBtn = document.getElementById('profStopBtn');
-  if (micBtn)  micBtn.classList.remove('active');
-  if (micIcon) micIcon.textContent = '🎤';
-  if (micLbl)  micLbl.textContent  = 'Parla';
-  if (stopBtn) stopBtn.style.display = 'none';
-};
-
-// ── Mic toggle (SpeechRecognition) ───────────────────────────────────
-window.profToggleMic = function() {
-  if (_prof.recognizing) {
-    _profStopMic();
-  } else {
-    _profStartMic();
-  }
-};
-
-function _profStartMic() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    alert('Il tuo browser non supporta il riconoscimento vocale. Usa Chrome o Edge.');
-    return;
-  }
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-
-  var micBtn  = document.getElementById('profMicBtn');
-  var micIcon = document.getElementById('profMicIcon');
-  var micLbl  = document.getElementById('profMicLabel');
-
-  _prof.recog = new SR();
-  _prof.recog.lang = 'it-IT';
-  _prof.recog.continuous = false;
-  _prof.recog.interimResults = false;
-  _prof.recog.maxAlternatives = 1;
-
-  _prof.recog.onstart = function() {
-    _prof.recognizing = true;
-    _profSetState('listening');
-    if (micBtn)  micBtn.classList.add('active');
-    if (micIcon) micIcon.textContent = '⏹';
-    if (micLbl)  micLbl.textContent  = 'Stop';
-    _profStartAudioViz();
-  };
-
-  _prof.recog.onresult = function(e) {
-    var transcript = e.results[0][0].transcript.trim();
-    if (transcript) profAsk(transcript);
-  };
-
-  _prof.recog.onerror = function(e) {
-    console.warn('[Prof] Speech error:', e.error);
-    _profStopMic();
-    if (e.error !== 'no-speech') {
-      _profAddBubble('ai', '⚠️ Errore microfono: ' + e.error);
-    }
-  };
-
-  _prof.recog.onend = function() {
-    _profStopMic();
-  };
-
-  try {
-    _prof.recog.start();
-  } catch(e) {
-    console.warn('[Prof] Recog start error:', e);
-  }
-}
-
-function _profStopMic() {
-  _prof.recognizing = false;
-  _profStopAudioViz();
-  if (_prof.recog) {
-    try { _prof.recog.stop(); } catch(e) {}
-    _prof.recog = null;
-  }
-  var micBtn  = document.getElementById('profMicBtn');
-  var micIcon = document.getElementById('profMicIcon');
-  var micLbl  = document.getElementById('profMicLabel');
-  if (micBtn)  micBtn.classList.remove('active');
-  if (micIcon) micIcon.textContent = '🎤';
-  if (micLbl)  micLbl.textContent  = 'Parla';
-  if (!_prof.speaking) _profSetState('idle');
-}
-
-// ── Audio visualizer (Web Audio API → vol bar) ────────────────────────
-function _profStartAudioViz() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-    .then(function(stream) {
-      _prof.micStream = stream;
-      _prof.audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
-      _prof.analyser  = _prof.audioCtx.createAnalyser();
-      _prof.analyser.fftSize = 256;
-      var src = _prof.audioCtx.createMediaStreamSource(stream);
-      src.connect(_prof.analyser);
-      _profVolLoop();
-    })
-    .catch(function() { /* permission denied, graceful */ });
-}
-
-function _profVolLoop() {
-  if (!_prof.analyser) return;
-  var buf = new Uint8Array(_prof.analyser.frequencyBinCount);
-  _prof.analyser.getByteFrequencyData(buf);
-  var sum = 0;
-  for (var i = 0; i < buf.length; i++) sum += buf[i];
-  var avg = sum / buf.length;
-  var pct = Math.min(100, (avg / 128) * 200);
-  var fill = document.getElementById('profVolFill');
-  if (fill) fill.style.width = pct + '%';
-  // scale orb core slightly
-  var core = document.getElementById('profOrbCore');
-  if (core && _prof.recognizing) {
-    var s = 1 + (pct / 100) * 0.25;
-    core.style.transform = 'scale(' + s.toFixed(2) + ')';
-  }
-  _prof.volRaf = requestAnimationFrame(_profVolLoop);
-}
-
-function _profStopAudioViz() {
-  if (_prof.volRaf) { cancelAnimationFrame(_prof.volRaf); _prof.volRaf = null; }
-  var fill = document.getElementById('profVolFill');
-  if (fill) fill.style.width = '0%';
-  var core = document.getElementById('profOrbCore');
-  if (core) core.style.transform = '';
-  if (_prof.micStream) {
-    _prof.micStream.getTracks().forEach(function(t) { t.stop(); });
-    _prof.micStream = null;
-  }
-  if (_prof.audioCtx) {
-    try { _prof.audioCtx.close(); } catch(e) {}
-    _prof.audioCtx = null;
-    _prof.analyser = null;
-  }
 }
 
 // ── File upload (PDF / DOCX) ──────────────────────────────────────────
@@ -24444,7 +24480,7 @@ window.profHandleFile = function(file) {
 
 // ── Clear chat ────────────────────────────────────────────────────────
 window.profClear = function() {
-  profStop();
+  _profStopAll();
   _prof.history  = [];
   _prof.docText  = '';
   _prof.docName  = '';
