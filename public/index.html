@@ -77,7 +77,7 @@ body.theme-light #screenWorkbench .doc-block:hover {
   background: rgba(109,40,217,0.06);
 }
 body.theme-light #screenWorkbench .doc-page {
-  background: #F4F0EB;
+  background: #ffffff;
   color: #1C1612;
 }
 /* ── Workbench: tutte le barre/sfondi hardcoded → beige/white ─── */
@@ -105,7 +105,7 @@ body.theme-light #wbProgressWrap                       { background: rgba(244,24
 body.theme-light #wbPdfContainer                       { scrollbar-color: rgba(91,33,182,0.3) #F4F0EB; }
 
 /* ── WB LIGHT MODE: document viewer + zoom + chat ───────────────── */
-body.theme-light #wbDocViewer        { background: #ffffff !important; scrollbar-color: #C0B4A8 #ffffff !important; }
+body.theme-light #wbDocViewer        { background: #F4F0EB !important; scrollbar-color: #C0B4A8 #F4F0EB !important; }
 body.theme-light #wbPdfContainer     { background: #ebebeb !important; }
 body.theme-light #wbDocText          { background: #ffffff !important; color: #1C1612 !important; }
 body.theme-light #wbViewerToolbar    { background: transparent !important; border: none !important; }
@@ -601,10 +601,10 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 /* ── DOC VIEWER: pagina bianca ChatPDF-style ─────────── */
 #screenWorkbench #wbDocViewer {
   flex: 1; overflow-y: auto;
-  background: #ffffff;
+  background: #F4F0EB;
   display: none; flex-direction: column;
   align-items: center; padding: 28px 32px 48px;
-  scrollbar-width: thin; scrollbar-color: #C0B4A8 #ffffff;
+  scrollbar-width: thin; scrollbar-color: #C0B4A8 #F4F0EB;
 }
 /* Zoom + page counter toolbar */
 #wbViewerToolbar {
@@ -708,7 +708,7 @@ body.theme-light #wbSaveBtn { border-color: rgba(91,33,182,.3); color: rgba(91,3
 /* Pagina bianca — simula foglio Word */
 #screenWorkbench .doc-page {
   width: 100%; max-width: 790px;
-  background: #F4F0EB; color: #1a1a1a;
+  background: #ffffff; color: #1a1a1a;
   border-radius: 3px; padding: 72px 96px 80px;
   box-shadow: 0 2px 12px rgba(0,0,0,.10);
   font-family: Calibri,'Segoe UI',Arial,sans-serif;
@@ -22067,40 +22067,95 @@ function wbRenderDocViewer(html, actualPageCount) {
   viewer.style.flexDirection = 'column';
   viewer.style.alignItems = 'center';
 
-  // Parse mammoth HTML → preserva la struttura originale del documento Word
+  // Parse mammoth HTML
   var parser = new DOMParser();
   var parsed = parser.parseFromString('<body>' + html + '</body>', 'text/html');
-  var nodes  = Array.from(parsed.body.childNodes).filter(function(n) {
-    return n.nodeType === 1 && (n.textContent || '').trim().length > 0;
+  var nodes = Array.from(parsed.body.childNodes).filter(function(n) {
+    return n.nodeType === 1 && (n.textContent || '').trim().length > 1;
   });
 
   function wcOf(n) {
     return (n.textContent || '').trim().split(/\s+/).filter(Boolean).length;
   }
 
-  // ── Ogni nodo top-level = un blocco interattivo separato (1:1 con Word) ──
-  // Per l'AI: se il blocco è troppo corto (<40 parole), la funzione di analisi
-  // raccoglierà automaticamente i blocchi adiacenti dal DOM per avere contesto.
-  var blocks = nodes.map(function(n) {
-    return { node: n, words: wcOf(n), text: (n.textContent || '').trim() };
-  }).filter(function(b) { return b.text.length > 0; });
+  // ── Algoritmo semantico di block-merging ──────────────────────────────────
+  // Regole:
+  //  1. Heading (h1-h6) chiude sempre il blocco precedente e inizia uno nuovo.
+  //     Tutto il contenuto successivo (paragrafi, liste, esempi) resta nello
+  //     stesso blocco fino al prossimo heading o separatore semantico.
+  //  2. Riga vuota (paragrafo vuoto/nbsp nel DOCX = doppio spazio Word) = fine
+  //     blocco, MA solo se il blocco corrente ha già >= MIN_FLUSH parole.
+  //     Righe vuote in sezioni piccole vengono ignorate (artefatti di formato).
+  //  3. Liste (ul/ol e righe •/-/numerate), esempi, note: si accumulano sempre
+  //     nel blocco corrente senza mai triggherare un flush.
+  //  4. MAX_WORDS = rete di sicurezza: nessun blocco supera ~380 parole.
+  //     Il taglio avviene al termine del paragrafo corrente, non a metà.
+  var MAX_WORDS = 380;   // rete di sicurezza — nessun blocco supera questa soglia
+  var MIN_FLUSH = 80;    // riga vuota ignorata se il blocco è ancora piccolo
+  var groups   = [];
+  var cur      = [];
+  var curWords = 0;
+
+  function isListNode(n) {
+    var tag = n.tagName.toLowerCase();
+    if (tag === 'ul' || tag === 'ol') return true;
+    var t = (n.textContent || '').trim();
+    return /^([•·\-\*]\s|[0-9]+[.)]\s|[a-z][.)]\s)/i.test(t);
+  }
+  function isEmptyNode(n) {
+    // Paragrafo vuoto o solo spazi/nbsp → doppio spazio Word
+    return (n.textContent || '').replace(/[\s\u00a0]/g, '').length === 0;
+  }
+  function flush() {
+    if (cur.length > 0) {
+      groups.push(cur.slice());
+      cur = []; curWords = 0;
+    }
+  }
+
+  nodes.forEach(function(node) {
+    var tag    = node.tagName.toLowerCase();
+    var isH    = /^h[1-6]$/.test(tag);
+    var wc     = wcOf(node);
+    var isList = isListNode(node);
+    var isEmpty = isEmptyNode(node);
+
+    if (isH) {
+      // Titolo → chiude blocco corrente, apre nuovo blocco col titolo
+      flush();
+      cur.push(node); curWords = wc;
+
+    } else if (isEmpty) {
+      // Riga vuota = separatore semantico Word (doppio spazio)
+      // Flush solo se abbiamo già abbastanza contenuto, altrimenti ignora
+      if (curWords >= MIN_FLUSH) flush();
+
+    } else {
+      // Tutto il resto (paragrafi, liste, esempi, note) → accumula
+      cur.push(node); curWords += wc;
+      // Rete di sicurezza: taglia solo se non siamo in mezzo a una lista
+      if (!isList && curWords >= MAX_WORDS) flush();
+    }
+  });
+  flush();
 
   // ── Calcola quante parole per pagina per i separatori ────────────────────
-  var _totalDocWords = blocks.reduce(function(s, b) { return s + b.words; }, 0);
+  var _totalDocWords = groups.reduce(function(s, g) {
+    return s + g.reduce(function(gs, n) { return gs + wcOf(n); }, 0);
+  }, 0);
   var WORDS_PER_PAGE = (actualPageCount && actualPageCount > 1 && _totalDocWords > 0)
     ? Math.max(180, Math.min(900, Math.round(_totalDocWords / actualPageCount)))
-    : 450;
+    : 320;
 
-  // ── Crea la pagina (un singolo div, scroll continuo come Word Web Layout) ─
+  // ── Crea pagina bianca + blocchi + numeri di pagina ──────────────────────
   var page = document.createElement('div');
   page.className = 'doc-page';
-  viewer.appendChild(page);
 
   var pageWordCount = 0;
   var pageNum       = 1;
 
-  function maybeInsertPageBreak(wc) {
-    pageWordCount += wc;
+  function maybeInsertPageBreak(wordsInBlock) {
+    pageWordCount += wordsInBlock;
     if (pageWordCount >= WORDS_PER_PAGE && pageNum < (actualPageCount || 9999)) {
       pageNum++;
       pageWordCount = pageWordCount % WORDS_PER_PAGE;
@@ -22108,57 +22163,42 @@ function wbRenderDocViewer(html, actualPageCount) {
       pb.className = 'doc-page-break';
       var pn = document.createElement('span');
       pn.className = 'doc-page-num';
-      pn.textContent = 'pag. ' + pageNum;
+      pn.textContent = '— ' + pageNum + ' —';
       pb.appendChild(pn);
       page.appendChild(pb);
     }
   }
 
-  // ── Crea un blocco interattivo per ogni nodo, preservando l'HTML originale ─
-  function makeBlock(b, idx) {
-    if (!b.text) return null;
-    maybeInsertPageBreak(b.words);
+  function makeBlock(group) {
+    var totalText = group.map(function(n) { return (n.textContent || '').trim(); }).join('\n').trim();
+    if (totalText.length < 5) return null;
+    var blockWords = group.reduce(function(s, n) { return s + wcOf(n); }, 0);
+    maybeInsertPageBreak(blockWords);
     var block = document.createElement('div');
     block.className = 'doc-block';
-    block.appendChild(b.node.cloneNode(true)); // preserva HTML/CSS del nodo originale
-
-    // Per l'AI: raccogli testo del blocco + contesto adiacente (window 200 parole)
-    function getAiText() {
-      var collected = b.text;
-      var extra = 0;
-      // aggiungi blocchi precedenti finché non supero 200 parole totali
-      for (var i = idx - 1; i >= 0 && extra < 200; i--) {
-        collected = blocks[i].text + '\n' + collected;
-        extra += blocks[i].words;
-      }
-      // aggiungi blocchi successivi
-      for (var j = idx + 1; j < blocks.length && extra < 200; j++) {
-        collected = collected + '\n' + blocks[j].text;
-        extra += blocks[j].words;
-      }
-      return collected;
-    }
-
+    block.innerHTML = group.map(function(n) { return n.outerHTML; }).join('');
     var chk = document.createElement('div');
     chk.className = 'doc-block-chk';
     chk.innerHTML = '✓';
     chk.title = 'Seleziona blocco (max 3)';
-    (function(bl, t, c, aiT) {
+    (function(b, t, c) {
       c.addEventListener('click', function(e) {
         e.stopPropagation();
-        wbToggleBlockSelect(bl, t, c);
+        wbToggleBlockSelect(b, t, c);
       });
-      bl.addEventListener('click', function(e) {
+      b.addEventListener('click', function(e) {
         e.stopPropagation();
         var sel = window.getSelection();
         if (sel && !sel.isCollapsed && sel.toString().trim().length > 2) return;
-        wbShowBlockTooltip(bl, aiT);
+        wbShowBlockTooltip(b, t);
       });
-    })(block, b.text, chk, getAiText());
+    })(block, totalText, chk);
     block.appendChild(chk);
-    wbNoteAddBadge(block, b.text);
+    wbNoteAddBadge(block, totalText);
     return block;
   }
+
+  viewer.appendChild(page);
 
   function wbPostRender() {
     viewer.onscroll = wbUpdatePageCounter;
@@ -22182,16 +22222,15 @@ function wbRenderDocViewer(html, actualPageCount) {
     if (sub) sub.textContent = 'Clicca un blocco per analizzarlo';
   }
 
-  // Rendering asincrono a chunk per evitare freeze su documenti grandi
-  var CHUNK = 40;
-  var bi = 0;
+  var CHUNK = 30;
+  var gi    = 0;
   function renderChunk() {
-    var end = Math.min(bi + CHUNK, blocks.length);
-    for (; bi < end; bi++) {
-      var bl = makeBlock(blocks[bi], bi);
+    var end = Math.min(gi + CHUNK, groups.length);
+    for (; gi < end; gi++) {
+      var bl = makeBlock(groups[gi]);
       if (bl) page.appendChild(bl);
     }
-    if (bi < blocks.length) {
+    if (gi < groups.length) {
       requestAnimationFrame(renderChunk);
     } else {
       wbPostRender();
