@@ -22208,6 +22208,7 @@ function wbRenderDocViewer(html, actualPageCount) {
   //  <em>Nome tipo</em>: ...      (corsivo iniziale seguito da :)
   function isBlockStarterNode(n) {
     var t = (n.textContent || '').trim();
+    var wc = t.split(/\s+/).filter(Boolean).length;
     // Trattino "—" diventa starter solo se ha >20 parole (voce sostanziosa a sé)
     // Voci brevi di elenco restano tutte nello stesso blocco
     if (/^[—–]\s+\S/.test(t) && wc > 20) return true;
