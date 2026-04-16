@@ -22071,7 +22071,11 @@ function wbRenderDocViewer(html, actualPageCount) {
   var parser = new DOMParser();
   var parsed = parser.parseFromString('<body>' + html + '</body>', 'text/html');
   var nodes = Array.from(parsed.body.childNodes).filter(function(n) {
-    return n.nodeType === 1 && (n.textContent || '').trim().length > 1;
+    if (n.nodeType !== 1) return false;
+    var t = (n.textContent || '').replace(/[\s\u00a0]/g, '');
+    // Preserva <p> vuoti: sono righe-vuota Word (separatori semantici)
+    if (t.length === 0) return n.tagName.toLowerCase() === 'p';
+    return t.length > 1;
   });
 
   function wcOf(n) {
@@ -22090,8 +22094,8 @@ function wbRenderDocViewer(html, actualPageCount) {
   //     nel blocco corrente senza mai triggherare un flush.
   //  4. MAX_WORDS = rete di sicurezza: nessun blocco supera ~380 parole.
   //     Il taglio avviene al termine del paragrafo corrente, non a metà.
-  var MAX_WORDS = 380;   // rete di sicurezza — nessun blocco supera questa soglia
-  var MIN_FLUSH = 80;    // riga vuota ignorata se il blocco è ancora piccolo
+  var MAX_WORDS = 250;   // rete di sicurezza — nessun blocco supera questa soglia
+  var MIN_FLUSH = 60;    // riga vuota ignorata se il blocco è ancora piccolo
   var groups   = [];
   var cur      = [];
   var curWords = 0;
