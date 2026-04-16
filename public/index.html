@@ -22179,8 +22179,9 @@ function wbRenderDocViewer(html, actualPageCount) {
     var t = (n.textContent || '').trim();
     if (t.length === 0) return false;
     var wc = t.split(/\s+/).filter(Boolean).length;
-    // "Art. 71 LA PROCEDURA APERTA" / "Art. 73 …" → articolo numerato
-    if (/^Art\.\s*\d+/i.test(t)) return true;
+    // "Art. 71 LA PROCEDURA APERTA …" → heading solo se ha >10 parole
+    // Articoli brevi tipo "Art. 1 - Principio del risultato." restano nel blocco come lista
+    if (/^Art\.\s*\d+/i.test(t) && wc > 10) return true;
     // "Sezione I", "Sezione II" → sezione numerata romana
     if (/^Sezione\s+[IVX0-9]/i.test(t)) return true;
     // "A) BANDO DI GARA", "B) PRESENTAZIONE OFFERTE" → lettera+) in caps
@@ -22207,7 +22208,9 @@ function wbRenderDocViewer(html, actualPageCount) {
   //  <em>Nome tipo</em>: ...      (corsivo iniziale seguito da :)
   function isBlockStarterNode(n) {
     var t = (n.textContent || '').trim();
-    if (/^[—–]\s+\S/.test(t)) return true;
+    // Trattino "—" diventa starter solo se ha >20 parole (voce sostanziosa a sé)
+    // Voci brevi di elenco restano tutte nello stesso blocco
+    if (/^[—–]\s+\S/.test(t) && wc > 20) return true;
     var first = n.firstElementChild;
     if (first && (first.tagName === 'EM' || first.tagName === 'STRONG')) {
       if (t.substring(0, 80).indexOf(':') !== -1) return true;
