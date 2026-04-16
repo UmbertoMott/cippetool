@@ -5882,7 +5882,6 @@ document.addEventListener('DOMContentLoaded', function() {
           </span>
         </div>
         <button class="wb-segment-btn" id="wbSegBtn" onclick="wbAutoSegment()" style="display:none">↻ Risegmenta</button>
-        <button class="wb-segment-btn" id="wbBlockMapBtn" onclick="wbToggleBlockMap()" style="display:none;background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.4)">☰ Blocchi</button>
       </div>
     </div>
 
@@ -22370,7 +22369,9 @@ function wbBuildBlockMap() {
   });
 
   if (count) count.textContent = blocks.length + ' blocchi';
-  if (btn)   btn.style.display = 'inline-flex';
+  // Apri automaticamente il pannello appena il documento è caricato
+  var panel = document.getElementById('wbBlockMap');
+  if (panel) panel.classList.add('bm-open');
 }
 
 var _wbActiveBlock = null;
