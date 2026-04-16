@@ -4780,6 +4780,274 @@ body.theme-light input:-webkit-autofill:focus {
 .llc-sch-cp-list{display:flex;flex-direction:column;gap:5px}
 .llc-sch-cp-item{font-size:10.5px;color:rgba(196,181,253,.8);padding:5px 8px;background:rgba(124,58,237,.06);border-radius:5px;border-left:2px solid rgba(124,58,237,.3);line-height:1.5;font-style:italic}
 </style>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     AI PROFESSOR — CSS
+     ═══════════════════════════════════════════════════════════════ -->
+<style>
+/* ── Prof: screen shell ───────────────────────────────────────── */
+#screenProfessor {
+  --prof-acc:     #f59e0b;
+  --prof-acc-lt:  #fbbf24;
+  --prof-acc-dim: rgba(245,158,11,.13);
+  --prof-acc-glow:rgba(245,158,11,.28);
+  --prof-bg:      #07060a;
+  --prof-card:    #0f0e14;
+  --prof-border:  rgba(245,158,11,.18);
+  --prof-border2: rgba(255,255,255,.08);
+  --prof-text:    #f5f0e8;
+  --prof-meta:    rgba(245,240,228,.38);
+  background: var(--prof-bg);
+  display: none; flex-direction: column;
+  font-family: 'Inter','Segoe UI',sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+#screenProfessor.active { display: flex; }
+
+/* light mode overrides */
+body.theme-light #screenProfessor {
+  --prof-bg:     #faf8f4;
+  --prof-card:   #ffffff;
+  --prof-border: rgba(180,120,10,.22);
+  --prof-text:   #1a1208;
+  --prof-meta:   rgba(26,18,8,.42);
+}
+body.theme-light #screenProfessor .prof-header      { background: rgba(250,248,244,.97) !important; border-bottom-color: rgba(0,0,0,.08) !important; }
+body.theme-light #screenProfessor .prof-left        { background: #f3f0ea !important; border-right-color: rgba(0,0,0,.08) !important; }
+body.theme-light #screenProfessor .prof-right       { background: #ffffff !important; }
+body.theme-light #screenProfessor .prof-upload-zone { background: rgba(245,158,11,.06) !important; border-color: rgba(180,120,10,.22) !important; }
+body.theme-light #screenProfessor .prof-upload-text { color: #6b4a12 !important; }
+body.theme-light #screenProfessor .prof-upload-sub  { color: rgba(107,74,18,.55) !important; }
+body.theme-light #screenProfessor .prof-chat-bubble-user { background: rgba(245,158,11,.12) !important; border-color: rgba(180,120,10,.28) !important; color: #1a1208 !important; }
+body.theme-light #screenProfessor .prof-chat-bubble-ai   { background: rgba(0,0,0,.04) !important;  border-color: rgba(0,0,0,.09) !important;  color: #1a1208 !important; }
+body.theme-light #screenProfessor .prof-text-input  { background: #f3f0ea !important; border-color: rgba(0,0,0,.12) !important; color: #1a1208 !important; }
+body.theme-light #screenProfessor .prof-controls    { background: rgba(243,240,234,.97) !important; border-top-color: rgba(0,0,0,.07) !important; }
+
+/* ── Prof: header ─────────────────────────────────────────────── */
+.prof-header {
+  flex-shrink: 0; display: flex; align-items: center; gap: 14px;
+  padding: 0 20px; height: 52px;
+  background: rgba(7,6,10,.96); border-bottom: 1px solid var(--prof-border);
+  backdrop-filter: blur(12px); z-index: 10;
+}
+.prof-back {
+  height: 30px; padding: 0 14px;
+  background: transparent; border: 1px solid var(--prof-border2);
+  border-radius: 7px; color: var(--prof-meta);
+  font: 600 11px/1 inherit; cursor: pointer; transition: all .15s;
+}
+.prof-back:hover { border-color: var(--prof-acc); color: var(--prof-acc); }
+.prof-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.prof-brand-name { font-size: 14px; font-weight: 800; letter-spacing: -.03em; color: var(--prof-text); }
+.prof-brand-tag  { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--prof-acc); }
+.prof-spacer     { flex: 1; }
+.prof-domain-badge {
+  height: 24px; padding: 0 12px;
+  background: var(--prof-acc-dim); border: 1px solid var(--prof-border);
+  border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--prof-acc); display: flex; align-items: center;
+  transition: all .2s;
+}
+.prof-theme-btn {
+  background: none; border: 1px solid var(--prof-border2); color: var(--prof-meta);
+  width: 30px; height: 30px; border-radius: 7px; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+
+/* ── Prof: body split ─────────────────────────────────────────── */
+.prof-body { flex: 1; display: flex; min-height: 0; overflow: hidden; }
+
+/* ── Prof: LEFT orb panel ─────────────────────────────────────── */
+.prof-left {
+  width: 300px; flex-shrink: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: space-between;
+  padding: 40px 24px 28px;
+  background: #0a0910; border-right: 1px solid var(--prof-border);
+  overflow: hidden;
+}
+.prof-orb-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 20px;
+  position: relative;
+}
+/* ── Orb core + rings ─────── */
+.prof-orb {
+  position: relative; width: 160px; height: 160px;
+  display: flex; align-items: center; justify-content: center;
+}
+.prof-orb-ring {
+  position: absolute; border-radius: 50%; border: 1.5px solid var(--prof-acc);
+  animation: profOrbPulse 3s ease-in-out infinite;
+  opacity: 0;
+}
+.prof-orb-ring.r1 { width: 100%; height: 100%; animation-delay: 0s;    opacity: .22; }
+.prof-orb-ring.r2 { width:  78%; height:  78%; animation-delay: .7s;   opacity: .30; }
+.prof-orb-ring.r3 { width:  58%; height:  58%; animation-delay: 1.4s;  opacity: .40; }
+@keyframes profOrbPulse {
+  0%,100% { transform: scale(1);    opacity: var(--base-op, .22); }
+  50%      { transform: scale(1.06); opacity: calc(var(--base-op, .22) * 2.5); }
+}
+.prof-orb-ring.r1 { --base-op: .22; }
+.prof-orb-ring.r2 { --base-op: .30; }
+.prof-orb-ring.r3 { --base-op: .40; }
+
+.prof-orb-core {
+  width: 72px; height: 72px; border-radius: 50%; position: relative;
+  background: radial-gradient(circle at 38% 38%, #fde68a 0%, #f59e0b 55%, #b45309 100%);
+  box-shadow: 0 0 24px var(--prof-acc-glow), 0 0 60px rgba(245,158,11,.14);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; transition: transform .2s, box-shadow .2s;
+  animation: profCoreIdle 4s ease-in-out infinite;
+}
+@keyframes profCoreIdle {
+  0%,100% { box-shadow: 0 0 24px rgba(245,158,11,.28), 0 0 60px rgba(245,158,11,.12); }
+  50%     { box-shadow: 0 0 36px rgba(245,158,11,.55), 0 0 80px rgba(245,158,11,.22); }
+}
+/* state overrides */
+#screenProfessor.prof-state-listening .prof-orb-core {
+  background: radial-gradient(circle at 38% 38%, #bfdbfe 0%, #3b82f6 55%, #1d4ed8 100%);
+  box-shadow: 0 0 36px rgba(59,130,246,.6), 0 0 80px rgba(59,130,246,.22);
+  animation: profCoreListening 1s ease-in-out infinite;
+}
+@keyframes profCoreListening {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.08); }
+}
+#screenProfessor.prof-state-thinking .prof-orb-core {
+  background: radial-gradient(circle at 38% 38%, #e9d5ff 0%, #a855f7 55%, #6b21a8 100%);
+  box-shadow: 0 0 36px rgba(168,85,247,.6), 0 0 80px rgba(168,85,247,.22);
+  animation: profCoreThinking 0.6s ease-in-out infinite alternate;
+}
+@keyframes profCoreThinking {
+  from { transform: scale(0.96) rotate(-2deg); }
+  to   { transform: scale(1.04) rotate(2deg);  }
+}
+#screenProfessor.prof-state-speaking .prof-orb-core {
+  background: radial-gradient(circle at 38% 38%, #fde68a 0%, #f59e0b 55%, #92400e 100%);
+  box-shadow: 0 0 48px rgba(245,158,11,.75), 0 0 90px rgba(245,158,11,.30);
+  animation: profCoreSpeaking .35s ease-in-out infinite alternate;
+}
+@keyframes profCoreSpeaking {
+  from { transform: scale(0.97); }
+  to   { transform: scale(1.07); }
+}
+.prof-state-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--prof-acc); opacity: .7; text-align: center;
+  transition: opacity .3s;
+}
+
+/* ── Prof: upload zone ────────────────────────────────────────── */
+.prof-upload-zone {
+  width: 100%; padding: 14px 16px; border-radius: 12px;
+  background: rgba(245,158,11,.07); border: 1.5px dashed var(--prof-border);
+  cursor: pointer; text-align: center; transition: all .2s;
+}
+.prof-upload-zone:hover { background: rgba(245,158,11,.13); border-color: var(--prof-acc-lt); }
+.prof-upload-zone.has-file { border-style: solid; background: rgba(245,158,11,.12); }
+.prof-upload-icon { font-size: 22px; margin-bottom: 4px; }
+.prof-upload-text { font-size: 11px; font-weight: 700; color: var(--prof-acc); letter-spacing: .04em; }
+.prof-upload-sub  { font-size: 10px; color: var(--prof-meta); margin-top: 3px; word-break: break-all; }
+
+/* ── Prof: RIGHT chat panel ───────────────────────────────────── */
+.prof-right {
+  flex: 1; min-width: 0; display: flex; flex-direction: column;
+  background: var(--prof-bg); overflow: hidden;
+}
+.prof-chat {
+  flex: 1; overflow-y: auto; padding: 24px 28px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+  scrollbar-width: thin; scrollbar-color: rgba(245,158,11,.2) transparent;
+}
+.prof-chat::-webkit-scrollbar { width: 4px; }
+.prof-chat::-webkit-scrollbar-thumb { background: rgba(245,158,11,.22); border-radius: 4px; }
+.prof-welcome { text-align: center; margin: auto; padding: 40px 20px; }
+.prof-welcome-title { font-size: 22px; font-weight: 800; letter-spacing: -.03em; color: var(--prof-acc); margin-bottom: 10px; }
+.prof-welcome-sub   { font-size: 13px; color: var(--prof-meta); line-height: 1.7; }
+/* bubbles */
+.prof-chat-bubble-user {
+  align-self: flex-end; max-width: 74%; padding: 10px 14px;
+  background: var(--prof-acc-dim); border: 1px solid var(--prof-border);
+  border-radius: 14px 14px 3px 14px; font-size: 13px; line-height: 1.55;
+  color: var(--prof-text); word-break: break-word;
+}
+.prof-chat-bubble-ai {
+  align-self: flex-start; max-width: 86%; padding: 12px 16px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 3px 14px 14px 14px; font-size: 13px; line-height: 1.65;
+  color: var(--prof-text); word-break: break-word;
+}
+.prof-chat-bubble-ai strong { color: var(--prof-acc); }
+.prof-bubble-thinking {
+  display: flex; gap: 5px; align-items: center; padding: 12px 16px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 3px 14px 14px 14px; align-self: flex-start;
+}
+.prof-bubble-thinking span {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--prof-acc);
+  animation: profDot .9s ease-in-out infinite;
+}
+.prof-bubble-thinking span:nth-child(2) { animation-delay: .2s; }
+.prof-bubble-thinking span:nth-child(3) { animation-delay: .4s; }
+@keyframes profDot {
+  0%,100% { opacity: .2; transform: translateY(0); }
+  50%     { opacity: 1;  transform: translateY(-4px); }
+}
+/* ── Prof: input row ──────────────────────────────────────────── */
+.prof-input-row {
+  flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px 0; margin-bottom: 0;
+}
+.prof-text-input {
+  flex: 1; height: 38px; padding: 0 14px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px; color: var(--prof-text); font: inherit; font-size: 13px;
+  outline: none; transition: border-color .15s;
+}
+.prof-text-input:focus   { border-color: var(--prof-acc); }
+.prof-text-input::placeholder { color: var(--prof-meta); }
+.prof-send-btn {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  background: var(--prof-acc); border: none; color: #1a0f00;
+  font-size: 16px; font-weight: 900; cursor: pointer; transition: opacity .15s;
+}
+.prof-send-btn:hover { opacity: .85; }
+/* ── Prof: controls bar ───────────────────────────────────────── */
+.prof-controls {
+  flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px 14px;
+  background: rgba(7,6,10,.95); border-top: 1px solid rgba(255,255,255,.06);
+}
+.prof-mic-btn {
+  display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 18px;
+  background: var(--prof-acc); border: none; border-radius: 10px;
+  color: #1a0f00; font: 700 12px/1 inherit; letter-spacing: .04em;
+  cursor: pointer; transition: all .15s; flex-shrink: 0;
+  box-shadow: 0 0 16px var(--prof-acc-glow);
+}
+.prof-mic-btn.active { background: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,.4); color: #fff; }
+.prof-mic-btn:hover:not(.active) { opacity: .85; }
+.prof-stop-btn {
+  height: 40px; padding: 0 16px; background: rgba(239,68,68,.12);
+  border: 1px solid rgba(239,68,68,.3); border-radius: 10px;
+  color: #f87171; font: 600 11px/1 inherit; cursor: pointer;
+  transition: all .15s; flex-shrink: 0;
+}
+.prof-stop-btn:hover { background: rgba(239,68,68,.22); }
+.prof-vol-bar {
+  flex: 1; height: 5px; background: rgba(255,255,255,.07); border-radius: 999px; overflow: hidden;
+}
+.prof-vol-fill { height: 100%; width: 0%; background: var(--prof-acc); border-radius: 999px; transition: width .1s; }
+.prof-clear-btn {
+  height: 32px; padding: 0 12px; background: transparent;
+  border: 1px solid var(--prof-border2); border-radius: 8px;
+  color: var(--prof-meta); font: 600 10px/1 inherit; cursor: pointer;
+  transition: all .15s; flex-shrink: 0;
+}
+.prof-clear-btn:hover { border-color: rgba(239,68,68,.4); color: #f87171; }
+</style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -5861,10 +6129,106 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </button>
 
+      <!-- AI PROFESSOR CARD -->
+      <button onclick="profOpen()" style="
+        background:var(--sur);border:1.5px solid var(--bdr);border-radius:20px;
+        padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
+        color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
+        display:flex;flex-direction:column;gap:14px;
+      " onmouseover="this.style.borderColor='#f59e0b';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(245,158,11,.18)'"
+         onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:40px">🎙️</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;margin-bottom:6px">Prof. Lex — AI Docente Vocale</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">Interazione 100% vocale · Analisi documenti · Privacy · Penale · Civile · Lavoro · AI con web search · Fonte autorevole per ogni dominio</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
+          Parla con il professore <span style="font-size:16px">→</span>
+        </div>
+      </button>
+
     </div>
     <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
       <span>Puoi tornare qui in qualsiasi momento</span>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     AI PROFESSOR SCREEN
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenProfessor">
+  <!-- Header -->
+  <div class="prof-header">
+    <button class="prof-back" onclick="profClose()">← Torna</button>
+    <div class="prof-brand">
+      <span style="font-size:18px">🎙️</span>
+      <span class="prof-brand-name">Prof. Lex</span>
+      <span class="prof-brand-tag">AI Docente · Voce</span>
+    </div>
+    <div class="prof-spacer"></div>
+    <div id="profDomainBadge" class="prof-domain-badge" style="display:none">—</div>
+    <button onclick="toggleTheme()" class="prof-theme-btn" title="Tema">☀️</button>
+  </div>
+
+  <!-- Body split: left orb | right chat -->
+  <div class="prof-body">
+
+    <!-- LEFT: orb + upload -->
+    <div class="prof-left">
+      <div class="prof-orb-wrap">
+        <div class="prof-orb" id="profOrb">
+          <div class="prof-orb-ring r1"></div>
+          <div class="prof-orb-ring r2"></div>
+          <div class="prof-orb-ring r3"></div>
+          <div class="prof-orb-core" id="profOrbCore">
+            <span id="profOrbIcon">🎙️</span>
+          </div>
+        </div>
+        <div class="prof-state-label" id="profStateLabel">In attesa…</div>
+      </div>
+
+      <div class="prof-upload-zone" id="profUploadZone" onclick="profPickFile()">
+        <div class="prof-upload-icon">📄</div>
+        <div class="prof-upload-text">Carica documento (PDF / DOCX)</div>
+        <div class="prof-upload-sub" id="profFileName">Nessun file caricato</div>
+      </div>
+      <input type="file" id="profFilePicker" accept=".pdf,.docx,.doc" style="display:none">
+    </div>
+
+    <!-- RIGHT: chat + input + controls -->
+    <div class="prof-right">
+      <div class="prof-chat" id="profChat">
+        <div class="prof-welcome" id="profWelcome">
+          <div class="prof-welcome-title">Ciao! Sono Prof. Lex</div>
+          <div class="prof-welcome-sub">
+            Premi <strong style="color:#f59e0b">🎤 Parla</strong> e fammi una domanda,<br>
+            oppure carica un documento a sinistra e chiedimi di analizzarlo.<br>
+            Posso aiutarti su Privacy, Penale, Lavoro, Civile, Diritto Europeo e molto altro.
+          </div>
+        </div>
+      </div>
+
+      <div class="prof-input-row">
+        <input type="text" id="profTextInput" class="prof-text-input"
+               placeholder="O scrivi qui la tua domanda…"
+               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();profAsk();}">
+        <button class="prof-send-btn" onclick="profAsk()" title="Invia">↑</button>
+      </div>
+
+      <div class="prof-controls">
+        <button class="prof-mic-btn" id="profMicBtn" onclick="profToggleMic()">
+          <span id="profMicIcon">🎤</span>
+          <span id="profMicLabel">Parla</span>
+        </button>
+        <button class="prof-stop-btn" id="profStopBtn" onclick="profStop()">⏹ Stop</button>
+        <div class="prof-vol-bar">
+          <div class="prof-vol-fill" id="profVolFill"></div>
+        </div>
+        <button class="prof-clear-btn" onclick="profClear()">🗑 Pulisci</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -23557,6 +23921,552 @@ function wbSelectSection(idx) {
     <button class="wmp-btn" onclick="document.getElementById('wbMaxPinsPopup').style.display='none'">Ho capito</button>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     AI PROFESSOR — JAVASCRIPT MODULE
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+'use strict';
+
+// ── Domain authority map ──────────────────────────────────────────────
+var PROF_AUTHORITIES = {
+  privacy: {
+    label: 'Privacy & Data Protection',
+    sources: 'GDPR (Reg. UE 2016/679), ePrivacy Dir. 2002/58/CE, CCPA (California), LGPD (Brasile), PIPL (Cina), Linee guida EDPB, Provvedimenti Garante Privacy IT, Decisioni CJEU (Schrems I & II, Meta/Facebook), WP29 opinions, ISO/IEC 27701'
+  },
+  penale: {
+    label: 'Diritto Penale',
+    sources: 'Codice Penale italiano (R.D. 1930/2531), Codice di Procedura Penale, D.Lgs. 231/2001 (responsabilità enti), CEDU art. 6-7, Giurisprudenza Cassazione penale, Direttiva 2012/29/UE (vittime reato), Linee guida ONU criminologia'
+  },
+  civile: {
+    label: 'Diritto Civile',
+    sources: 'Codice Civile italiano (1942), Codice di Procedura Civile, Direttiva 93/13/CEE (clausole abusive), Dir. 2011/83/UE (consumatori), Reg. Roma I e II, Giurisprudenza Cassazione civile, Principi UNIDROIT'
+  },
+  lavoro: {
+    label: 'Diritto del Lavoro',
+    sources: 'Statuto dei Lavoratori (L. 300/1970), D.Lgs. 81/2015 (Jobs Act), D.Lgs. 81/2008 (sicurezza), Direttiva UE 2019/1152 (trasparenza), Direttiva UE 2019/1158 (equilibrio vita-lavoro), Reg. UE 2019/452 (CSDD), Accordi CCNL, Giurisprudenza giuslavoristica'
+  },
+  amministrativo: {
+    label: 'Diritto Amministrativo',
+    sources: 'L. 241/1990 (procedimento amm.), D.Lgs. 50/2016 (codice appalti), D.Lgs. 33/2013 (trasparenza PA), TAR e Consiglio di Stato, Linee guida ANAC, Carta dei diritti fondamentali UE, OCSE governance pubblica'
+  },
+  europeo: {
+    label: 'Diritto Europeo',
+    sources: 'TFUE, TUE, Carta dei diritti fondamentali UE, Reg. 2024/1689 (AI Act), DSA (Reg. 2022/2065), DMA (Reg. 2022/1925), NIS2 (Dir. 2022/2555), DORA (Reg. 2022/2554), Giurisprudenza CGUE, CEDU'
+  },
+  costituzionale: {
+    label: 'Diritto Costituzionale',
+    sources: 'Costituzione della Repubblica Italiana (1948), Giurisprudenza Corte Costituzionale, Dottrina costituzionalistica, CEDU e Protocolli, Convenzioni internazionali sui diritti umani, Corte EDU Strasburgo'
+  },
+  ai: {
+    label: 'AI & Tech Law',
+    sources: 'AI Act UE (Reg. 2024/1689), GDPR artt. 22 e 35 (automated decision-making, DPIA), Linee guida EDPB su AI, NIST AI RMF, ISO/IEC 42001, Proposta EU Liability Directive, FTC AI guidelines USA, OECD AI Principles'
+  }
+};
+
+// ── State ─────────────────────────────────────────────────────────────
+var _prof = {
+  domain: null,
+  docText: '',
+  docName: '',
+  history: [],          // [{role:'user'|'model', parts:[{text}]}]
+  recog: null,
+  recognizing: false,
+  speaking: false,
+  audioCtx: null,
+  analyser: null,
+  micStream: null,
+  volRaf: null,
+  utterance: null
+};
+
+// ── Open / Close ──────────────────────────────────────────────────────
+window.profOpen = function() {
+  showScreen('screenProfessor');
+  _profSetState('idle');
+};
+window.profClose = function() {
+  profStop();
+  showScreen('screenMode');
+};
+
+// ── State machine ─────────────────────────────────────────────────────
+function _profSetState(state) {
+  var sc = document.getElementById('screenProfessor');
+  var label = document.getElementById('profStateLabel');
+  var icon  = document.getElementById('profOrbIcon');
+  if (!sc) return;
+  sc.classList.remove('prof-state-listening','prof-state-thinking','prof-state-speaking');
+  var labels = { idle:'In attesa…', listening:'In ascolto…', thinking:'Sto elaborando…', speaking:'Sto parlando…' };
+  var icons  = { idle:'🎙️', listening:'👂', thinking:'💭', speaking:'🔊' };
+  if (state !== 'idle') sc.classList.add('prof-state-' + state);
+  if (label) label.textContent = labels[state] || 'In attesa…';
+  if (icon)  icon.textContent  = icons[state]  || '🎙️';
+}
+
+// ── Domain detection ──────────────────────────────────────────────────
+var _profDomainPatterns = [
+  { domain:'privacy',         re:/gdpr|dati\s+person|data\s+protection|privacy|garante|edpb|trattamento|titolare|responsabile\s+del\s+trattamento|interessato|consenso|data\s+breach/i },
+  { domain:'penale',          re:/reato|codice\s+penale|imputato|condanna|pena|sentenza\s+penale|delitto|contravvenzione|recidiva|archiviazione|rinvio\s+a\s+giudizio/i },
+  { domain:'lavoro',          re:/lavoratore|datore\s+di\s+lavoro|contratto\s+di\s+lavoro|ccnl|licenziamento|mobbing|inps|inail|retribuzione|orario\s+di\s+lavoro|jobs\s+act/i },
+  { domain:'amministrativo',  re:/pubblica\s+amministrazione|appalto|gara\s+pubblica|anac|silenzio[-\s]assenso|procedimento\s+amministrativo|ricorso\s+al\s+tar|consiglio\s+di\s+stato/i },
+  { domain:'europeo',         re:/diritto\s+europeo|ue\s*\d{4}|regolamento\s+ue|direttiva\s+ue|ai\s+act|dsa|dma|nis2|dora|tfue|cgue|corte\s+di\s+giustizia/i },
+  { domain:'ai',              re:/intelligenza\s+artificiale|ai\s+act|machine\s+learning|llm|large\s+language\s+model|automated\s+decision|algoritmo/i },
+  { domain:'costituzionale',  re:/costituzione|corte\s+costituzionale|diritti\s+fondamentali|cedu|articolo\s+\d+\s+cost\b/i },
+  { domain:'civile',          re:/codice\s+civile|contratto|risarcimento\s+danni|responsabilit[àa]\s+civile|obbligazione|inadempimento|cassazione\s+civile/i }
+];
+
+function profDetectDomain(text) {
+  var scores = {};
+  _profDomainPatterns.forEach(function(p) {
+    var m = text.match(new RegExp(p.re.source, 'gi'));
+    if (m) scores[p.domain] = (scores[p.domain] || 0) + m.length;
+  });
+  var best = null, bestScore = 0;
+  Object.keys(scores).forEach(function(d) {
+    if (scores[d] > bestScore) { bestScore = scores[d]; best = d; }
+  });
+  return bestScore >= 1 ? best : null;
+}
+
+function _profUpdateDomainBadge(domain) {
+  _prof.domain = domain;
+  var badge = document.getElementById('profDomainBadge');
+  if (!badge) return;
+  if (domain && PROF_AUTHORITIES[domain]) {
+    badge.textContent = PROF_AUTHORITIES[domain].label;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ── System prompt builder ─────────────────────────────────────────────
+function _profBuildSystemPrompt() {
+  var domain = _prof.domain || 'europeo';
+  var auth   = PROF_AUTHORITIES[domain] || PROF_AUTHORITIES['europeo'];
+  var docCtx = _prof.docText
+    ? '\n\n## Documento caricato dall\'utente:\n' + _prof.docText.substring(0, 6000) + (_prof.docText.length > 6000 ? '\n[...documento troncato per lunghezza...]' : '')
+    : '';
+
+  return 'Sei Prof. Lex, un docente universitario di diritto di alto profilo, esperto in ' + auth.label + '.\n'
+    + 'Rispondi in italiano, con linguaggio autorevole ma accessibile, come un professore che spiega ad un dottorando o a un avvocato.\n'
+    + 'Usa fonti normative precise. Le autorità e fonti principali per questo dominio sono:\n'
+    + auth.sources + '\n'
+    + 'Struttura le risposte in modo chiaro: definizione, normativa di riferimento, casi pratici/giurisprudenza, implicazioni.\n'
+    + 'Se non sai qualcosa con certezza, dillo esplicitamente invece di inventare.\n'
+    + 'Risposte moderate in lunghezza: complete ma non eccessivamente lunghe per essere lette ad alta voce.'
+    + docCtx;
+}
+
+// ── Chat bubble helpers ───────────────────────────────────────────────
+function _profAddBubble(role, text) {
+  var chat = document.getElementById('profChat');
+  var welcome = document.getElementById('profWelcome');
+  if (welcome) { welcome.style.display = 'none'; }
+  var div = document.createElement('div');
+  div.className = role === 'user' ? 'prof-chat-bubble-user' : 'prof-chat-bubble-ai';
+  // basic markdown → html
+  var html = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/\n/g,'<br>');
+  div.innerHTML = html;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function _profAddThinking() {
+  var chat = document.getElementById('profChat');
+  var welcome = document.getElementById('profWelcome');
+  if (welcome) welcome.style.display = 'none';
+  var div = document.createElement('div');
+  div.className = 'prof-bubble-thinking';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+// ── Ask (core) ────────────────────────────────────────────────────────
+window.profAsk = function(questionOverride) {
+  var input = document.getElementById('profTextInput');
+  var question = questionOverride || (input ? input.value.trim() : '');
+  if (!question) return;
+  if (input) input.value = '';
+
+  // detect domain from question + doc
+  var combined = question + ' ' + _prof.docText.substring(0, 2000);
+  var detected = profDetectDomain(combined);
+  if (detected) _profUpdateDomainBadge(detected);
+
+  _profAddBubble('user', question);
+  _prof.history.push({ role: 'user', parts: [{ text: question }] });
+
+  _profSetState('thinking');
+  var stopBtn = document.getElementById('profStopBtn');
+  if (stopBtn) stopBtn.style.display = 'inline-flex';
+
+  var thinkEl = _profAddThinking();
+
+  // Build Gemini payload
+  var sysPrompt = _profBuildSystemPrompt();
+  var contents = _prof.history.slice(-12); // last 12 turns
+
+  fetch('/api/gemini', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gemini-2.0-flash',
+      system_instruction: sysPrompt,
+      contents: contents,
+      generationConfig: { temperature: 0.65, maxOutputTokens: 1024 }
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
+    var answer = '';
+    try {
+      answer = data.candidates[0].content.parts[0].text || '';
+    } catch(e) {
+      answer = data.text || data.error || 'Errore nella risposta.';
+    }
+    _prof.history.push({ role: 'model', parts: [{ text: answer }] });
+    _profAddBubble('ai', answer);
+    _profSpeak(answer);
+  })
+  .catch(function(err) {
+    if (thinkEl && thinkEl.parentNode) thinkEl.parentNode.removeChild(thinkEl);
+    _profSetState('idle');
+    if (stopBtn) stopBtn.style.display = 'none';
+    _profAddBubble('ai', '⚠️ Errore di connessione: ' + err.message);
+    console.error('[Prof] API error:', err);
+  });
+};
+
+// ── TTS speak ─────────────────────────────────────────────────────────
+function _profSpeak(text) {
+  if (!window.speechSynthesis) {
+    _profSetState('idle');
+    var stopBtn = document.getElementById('profStopBtn');
+    if (stopBtn) stopBtn.style.display = 'none';
+    return;
+  }
+  window.speechSynthesis.cancel();
+  _profSetState('speaking');
+
+  // strip markdown for TTS
+  var clean = text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\n+/g, ' ')
+    .trim();
+
+  var utter = new SpeechSynthesisUtterance(clean);
+  utter.lang   = 'it-IT';
+  utter.rate   = 0.82;
+  utter.pitch  = 0.70;
+
+  // pick best Italian male voice
+  function _pickVoice() {
+    var voices = window.speechSynthesis.getVoices();
+    var prefs = ['Luca','Cosimo','Google italiano','it-IT'];
+    for (var i = 0; i < prefs.length; i++) {
+      for (var j = 0; j < voices.length; j++) {
+        if (voices[j].name.toLowerCase().indexOf(prefs[i].toLowerCase()) !== -1
+            || voices[j].lang.toLowerCase().indexOf(prefs[i].toLowerCase()) !== -1) {
+          return voices[j];
+        }
+      }
+    }
+    return null;
+  }
+
+  var voice = _pickVoice();
+  if (!voice && window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = function() {
+      utter.voice = _pickVoice();
+    };
+  } else if (voice) {
+    utter.voice = voice;
+  }
+
+  utter.onend = function() {
+    _profSetState('idle');
+    var stopBtn = document.getElementById('profStopBtn');
+    if (stopBtn) stopBtn.style.display = 'none';
+    _prof.speaking = false;
+  };
+  utter.onerror = function() {
+    _profSetState('idle');
+    var stopBtn = document.getElementById('profStopBtn');
+    if (stopBtn) stopBtn.style.display = 'none';
+    _prof.speaking = false;
+  };
+
+  _prof.utterance = utter;
+  _prof.speaking = true;
+  window.speechSynthesis.speak(utter);
+}
+
+// ── Stop (both speech + recognition) ─────────────────────────────────
+window.profStop = function() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (_prof.recog && _prof.recognizing) {
+    try { _prof.recog.stop(); } catch(e) {}
+    _prof.recognizing = false;
+  }
+  _profStopAudioViz();
+  _prof.speaking = false;
+  _profSetState('idle');
+  var micBtn  = document.getElementById('profMicBtn');
+  var micIcon = document.getElementById('profMicIcon');
+  var micLbl  = document.getElementById('profMicLabel');
+  var stopBtn = document.getElementById('profStopBtn');
+  if (micBtn)  micBtn.classList.remove('active');
+  if (micIcon) micIcon.textContent = '🎤';
+  if (micLbl)  micLbl.textContent  = 'Parla';
+  if (stopBtn) stopBtn.style.display = 'none';
+};
+
+// ── Mic toggle (SpeechRecognition) ───────────────────────────────────
+window.profToggleMic = function() {
+  if (_prof.recognizing) {
+    _profStopMic();
+  } else {
+    _profStartMic();
+  }
+};
+
+function _profStartMic() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    alert('Il tuo browser non supporta il riconoscimento vocale. Usa Chrome o Edge.');
+    return;
+  }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+  var micBtn  = document.getElementById('profMicBtn');
+  var micIcon = document.getElementById('profMicIcon');
+  var micLbl  = document.getElementById('profMicLabel');
+
+  _prof.recog = new SR();
+  _prof.recog.lang = 'it-IT';
+  _prof.recog.continuous = false;
+  _prof.recog.interimResults = false;
+  _prof.recog.maxAlternatives = 1;
+
+  _prof.recog.onstart = function() {
+    _prof.recognizing = true;
+    _profSetState('listening');
+    if (micBtn)  micBtn.classList.add('active');
+    if (micIcon) micIcon.textContent = '⏹';
+    if (micLbl)  micLbl.textContent  = 'Stop';
+    _profStartAudioViz();
+  };
+
+  _prof.recog.onresult = function(e) {
+    var transcript = e.results[0][0].transcript.trim();
+    if (transcript) profAsk(transcript);
+  };
+
+  _prof.recog.onerror = function(e) {
+    console.warn('[Prof] Speech error:', e.error);
+    _profStopMic();
+    if (e.error !== 'no-speech') {
+      _profAddBubble('ai', '⚠️ Errore microfono: ' + e.error);
+    }
+  };
+
+  _prof.recog.onend = function() {
+    _profStopMic();
+  };
+
+  try {
+    _prof.recog.start();
+  } catch(e) {
+    console.warn('[Prof] Recog start error:', e);
+  }
+}
+
+function _profStopMic() {
+  _prof.recognizing = false;
+  _profStopAudioViz();
+  if (_prof.recog) {
+    try { _prof.recog.stop(); } catch(e) {}
+    _prof.recog = null;
+  }
+  var micBtn  = document.getElementById('profMicBtn');
+  var micIcon = document.getElementById('profMicIcon');
+  var micLbl  = document.getElementById('profMicLabel');
+  if (micBtn)  micBtn.classList.remove('active');
+  if (micIcon) micIcon.textContent = '🎤';
+  if (micLbl)  micLbl.textContent  = 'Parla';
+  if (!_prof.speaking) _profSetState('idle');
+}
+
+// ── Audio visualizer (Web Audio API → vol bar) ────────────────────────
+function _profStartAudioViz() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(function(stream) {
+      _prof.micStream = stream;
+      _prof.audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+      _prof.analyser  = _prof.audioCtx.createAnalyser();
+      _prof.analyser.fftSize = 256;
+      var src = _prof.audioCtx.createMediaStreamSource(stream);
+      src.connect(_prof.analyser);
+      _profVolLoop();
+    })
+    .catch(function() { /* permission denied, graceful */ });
+}
+
+function _profVolLoop() {
+  if (!_prof.analyser) return;
+  var buf = new Uint8Array(_prof.analyser.frequencyBinCount);
+  _prof.analyser.getByteFrequencyData(buf);
+  var sum = 0;
+  for (var i = 0; i < buf.length; i++) sum += buf[i];
+  var avg = sum / buf.length;
+  var pct = Math.min(100, (avg / 128) * 200);
+  var fill = document.getElementById('profVolFill');
+  if (fill) fill.style.width = pct + '%';
+  // scale orb core slightly
+  var core = document.getElementById('profOrbCore');
+  if (core && _prof.recognizing) {
+    var s = 1 + (pct / 100) * 0.25;
+    core.style.transform = 'scale(' + s.toFixed(2) + ')';
+  }
+  _prof.volRaf = requestAnimationFrame(_profVolLoop);
+}
+
+function _profStopAudioViz() {
+  if (_prof.volRaf) { cancelAnimationFrame(_prof.volRaf); _prof.volRaf = null; }
+  var fill = document.getElementById('profVolFill');
+  if (fill) fill.style.width = '0%';
+  var core = document.getElementById('profOrbCore');
+  if (core) core.style.transform = '';
+  if (_prof.micStream) {
+    _prof.micStream.getTracks().forEach(function(t) { t.stop(); });
+    _prof.micStream = null;
+  }
+  if (_prof.audioCtx) {
+    try { _prof.audioCtx.close(); } catch(e) {}
+    _prof.audioCtx = null;
+    _prof.analyser = null;
+  }
+}
+
+// ── File upload (PDF / DOCX) ──────────────────────────────────────────
+window.profPickFile = function() {
+  var picker = document.getElementById('profFilePicker');
+  if (picker) picker.click();
+};
+
+(function() {
+  var picker = document.getElementById('profFilePicker');
+  if (!picker) return;
+  picker.addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    profHandleFile(file);
+    picker.value = '';
+  });
+})();
+
+window.profHandleFile = function(file) {
+  var nameEl = document.getElementById('profFileName');
+  var zone   = document.getElementById('profUploadZone');
+  _prof.docName = file.name;
+  if (nameEl) nameEl.textContent = file.name;
+  if (zone)   zone.classList.add('has-file');
+
+  var ext = file.name.split('.').pop().toLowerCase();
+
+  if (ext === 'docx' || ext === 'doc') {
+    if (!window.mammoth) {
+      _profAddBubble('ai', '⚠️ Libreria mammoth non disponibile per leggere DOCX.');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      mammoth.extractRawValue({ arrayBuffer: ev.target.result })
+        .then(function(res) {
+          _prof.docText = res.value || '';
+          var detected = profDetectDomain(_prof.docText.substring(0, 3000));
+          if (detected) _profUpdateDomainBadge(detected);
+          _profAddBubble('ai', '📄 Documento caricato: **' + file.name + '**\n' + _prof.docText.length + ' caratteri estratti. Ora puoi farmi domande su questo testo.');
+        })
+        .catch(function(err) {
+          _profAddBubble('ai', '⚠️ Errore lettura DOCX: ' + err.message);
+        });
+    };
+    reader.readAsArrayBuffer(file);
+  } else if (ext === 'pdf') {
+    if (!window.pdfjsLib) {
+      _profAddBubble('ai', '⚠️ Libreria PDF.js non disponibile.');
+      return;
+    }
+    var reader2 = new FileReader();
+    reader2.onload = function(ev) {
+      pdfjsLib.getDocument({ data: ev.target.result }).promise.then(function(pdf) {
+        var pages = pdf.numPages;
+        var texts = [];
+        var promises = [];
+        for (var p = 1; p <= Math.min(pages, 30); p++) {
+          promises.push(pdf.getPage(p).then(function(page) {
+            return page.getTextContent().then(function(tc) {
+              return tc.items.map(function(i) { return i.str; }).join(' ');
+            });
+          }));
+        }
+        Promise.all(promises).then(function(results) {
+          _prof.docText = results.join('\n');
+          var detected = profDetectDomain(_prof.docText.substring(0, 3000));
+          if (detected) _profUpdateDomainBadge(detected);
+          _profAddBubble('ai', '📄 PDF caricato: **' + file.name + '**\n' + pages + ' pagine, ' + _prof.docText.length + ' caratteri estratti. Pronto per domande.');
+        });
+      }).catch(function(err) {
+        _profAddBubble('ai', '⚠️ Errore lettura PDF: ' + err.message);
+      });
+    };
+    reader2.readAsArrayBuffer(file);
+  } else {
+    _profAddBubble('ai', '⚠️ Formato non supportato. Carica un PDF o DOCX.');
+    if (zone) zone.classList.remove('has-file');
+  }
+};
+
+// ── Clear chat ────────────────────────────────────────────────────────
+window.profClear = function() {
+  profStop();
+  _prof.history  = [];
+  _prof.docText  = '';
+  _prof.docName  = '';
+  _prof.domain   = null;
+  var chat    = document.getElementById('profChat');
+  var welcome = document.getElementById('profWelcome');
+  var nameEl  = document.getElementById('profFileName');
+  var zone    = document.getElementById('profUploadZone');
+  var badge   = document.getElementById('profDomainBadge');
+  if (chat) {
+    // remove all children except welcome
+    while (chat.firstChild) chat.removeChild(chat.firstChild);
+    if (welcome) { welcome.style.display = ''; chat.appendChild(welcome); }
+  }
+  if (nameEl) nameEl.textContent = 'Nessun file caricato';
+  if (zone)   zone.classList.remove('has-file');
+  if (badge)  badge.style.display = 'none';
+};
+
+})(); // end IIFE
+</script>
+
 </body>
 </html>
 
