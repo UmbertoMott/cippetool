@@ -144,17 +144,50 @@ body.theme-light #screenWorkbench .wb-tool-card   { background: rgba(0,0,0,0.03)
 body.theme-light #screenWorkbench .doc-block   { color: #1C1612 !important; background: #fff !important; }
 body.theme-light #screenWorkbench .doc-page    { color: #1C1612 !important; }
 
-/* ── Audio btn + Chat Integrale active ──────────────────────────── */
-#screenWorkbench .wb-audio-btn {
-  display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;
-  font-size:10px;font-weight:600;letter-spacing:.04em;color:rgba(255,255,255,.42);
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  border-radius:20px;cursor:pointer;transition:all .15s;
+/* ── Bubble action bar (Copia + TTS) ─────────────────────────────── */
+.wb-bubble-actions {
+  display:flex; align-items:center; gap:2px;
+  margin-top:8px; padding-top:6px;
+  border-top:1px solid rgba(255,255,255,.07);
 }
-#screenWorkbench .wb-audio-btn:hover { color:#c084fc;border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.08); }
-#screenWorkbench .wb-audio-btn.speaking { color:#4ade80;border-color:rgba(74,222,128,.4);animation:wbAudioPulse 1s infinite; }
+.wb-bub-act {
+  background:none; border:none; cursor:pointer;
+  color:rgba(255,255,255,.32); font-size:12px;
+  padding:3px 7px; border-radius:6px; line-height:1;
+  transition:color .12s, background .12s; display:inline-flex; align-items:center; gap:4px;
+}
+.wb-bub-act:hover { color:rgba(255,255,255,.8); background:rgba(255,255,255,.07); }
+.wb-bub-act.tts-on { color:#a78bfa; }
+body.theme-light .wb-bubble-actions { border-top-color:rgba(0,0,0,.08); }
+body.theme-light .wb-bub-act { color:rgba(0,0,0,.3); }
+body.theme-light .wb-bub-act:hover { color:rgba(0,0,0,.7); background:rgba(0,0,0,.05); }
+body.theme-light .wb-bub-act.tts-on { color:#7c3aed; }
+
+/* ── TTS Mini-Player ─────────────────────────────────────────────── */
+.wb-tts-player {
+  margin-top:8px; padding:8px 10px;
+  background:rgba(168,85,247,.07); border:1px solid rgba(168,85,247,.18);
+  border-radius:10px;
+}
+.wb-tts-controls { display:flex; align-items:center; gap:5px; margin-bottom:7px; }
+.wb-tts-ctrl {
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.65); border-radius:6px; cursor:pointer;
+  font-size:11px; padding:3px 8px; transition:all .12s; white-space:nowrap; line-height:1.4;
+}
+.wb-tts-ctrl:hover { background:rgba(168,85,247,.22); border-color:rgba(168,85,247,.5); color:#fff; }
+.wb-tts-ctrl.tts-pp { font-size:15px; padding:2px 10px; min-width:34px; text-align:center; }
+.wb-tts-time { font-size:10px; color:rgba(255,255,255,.38); font-family:monospace; margin-left:auto; letter-spacing:.02em; }
+.wb-tts-track {
+  height:4px; background:rgba(255,255,255,.1); border-radius:3px;
+  cursor:pointer; position:relative; overflow:hidden;
+}
+.wb-tts-fill { height:100%; background:linear-gradient(90deg,#a78bfa,#c084fc); border-radius:3px; width:0%; pointer-events:none; }
+body.theme-light .wb-tts-player { background:rgba(91,33,182,.05); border-color:rgba(91,33,182,.14); }
+body.theme-light .wb-tts-ctrl { background:rgba(0,0,0,.04); border-color:rgba(0,0,0,.1); color:rgba(0,0,0,.55); }
+body.theme-light .wb-tts-time { color:rgba(0,0,0,.35); }
+body.theme-light .wb-tts-track { background:rgba(0,0,0,.08); }
 @keyframes wbAudioPulse { 0%,100%{opacity:1} 50%{opacity:.55} }
-body.theme-light #screenWorkbench .wb-audio-btn { color:#5A4A3A;background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12); }
 #wbFullDocBtn.wbfd-active { color:#818cf8 !important;border-color:rgba(129,140,248,.55) !important;background:rgba(129,140,248,.15) !important; }
 body.theme-light #wbFullDocBtn.wbfd-active { color:#5B21B6 !important;border-color:rgba(91,33,182,.4) !important;background:rgba(91,33,182,.1) !important; }
 /* legal toggle + integrale light mode */
@@ -21912,24 +21945,106 @@ function wbToggleFullDoc() {
   if (btn) btn.classList.toggle('wbfd-active', _wbChatFullDoc);
 }
 
-function wbSpeakText(text) {
+// ── WB TTS MINI-PLAYER ENGINE ─────────────────────────────────────────────────
+var _wbTTS = { utter:null, text:'', charIndex:0, totalChars:0, rate:0.82,
+               paused:false, playerEl:null, btnEl:null, rafId:null };
+var _WB_TTS_CPS = 12; // chars/sec Italian at rate 1.0
+
+function _wbTTSPickVoice() {
+  var voices = window.speechSynthesis.getVoices();
+  var pref = ['Luca','Cosimo','Google italiano','Mario','Google Italian'];
+  for (var p = 0; p < pref.length; p++)
+    for (var v = 0; v < voices.length; v++)
+      if (voices[v].name.indexOf(pref[p]) !== -1) return voices[v];
+  for (var v = 0; v < voices.length; v++)
+    if ((voices[v].lang||'').startsWith('it')) return voices[v];
+  return null;
+}
+
+function wbTTSPlay(text, playerEl, btnEl, fromChar) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  var clean = text.replace(/<[^>]*>/g, '').replace(/#{1,6}\s/g, '').replace(/\*\*/g, '').trim();
-  var utt = new SpeechSynthesisUtterance(clean);
-  utt.lang = 'it-IT'; utt.rate = 0.88; utt.pitch = 0.92; utt.volume = 1;
-  var setVoice = function() {
-    var voices = window.speechSynthesis.getVoices();
-    var male = voices.find(function(v) {
-      var n = v.name.toLowerCase();
-      return v.lang.startsWith('it') && (n.includes('luca') || n.includes('cosimo') || n.includes('mario') || n.includes('male'));
-    }) || voices.find(function(v) { return v.lang.startsWith('it'); });
-    if (male) utt.voice = male;
+  if (_wbTTS.rafId) cancelAnimationFrame(_wbTTS.rafId);
+  fromChar = fromChar || 0;
+  var clean = text.replace(/<[^>]*>/g,'').replace(/#{1,6}\s/g,'').replace(/\*\*/g,'').trim();
+  _wbTTS.text = clean; _wbTTS.totalChars = clean.length;
+  _wbTTS.charIndex = fromChar; _wbTTS.playerEl = playerEl;
+  _wbTTS.btnEl = btnEl; _wbTTS.paused = false;
+
+  var utter = new SpeechSynthesisUtterance(clean.substring(fromChar));
+  utter.lang='it-IT'; utter.rate=_wbTTS.rate; utter.pitch=0.75; utter.volume=1.0;
+  _wbTTS.utter = utter;
+
+  var applyVoice = function() { var v=_wbTTSPickVoice(); if(v) utter.voice=v; };
+  if (window.speechSynthesis.getVoices().length) applyVoice();
+  else window.speechSynthesis.onvoiceschanged = applyVoice;
+
+  utter.onboundary = function(e) {
+    if (e.name==='word') { _wbTTS.charIndex = fromChar + (e.charIndex||0); }
   };
-  if (window.speechSynthesis.getVoices().length) { setVoice(); }
-  else { window.speechSynthesis.onvoiceschanged = setVoice; }
-  window.speechSynthesis.speak(utt);
+  utter.onend = function() {
+    _wbTTS.charIndex = _wbTTS.totalChars;
+    _wbTTSUpdateUI(); _wbTTSSetState(false);
+    if (_wbTTS.rafId) cancelAnimationFrame(_wbTTS.rafId);
+  };
+  utter.onerror = function() { _wbTTSSetState(false); };
+
+  _wbTTSSetState(true);
+  window.speechSynthesis.speak(utter);
+  _wbTTSRaf();
 }
+
+function _wbTTSRaf() {
+  _wbTTSUpdateUI();
+  if (!_wbTTS.paused && _wbTTS.charIndex < _wbTTS.totalChars)
+    _wbTTS.rafId = requestAnimationFrame(_wbTTSRaf);
+}
+
+function wbTTSPauseResume() {
+  if (!window.speechSynthesis) return;
+  if (_wbTTS.paused) {
+    window.speechSynthesis.resume(); _wbTTS.paused = false; _wbTTSRaf();
+  } else {
+    window.speechSynthesis.pause(); _wbTTS.paused = true;
+  }
+  _wbTTSSetState(!_wbTTS.paused);
+}
+
+function wbTTSSeek(deltaSec) {
+  if (!_wbTTS.text) return;
+  var dc = Math.round(deltaSec * _WB_TTS_CPS * _wbTTS.rate);
+  var nc = Math.max(0, Math.min(_wbTTS.totalChars-1, _wbTTS.charIndex + dc));
+  wbTTSPlay(_wbTTS.text, _wbTTS.playerEl, _wbTTS.btnEl, nc);
+}
+
+function wbTTSStop() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (_wbTTS.rafId) cancelAnimationFrame(_wbTTS.rafId);
+  _wbTTSSetState(false); _wbTTS.utter=null; _wbTTS.charIndex=0;
+}
+
+function _wbTTSSetState(playing) {
+  var p = _wbTTS.playerEl;
+  if (p) { var pp=p.querySelector('.tts-pp'); if(pp) pp.textContent=playing?'⏸':'▶'; }
+  if (_wbTTS.btnEl) _wbTTS.btnEl.classList.toggle('tts-on', playing||_wbTTS.paused);
+}
+
+function _wbTTSUpdateUI() {
+  var p = _wbTTS.playerEl; if (!p) return;
+  var pct = _wbTTS.totalChars>0 ? (_wbTTS.charIndex/_wbTTS.totalChars*100) : 0;
+  var fill = p.querySelector('.wb-tts-fill'); if(fill) fill.style.width=Math.min(100,pct)+'%';
+  var tEl = p.querySelector('.wb-tts-time');
+  if (tEl) {
+    var cur=Math.round(_wbTTS.charIndex/(_WB_TTS_CPS*_wbTTS.rate));
+    var tot=Math.round(_wbTTS.totalChars/(_WB_TTS_CPS*_wbTTS.rate));
+    tEl.textContent=_wbTTSFmt(cur)+' / '+_wbTTSFmt(tot);
+  }
+}
+
+function _wbTTSFmt(s) { var m=Math.floor(s/60),ss=s%60; return m+':'+(ss<10?'0':'')+ss; }
+
+// kept for backward compat (LLC module)
+function wbSpeakText(text) { wbTTSPlay(text, null, null, 0); }
 
 async function wbChatSend(overridePrompt, opts) {
   opts = opts || {};
@@ -22015,22 +22130,66 @@ async function wbChatSend(overridePrompt, opts) {
     var aiText = data.text || data.reply || data.response || '';
     aiBubble.innerHTML = '<p style="margin:0 0 8px 0">' + _wbMdToHtml(aiText || '(nessuna risposta)') + '</p>';
     aiBubble.style.color = '#e0e0e0';
-    // Pulsante audio
-    var audioBtn = document.createElement('button');
-    audioBtn.className = 'wb-audio-btn';
-    audioBtn.title = 'Ascolta la risposta (voce italiana)';
-    audioBtn.textContent = '🔊 Ascolta';
-    (function(t, btn) {
-      btn.addEventListener('click', function() {
-        btn.classList.add('speaking');
-        wbSpeakText(t);
-        window.speechSynthesis.addEventListener('end', function onEnd() {
-          btn.classList.remove('speaking');
-          window.speechSynthesis.removeEventListener('end', onEnd);
-        });
+
+    // ── Action bar (Copia + TTS) ──────────────────────────────────
+    var actBar = document.createElement('div');
+    actBar.className = 'wb-bubble-actions';
+
+    var copyBtn = document.createElement('button');
+    copyBtn.className = 'wb-bub-act';
+    copyBtn.title = 'Copia testo';
+    copyBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copia';
+    copyBtn.addEventListener('click', function() {
+      navigator.clipboard.writeText(aiText).then(function() {
+        copyBtn.innerHTML = '✓ Copiato';
+        setTimeout(function() {
+          copyBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copia';
+        }, 1600);
       });
-    })(aiText, audioBtn);
-    aiBubble.appendChild(audioBtn);
+    });
+
+    var ttsBtn = document.createElement('button');
+    ttsBtn.className = 'wb-bub-act';
+    ttsBtn.title = 'Ascolta (voce italiana maschile)';
+    ttsBtn.innerHTML = '🔊';
+
+    // Mini-player (nascosto finché non si clicca 🔊)
+    var playerEl = document.createElement('div');
+    playerEl.className = 'wb-tts-player';
+    playerEl.style.display = 'none';
+    playerEl.innerHTML =
+      '<div class="wb-tts-controls">' +
+        '<button class="wb-tts-ctrl" onclick="wbTTSSeek(-10)">⏮ −10s</button>' +
+        '<button class="wb-tts-ctrl tts-pp" onclick="wbTTSPauseResume()">⏸</button>' +
+        '<button class="wb-tts-ctrl" onclick="wbTTSSeek(10)">+10s ⏭</button>' +
+        '<span class="wb-tts-time">0:00 / 0:00</span>' +
+      '</div>' +
+      '<div class="wb-tts-track"><div class="wb-tts-fill"></div></div>';
+
+    // Click sulla track → seek a posizione specifica
+    playerEl.querySelector('.wb-tts-track').addEventListener('click', function(e) {
+      var rect = this.getBoundingClientRect();
+      var pct  = (e.clientX - rect.left) / rect.width;
+      var nc   = Math.round(pct * _wbTTS.totalChars);
+      wbTTSPlay(_wbTTS.text, _wbTTS.playerEl, _wbTTS.btnEl, nc);
+    });
+
+    (function(t, pEl, bEl) {
+      bEl.addEventListener('click', function() {
+        if (pEl.style.display === 'none') {
+          wbTTSStop();
+          pEl.style.display = 'block';
+          wbTTSPlay(t, pEl, bEl, 0);
+        } else {
+          wbTTSPauseResume();
+        }
+      });
+    })(aiText, playerEl, ttsBtn);
+
+    actBar.appendChild(copyBtn);
+    actBar.appendChild(ttsBtn);
+    aiBubble.appendChild(actBar);
+    aiBubble.appendChild(playerEl);
   } catch(e) {
     aiBubble.textContent = '⚠️ ' + e.message;
     aiBubble.style.color = '#ff6d8d';
