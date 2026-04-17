@@ -1570,8 +1570,11 @@ async def get_preview_url(
 # PROF. LEX — Gemini Live Voice WebSocket
 # ═══════════════════════════════════════════════════════════════════
 
-PROF_LEX_LIVE_MODEL = "gemini-2.0-flash-live-001"
-PROF_LEX_LIVE_MODEL_FALLBACK = "gemini-2.0-flash-live-preview-04-09"
+PROF_LEX_LIVE_MODELS = [
+    "gemini-live-2.5-flash-preview",        # newest Live model
+    "gemini-2.0-flash-live-001",            # previous stable
+    "gemini-2.0-flash-live-preview-04-09",  # preview fallback
+]
 
 PROF_LEX_DEFAULT_PROMPT = (
     "Sei Prof. Lex, un docente universitario di diritto di alto profilo, "
@@ -1669,8 +1672,8 @@ async def voice_websocket(websocket: WebSocket):
 
     client = _genai.Client(api_key=GEMINI_API_KEY)
 
-    # Try primary model, fall back to preview if not found
-    for live_model in (PROF_LEX_LIVE_MODEL, PROF_LEX_LIVE_MODEL_FALLBACK):
+    # Try models in order, falling back on model-not-found errors
+    for live_model in PROF_LEX_LIVE_MODELS:
         try:
             async with client.aio.live.connect(model=live_model, config=live_config) as session:
                 logger.info("[VoiceWS] Gemini Live connected (%s)", live_model)

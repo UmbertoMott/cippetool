@@ -24219,7 +24219,7 @@ window.profToggleConversation = function() {
   else               { _profBeginConversation(); }
 };
 
-function _profBeginConversation() {
+async function _profBeginConversation() {
   _profAutoMode = true;
   var btn  = document.getElementById('profStartBtn');
   var icon = document.getElementById('profStartIcon');
@@ -24228,6 +24228,17 @@ function _profBeginConversation() {
   if (icon) icon.textContent = '■';
   if (lbl)  lbl.textContent  = 'Termina';
   _profSetState('listening');
+
+  // Ping backend to wake up Render before opening WebSocket
+  var healthUrl = _PROF_WS_URL.replace(/^wss?:\/\//, 'https://').replace(/^ws:\/\//, 'http://').replace('/ws/voice', '/api/health');
+  try {
+    if (lbl) lbl.textContent = 'Connessione…';
+    await fetch(healthUrl, { signal: AbortSignal.timeout(12000) });
+  } catch(e) {
+    console.warn('[Prof] Health ping failed, proceeding anyway:', e.message);
+  }
+  if (!_profAutoMode) return; // user stopped while pinging
+  if (lbl) lbl.textContent = 'Termina';
   _profStartAudio();
 }
 
@@ -24350,16 +24361,21 @@ function _profConnectWS() {
     }
   };
 
+  var _wsErrorFired = false;
   ws.onerror = function(e) {
+    _wsErrorFired = true;
     console.error('[Prof] WS error', e);
-    _profAddBubble('ai', '⚠️ Errore connessione vocale. Riprova.');
   };
 
   ws.onclose = function(e) {
     console.log('[Prof] WS closed', e.code);
     _prof.wsReady = false;
     if (_profAutoMode) {
-      _profAddBubble('ai', '⚠️ Connessione persa (cod ' + e.code + '). Premi ▶ per ricominciare.');
+      if (_wsErrorFired || e.code === 1006) {
+        _profAddBubble('ai', '⚠️ Server vocale non raggiungibile (cod ' + e.code + '). Il server potrebbe essere in avvio — riprova tra 20 secondi.');
+      } else {
+        _profAddBubble('ai', '⚠️ Connessione persa (cod ' + e.code + '). Premi ▶ per ricominciare.');
+      }
       _profStopAll();
     }
   };

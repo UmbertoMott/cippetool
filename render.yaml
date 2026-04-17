@@ -19,7 +19,7 @@ services:
       - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
         sync: false
       - key: CORS_ORIGINS
-        value: https://cippetool.vercel.app,http://localhost:7890
+        value: https://privacyaitool.vercel.app,https://cippetool.vercel.app,http://localhost:7890
       - key: LOCAL_UPLOADS_DIR
         value: /opt/render/project/src/backend/local_uploads
     disk:
