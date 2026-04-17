@@ -240,6 +240,30 @@ def _pdf_bytes_cached(blob_name: str) -> bytes:
     return data
 
 
+def _extract_text_from_bytes(blob_name: str, pdf_bytes: bytes,
+                              page_start: int = 0, page_end=None) -> dict:
+    """PyMuPDF text extraction from raw bytes — used for both local and GCS docs."""
+    import fitz
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    total_pages = doc.page_count
+    end = min(page_end, total_pages) if page_end else total_pages
+    pages, full_text = [], []
+    for n in range(page_start, end):
+        text = doc[n].get_text("text")
+        pages.append({"page": n + 1, "text": text, "char_count": len(text)})
+        full_text.append(text)
+    doc.close()
+    combined = "\n\n--- Pagina ---\n\n".join(full_text)
+    return {
+        "blob_name": blob_name,
+        "total_pages": total_pages,
+        "extracted_pages": list(range(page_start + 1, end + 1)),
+        "pages": pages,
+        "full_text": combined,
+        "total_chars": len(combined),
+    }
+
+
 @app.get("/api/documents/pdf")
 async def stream_pdf(
     request: Request,
@@ -322,12 +346,9 @@ async def extract_text(req: TextExtractionRequest):
     if not gcs:
         raise HTTPException(status_code=503, detail="GCS client non inizializzato")
     try:
-        result = gcs.extract_text(
-            req.blob_name,
-            page_start=req.page_start,
-            page_end=req.page_end
-        )
-        return result
+        pdf_bytes = _pdf_bytes_cached(req.blob_name)
+        return _extract_text_from_bytes(req.blob_name, pdf_bytes,
+                                        req.page_start, req.page_end)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Documento '{req.blob_name}' non trovato")
     except Exception as e:
@@ -346,7 +367,7 @@ async def extract_word_text(blob_name: str = Query(...)):
     if ext not in ("docx", "doc"):
         raise HTTPException(status_code=400, detail="Usa questo endpoint solo per .docx/.doc")
     try:
-        file_bytes = gcs.download_pdf_bytes(blob_name)  # download_pdf_bytes è generico
+        file_bytes = _pdf_bytes_cached(blob_name)
         if ext == "docx":
             from docx import Document as DocxDocument
             import io
@@ -438,8 +459,14 @@ async def get_ai_context(
     if not gcs:
         raise HTTPException(status_code=503, detail="GCS client non inizializzato")
     try:
-        meta = gcs.get_pdf_metadata(blob_name)
-        text_data = gcs.extract_text(blob_name, page_start=0, page_end=max_pages)
+        pdf_bytes = _pdf_bytes_cached(blob_name)
+        text_data = _extract_text_from_bytes(blob_name, pdf_bytes,
+                                             page_start=0, page_end=max_pages)
+        # Metadata: try GCS, fall back to basic info for local files
+        try:
+            meta = gcs.get_pdf_metadata(blob_name)
+        except Exception:
+            meta = {"filename": blob_name.split("/")[-1], "pages": text_data["total_pages"]}
 
         return {
             "metadata": meta,
@@ -469,7 +496,7 @@ async def pdf_proxy(
     if not gcs:
         raise HTTPException(status_code=503, detail="GCS client non inizializzato")
     try:
-        pdf_bytes = gcs.download_pdf_bytes(blob_name)
+        pdf_bytes = _pdf_bytes_cached(blob_name)
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",
@@ -515,15 +542,16 @@ async def vertex_analyze(req: VertexAnalyzeRequest):
 
     model_id = req.model or VERTEX_MODEL
 
-    # Verify blob exists before calling Vertex AI (cheap GCS call)
-    try:
-        blob = gcs._bucket.blob(req.blob_name)
-        if not blob.exists():
-            raise FileNotFoundError(req.blob_name)
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail=f"Documento '{req.blob_name}' non trovato")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"GCS check error: {e}")
+    # Verify blob exists (local files skip GCS check)
+    if not req.blob_name.startswith("local/"):
+        try:
+            blob = gcs._bucket.blob(req.blob_name)
+            if not blob.exists():
+                raise FileNotFoundError(req.blob_name)
+        except FileNotFoundError:
+            raise HTTPException(status_code=404, detail=f"Documento '{req.blob_name}' non trovato")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"GCS check error: {e}")
 
     prompt = (
         "Sei un esperto Senior di diritto europeo della protezione dei dati (GDPR, ePrivacy, AI Act).\n\n"
@@ -556,7 +584,7 @@ async def vertex_analyze(req: VertexAnalyzeRequest):
         # Downloads PDF bytes from GCS, sends as inline data to Gemini REST API.
         # Preferred when GEMINI_API_KEY is set.
         if GEMINI_API_KEY:
-            pdf_bytes = gcs.download_pdf_bytes(req.blob_name)
+            pdf_bytes = _pdf_bytes_cached(req.blob_name)
             pdf_part  = _genai_types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf")
             client    = _genai.Client(api_key=GEMINI_API_KEY)
             logger.info(f"[VertexAI] Using Gemini API key (inline PDF, model={model_id})")
@@ -635,7 +663,7 @@ async def embed_document(req: EmbedRequest, db: Session = Depends(get_db)):
     if not is_indexed(db, req.blob_name) or req.force:
         try:
             # Scarica PDF bytes
-            pdf_bytes = gcs.download_pdf_bytes(req.blob_name)
+            pdf_bytes = _pdf_bytes_cached(req.blob_name)
 
             # Auto-detect: PDF scansionato → Document AI OCR, altrimenti PyMuPDF
             if docai_service.is_ready() and docai_service.needs_ocr(pdf_bytes):
@@ -714,7 +742,7 @@ async def semantic_search_endpoint(req: SemanticSearchRequest, db: Session = Dep
         if not req.auto_index:
             raise HTTPException(status_code=404, detail="Documento non ancora indicizzato. Chiama /api/documents/embed prima.")
         try:
-            pdf_bytes = gcs.download_pdf_bytes(req.blob_name)
+            pdf_bytes = _pdf_bytes_cached(req.blob_name)
             chunks    = index_document(pdf_bytes)
             save_embeddings(db, req.blob_name, chunks)
             logger.info(f"[Embed] Auto-index {req.blob_name} → {len(chunks)} chunk")
@@ -804,7 +832,7 @@ async def ocr_document(req: OcrRequest):
         raise HTTPException(status_code=503, detail="GCS client non inizializzato")
 
     try:
-        pdf_bytes = gcs.download_pdf_bytes(req.blob_name)
+        pdf_bytes = _pdf_bytes_cached(req.blob_name)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Documento '{req.blob_name}' non trovato")
     except Exception as e:
@@ -875,7 +903,7 @@ async def ocr_embed_document(req: OcrEmbedRequest, db: Session = Depends(get_db)
         }
 
     try:
-        pdf_bytes = gcs.download_pdf_bytes(req.blob_name)
+        pdf_bytes = _pdf_bytes_cached(req.blob_name)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Documento '{req.blob_name}' non trovato")
     except Exception as e:
@@ -987,7 +1015,7 @@ async def docai_ingest(req: DocAIIngestRequest, db: Session = Depends(get_db)):
         }
 
     try:
-        pdf_bytes = gcs.download_pdf_bytes(req.blob_name)
+        pdf_bytes = _pdf_bytes_cached(req.blob_name)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Documento '{req.blob_name}' non trovato")
     except Exception as e:

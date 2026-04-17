@@ -129,8 +129,9 @@ def extract_blocks_from_pdf(pdf_bytes: bytes) -> List[dict]:
             logger.warning(f"[Embed] Limite {MAX_CHUNKS_PER_DOC} chunk raggiunto a pagina {page_num}")
             break
 
+    total_pages = doc.page_count
     doc.close()
-    logger.info(f"[Embed] Estratti {len(blocks_out)} blocchi da {doc.page_count} pagine")
+    logger.info(f"[Embed] Estratti {len(blocks_out)} blocchi da {total_pages} pagine")
     return blocks_out[:MAX_CHUNKS_PER_DOC]
 
 
