@@ -997,6 +997,95 @@ body.theme-light #screenWorkbench .wb-note-badge { color: #5B21B6 !important; ba
 .wbt-btn-tools { background: linear-gradient(135deg,#c084fc,#7c3aed); color: #fff; width: 100%; }
 .wbt-btn-explain { background: linear-gradient(135deg,rgba(250,204,21,.18),rgba(250,204,21,.08)); color: #fde68a; border: 1px solid rgba(250,204,21,.3); width: 100%; margin-bottom: 4px; }
 
+/* ── Margin Notes System ─────────────────────────────────────── */
+#screenWorkbench .doc-note-trigger {
+  position: absolute; right: -62px; top: 14px;
+  width: 28px; height: 2px;
+  background: rgba(180,160,130,.45); border-radius: 2px;
+  cursor: pointer; transition: background .15s, width .15s;
+  z-index: 12;
+}
+#screenWorkbench .doc-note-trigger::after {
+  content: '+'; position: absolute; right: -14px; top: -7px;
+  font-size: 10px; color: rgba(180,160,130,.0); font-weight: 700;
+  transition: color .15s;
+}
+#screenWorkbench .doc-block:hover .doc-note-trigger {
+  background: rgba(120,80,20,.55); width: 32px;
+}
+#screenWorkbench .doc-block:hover .doc-note-trigger::after { color: rgba(120,80,20,.55); }
+#screenWorkbench .doc-note-trigger.has-note {
+  background: rgba(180,120,20,.7) !important; width: 30px !important;
+}
+body.theme-light #screenWorkbench .doc-note-trigger { background: rgba(160,130,80,.45); }
+body.theme-light #screenWorkbench .doc-block:hover .doc-note-trigger { background: rgba(100,60,10,.55); }
+body.theme-light #screenWorkbench .doc-note-trigger.has-note { background: rgba(150,90,10,.65) !important; }
+
+/* Inline note display */
+#screenWorkbench .doc-note-inline {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin: 8px 0 4px; padding: 9px 13px;
+  border-left: 3px solid rgba(160,100,20,.5);
+  background: rgba(255,248,220,.06);
+  border-radius: 0 6px 6px 0;
+}
+#screenWorkbench .doc-note-inline .dni-icon {
+  font-size: 13px; flex-shrink: 0; margin-top: 1px; opacity: .7;
+}
+#screenWorkbench .doc-note-inline .dni-text {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 13px; line-height: 1.65; color: #1a1008;
+  font-style: normal; letter-spacing: .01em;
+}
+#screenWorkbench .doc-note-inline .dni-actions {
+  margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; align-items: flex-start;
+}
+#screenWorkbench .doc-note-inline .dni-edit-btn,
+#screenWorkbench .doc-note-inline .dni-del-btn {
+  background: none; border: none; cursor: pointer; font-size: 11px;
+  padding: 2px 5px; border-radius: 4px;
+  color: rgba(80,50,10,.45); transition: background .12s, color .12s;
+}
+#screenWorkbench .doc-note-inline .dni-edit-btn:hover { background: rgba(160,100,20,.12); color: #5a3208; }
+#screenWorkbench .doc-note-inline .dni-del-btn:hover { background: rgba(220,30,30,.1); color: #b91c1c; }
+body.theme-light #screenWorkbench .doc-note-inline { background: rgba(255,248,220,.6); border-left-color: rgba(140,80,10,.4); }
+body.theme-light #screenWorkbench .doc-note-inline .dni-text { color: #1a1008; }
+
+/* Note editor */
+#screenWorkbench .doc-note-editor-wrap {
+  margin: 8px 0 4px; padding: 10px 13px;
+  border-left: 3px solid rgba(160,100,20,.6);
+  background: rgba(255,248,200,.07);
+  border-radius: 0 6px 6px 0;
+}
+#screenWorkbench .doc-note-editor-wrap textarea {
+  width: 100%; box-sizing: border-box;
+  min-height: 72px; resize: vertical;
+  background: rgba(255,255,255,.92); color: #1a1008;
+  border: 1px solid rgba(160,100,20,.3); border-radius: 5px;
+  padding: 8px 10px; font-family: 'Georgia','Times New Roman',serif;
+  font-size: 13px; line-height: 1.65; outline: none;
+}
+#screenWorkbench .doc-note-editor-wrap textarea:focus { border-color: rgba(160,100,20,.65); background: #fff; }
+#screenWorkbench .doc-note-editor-row {
+  display: flex; gap: 7px; margin-top: 7px; align-items: center;
+}
+#screenWorkbench .doc-note-save-btn {
+  padding: 5px 14px; border-radius: 6px; border: none; cursor: pointer;
+  background: rgba(140,80,10,.82); color: #fff; font-size: 11.5px; font-weight: 700;
+  font-family: 'DM Sans','Syne',sans-serif; transition: background .12s;
+}
+#screenWorkbench .doc-note-save-btn:hover { background: rgba(140,80,10,1); }
+#screenWorkbench .doc-note-cancel-btn {
+  padding: 5px 11px; border-radius: 6px; border: 1px solid rgba(160,100,20,.25);
+  cursor: pointer; background: none; color: rgba(80,50,10,.6); font-size: 11.5px;
+  font-family: 'DM Sans','Syne',sans-serif; transition: background .12s;
+}
+#screenWorkbench .doc-note-cancel-btn:hover { background: rgba(160,100,20,.08); }
+#screenWorkbench .doc-note-hint {
+  font-size: 10px; color: rgba(80,50,10,.4); margin-left: auto; font-family: monospace;
+}
+
 /* Chat Contestuale — bolle */
 #screenWorkbench .wb-chat-bubble-user {
   align-self: flex-end; max-width: 85%;
@@ -20548,6 +20637,113 @@ function wbExpandTool(n) {
 var _WB_NOTES_KEY = 'wb_block_notes_v1';
 var _wbBlockNotes = null;
 
+// ── User Margin Notes ─────────────────────────────────────────────
+var _WB_USER_NOTES_KEY = 'wb_user_notes_v1';
+var _wbUserNotes = null;
+
+function _wbUserNotesLoad() {
+  if (_wbUserNotes !== null) return _wbUserNotes;
+  try { _wbUserNotes = JSON.parse(localStorage.getItem(_WB_USER_NOTES_KEY) || '{}'); }
+  catch(e) { _wbUserNotes = {}; }
+  return _wbUserNotes;
+}
+function _wbUserNotesPersist() {
+  try { localStorage.setItem(_WB_USER_NOTES_KEY, JSON.stringify(_wbUserNotes)); } catch(e) {}
+}
+function _wbUserNoteGet(hash) { return (_wbUserNotesLoad()[hash] || {}).text || ''; }
+function _wbUserNoteSave(hash, text) {
+  _wbUserNotesLoad();
+  if (text) { _wbUserNotes[hash] = { text: text, ts: Date.now() }; }
+  else { delete _wbUserNotes[hash]; }
+  _wbUserNotesPersist();
+}
+
+function wbNoteShowEditor(blockEl, hash, existingText) {
+  // Remove any other open editors first
+  document.querySelectorAll('#wbDocViewer .doc-note-editor-wrap').forEach(function(w) {
+    if (w.parentNode !== blockEl) w.remove();
+  });
+  // If editor already open in this block, close it
+  var existing = blockEl.querySelector('.doc-note-editor-wrap');
+  if (existing) { existing.remove(); return; }
+
+  var wrap = document.createElement('div');
+  wrap.className = 'doc-note-editor-wrap';
+  var ta = document.createElement('textarea');
+  ta.placeholder = 'Scrivi qui la tua nota…';
+  ta.value = existingText || '';
+  wrap.appendChild(ta);
+  var row = document.createElement('div');
+  row.className = 'doc-note-editor-row';
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'doc-note-save-btn';
+  saveBtn.textContent = 'Salva nota';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'doc-note-cancel-btn';
+  cancelBtn.textContent = 'Annulla';
+  var hint = document.createElement('span');
+  hint.className = 'doc-note-hint';
+  hint.textContent = 'Ctrl+Enter per salvare';
+  row.appendChild(saveBtn);
+  row.appendChild(cancelBtn);
+  row.appendChild(hint);
+  wrap.appendChild(row);
+
+  saveBtn.addEventListener('click', function() { wbNoteCommit(blockEl, hash, ta.value.trim()); });
+  cancelBtn.addEventListener('click', function() { wrap.remove(); });
+  ta.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault(); wbNoteCommit(blockEl, hash, ta.value.trim());
+    }
+    if (e.key === 'Escape') wrap.remove();
+  });
+
+  // Insert after existing note-inline (if any) or at end of block
+  var inline = blockEl.querySelector('.doc-note-inline');
+  if (inline) { inline.after(wrap); } else { blockEl.appendChild(wrap); }
+  setTimeout(function() { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 40);
+}
+
+function wbNoteCommit(blockEl, hash, text) {
+  _wbUserNoteSave(hash, text);
+  // Remove editor
+  var wrap = blockEl.querySelector('.doc-note-editor-wrap');
+  if (wrap) wrap.remove();
+  // Update trigger indicator
+  var trigger = blockEl.querySelector('.doc-note-trigger');
+  if (trigger) trigger.classList.toggle('has-note', !!text);
+  // Render/update inline note
+  var inline = blockEl.querySelector('.doc-note-inline');
+  if (inline) inline.remove();
+  if (text) wbNoteRenderInline(blockEl, hash, text);
+}
+
+function wbNoteRenderInline(blockEl, hash, text) {
+  var inline = document.createElement('div');
+  inline.className = 'doc-note-inline';
+  inline.innerHTML =
+    '<span class="dni-icon">📝</span>' +
+    '<span class="dni-text"></span>' +
+    '<div class="dni-actions">' +
+      '<button class="dni-edit-btn" title="Modifica nota">✏️</button>' +
+      '<button class="dni-del-btn" title="Elimina nota">✕</button>' +
+    '</div>';
+  inline.querySelector('.dni-text').textContent = text;
+  inline.querySelector('.dni-edit-btn').addEventListener('click', function(e) {
+    e.stopPropagation(); wbNoteShowEditor(blockEl, hash, text);
+  });
+  inline.querySelector('.dni-del-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    _wbUserNoteSave(hash, '');
+    inline.remove();
+    var trigger = blockEl.querySelector('.doc-note-trigger');
+    if (trigger) trigger.classList.remove('has-note');
+  });
+  // Insert after chk and existing content
+  var chk = blockEl.querySelector('.doc-block-chk');
+  if (chk) { chk.before(inline); } else { blockEl.appendChild(inline); }
+}
+
 function wbBlockHash(text) {
   var s = (text || '').substring(0, 120);
   var h = 5381;
@@ -20658,6 +20854,24 @@ function wbReattachDocBlocks(viewer) {
       wbShowBlockTooltip(fresh, text);
     });
     wbNoteAddBadge(fresh, text);
+    // Re-attach margin note trigger
+    var noteHash = wbBlockHash(text);
+    var nt = fresh.querySelector('.doc-note-trigger');
+    if (nt) {
+      var existNote = _wbUserNoteGet(noteHash);
+      if (existNote) nt.classList.add('has-note');
+      (function(b, h, trigger) {
+        trigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          wbNoteShowEditor(b, h, _wbUserNoteGet(h));
+        });
+      })(fresh, noteHash, nt);
+    }
+    // Render any existing inline note
+    if (!fresh.querySelector('.doc-note-inline')) {
+      var existNote2 = _wbUserNoteGet(noteHash);
+      if (existNote2) wbNoteRenderInline(fresh, noteHash, existNote2);
+    }
   });
 }
 
@@ -23185,6 +23399,19 @@ function wbRenderDocViewer(html, actualPageCount) {
     chk.className = 'doc-block-chk';
     chk.innerHTML = '✓';
     chk.title = 'Seleziona blocco (max 3)';
+    // ── Margin note trigger line ──────────────────────────────────
+    var hash = wbBlockHash(totalText);
+    var noteTrigger = document.createElement('div');
+    noteTrigger.className = 'doc-note-trigger';
+    noteTrigger.title = 'Aggiungi nota';
+    var existingNote = _wbUserNoteGet(hash);
+    if (existingNote) noteTrigger.classList.add('has-note');
+    (function(b, h, nt) {
+      nt.addEventListener('click', function(e) {
+        e.stopPropagation();
+        wbNoteShowEditor(b, h, _wbUserNoteGet(h));
+      });
+    })(block, hash, noteTrigger);
     (function(b, t, c) {
       c.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -23197,8 +23424,11 @@ function wbRenderDocViewer(html, actualPageCount) {
         wbShowBlockTooltip(b, t);
       });
     })(block, totalText, chk);
+    block.appendChild(noteTrigger);
     block.appendChild(chk);
     wbNoteAddBadge(block, totalText);
+    // Render existing user note inline
+    if (existingNote) wbNoteRenderInline(block, hash, existingNote);
     return block;
   }
 
