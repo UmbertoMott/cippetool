@@ -20486,6 +20486,13 @@ async function wbPickerOpen(sessionId) {
       });
       viewer.onscroll = wbUpdatePageCounter;
       wbUpdatePageCounter();
+      // Reconstruct _wbDocText from block text so chat AI actions work without file on server
+      if (!_wbDocText) {
+        var allBlocks = viewer.querySelectorAll('.doc-block');
+        var parts = [];
+        allBlocks.forEach(function(b) { parts.push(b.textContent.trim()); });
+        _wbDocText = parts.join('\n\n').substring(0, 200000);
+      }
     }
     if (fmEl) fmEl.textContent = '✅ Sessione ripristinata · visualizzazione documento disponibile · ricarica il file per analisi AI';
   }
