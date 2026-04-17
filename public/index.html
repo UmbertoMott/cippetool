@@ -20301,6 +20301,8 @@ async function wbPickerOpen(sessionId) {
   showScreen('screenWorkbench');
   wbInit();
   wbResetState();
+  // Always unlock tools when restoring a session (pointer-events:none would swallow all clicks otherwise)
+  wbUnlockTools();
   // Restore chat
   if (s.chat && s.chat.length) {
     var messagesEl = document.getElementById('wbChatMessages');
@@ -22598,6 +22600,7 @@ function wbTTSPlay(text, playerEl, btnEl, fromChar) {
   utter.onerror = function() { _wbTTSSetState(false); };
 
   _wbTTSSetState(true);
+  window.speechSynthesis.resume(); // Chrome: flush any stale paused state before speaking
   window.speechSynthesis.speak(utter);
   _wbTTSRaf();
 }
