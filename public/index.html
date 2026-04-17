@@ -190,6 +190,33 @@ body.theme-light .wb-tts-time { color:rgba(0,0,0,.35); }
 body.theme-light .wb-tts-track { background:rgba(0,0,0,.08); }
 @keyframes wbAudioPulse { 0%,100%{opacity:1} 50%{opacity:.55} }
 #wbFullDocBtn.wbfd-active { color:#818cf8 !important;border-color:rgba(129,140,248,.55) !important;background:rgba(129,140,248,.15) !important; }
+
+/* ── Quick Explain Popup ─────────────────────────────────────── */
+#wbQuickExplainPopup {
+  position:fixed; z-index:10010; max-width:340px; min-width:220px;
+  background:#16162a; border:1px solid rgba(168,85,247,.5);
+  border-radius:12px; padding:12px 14px 10px;
+  box-shadow:0 12px 48px rgba(0,0,0,.75), 0 0 0 1px rgba(168,85,247,.1);
+  font-size:12.5px; line-height:1.6; color:#e0daf5;
+  display:none;
+}
+#wbQuickExplainPopup.qep-visible { display:block; }
+#wbQuickExplainPopup .qep-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px; font-size:10px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:#a78bfa;
+}
+#wbQuickExplainPopup .qep-close {
+  background:none; border:none; color:rgba(255,255,255,.35); cursor:pointer;
+  font-size:14px; padding:0 2px; line-height:1;
+}
+#wbQuickExplainPopup .qep-close:hover { color:#fff; }
+#wbQuickExplainPopup .qep-body { color:#d4d4f0; }
+#wbQuickExplainPopup .qep-loading { color:rgba(168,85,247,.7); font-size:11px; }
+body.theme-light #wbQuickExplainPopup { background:#f7f4ff; border-color:rgba(91,33,182,.3); color:#2e1b6e; box-shadow:0 8px 32px rgba(0,0,0,.18); }
+body.theme-light #wbQuickExplainPopup .qep-head { color:#7c3aed; }
+body.theme-light #wbQuickExplainPopup .qep-body { color:#3d1a70; }
+body.theme-light #wbQuickExplainPopup .qep-close { color:rgba(0,0,0,.3); }
 body.theme-light #wbFullDocBtn.wbfd-active { color:#5B21B6 !important;border-color:rgba(91,33,182,.4) !important;background:rgba(91,33,182,.1) !important; }
 /* legal toggle + integrale light mode */
 body.theme-light #wbFullDocBtn { color:#3D2B1F !important; border-color:rgba(0,0,0,.22) !important; background:rgba(0,0,0,.05) !important; }
@@ -945,6 +972,10 @@ body.theme-light #screenWorkbench .wb-note-badge { color: #5B21B6 !important; ba
   background: rgba(34,211,238,.1); border-color: rgba(34,211,238,.35); color: #22d3ee;
 }
 .tsb-ai-tools:hover { background: rgba(34,211,238,.22); }
+.tsb-ai-explain {
+  background: rgba(250,204,21,.1); border-color: rgba(250,204,21,.35); color: #fde68a;
+}
+.tsb-ai-explain:hover { background: rgba(250,204,21,.2); }
 
 /* Block Tooltip */
 #wbBlockTooltip {
@@ -964,6 +995,7 @@ body.theme-light #screenWorkbench .wb-note-badge { color: #5B21B6 !important; ba
 .wbt-btn:hover { opacity: .82; }
 .wbt-btn-chat { background: rgba(129,140,248,.15); color: #a5b4fc; border: 1px solid rgba(129,140,248,.25); }
 .wbt-btn-tools { background: linear-gradient(135deg,#c084fc,#7c3aed); color: #fff; width: 100%; }
+.wbt-btn-explain { background: linear-gradient(135deg,rgba(250,204,21,.18),rgba(250,204,21,.08)); color: #fde68a; border: 1px solid rgba(250,204,21,.3); width: 100%; margin-bottom: 4px; }
 
 /* Chat Contestuale — bolle */
 #screenWorkbench .wb-chat-bubble-user {
@@ -20341,8 +20373,9 @@ async function wbPickerOpen(sessionId) {
   var fileInfo = document.getElementById('wbFileInfo');
   if (noFile) noFile.style.display = 'none';
   if (fileInfo) fileInfo.style.display = 'flex';
-  // Restore document viewer HTML
-  if (s.docViewerHTML && s.docViewerHTML.length > 20) {
+  // Restore document viewer HTML (skip for PDFs — wbLoadDocText will re-render all pages)
+  var blobIsPdf = s.blobName && s.blobName.toLowerCase().split('?')[0].endsWith('.pdf');
+  if (s.docViewerHTML && s.docViewerHTML.length > 20 && !blobIsPdf) {
     var viewer = document.getElementById('wbDocViewer');
     var placeholder = document.getElementById('wbDocPlaceholder');
     var tb = document.getElementById('wbViewerToolbar');
@@ -20353,9 +20386,7 @@ async function wbPickerOpen(sessionId) {
       viewer.style.display = 'flex';
       viewer.style.flexDirection = 'column';
       viewer.style.alignItems = 'center';
-      // Re-attach click handlers on restored blocks
       wbReattachDocBlocks(viewer);
-      // Bind scroll → page counter
       viewer.onscroll = wbUpdatePageCounter;
       wbUpdatePageCounter();
     }
@@ -21843,6 +21874,9 @@ async function wbLoadDocText(blobName) {
     // ── PDF: PDF.js via backend proxy ────────────────────────────
     var container = document.getElementById('wbPdfContainer');
     document.getElementById('wbDocPlaceholder').style.display = 'none';
+    // Hide Word-style viewer: PDF uses canvas container, not text blocks
+    var docViewer = document.getElementById('wbDocViewer');
+    if (docViewer) { docViewer.style.display = 'none'; docViewer.innerHTML = ''; }
     container.style.display = 'block';
     container.innerHTML = '<div style="text-align:center;padding:40px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">⏳ Caricamento PDF…</div>';
 
@@ -21889,6 +21923,7 @@ async function wbLoadDocText(blobName) {
       }
       // Salva testo estratto per i tool AI
       var fullText = textParts.join('\n\n');
+      _wbDocText = fullText.substring(0, 200000);
       if (fullText) document.getElementById('wbDocText').textContent = fullText.substring(0, 15000);
 
     } catch(e) {
@@ -22556,19 +22591,76 @@ function wbToggleFullDoc() {
 }
 
 // ── WB TTS MINI-PLAYER ENGINE ─────────────────────────────────────────────────
-var _wbTTS = { utter:null, text:'', charIndex:0, totalChars:0, rate:0.82,
-               paused:false, playerEl:null, btnEl:null, rafId:null };
-var _WB_TTS_CPS = 12; // chars/sec Italian at rate 1.0
+var _wbTTS = { utter:null, text:'', charIndex:0, totalChars:0, rate:1.05,
+               paused:false, playerEl:null, btnEl:null, rafId:null,
+               chunks:[], chunkIdx:0 };
+var _WB_TTS_CPS = 14; // chars/sec Italian at rate 1.0 (adjusted for faster rate)
 
 function _wbTTSPickVoice() {
   var voices = window.speechSynthesis.getVoices();
-  var pref = ['Luca','Cosimo','Google italiano','Mario','Google Italian'];
+  // Prefer deep Italian male voices
+  var pref = ['Luca','Cosimo','Mario','Google italiano','Google Italian','it-IT-Standard-B','it-IT-Standard-D'];
   for (var p = 0; p < pref.length; p++)
     for (var v = 0; v < voices.length; v++)
       if (voices[v].name.indexOf(pref[p]) !== -1) return voices[v];
+  // Any Italian voice
   for (var v = 0; v < voices.length; v++)
     if ((voices[v].lang||'').startsWith('it')) return voices[v];
   return null;
+}
+
+// Split text into natural chunks at sentence/paragraph boundaries (~1200 chars max)
+function _wbTTSSplit(text) {
+  var chunks = [];
+  // Split on paragraph breaks first, then sentence endings
+  var paras = text.split(/\n{2,}/);
+  paras.forEach(function(para) {
+    if (para.length <= 1200) { if (para.trim()) chunks.push(para.trim()); return; }
+    // Split long paragraph at sentence boundaries
+    var sentences = para.match(/[^.!?]+[.!?]+[\s]*/g) || [para];
+    var buf = '';
+    sentences.forEach(function(s) {
+      if (buf.length + s.length > 1200 && buf) { chunks.push(buf.trim()); buf = ''; }
+      buf += s;
+    });
+    if (buf.trim()) chunks.push(buf.trim());
+  });
+  return chunks.filter(function(c){ return c.length > 0; });
+}
+
+function _wbTTSSpeakChunk(chunkIdx) {
+  if (chunkIdx >= _wbTTS.chunks.length || _wbTTS.paused) return;
+  _wbTTS.chunkIdx = chunkIdx;
+  var chunk = _wbTTS.chunks[chunkIdx];
+  var utter = new SpeechSynthesisUtterance(chunk);
+  utter.lang = 'it-IT'; utter.rate = _wbTTS.rate; utter.pitch = 0.72; utter.volume = 1.0;
+  _wbTTS.utter = utter;
+  var voice = _wbTTSPickVoice();
+  if (voice) utter.voice = voice;
+  // Update global charIndex based on chunk start offset
+  var offset = _wbTTS.chunkOffsets[chunkIdx] || 0;
+  utter.onboundary = function(e) {
+    if (e.name === 'word') _wbTTS.charIndex = offset + (e.charIndex || 0);
+  };
+  utter.onend = function() {
+    if (_wbTTS.paused) return;
+    var nextOffset = _wbTTS.chunkOffsets[chunkIdx + 1];
+    _wbTTS.charIndex = nextOffset !== undefined ? nextOffset : _wbTTS.totalChars;
+    if (chunkIdx + 1 < _wbTTS.chunks.length) {
+      window.speechSynthesis.resume();
+      _wbTTSSpeakChunk(chunkIdx + 1);
+    } else {
+      _wbTTS.charIndex = _wbTTS.totalChars;
+      _wbTTSUpdateUI(); _wbTTSSetState(false);
+      if (_wbTTS.rafId) cancelAnimationFrame(_wbTTS.rafId);
+    }
+  };
+  utter.onerror = function(e) {
+    if (e.error === 'interrupted' || e.error === 'canceled') return; // normal stop
+    _wbTTSSetState(false);
+  };
+  window.speechSynthesis.resume();
+  window.speechSynthesis.speak(utter);
 }
 
 function wbTTSPlay(text, playerEl, btnEl, fromChar) {
@@ -22581,28 +22673,33 @@ function wbTTSPlay(text, playerEl, btnEl, fromChar) {
   _wbTTS.charIndex = fromChar; _wbTTS.playerEl = playerEl;
   _wbTTS.btnEl = btnEl; _wbTTS.paused = false;
 
-  var utter = new SpeechSynthesisUtterance(clean.substring(fromChar));
-  utter.lang='it-IT'; utter.rate=_wbTTS.rate; utter.pitch=0.75; utter.volume=1.0;
-  _wbTTS.utter = utter;
+  // Build chunks from fromChar onward
+  var remaining = clean.substring(fromChar);
+  _wbTTS.chunks = _wbTTSSplit(remaining);
+  // Compute char offsets for each chunk (relative to clean string)
+  _wbTTS.chunkOffsets = [];
+  var off = fromChar;
+  _wbTTS.chunks.forEach(function(ch) {
+    _wbTTS.chunkOffsets.push(off);
+    off += ch.length + 1; // +1 for separator
+  });
 
-  var applyVoice = function() { var v=_wbTTSPickVoice(); if(v) utter.voice=v; };
-  if (window.speechSynthesis.getVoices().length) applyVoice();
-  else window.speechSynthesis.onvoiceschanged = applyVoice;
+  if (!_wbTTS.chunks.length) return;
 
-  utter.onboundary = function(e) {
-    if (e.name==='word') { _wbTTS.charIndex = fromChar + (e.charIndex||0); }
+  // Ensure voices loaded before starting
+  var startSpeech = function() {
+    _wbTTSSetState(true);
+    _wbTTSSpeakChunk(0);
+    _wbTTSRaf();
   };
-  utter.onend = function() {
-    _wbTTS.charIndex = _wbTTS.totalChars;
-    _wbTTSUpdateUI(); _wbTTSSetState(false);
-    if (_wbTTS.rafId) cancelAnimationFrame(_wbTTS.rafId);
-  };
-  utter.onerror = function() { _wbTTSSetState(false); };
-
-  _wbTTSSetState(true);
-  window.speechSynthesis.resume(); // Chrome: flush any stale paused state before speaking
-  window.speechSynthesis.speak(utter);
-  _wbTTSRaf();
+  if (window.speechSynthesis.getVoices().length) {
+    startSpeech();
+  } else {
+    window.speechSynthesis.onvoiceschanged = function() {
+      window.speechSynthesis.onvoiceschanged = null;
+      startSpeech();
+    };
+  }
 }
 
 function _wbTTSRaf() {
@@ -22614,7 +22711,17 @@ function _wbTTSRaf() {
 function wbTTSPauseResume() {
   if (!window.speechSynthesis) return;
   if (_wbTTS.paused) {
-    window.speechSynthesis.resume(); _wbTTS.paused = false; _wbTTSRaf();
+    _wbTTS.paused = false;
+    // Resume: re-speak current chunk from charIndex
+    window.speechSynthesis.cancel();
+    var resumeText = _wbTTS.text.substring(_wbTTS.charIndex);
+    _wbTTS.chunks = _wbTTSSplit(resumeText);
+    var off = _wbTTS.charIndex;
+    _wbTTS.chunkOffsets = [];
+    _wbTTS.chunks.forEach(function(ch) { _wbTTS.chunkOffsets.push(off); off += ch.length + 1; });
+    _wbTTSSetState(true);
+    _wbTTSSpeakChunk(0);
+    _wbTTSRaf();
   } else {
     window.speechSynthesis.pause(); _wbTTS.paused = true;
   }
@@ -23213,6 +23320,7 @@ function wbShowBlockTooltip(blockEl, text) {
     tt = document.createElement('div');
     tt.id = 'wbBlockTooltip';
     tt.innerHTML =
+      '<button class="wbt-btn wbt-btn-explain" onclick="wbQuickExplain(_wbActiveBlockText, this)">⚡ Spiega velocemente</button>' +
       '<div class="wbt-row">' +
         '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'analizza\')">Analizza</button>' +
         '<button class="wbt-btn wbt-btn-chat" onclick="wbBlockAction(\'approfondisci\')">Approfondisci</button>' +
@@ -23509,7 +23617,8 @@ function _wbGetOrCreateTextSelBar() {
     { label: 'Approfondisci', action: 'approfondisci' },
     { label: 'Collega',       action: 'collega'       },
     { label: 'Indica esempio', action: 'esempio'      },
-    { label: '⚙ Tools',      action: 'tools', extra: 'tsb-ai-tools' }
+    { label: '⚙ Tools',      action: 'tools', extra: 'tsb-ai-tools' },
+    { label: '⚡ Spiega',    action: 'spiega', extra: 'tsb-ai-explain' }
   ];
   aiActions.forEach(function(a) {
     var btn = document.createElement('button');
@@ -23559,6 +23668,59 @@ function wbShowTextSelBar(rect) {
   bar.style.top  = top  + 'px';
   bar.style.left = left + 'px';
 }
+
+// ── Quick Explain ────────────────────────────────────────────────────────────
+async function wbQuickExplain(text, anchorEl) {
+  if (!text || text.trim().length < 5) return;
+  var pop = document.getElementById('wbQuickExplainPopup');
+  if (!pop) {
+    pop = document.createElement('div');
+    pop.id = 'wbQuickExplainPopup';
+    pop.innerHTML =
+      '<div class="qep-head"><span>⚡ Spiegazione rapida</span>' +
+      '<button class="qep-close" onclick="document.getElementById(\'wbQuickExplainPopup\').classList.remove(\'qep-visible\')">✕</button></div>' +
+      '<div class="qep-body"></div>';
+    document.body.appendChild(pop);
+  }
+  var bodyEl = pop.querySelector('.qep-body');
+  bodyEl.innerHTML = '<span class="qep-loading">⟳ Elaborazione…</span>';
+  pop.classList.add('qep-visible');
+
+  // Position near anchor element or near center-top of viewport
+  var rect = anchorEl ? anchorEl.getBoundingClientRect() : { bottom: 60, left: window.innerWidth / 2 - 160, width: 0 };
+  var top = rect.bottom + 8;
+  var left = rect.left;
+  if (left + 340 > window.innerWidth - 8) left = window.innerWidth - 348;
+  if (left < 8) left = 8;
+  if (top + 200 > window.innerHeight - 8) top = rect.top - 208 > 8 ? rect.top - 208 : 8;
+  pop.style.top = top + 'px';
+  pop.style.left = left + 'px';
+
+  try {
+    var snippet = text.substring(0, 600);
+    var prompt = 'Spiega in modo chiaro e conciso (max 80 parole, italiano) il seguente testo, come se lo spiegassi a uno studente di giurisprudenza:\n\n"' + snippet + '"\n\nRispondi solo con la spiegazione, senza preamboli.';
+    var resp = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.3, maxOutputTokens: 300 }
+      })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var data = await resp.json();
+    var expl = (data.text || data.reply || data.response || '').trim();
+    bodyEl.innerHTML = expl ? _wbMdToHtml(expl) : '(nessuna risposta)';
+  } catch(e) {
+    bodyEl.innerHTML = '<span style="color:#ff6d8d">⚠️ ' + e.message + '</span>';
+  }
+  // Auto-close after 30s
+  clearTimeout(wbQuickExplain._t);
+  wbQuickExplain._t = setTimeout(function() {
+    pop.classList.remove('qep-visible');
+  }, 30000);
+}
+wbQuickExplain._t = null;
 
 function wbHideTextSelBar() {
   var bar = document.getElementById('wbTextSelBar');
@@ -23615,7 +23777,13 @@ function wbApplySelFormat(type, colorVal) {
 
 function wbSelTextAction(action) {
   if (!_wbSelText || _wbSelText.length < 5) { wbHideTextSelBar(); return; }
-  var text    = _wbSelText;
+  var text = _wbSelText;
+  if (action === 'spiega') {
+    var selBarEl = document.getElementById('wbTextSelBar');
+    wbHideTextSelBar();
+    wbQuickExplain(text, selBarEl);
+    return;
+  }
   var promptMap = {
     'analizza':      'Analizza in profondità questo testo selezionato dal documento.\n\nTESTO:\n"' + text + '"\n\n## Contenuto\n...\n## Concetti chiave\n...\n## Rilevanza\n...\n## Implicazioni pratiche\n...',
     'approfondisci': 'Approfondisci questo testo selezionato.\n\nTESTO:\n"' + text + '"\n\n## Espansione concettuale\n...\n## Esempi concreti\n...\n## Riferimenti normativi\n...\n## Per approfondire\n...',
