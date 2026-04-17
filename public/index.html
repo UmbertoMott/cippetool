@@ -20464,18 +20464,26 @@ async function wbPickerOpen(sessionId) {
   if (fileInfo) fileInfo.style.display = 'flex';
   // Restore document viewer HTML (skip for PDFs — wbLoadDocText will re-render all pages)
   var blobIsPdf = s.blobName && s.blobName.toLowerCase().split('?')[0].endsWith('.pdf');
-  if (s.docViewerHTML && s.docViewerHTML.length > 20 && !blobIsPdf) {
+  var savedDocHTML = '';
+  try { savedDocHTML = localStorage.getItem('wb_doc_html_' + sessionId) || s.docViewerHTML || ''; } catch(e) {}
+  if (savedDocHTML && savedDocHTML.length > 20 && !blobIsPdf) {
     var viewer = document.getElementById('wbDocViewer');
     var placeholder = document.getElementById('wbDocPlaceholder');
     var tb = document.getElementById('wbViewerToolbar');
     if (viewer) {
-      viewer.innerHTML = s.docViewerHTML;
+      viewer.innerHTML = savedDocHTML;
       if (placeholder) placeholder.style.display = 'none';
       if (tb) tb.style.display = 'flex';
       viewer.style.display = 'flex';
       viewer.style.flexDirection = 'column';
       viewer.style.alignItems = 'center';
       wbReattachDocBlocks(viewer);
+      // Re-attach mouseup listener on .doc-page for text selection/underline/highlight
+      var pages = viewer.querySelectorAll('.doc-page');
+      pages.forEach(function(pg) {
+        pg.removeEventListener('mouseup', wbDocPageMouseUp);
+        pg.addEventListener('mouseup', wbDocPageMouseUp);
+      });
       viewer.onscroll = wbUpdatePageCounter;
       wbUpdatePageCounter();
     }
@@ -20497,6 +20505,7 @@ async function wbPickerOpen(sessionId) {
 
 function wbPickerDelete(sessionId) {
   if (!confirm('Eliminare questa sessione salvata?')) return;
+  try { localStorage.removeItem('wb_doc_html_' + sessionId); } catch(e) {}
   wbSessionSaveAll(wbSessionGetAll().filter(function(s) { return s.id !== sessionId; }));
   wbPickerRender();
 }
@@ -20528,13 +20537,19 @@ function wbSaveSession(manual) {
     var el = document.getElementById('wbTool0' + n + 'Result');
     toolOutputs[n] = el ? el.innerHTML : '';
   });
-  // Save document viewer HTML (truncated to 120KB to stay within localStorage limits)
+  // Save document viewer HTML — store full HTML in a separate localStorage key to avoid JSON size limits
   var docViewerEl = document.getElementById('wbDocViewer');
   var docViewerHTML = '';
-  try { docViewerHTML = (docViewerEl ? docViewerEl.innerHTML : '').substring(0, 120000); } catch(e) {}
+  try { docViewerHTML = (docViewerEl ? docViewerEl.innerHTML : ''); } catch(e) {}
+  if (docViewerHTML.length > 20) {
+    try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML); } catch(e) {
+      // localStorage full — try with truncation as fallback
+      try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML.substring(0, 500000)); } catch(e2) {}
+    }
+  }
   sessions[idx].chat = chat;
   sessions[idx].toolOutputs = toolOutputs;
-  sessions[idx].docViewerHTML = docViewerHTML;
+  sessions[idx].docViewerHTML = ''; // kept for schema compat, actual HTML is in wb_doc_html_<id>
   sessions[idx].blobName = _wbCurrentBlob || sessions[idx].blobName || null;
   sessions[idx].savedAt = new Date().toISOString();
   sessions[idx].chatCount = chat.filter(function(m){ return m.role==='user'; }).length;
