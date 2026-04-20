@@ -5,6 +5,10 @@
     { "src": "api/gemini.js", "use": "@vercel/node" },
     { "src": "api/ocr-image.js", "use": "@vercel/node" }
   ],
+  "functions": {
+    "api/ocr-image.js": { "maxDuration": 60 },
+    "api/gemini.js":    { "maxDuration": 30 }
+  },
   "routes": [
     { "src": "/api/gemini", "dest": "/api/gemini.js" },
     { "src": "/api/ocr-image", "dest": "/api/ocr-image.js" },
