@@ -6,14 +6,15 @@ export const config = {
   maxDuration: 60,
 };
 
+// Solo versioni stabili esplicite — no alias, no preview (hanno quota limitata)
 const OCR_MODELS = [
-  'gemini-flash-latest',   // alias stabile → sempre il miglior flash disponibile
   'gemini-2.5-flash',
+  'gemini-2.0-flash-001',
   'gemini-2.5-flash-lite',
-  'gemini-2.0-flash-001',  // versione pinned stabile
+  'gemini-2.0-flash-lite-001',
 ];
 
-const MODEL_TIMEOUT_MS = 12000; // 12s per model, then try next
+const MODEL_TIMEOUT_MS = 20000; // 20s per model, then try next
 
 function fetchWithTimeout(url, options, ms) {
   const ctrl = new AbortController();
@@ -43,7 +44,7 @@ export default async function handler(req, res) {
         { text: 'Estrai tutto il testo presente in questa immagine di documento esattamente come appare. Preserva gli a capo e la struttura originale. Restituisci solo il testo estratto, senza commenti o spiegazioni aggiuntive.' }
       ]
     }],
-    generationConfig: { temperature: 0.1, maxOutputTokens: 8192 },
+    generationConfig: { temperature: 0.1, maxOutputTokens: 32768 },
   };
 
   let lastErr = '';

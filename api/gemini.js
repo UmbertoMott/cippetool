@@ -1,12 +1,13 @@
 // Vercel Serverless Function — proxy Gemini API
 // GEMINI_API_KEY must be set in Vercel project environment variables
 
+// Solo versioni stabili esplicite — no alias, no preview
 const MODELS = [
-  'gemini-flash-latest',   // alias stabile → sempre il miglior flash disponibile
   'gemini-2.5-flash',
+  'gemini-2.0-flash-001',
   'gemini-2.5-flash-lite',
-  'gemini-2.0-flash-001',  // versione pinned stabile
-  'gemini-pro-latest',
+  'gemini-2.0-flash-lite-001',
+  'gemini-2.5-pro',
 ];
 
 export default async function handler(req, res) {
