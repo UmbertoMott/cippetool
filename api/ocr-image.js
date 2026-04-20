@@ -5,7 +5,13 @@ export const config = {
   api: { bodyParser: { sizeLimit: '10mb' } },
 };
 
-const MODEL = 'gemini-2.0-flash';
+const OCR_MODELS = [
+  'gemini-2.5-flash-preview-04-17',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite-preview-06-17',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro',
+];
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -31,24 +37,32 @@ export default async function handler(req, res) {
     generationConfig: { temperature: 0.1, maxOutputTokens: 8192 },
   };
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+  let lastErr = '';
+  for (const model of OCR_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
 
-    if (!r.ok) {
-      const err = await r.json().catch(() => ({}));
-      return res.status(500).json({ error: err?.error?.message || r.statusText });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        lastErr = err?.error?.message || r.statusText;
+        // Try next model if this one is unavailable/deprecated
+        if (r.status === 404 || r.status === 400 || (lastErr && (lastErr.includes('no longer') || lastErr.includes('not found') || lastErr.includes('deprecated')))) continue;
+        return res.status(500).json({ error: lastErr, model });
+      }
+
+      const data = await r.json();
+      const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+      return res.status(200).json({ text, confidence: 0.95, model });
+
+    } catch (e) {
+      lastErr = e.message;
     }
-
-    const data = await r.json();
-    const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
-    return res.status(200).json({ text, confidence: 0.95 });
-
-  } catch (e) {
-    return res.status(500).json({ error: e.message });
   }
+
+  return res.status(500).json({ error: lastErr || 'Tutti i modelli Gemini Vision non disponibili' });
 }

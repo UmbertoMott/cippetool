@@ -62,15 +62,14 @@ BUCKET_NAME        = os.getenv("GCS_BUCKET_NAME", "data-protection-archive")
 CORS_ORIGINS       = os.getenv("CORS_ORIGINS", "http://localhost:7890").split(",")
 VERTEX_PROJECT     = os.getenv("GOOGLE_CLOUD_PROJECT", "")
 VERTEX_LOCATION    = os.getenv("VERTEX_AI_LOCATION", "us-central1")
-VERTEX_MODEL       = os.getenv("VERTEX_AI_MODEL", "gemini-2.0-flash")
+VERTEX_MODEL       = os.getenv("VERTEX_AI_MODEL", "gemini-2.5-flash")
 
 # Ordered fallback chain for the Gemini proxy — first model that responds wins
 _PROXY_FALLBACK_MODELS = [
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
+    "gemini-2.5-flash-preview-04-17",
     "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash-lite-preview-06-17",
+    "gemini-1.5-flash",
     "gemini-1.5-pro",
 ]
 GEMINI_API_KEY     = os.getenv("GEMINI_API_KEY", "")  # Non-Vertex fallback
@@ -897,7 +896,7 @@ async def ocr_image(req: OcrImageRequest):
         contents = [_genai_types.Content(role="user", parts=[image_part, text_part])]
         config = _genai_types.GenerateContentConfig(max_output_tokens=8192, temperature=0.1)
         def _call():
-            return client.models.generate_content(model="gemini-2.0-flash", contents=contents, config=config)
+            return client.models.generate_content(model="gemini-2.5-flash-preview-04-17", contents=contents, config=config)
         response = await asyncio.to_thread(_call)
         return {"text": response.text.strip(), "confidence": 0.95}
     except Exception as e:
