@@ -2,11 +2,11 @@
 // GEMINI_API_KEY must be set in Vercel project environment variables
 
 const MODELS = [
-  'gemini-2.5-flash-preview-04-17',
+  'gemini-flash-latest',   // alias stabile → sempre il miglior flash disponibile
   'gemini-2.5-flash',
-  'gemini-2.5-flash-lite-preview-06-17',
-  'gemini-1.5-flash',
-  'gemini-1.5-pro',
+  'gemini-2.5-flash-lite',
+  'gemini-2.0-flash-001',  // versione pinned stabile
+  'gemini-pro-latest',
 ];
 
 export default async function handler(req, res) {
