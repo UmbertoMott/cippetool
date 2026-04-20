@@ -869,6 +869,42 @@ async def ocr_document(req: OcrRequest):
         raise HTTPException(status_code=500, detail=f"Document AI OCR error: {e}")
 
 
+class OcrImageRequest(BaseModel):
+    image_b64: str          # base64-encoded image (JPEG/PNG)
+    mime_type: str = "image/jpeg"
+    lang_hint: str = "ita"  # language hint (unused by Gemini, kept for future)
+
+@app.post("/api/ocr/image")
+async def ocr_image(req: OcrImageRequest):
+    """
+    OCR di una singola immagine usando Gemini Vision.
+    Accetta un'immagine in base64 e restituisce il testo estratto.
+    """
+    if not _genai_available:
+        raise HTTPException(status_code=503, detail="google-genai non installato")
+    if not GEMINI_API_KEY:
+        raise HTTPException(status_code=503, detail="GEMINI_API_KEY non configurata")
+    try:
+        import base64 as _b64
+        image_bytes = _b64.b64decode(req.image_b64)
+        client = _genai.Client(api_key=GEMINI_API_KEY)
+        image_part = _genai_types.Part.from_bytes(data=image_bytes, mime_type=req.mime_type)
+        text_part = _genai_types.Part.from_text(
+            text="Estrai tutto il testo presente in questa immagine di documento esattamente come appare. "
+                 "Preserva gli a capo e la struttura originale. "
+                 "Restituisci solo il testo estratto, senza commenti o spiegazioni aggiuntive."
+        )
+        contents = [_genai_types.Content(role="user", parts=[image_part, text_part])]
+        config = _genai_types.GenerateContentConfig(max_output_tokens=8192, temperature=0.1)
+        def _call():
+            return client.models.generate_content(model="gemini-2.0-flash", contents=contents, config=config)
+        response = await asyncio.to_thread(_call)
+        return {"text": response.text.strip(), "confidence": 0.95}
+    except Exception as e:
+        logger.error(f"[OCR/image] Errore: {e}")
+        raise HTTPException(status_code=500, detail=f"OCR error: {e}")
+
+
 @app.post("/api/documents/ocr-embed")
 async def ocr_embed_document(req: OcrEmbedRequest, db: Session = Depends(get_db)):
     """
