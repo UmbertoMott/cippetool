@@ -28,9 +28,10 @@ export default async function handler(req, res) {
     contents: body.contents,
     generationConfig: body.generationConfig || { temperature: 0.4, maxOutputTokens: 2048 },
   };
+  if (body.system_instruction) geminiBody.system_instruction = body.system_instruction;
   if (body.tools) geminiBody.tools = body.tools;
-  // safetySettings ignored server-side
 
+  let lastErr = '';
   for (const model of modelsToTry) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
@@ -42,9 +43,12 @@ export default async function handler(req, res) {
 
       if (!geminiResp.ok) {
         const errData = await geminiResp.json().catch(() => ({}));
-        const errMsg = errData?.error?.message || geminiResp.statusText;
-        if (geminiResp.status === 404 || errMsg.toLowerCase().includes('not found')) continue;
-        return res.status(500).json({ error: errMsg });
+        lastErr = errData?.error?.message || geminiResp.statusText;
+        const s = geminiResp.status;
+        // Retry on: not found, quota, overload, server error, deprecation
+        if (s === 404 || s === 429 || s === 500 || s === 503 ||
+            /not found|deprecated|quota|overload|unavailable/i.test(lastErr)) continue;
+        return res.status(500).json({ error: lastErr });
       }
 
       const data = await geminiResp.json();
@@ -52,11 +56,9 @@ export default async function handler(req, res) {
       return res.status(200).json({ text });
 
     } catch (e) {
-      if (model === modelsToTry[modelsToTry.length - 1]) {
-        return res.status(500).json({ error: e.message });
-      }
+      lastErr = e.message;
     }
   }
 
-  return res.status(503).json({ error: 'Tutti i modelli Gemini non disponibili' });
+  return res.status(503).json({ error: lastErr || 'Tutti i modelli Gemini non disponibili' });
 }
