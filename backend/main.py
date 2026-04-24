@@ -62,15 +62,15 @@ BUCKET_NAME        = os.getenv("GCS_BUCKET_NAME", "data-protection-archive")
 CORS_ORIGINS       = os.getenv("CORS_ORIGINS", "http://localhost:7890").split(",")
 VERTEX_PROJECT     = os.getenv("GOOGLE_CLOUD_PROJECT", "")
 VERTEX_LOCATION    = os.getenv("VERTEX_AI_LOCATION", "us-central1")
-VERTEX_MODEL       = os.getenv("VERTEX_AI_MODEL", "gemini-flash-latest")
+VERTEX_MODEL       = os.getenv("VERTEX_AI_MODEL", "gemini-2.5-flash")
 
-# Ordered fallback chain for the Gemini proxy — first model that responds wins
+# Solo versioni stabili esplicite — no alias, no preview
 _PROXY_FALLBACK_MODELS = [
-    "gemini-flash-latest",   # alias stabile → sempre il miglior flash
     "gemini-2.5-flash",
+    "gemini-2.0-flash-001",
     "gemini-2.5-flash-lite",
-    "gemini-2.0-flash-001",  # versione pinned stabile
-    "gemini-pro-latest",
+    "gemini-2.0-flash-lite-001",
+    "gemini-2.5-pro",
 ]
 GEMINI_API_KEY     = os.getenv("GEMINI_API_KEY", "")  # Non-Vertex fallback
 
@@ -1859,6 +1859,66 @@ async def voice_websocket(websocket: WebSocket):
         await websocket.close()
     except Exception:
         pass
+
+
+# ── Piper TTS ─────────────────────────────────────────────────────
+
+# Lazy import — only loads piper_tts module when first /api/speak request arrives,
+# so startup is not blocked if the module has an import-time issue.
+_piper_tts = None
+
+def _get_piper():
+    global _piper_tts
+    if _piper_tts is None:
+        try:
+            import piper_tts as _pt
+            _piper_tts = _pt
+        except ImportError as e:
+            raise RuntimeError(f"piper_tts module not found: {e}")
+    return _piper_tts
+
+
+class SpeakRequest(BaseModel):
+    text: str
+    length_scale: float = 1.08   # >1 = slower, for legal text clarity
+
+
+@app.post("/api/speak")
+async def speak(req: SpeakRequest):
+    """
+    POST /api/speak  { text, length_scale? }
+    Returns audio/wav synthesized by Piper TTS (it_IT-riccardo-medium).
+    On first call downloads piper binary + voice model to /tmp (~70 MB total).
+    Subsequent calls are fast (files cached in /tmp for process lifetime).
+    """
+    if not req.text or not req.text.strip():
+        raise HTTPException(status_code=400, detail="text required")
+
+    try:
+        pt = _get_piper()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+    text = req.text.strip()[:4000]
+
+    try:
+        normalized = await asyncio.to_thread(pt.normalize_legal_text, text)
+        wav_bytes   = await asyncio.to_thread(pt.synthesize, normalized, req.length_scale)
+    except RuntimeError as e:
+        logger.error("[Speak] Piper error: %s", e)
+        raise HTTPException(status_code=500, detail=f"TTS synthesis error: {e}")
+    except Exception as e:
+        logger.error("[Speak] Unexpected error: %s", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return Response(
+        content=wav_bytes,
+        media_type="audio/wav",
+        headers={
+            "Content-Length": str(len(wav_bytes)),
+            "Cache-Control": "no-store",
+        },
+    )
 
 
 # ── Serve Frontend (optional) ──────────────────────────────────────
