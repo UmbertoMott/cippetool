@@ -1,6 +1,6 @@
 // Vercel Serverless Function — TTS proxy
-// Priority 1: Gemini TTS (GEMINI_API_KEY — già configurata)
-// Priority 2: Google Cloud TTS Chirp 3 HD (GOOGLE_TTS_API_KEY — richiede service account)
+// Priority 1: Google Cloud TTS Chirp 3 HD (GOOGLE_TTS_API_KEY)
+// Priority 2: Gemini TTS (GEMINI_API_KEY — fallback)
 // Priority 3: OpenAI TTS (OPENAI_API_KEY — fallback)
 
 // Wrap raw L16 PCM in a WAV container so browsers can decode it
@@ -31,8 +31,8 @@ const GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 
 const GOOGLE_VOICES_CHIRP = {
-  'it': { languageCode: 'it-IT', name: 'it-IT-Chirp3-HD-Orus' },
-  'en': { languageCode: 'en-US', name: 'en-US-Chirp3-HD-Orus' },
+  'it': { languageCode: 'it-IT', name: 'it-IT-Chirp3-HD-Aoede' },
+  'en': { languageCode: 'en-US', name: 'en-US-Chirp3-HD-Aoede' },
 };
 
 // Gemini prebuilt voice — Charon: informative, clearly male, good for legal content
@@ -52,59 +52,7 @@ export default async function handler(req, res) {
   const GOOGLE_KEY  = process.env.GOOGLE_TTS_API_KEY;
   const OPENAI_KEY  = process.env.OPENAI_API_KEY;
 
-  // ── 1. Gemini TTS (primary — uses existing GEMINI_API_KEY) ────────────
-  if (GEMINI_KEY) {
-    try {
-      const url = `${GEMINI_BASE}/models/${GEMINI_TTS_MODEL}:generateContent?key=${GEMINI_KEY}`;
-      const gRes = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text }] }],
-          generationConfig: {
-            responseModalities: ['AUDIO'],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: { voiceName: GEMINI_VOICE },
-              },
-            },
-          },
-        }),
-      });
-
-      if (gRes.ok) {
-        const data = await gRes.json();
-        const inline = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-        if (inline?.data) {
-          let buf = Buffer.from(inline.data, 'base64');
-          let mime = inline.mimeType || 'audio/wav';
-          console.log('Gemini TTS ok — mime:', mime, 'bytes:', buf.length);
-          // Gemini returns raw L16 PCM — wrap in WAV so browsers can decode it
-          if (mime.includes('L16') || mime.includes('pcm') || mime.includes('raw')) {
-            const rateMatch = mime.match(/rate=(\d+)/);
-            const sampleRate = rateMatch ? parseInt(rateMatch[1]) : 24000;
-            buf = pcmToWav(buf, sampleRate);
-            mime = 'audio/wav';
-          }
-          res.setHeader('Content-Type', mime);
-          res.setHeader('Cache-Control', 'no-store');
-          return res.status(200).send(buf);
-        } else {
-          // Log full response so we can see what Gemini returned (no audio data)
-          const finishReason = data?.candidates?.[0]?.finishReason;
-          const errMsg = data?.error?.message;
-          console.error('Gemini TTS: no inlineData. finishReason:', finishReason, 'error:', errMsg, 'keys:', JSON.stringify(Object.keys(data || {})));
-        }
-      } else {
-        const err = await gRes.json().catch(() => ({}));
-        console.error('Gemini TTS error', gRes.status, err?.error?.message);
-      }
-    } catch (e) {
-      console.error('Gemini TTS exception:', e.message);
-    }
-  }
-
-  // ── 2. Google Cloud TTS Chirp 3 HD (needs service account auth) ────────
+  // ── 1. Google Cloud TTS Chirp 3 HD (primary) ──────────────────────────
   if (GOOGLE_KEY) {
     try {
       const voiceCfg = GOOGLE_VOICES_CHIRP[lang] || GOOGLE_VOICES_CHIRP['it'];
@@ -132,6 +80,56 @@ export default async function handler(req, res) {
       }
     } catch (e) {
       console.error('Google Cloud TTS exception:', e.message);
+    }
+  }
+
+  // ── 2. Gemini TTS (fallback) ───────────────────────────────────────────
+  if (GEMINI_KEY) {
+    try {
+      const url = `${GEMINI_BASE}/models/${GEMINI_TTS_MODEL}:generateContent?key=${GEMINI_KEY}`;
+      const gRes = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text }] }],
+          generationConfig: {
+            responseModalities: ['AUDIO'],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: GEMINI_VOICE },
+              },
+            },
+          },
+        }),
+      });
+
+      if (gRes.ok) {
+        const data = await gRes.json();
+        const inline = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+        if (inline?.data) {
+          let buf = Buffer.from(inline.data, 'base64');
+          let mime = inline.mimeType || 'audio/wav';
+          console.log('Gemini TTS ok — mime:', mime, 'bytes:', buf.length);
+          if (mime.includes('L16') || mime.includes('pcm') || mime.includes('raw')) {
+            const rateMatch = mime.match(/rate=(\d+)/);
+            const sampleRate = rateMatch ? parseInt(rateMatch[1]) : 24000;
+            buf = pcmToWav(buf, sampleRate);
+            mime = 'audio/wav';
+          }
+          res.setHeader('Content-Type', mime);
+          res.setHeader('Cache-Control', 'no-store');
+          return res.status(200).send(buf);
+        } else {
+          const finishReason = data?.candidates?.[0]?.finishReason;
+          const errMsg = data?.error?.message;
+          console.error('Gemini TTS: no inlineData. finishReason:', finishReason, 'error:', errMsg);
+        }
+      } else {
+        const err = await gRes.json().catch(() => ({}));
+        console.error('Gemini TTS error', gRes.status, err?.error?.message);
+      }
+    } catch (e) {
+      console.error('Gemini TTS exception:', e.message);
     }
   }
 
