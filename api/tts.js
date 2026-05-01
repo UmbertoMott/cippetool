@@ -7,24 +7,27 @@
 function pcmToWav(pcmBuf, sampleRate = 24000, channels = 1, bitsPerSample = 16) {
   const dataSize = pcmBuf.length;
   const wav = Buffer.alloc(44 + dataSize);
-  // RIFF header
   wav.write('RIFF', 0);
   wav.writeUInt32LE(36 + dataSize, 4);
   wav.write('WAVE', 8);
-  // fmt chunk
   wav.write('fmt ', 12);
-  wav.writeUInt32LE(16, 16);           // chunk size
-  wav.writeUInt16LE(1, 20);            // PCM format
+  wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20);
   wav.writeUInt16LE(channels, 22);
   wav.writeUInt32LE(sampleRate, 24);
-  wav.writeUInt32LE(sampleRate * channels * bitsPerSample / 8, 28); // byte rate
-  wav.writeUInt16LE(channels * bitsPerSample / 8, 32);              // block align
+  wav.writeUInt32LE(sampleRate * channels * bitsPerSample / 8, 28);
+  wav.writeUInt16LE(channels * bitsPerSample / 8, 32);
   wav.writeUInt16LE(bitsPerSample, 34);
-  // data chunk
   wav.write('data', 36);
   wav.writeUInt32LE(dataSize, 40);
   pcmBuf.copy(wav, 44);
   return wav;
+}
+
+// Wraps text in SSML with <mark> before each word for timepoint sync
+function buildSSML(text) {
+  const words = text.trim().split(/\s+/);
+  return '<speak>' + words.map((w, i) => `<mark name="w${i}"/>${w}`).join(' ') + '</speak>';
 }
 
 const GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
@@ -35,7 +38,6 @@ const GOOGLE_VOICES_CHIRP = {
   'en': { languageCode: 'en-US', name: 'en-US-Chirp3-HD-Aoede' },
 };
 
-// Gemini prebuilt voice — Charon: informative, clearly male, good for legal content
 const GEMINI_VOICE = 'Charon';
 
 export default async function handler(req, res) {
@@ -56,19 +58,32 @@ export default async function handler(req, res) {
   if (GOOGLE_KEY) {
     try {
       const voiceCfg = GOOGLE_VOICES_CHIRP[lang] || GOOGLE_VOICES_CHIRP['it'];
+      const ssml = buildSSML(text.substring(0, 5000));
       const gRes = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GOOGLE_KEY },
         body: JSON.stringify({
-          input: { text: text.substring(0, 5000) },
+          input: { ssml },
           voice: voiceCfg,
           audioConfig: { audioEncoding: 'MP3', speakingRate: Math.min(Math.max(speed, 0.25), 4.0) },
+          timepointTypes: ['SSML_MARK'],
         }),
       });
 
       if (gRes.ok) {
         const data = await gRes.json();
         if (data.audioContent) {
+          if (data.timepoints && data.timepoints.length > 0) {
+            // Chirp3-HD supporta timepoints: restituisce JSON per highlight sincronizzato
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Cache-Control', 'no-store');
+            return res.status(200).json({
+              audio: data.audioContent,
+              mimeType: 'audio/mpeg',
+              timepoints: data.timepoints,
+            });
+          }
+          // Nessun timepoint (voce non supportata): raw audio come prima
           const buf = Buffer.from(data.audioContent, 'base64');
           res.setHeader('Content-Type', 'audio/mpeg');
           res.setHeader('Cache-Control', 'no-store');
