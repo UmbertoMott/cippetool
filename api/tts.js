@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   const ssml = buildSSML(text.substring(0, 5000));
 
   try {
-    const gRes = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
+    const gRes = await fetch('https://texttospeech.googleapis.com/v1beta1/text:synthesize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GOOGLE_KEY },
       body: JSON.stringify({
