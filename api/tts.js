@@ -1,10 +1,15 @@
 // Vercel Serverless Function — TTS proxy
 // Provider unico: Google Cloud TTS Chirp3-HD (GOOGLE_TTS_API_KEY)
 
-// Wraps text in SSML with <mark> before each word for timepoint sync
+function escXml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+
+// Wraps text in SSML with <mark> before each word for timepoint sync.
+// Words must be XML-escaped — unescaped & < > break SSML and cause Google 400.
 function buildSSML(text) {
   const words = text.trim().split(/\s+/);
-  return '<speak>' + words.map((w, i) => `<mark name="w${i}"/>${w}`).join(' ') + '</speak>';
+  return '<speak>' + words.map((w, i) => `<mark name="w${i}"/>${escXml(w)}`).join(' ') + '</speak>';
 }
 
 const GOOGLE_VOICES_CHIRP = {
@@ -42,8 +47,9 @@ export default async function handler(req, res) {
 
     if (!gRes.ok) {
       const err = await gRes.json().catch(() => ({}));
-      console.error('Google Cloud TTS error', gRes.status, err?.error?.code);
-      return res.status(502).json({ error: 'Google TTS error', code: gRes.status });
+      const detail = err?.error?.message || err?.error?.code || 'unknown';
+      console.error('Google Cloud TTS error', gRes.status, detail);
+      return res.status(502).json({ error: 'Google TTS error', code: gRes.status, detail });
     }
 
     const data = await gRes.json();
