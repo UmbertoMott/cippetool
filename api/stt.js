@@ -17,9 +17,9 @@ export default async function handler(req, res) {
   const langCode = lang === 'en' ? 'en-US' : 'it-IT';
   const altLang  = lang === 'en' ? 'it-IT' : 'en-US';
 
-  // WEBM_OPUS and OGG_OPUS don't need sampleRateHertz (embedded in container)
   const config = {
     encoding,
+    sampleRateHertz: 48000,
     languageCode: langCode,
     alternativeLanguageCodes: [altLang],
     enableAutomaticPunctuation: true,
