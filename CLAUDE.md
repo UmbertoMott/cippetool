@@ -1,101 +1,43 @@
-# CLAUDE.md — CIPP/E Legal SaaS
+# CLAUDE.md — CIPP/E Legal SaaS (cipp_legal_saas)
 
-Progetto: **privacyaitool.vercel.app**
-Repo: `cipp_legal_saas/`
-File principale frontend: `public/index.html` (tutto il codice UI/logica è qui)
-API serverless: `api/` (Vercel Functions, ESM)
+> Leggi anche `/Users/umbertomottola/Downloads/CIPPETOOL/CLAUDE.md` per il contesto completo.
 
 ---
 
-## Regola fondamentale — deploy target
+## Regola fondamentale
 
-**Le modifiche vanno sempre su `cipp_legal_saas/public/index.html`.**
-Non toccare mai il file standalone `CIPPETOOL/cipp_e_IAPP_UmbertoMottolaSaas_v5_*.html` come target di deploy — è un export/backup, non la sorgente attiva.
-
----
-
-## TTS — Google Cloud TTS Chirp3-HD (voce canonica)
-
-**Skill di riferimento:** `~/.claude/skills/google-tts-chirp3hd/SKILL.md`
-
-### Priorità provider (api/tts.js)
-
-1. **Google Cloud TTS Chirp3-HD** — provider principale (`GOOGLE_TTS_API_KEY`)
-   - Voce italiana: `it-IT-Chirp3-HD-Aoede`
-   - Voce inglese: `en-US-Chirp3-HD-Aoede`
-2. Gemini TTS (`GEMINI_API_KEY`) — fallback
-3. OpenAI TTS (`OPENAI_API_KEY`) — ultimo fallback
-
-**Non invertire questa priorità.** Se Chirp3-HD non risponde, il fallback è automatico — non spostare Gemini al primo posto.
-
-### Architettura gapless (public/index.html)
-
-Il playback usa `sentences.map(fetch + decodeAudioData in parallelo)` — tutti i segmenti vengono fetchati **e decodificati** in parallelo prima che `scheduleNext` li consumi. Questo elimina i gap di 4-5s tra segmenti.
-
-**Non tornare al decode sequenziale dentro `scheduleNext`** — causerebbe di nuovo i gap.
-
-Pattern critico:
-```js
-var bufPromises = sentences.map(function(sent, idx) {
-  return abPromise.then(function(ab) {
-    return new Promise(function(res, rej) { ctx.decodeAudioData(ab, res, rej); });
-  }).catch(function() { return null; });
-});
-```
-
-### Variabili di stato TTS (non rimuovere)
-
-- `_wbCbtts` — stato globale AudioContext + sources + cancelled flag
-- `_wbPF` — prefetch del primo segmento (scatta a mouseup sulla selezione)
-- `_wbWordHL` — word highlight sincronizzato con l'audio
-- `_wbSelRect` — rect della selezione salvato a mouseup (coordinate certe per il popup nota)
+**File deploy:** `public/index.html` → push su `main` → Vercel auto-deploya.
+**NON modificare** il file standalone in `CIPPETOOL/`.
 
 ---
 
-## AI Document Workbench — invarianti
+## TTS — api/tts.js
 
-### Nota a margine
+- Provider unico: **Google Cloud TTS Chirp3-HD** (`GOOGLE_TTS_API_KEY`)
+- Endpoint: `https://texttospeech.googleapis.com/v1/text:synthesize`
+- Input: `{ text: "..." }` — **NON ssml**, **NON timepointTypes** (causa 400 con Chirp3-HD)
+- Risposta: MP3 binario diretto (`audio/mpeg`)
+- Nessun fallback Gemini/OpenAI/WebSpeech
 
-`wbInsertMarginNote()` usa `_wbSelRect` (salvato al mouseup in `wbDocPageMouseUp`) per posizionare il popup:
-- **Destra** del testo selezionato: `left = _wbSelRect.right + 14`
-- **Altezza del primo rigo**: `top = _wbSelRect.top`
+Skill: `~/.claude/skills/google-tts-chirp3hd/SKILL.md`
 
-**Non ricalcolare `getBoundingClientRect()` dopo lo scroll** — restituirebbe coordinate errate. Usare sempre `_wbSelRect`.
+## TTS — frontend (public/index.html)
 
-### Auto-save — trigger obbligatori
+Skill completa: `~/.claude/skills/tts-selection-miniplayer/SKILL.md`
 
-`_wbAutoSave()` deve essere chiamata in questi punti (aggiunta dopo regressions):
+Bug critici risolti (NON reintrodurre):
+1. `done()` in `_wbCbttsPlay` usa delay su `nextAt - ctx.currentTime` — senza questo il mini-player sparisce mentre l'audio suona
+2. `_wbWordHLSchedule` usa sentence-level (NON word-by-word) — Chirp3-HD non ha timepoints
+3. `topPx` in `wbInsertMarginNote` diviso per `_wbZoom`
+4. Delete note su sessioni ripristinate: event delegation su `.doc-page`
 
-- Dopo conferma nota (`wbMarginNoteConfirm`)
-- Dopo invio messaggio chat (dopo `messagesEl.appendChild(userBubble)`)
-- Dopo caricamento documento (`wbPostRender`)
-- Dopo completamento tool AI
-- Dopo risposta AI chat
+## Vercel
 
-### done() guard in _wbCbttsPlay
-
-`_doneCalled` guard è obbligatorio per evitare che il mini-player sparisca prima della fine audio:
-```js
-var _doneCalled = false;
-function done() {
-  if (_doneCalled || _wbCbtts.cancelled) return;
-  _doneCalled = true;
-  setStatus(''); _wbWordHLStop(); if (onDone) onDone();
-}
-```
-`done()` si chiama **solo** da `src.onended` (ultimo segmento) — mai da `scheduleNext` quando `idx >= n`.
-
----
-
-## Vercel — ambiente
-
-- Cold start: 3-5s → mitigato con warm-up a mousedown e caricamento documento
-- Keep-warm: ping `/api/tts` ogni 3 minuti da `_wbTTSScheduleKeepWarm()`
-- Env vars necessarie: `GOOGLE_TTS_API_KEY`, `GEMINI_API_KEY` (già presente), opzionale `OPENAI_API_KEY`
-
----
+- Env var modificate → **Redeploy manuale** obbligatorio
+- `GOOGLE_TTS_API_KEY` deve avere spunta su **Production**
+- Tutti i file in `vercel.json builds[]` devono essere committati (se mancano → build silenziosamente fallisce)
+- Keep-warm: `_wbTTSScheduleKeepWarm()` ogni 3 min
 
 ## Commit
 
-Branch principale: `main` → deploy automatico su Vercel.
-Prefissi commit: `fix:`, `feat:`, `perf:`, `design:`.
+Branch: `main`. Prefissi: `fix:` `feat:` `perf:` `design:`.
