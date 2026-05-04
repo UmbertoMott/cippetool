@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       role: 'user',
       parts: [
         { inlineData: { mimeType: mime_type, data: image_b64 } },
-        { text: 'Estrai tutto il testo presente in questa immagine di documento esattamente come appare. Preserva gli a capo e la struttura originale. Restituisci solo il testo estratto, senza commenti o spiegazioni aggiuntive.' }
+        { text: 'Estrai il testo di questo documento in formato Markdown, preservando la struttura visiva:\n- Usa # per titoli principali (font grande, intestazione di sezione, testo centrato o in maiuscolo enfatico)\n- Usa ## per sottotitoli o intestazioni secondarie\n- Usa ### per intestazioni di terzo livello\n- Usa **testo** per parole in grassetto o comunque enfatizzate visivamente\n- Testo normale per il corpo del documento\n- Preserva a capo e separazione tra paragrafi\nRestituisci solo il Markdown, senza spiegazioni o commenti aggiuntivi.' }
       ]
     }],
     generationConfig: { temperature: 0.1, maxOutputTokens: 32768 },
