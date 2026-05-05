@@ -524,10 +524,10 @@ body.theme-light .llc-vchat-result {
 .wbp-new-btn { display: inline-flex; align-items: center; gap: 7px; padding: 7px 16px; background: none; border: 1px solid var(--bdr); border-radius: 8px; color: var(--txt); font: 600 13px/1 inherit; cursor: pointer; transition: all .15s; }
 .wbp-new-btn:hover { border-color: var(--acc); color: var(--acc); }
 .wbp-sessions-title { display: none; }
-.wbp-table-head { display: grid; grid-template-columns: 1fr 100px 90px 60px 90px 32px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--bdr); margin-bottom: 0; }
+.wbp-table-head { display: grid; grid-template-columns: minmax(0,1fr) 120px 110px 80px 90px 36px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--bdr); margin-bottom: 0; }
 .wbp-table-head span { font: 600 11px/1 inherit; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); }
 .wbp-grid { display: flex; flex-direction: column; }
-.wbp-card { background: transparent; border: none; border-bottom: 1px solid var(--bdr); border-radius: 0; padding: 0; display: grid; grid-template-columns: 1fr 100px 90px 60px 90px 32px; align-items: center; min-height: 50px; transition: background .15s; }
+.wbp-card { background: transparent; border: none; border-bottom: 1px solid var(--bdr); border-radius: 0; padding: 0; display: grid; grid-template-columns: minmax(0,1fr) 120px 110px 80px 90px 36px; align-items: center; min-height: 50px; transition: background .15s; }
 .wbp-card:hover { background: var(--sur); }
 .wbp-card-icon { display: none; }
 .wbp-card-body { min-width: 0; padding: 13px 0; }
@@ -21623,7 +21623,7 @@ function wbPickerRender() {
       + '<div class="wbp-card-tools">' + toolCount + '</div>'
       + '<div class="wbp-card-actions">'
       + '<button class="wbp-open-btn" onclick="wbPickerOpen(\''+s.id+'\')">Apri →</button>'
-      + '<button class="wbp-del-btn" onclick="wbPickerDelete(\''+s.id+'\')" title="Elimina">×</button>'
+      + '<button class="wbp-del-btn" onclick="wbPickerDelete(\''+s.id+'\')" title="Elimina"><svg width="12" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>'
       + '</div></div>';
   }).join('');
 }
