@@ -7111,105 +7111,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- MODE CHOICE SCREEN ─────────────────────────────────────────────── -->
 <div class="screen" id="screenMode">
-  <div id="modeWrap" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:32px;padding:40px 20px">
-    <div style="text-align:center;margin-bottom:8px">
-      <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:8px" id="modeGreet">Bentornato!</div>
-      <div style="color:var(--muted);font-size:14px">Scegli la modalità di studio per questa sessione</div>
+  <div id="modeWrap" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:20px;padding:40px 20px">
+    <div style="text-align:left;width:100%;max-width:860px;">
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:-.3px;" id="modeGreet">Bentornato!</div>
     </div>
-    <div id="modeGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;width:100%;max-width:1020px">
+    <div id="modeGrid" style="width:100%;max-width:860px;border:1px solid var(--bdr);border-radius:14px;overflow:hidden;">
 
-      <!-- QUIZ CARD -->
-      <button onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}lrlGoMode('quiz')" style="
-        background:var(--sur);border:1.5px solid var(--bdr);border-radius:20px;
-        padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
-        color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
-        display:flex;flex-direction:column;gap:14px;
-      " onmouseover="this.style.borderColor='var(--acc)';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(167,139,250,.2)'"
-         onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
-        <div style="font-size:40px">📝</div>
-        <div>
-          <div style="font-size:18px;font-weight:800;margin-bottom:6px">Quiz &amp; Training</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.6">982 domande CIPP/E · 9 quiz da 90 quesiti · Agente AI tutor · Timer IAPP · Flashcard e scenari avanzati</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
-          Vai ai quiz <span style="font-size:16px">→</span>
-        </div>
-      </button>
+      <!-- ROW 1 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--bdr);">
 
-      <!-- LEGAL RESEARCH CARD -->
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}lrlGoMode('research')" style="
-        background:var(--sur);border:1.5px solid var(--bdr);border-radius:20px;
-        padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
-        color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
-        display:flex;flex-direction:column;gap:14px;
-      " onmouseover="this.style.borderColor='#06b6d4';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(6,182,212,.15)'"
-         onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
-        <div style="font-size:40px">⚖️</div>
-        <div>
-          <div style="font-size:18px;font-weight:800;margin-bottom:6px">Legal Research Lab</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.6">Linee guida EDPB/WP29 · Giurisprudenza CJEU · DPIA · LIA · TIA · AI con web search · Viewer con highlights automatici</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#06b6d4;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
-          Apri il lab <span style="font-size:16px">→</span>
-        </div>
-      </button>
+        <!-- QUIZ -->
+        <button onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}lrlGoMode('quiz')"
+          style="background:transparent;border:none;border-right:1px solid var(--bdr);padding:28px 24px 24px;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;justify-content:space-between;gap:32px;transition:background .15s;"
+          onmouseover="this.style.background='var(--bdr)'" onmouseout="this.style.background='transparent'">
+          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;line-height:1.35;">Quiz &amp; Training</div>
+          <div style="font-size:18px;color:var(--muted);line-height:1;transition:transform .15s;display:inline-block;" class="_mc-arrow">→</div>
+        </button>
 
-      <!-- AI WORKBENCH CARD -->
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}showScreen('screenWBPicker');wbPickerInit()" style="
-        background:var(--sur);border:1.5px solid var(--bdr);border-radius:20px;
-        padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
-        color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
-        display:flex;flex-direction:column;gap:14px;
-      " onmouseover="this.style.borderColor='#d394ff';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(211,148,255,.2)'"
-         onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
-        <div style="font-size:40px">🔬</div>
-        <div>
-          <div style="font-size:18px;font-weight:800;margin-bottom:6px">AI Document Workbench</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.6">Carica un PDF · Analisi AI strutturata · Visual Storytelling · Sintesi concetti · Domande di ripasso · Flashcard automatiche</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#d394ff;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
-          Apri il workbench <span style="font-size:16px">→</span>
-        </div>
-      </button>
+        <!-- LEGAL RESEARCH -->
+        <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}lrlGoMode('research')"
+          style="background:transparent;border:none;border-right:1px solid var(--bdr);padding:28px 24px 24px;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;justify-content:space-between;gap:32px;transition:background .15s;"
+          onmouseover="this.style.background='var(--bdr)'" onmouseout="this.style.background='transparent'">
+          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;line-height:1.35;">Legal Research Lab</div>
+          <div style="font-size:18px;color:var(--muted);line-height:1;">→</div>
+        </button>
 
-      <!-- AI PROFESSOR CARD -->
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}profOpen()" style="
-        background:var(--sur);border:1.5px solid var(--bdr);border-radius:20px;
-        padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
-        color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
-        display:flex;flex-direction:column;gap:14px;
-      " onmouseover="this.style.borderColor='#a855f7';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(168,85,247,.20)'"
-         onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
-        <div style="font-size:40px">🎙️</div>
-        <div>
-          <div style="font-size:18px;font-weight:800;margin-bottom:6px">Prof. Lex — AI Docente Vocale</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.6">Interazione 100% vocale · Analisi documenti · Privacy · Penale · Civile · Lavoro · AI con web search · Fonte autorevole per ogni dominio</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
-          Parla con il professore <span style="font-size:16px">→</span>
-        </div>
-      </button>
+        <!-- AI WORKBENCH -->
+        <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}showScreen('screenWBPicker');wbPickerInit()"
+          style="background:transparent;border:none;padding:28px 24px 24px;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;justify-content:space-between;gap:32px;transition:background .15s;"
+          onmouseover="this.style.background='var(--bdr)'" onmouseout="this.style.background='transparent'">
+          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;line-height:1.35;">AI Document Workbench</div>
+          <div style="font-size:18px;color:var(--muted);line-height:1;">→</div>
+        </button>
 
-      <!-- OCR DOCUMENT CARD -->
-      <button onclick="ocrOpen()" style="
-        background:var(--sur);border:1.5px solid var(--bdr);border-radius:20px;
-        padding:36px 28px;cursor:pointer;text-align:left;transition:all .22s;
-        color:var(--txt);font-family:inherit;position:relative;overflow:hidden;
-        display:flex;flex-direction:column;gap:14px;
-      " onmouseover="this.style.borderColor='#4F46E5';this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(79,70,229,.20)'"
-         onmouseout="this.style.borderColor='var(--bdr)';this.style.transform='';this.style.boxShadow=''">
-        <div style="font-size:40px">📷</div>
-        <div>
-          <div style="font-size:18px;font-weight:800;margin-bottom:6px">OCR Documento</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.6">Fotografa documenti multi-pagina · OCR con progress animato · Editor testo estratto · Export .docx / .pdf · Storico sessioni</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#4F46E5;text-transform:uppercase;letter-spacing:.8px;margin-top:4px">
-          Apri OCR <span style="font-size:16px">→</span>
-        </div>
-      </button>
+      </div>
+
+      <!-- ROW 2 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
+
+        <!-- AI PROFESSOR -->
+        <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}profOpen()"
+          style="background:transparent;border:none;border-right:1px solid var(--bdr);padding:28px 24px 24px;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;justify-content:space-between;gap:32px;transition:background .15s;"
+          onmouseover="this.style.background='var(--bdr)'" onmouseout="this.style.background='transparent'">
+          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;line-height:1.35;">Prof. Lex — AI Docente Vocale</div>
+          <div style="font-size:18px;color:var(--muted);line-height:1;">→</div>
+        </button>
+
+        <!-- OCR -->
+        <button onclick="ocrOpen()"
+          style="background:transparent;border:none;border-right:1px solid var(--bdr);padding:28px 24px 24px;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;justify-content:space-between;gap:32px;transition:background .15s;"
+          onmouseover="this.style.background='var(--bdr)'" onmouseout="this.style.background='transparent'">
+          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;line-height:1.35;">OCR Documento</div>
+          <div style="font-size:18px;color:var(--muted);line-height:1;">→</div>
+        </button>
+
+        <!-- EMPTY CELL -->
+        <div style="padding:28px 24px 24px;"></div>
+
+      </div>
 
     </div>
-    <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
+    <div style="font-size:11px;color:var(--muted);opacity:.6">
       <span>Puoi tornare qui in qualsiasi momento</span>
     </div>
   </div>
