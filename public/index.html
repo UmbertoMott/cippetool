@@ -1166,9 +1166,19 @@ body.theme-light #screenWorkbench .wb-margin-note { background: #fffef0; color: 
   position: absolute; top: 3px; right: 3px;
   background: none; border: none; cursor: pointer;
   font-size: 8px; color: rgba(0,0,0,.25); line-height: 1;
-  padding: 0; opacity: 0.3; transition: opacity .12s;
+  padding: 0; opacity: 0; transition: opacity .12s;
 }
 #screenWorkbench .wb-margin-note:hover .wb-margin-note-del { opacity: 1; }
+#screenWorkbench .wb-margin-note-edit {
+  position: absolute; top: 3px; left: 3px;
+  background: none; border: none; cursor: pointer;
+  color: rgba(0,0,0,.3); line-height: 1; padding: 0;
+  opacity: 0; transition: opacity .12s; display: flex; align-items: center;
+}
+#screenWorkbench .wb-margin-note:hover .wb-margin-note-edit { opacity: 1; }
+#screenWorkbench .wb-margin-note-text { display: block; padding: 0 10px 0 10px; }
+#screenWorkbench .wb-margin-note-edit-area { width: 100%; font-family: Georgia,serif; font-size: 8pt; border: none; border-bottom: 1px solid #c9a84c; outline: none; background: transparent; resize: none; color: inherit; margin: 0; padding: 2px 0; box-sizing: border-box; }
+#screenWorkbench .wb-margin-note-save { display: block; margin-top: 4px; background: none; border: none; cursor: pointer; color: #c9a84c; font-size: 10px; font-weight: 700; padding: 0; }
 #wbMarginNoteInput {
   display: none; position: fixed; z-index: 10100;
   background: rgba(18,18,26,.97); backdrop-filter: blur(14px);
@@ -21607,7 +21617,7 @@ function wbPickerRender() {
     var toolCount = (s.toolsGenerated||0) > 0 ? s.toolsGenerated : '—';
     var name = (s.docName||'Sessione senza documento').replace(/^\d+\)\s*/,'');
     return '<div class="wbp-card">'
-      + '<div class="wbp-card-body"><div class="wbp-card-name">' + name + '</div></div>'
+      + '<div class="wbp-card-body"><div class="wbp-card-name" title="Doppio click per rinominare" ondblclick="wbPickerStartRename(event,\''+s.id+'\')" style="cursor:text">' + name.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</div></div>'
       + '<div class="wbp-card-date">' + date + '</div>'
       + '<div class="wbp-card-chat">' + chatCount + '</div>'
       + '<div class="wbp-card-tools">' + toolCount + '</div>'
@@ -21616,6 +21626,31 @@ function wbPickerRender() {
       + '<button class="wbp-del-btn" onclick="wbPickerDelete(\''+s.id+'\')" title="Elimina">×</button>'
       + '</div></div>';
   }).join('');
+}
+
+function wbPickerStartRename(e, id) {
+  var nameEl = e.currentTarget;
+  var current = nameEl.textContent.trim();
+  nameEl.innerHTML = '';
+  var inp = document.createElement('input');
+  inp.type = 'text';
+  inp.value = current;
+  inp.style.cssText = 'width:100%;font:600 13px/1 inherit;border:none;border-bottom:1.5px solid var(--acc);outline:none;background:transparent;color:var(--txt);padding:2px 0;box-sizing:border-box;';
+  nameEl.appendChild(inp);
+  inp.focus(); inp.select();
+
+  function save() {
+    var newName = inp.value.trim() || current;
+    var sessions = wbSessionGetAll();
+    var s = sessions.find(function(x) { return x.id === id; });
+    if (s && newName !== current) { s.docName = newName; wbSessionSaveAll(sessions); }
+    wbPickerRender();
+  }
+  inp.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Enter') { ev.preventDefault(); save(); }
+    if (ev.key === 'Escape') { wbPickerRender(); }
+  });
+  inp.addEventListener('blur', save);
 }
 
 function wbPickerNew() {
@@ -22004,12 +22039,23 @@ function _wbMarginNotesRender() {
 function _wbMarginNoteRenderOne(page, note) {
   var el = document.createElement('div');
   el.className = 'wb-margin-note';
-  // Clamp al contenuto della pagina: note salvate con bug zoom (top > offsetHeight)
-  // vengono portate in fondo al testo invece di finire oltre il documento.
   var safeTop = Math.min(note.top, Math.max(0, page.offsetHeight - 40));
   el.style.top = safeTop + 'px';
   el.setAttribute('data-note-id', note.id);
-  var textEl = document.createTextNode(note.text);
+
+  var editBtn = document.createElement('button');
+  editBtn.className = 'wb-margin-note-edit';
+  editBtn.title = 'Modifica';
+  editBtn.innerHTML = '<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  editBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    _wbMarginNoteStartEdit(el, note);
+  });
+
+  var textSpan = document.createElement('span');
+  textSpan.className = 'wb-margin-note-text';
+  textSpan.textContent = note.text;
+
   var delBtn = document.createElement('button');
   delBtn.className = 'wb-margin-note-del';
   delBtn.title = 'Elimina';
@@ -22018,9 +22064,49 @@ function _wbMarginNoteRenderOne(page, note) {
     e.stopPropagation();
     _wbMarginNoteDelete(note.id);
   });
-  el.appendChild(textEl);
+
+  el.appendChild(editBtn);
+  el.appendChild(textSpan);
   el.appendChild(delBtn);
   page.appendChild(el);
+}
+
+function _wbMarginNoteStartEdit(el, note) {
+  var textSpan = el.querySelector('.wb-margin-note-text');
+  if (!textSpan || el.querySelector('.wb-margin-note-edit-area')) return;
+  textSpan.style.display = 'none';
+
+  var ta = document.createElement('textarea');
+  ta.className = 'wb-margin-note-edit-area';
+  ta.value = note.text;
+  ta.rows = 3;
+
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'wb-margin-note-save';
+  saveBtn.textContent = '✓ Salva';
+
+  function doSave() {
+    var newText = ta.value.trim();
+    if (!newText) { ta.focus(); return; }
+    var key = _wbMarginNotesDocKey();
+    var data = _wbMarginNotesLoad();
+    var n = (data[key] || []).find(function(n) { return n.id === note.id; });
+    if (n) { n.text = newText; note.text = newText; _wbMarginNotesSave(); }
+    textSpan.textContent = newText;
+    textSpan.style.display = '';
+    ta.remove(); saveBtn.remove();
+    _wbAutoSave();
+  }
+
+  saveBtn.addEventListener('click', function(e) { e.stopPropagation(); doSave(); });
+  ta.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); doSave(); }
+    if (e.key === 'Escape') { textSpan.style.display = ''; ta.remove(); saveBtn.remove(); }
+  });
+
+  el.appendChild(ta);
+  el.appendChild(saveBtn);
+  ta.focus(); ta.select();
 }
 
 function _wbMarginNoteDelete(id) {
@@ -28041,13 +28127,13 @@ window.ocrHandleFiles = function(files) {
         var img = new Image();
         img.onload = function() {
           try {
-            var MAX_THUMB = 600;
+            var MAX_THUMB = 180;
             var iw = img.naturalWidth, ih = img.naturalHeight;
             var scale = Math.min(1, MAX_THUMB / Math.max(iw, ih));
             var tw = Math.round(iw * scale), th = Math.round(ih * scale);
             var cv = document.createElement('canvas'); cv.width = tw; cv.height = th;
             cv.getContext('2d').drawImage(img, 0, 0, iw, ih, 0, 0, tw, th);
-            pg.thumbnailSmall = cv.toDataURL('image/jpeg', 0.72);
+            pg.thumbnailSmall = cv.toDataURL('image/jpeg', 0.35);
           } catch(_e) {}
         };
         img.src = e.target.result;
