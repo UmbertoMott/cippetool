@@ -519,27 +519,28 @@ body.theme-light .llc-vchat-result {
 .wbp-root { max-width: 860px; margin: 0 auto; padding: 52px 28px 80px; }
 .wbp-back { background: none; border: 1px solid var(--bdr); border-radius: 8px; color: var(--muted); padding: 5px 14px; font: 600 12px/1 inherit; cursor: pointer; transition: all .15s; }
 .wbp-back:hover { border-color: var(--acc); color: var(--acc); }
-.wbp-heading { font: 800 28px/1.2 'Syne',sans-serif; color: var(--txt); margin: 28px 0 6px; letter-spacing: -.5px; }
-.wbp-sub { font-size: 14px; color: var(--muted); margin-bottom: 36px; }
-.wbp-new-btn { width: 100%; padding: 22px 28px; background: linear-gradient(135deg, rgba(168,85,247,.12), rgba(79,70,229,.08)); border: 2px dashed rgba(168,85,247,.4); border-radius: 16px; color: #c084fc; font: 700 14px/1 inherit; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all .2s; margin-bottom: 28px; }
-.wbp-new-btn:hover { background: linear-gradient(135deg, rgba(168,85,247,.2), rgba(79,70,229,.14)); border-color: rgba(168,85,247,.7); transform: translateY(-2px); }
-body.theme-light .wbp-new-btn { color: #5B21B6; background: rgba(91,33,182,.07); border-color: rgba(91,33,182,.3); }
-body.theme-light .wbp-new-btn:hover { background: rgba(91,33,182,.12); border-color: rgba(91,33,182,.55); }
-.wbp-sessions-title { font: 700 11px/1 inherit; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; }
-.wbp-grid { display: flex; flex-direction: column; gap: 10px; }
-.wbp-card { background: var(--sur); border: 1px solid var(--bdr); border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; transition: all .2s; }
-.wbp-card:hover { border-color: rgba(168,85,247,.4); transform: translateX(3px); }
-body.theme-light .wbp-card:hover { border-color: rgba(91,33,182,.35); }
-.wbp-card-icon { font-size: 28px; flex-shrink: 0; }
-.wbp-card-body { flex: 1; min-width: 0; }
-.wbp-card-name { font: 700 14px/1.3 inherit; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
-.wbp-card-meta { font-size: 11px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
-.wbp-card-badge { background: var(--sur2); border: 1px solid var(--bdr); border-radius: 5px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
-.wbp-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.wbp-open-btn { background: linear-gradient(135deg,#a855f7,#7c3aed); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font: 700 12px/1 inherit; cursor: pointer; transition: opacity .15s; }
-.wbp-open-btn:hover { opacity: .85; }
-.wbp-del-btn { background: none; border: 1px solid rgba(239,68,68,.3); color: #f87171; border-radius: 8px; width: 34px; height: 34px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
-.wbp-del-btn:hover { background: rgba(239,68,68,.1); border-color: #f87171; }
+.wbp-heading { font: 800 28px/1.2 'Syne',sans-serif; color: var(--txt); letter-spacing: -.5px; }
+.wbp-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+.wbp-new-btn { display: inline-flex; align-items: center; gap: 7px; padding: 7px 16px; background: none; border: 1px solid var(--bdr); border-radius: 8px; color: var(--txt); font: 600 13px/1 inherit; cursor: pointer; transition: all .15s; }
+.wbp-new-btn:hover { border-color: var(--acc); color: var(--acc); }
+.wbp-sessions-title { display: none; }
+.wbp-table-head { display: grid; grid-template-columns: 1fr 100px 90px 60px 90px 32px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--bdr); margin-bottom: 0; }
+.wbp-table-head span { font: 600 11px/1 inherit; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); }
+.wbp-grid { display: flex; flex-direction: column; }
+.wbp-card { background: transparent; border: none; border-bottom: 1px solid var(--bdr); border-radius: 0; padding: 0; display: grid; grid-template-columns: 1fr 100px 90px 60px 90px 32px; align-items: center; min-height: 50px; transition: background .15s; }
+.wbp-card:hover { background: var(--sur); }
+.wbp-card-icon { display: none; }
+.wbp-card-body { min-width: 0; padding: 13px 0; }
+.wbp-card-name { font: 600 13px/1.3 inherit; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wbp-card-meta { display: none; }
+.wbp-card-date { font-size: 12px; color: var(--muted); }
+.wbp-card-chat { font-size: 12px; color: var(--muted); }
+.wbp-card-tools { font-size: 12px; color: var(--muted); }
+.wbp-card-actions { display: flex; gap: 4px; align-items: center; justify-content: flex-end; grid-column: 5 / 7; }
+.wbp-open-btn { background: none; border: none; color: var(--acc); font: 600 12px/1 inherit; cursor: pointer; padding: 5px 8px; border-radius: 6px; transition: background .15s; white-space: nowrap; }
+.wbp-open-btn:hover { background: rgba(168,85,247,.1); }
+.wbp-del-btn { background: none; border: none; color: var(--muted); border-radius: 6px; width: 26px; height: 26px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color .15s; line-height: 1; }
+.wbp-del-btn:hover { color: #f87171; }
 .wbp-empty { text-align: center; color: var(--muted); padding: 48px 0; font-size: 13px; }
 /* WB save button */
 #wbSaveBtn { background:none; border:1px solid var(--wb-border); color:var(--wb-meta); width:28px; height:28px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; flex-shrink:0; margin-right:2px; }
@@ -7567,12 +7568,18 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="screen" id="screenWBPicker">
   <div class="wbp-root">
     <button class="wbp-back" onclick="goBack()">← Torna</button>
-    <div class="wbp-heading">🔬 AI Document Workbench</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:28px 0 6px;">
+      <div class="wbp-heading">AI Document Workbench</div>
+      <button class="wbp-new-btn" onclick="wbPickerNew()">＋ Nuova Sessione</button>
+    </div>
     <div class="wbp-sub">Riprendi una sessione salvata oppure iniziane una nuova</div>
-    <button class="wbp-new-btn" onclick="wbPickerNew()">
-      <span style="font-size:20px">＋</span> Nuova Sessione
-    </button>
-    <div class="wbp-sessions-title">Sessioni salvate</div>
+    <div class="wbp-table-head">
+      <span>Nome</span>
+      <span>Data</span>
+      <span>Messaggi</span>
+      <span>Tool</span>
+      <span></span><span></span>
+    </div>
     <div class="wbp-grid" id="wbPickerList">
       <div class="wbp-empty">Nessuna sessione salvata ancora.</div>
     </div>
@@ -21596,21 +21603,17 @@ function wbPickerRender() {
   listEl.innerHTML = sessions.map(function(s) {
     var date = '';
     try { date = new Date(s.savedAt||s.createdAt).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}); } catch(e){}
-    var toolsBadge = (s.toolsGenerated||0) > 0
-      ? '<span class="wbp-card-badge">'+s.toolsGenerated+' tool</span>' : '';
-    var chatBadge = (s.chatCount||0) > 0
-      ? '<span class="wbp-card-badge">'+s.chatCount+' messaggi</span>' : '';
-    var ext = (s.docName||'').split('.').pop().toLowerCase();
-    var icon = ext === 'pdf' ? '📕' : (ext === 'docx'||ext === 'doc') ? '📘' : '📄';
+    var chatCount = (s.chatCount||0) > 0 ? s.chatCount : '—';
+    var toolCount = (s.toolsGenerated||0) > 0 ? s.toolsGenerated : '—';
+    var name = (s.docName||'Sessione senza documento').replace(/^\d+\)\s*/,'');
     return '<div class="wbp-card">'
-      + '<div class="wbp-card-icon">' + icon + '</div>'
-      + '<div class="wbp-card-body">'
-      + '<div class="wbp-card-name">' + (s.docName||'Sessione senza documento').replace(/^\d+\)\s*/,'') + '</div>'
-      + '<div class="wbp-card-meta">' + date + ' ' + (chatBadge||'') + ' ' + (toolsBadge||'') + '</div>'
-      + '</div>'
+      + '<div class="wbp-card-body"><div class="wbp-card-name">' + name + '</div></div>'
+      + '<div class="wbp-card-date">' + date + '</div>'
+      + '<div class="wbp-card-chat">' + chatCount + '</div>'
+      + '<div class="wbp-card-tools">' + toolCount + '</div>'
       + '<div class="wbp-card-actions">'
-      + '<button class="wbp-open-btn" onclick="wbPickerOpen(\''+s.id+'\')">Continua →</button>'
-      + '<button class="wbp-del-btn" onclick="wbPickerDelete(\''+s.id+'\')" title="Elimina sessione">🗑️</button>'
+      + '<button class="wbp-open-btn" onclick="wbPickerOpen(\''+s.id+'\')">Apri →</button>'
+      + '<button class="wbp-del-btn" onclick="wbPickerDelete(\''+s.id+'\')" title="Elimina">×</button>'
       + '</div></div>';
   }).join('');
 }
