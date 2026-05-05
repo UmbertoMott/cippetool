@@ -7122,8 +7122,9 @@ document.addEventListener('DOMContentLoaded', function() {
         style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
         onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="overflow:hidden;height:220px;">
+        <div style="overflow:hidden;height:220px;position:relative;">
           <img src="/previews/prev_quiz.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,.2);pointer-events:none;"></div>
         </div>
         <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;">Quiz &amp; Training</span>
@@ -7136,8 +7137,9 @@ document.addEventListener('DOMContentLoaded', function() {
         style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
         onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="overflow:hidden;height:220px;">
+        <div style="overflow:hidden;height:220px;position:relative;">
           <img src="/previews/prev_research.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,.2);pointer-events:none;"></div>
         </div>
         <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;">Legal Research Lab</span>
@@ -7150,8 +7152,9 @@ document.addEventListener('DOMContentLoaded', function() {
         style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
         onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="overflow:hidden;height:220px;">
+        <div style="overflow:hidden;height:220px;position:relative;">
           <img src="/previews/prev_workbench.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,.2);pointer-events:none;"></div>
         </div>
         <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;">AI Document Workbench</span>
@@ -7164,8 +7167,9 @@ document.addEventListener('DOMContentLoaded', function() {
         style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
         onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="overflow:hidden;height:220px;">
+        <div style="overflow:hidden;height:220px;position:relative;">
           <img src="/previews/prev_proflex.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,.2);pointer-events:none;"></div>
         </div>
         <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;">Prof. Lex — AI Docente Vocale</span>
@@ -7175,11 +7179,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       <!-- ── OCR DOCUMENTO (full width) ── -->
       <button onclick="ocrOpen()"
-        style="grid-column:1/-1;background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
+        style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
         onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="overflow:hidden;height:180px;">
+        <div style="overflow:hidden;height:220px;position:relative;">
           <img src="/previews/prev_ocr.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,.2);pointer-events:none;"></div>
         </div>
         <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;">OCR Documento</span>
