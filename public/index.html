@@ -32445,21 +32445,31 @@ window.trDocInputChange = async function(ev) {
     var text = '';
     try { text = await trExtractText(f); } catch(e) { console.warn('[TR] extract err', e); }
     _trExtractingCount--;
-    // Update stored text
-    (function(id, t) {
-      trUpdateCurrent(function(r) {
-        var d = (r.docs||[]).find(function(x){ return x.id === id; });
-        if (d) d.text = t;
-      });
-      trEditorRender(); // aggiorna badge stato nel documento
-    })(docId, text);
+    // Salvataggio diretto nel localStorage — bypassa trUpdateCurrent per evitare silent fail
     var chars = (text||'').trim().length;
-    console.log('[TR] extracted', chars, 'chars from', docName);
+    console.log('[TR] extracted', chars, 'chars from', docName, '| docId:', docId);
+    try {
+      var _all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+      var _rev = _all.find(function(x){ return x.id === _trCurrentId; });
+      if (_rev) {
+        var _doc = (_rev.docs||[]).find(function(x){ return x.id === docId; });
+        if (_doc) {
+          _doc.text = text;
+          localStorage.setItem(TR_KEY, JSON.stringify(_all));
+          console.log('[TR] saved ok, doc.text len:', _doc.text.length);
+        } else {
+          console.error('[TR] doc not found in review! docId:', docId, 'docs:', _rev.docs.map(function(d){return d.id;}));
+        }
+      } else {
+        console.error('[TR] review not found! _trCurrentId:', _trCurrentId);
+      }
+    } catch(saveErr) { console.error('[TR] save error:', saveErr); }
+    trEditorRender();
     if (chars > 0) {
       if(status) status.textContent = '✓ ' + chars + ' caratteri estratti da ' + docName;
       setTimeout(function(){ if(status && !_trExtractingCount) status.textContent = ''; }, 3000);
     } else {
-      if(status) status.textContent = '⚠ Nessun testo in ' + docName + ' — prova PDF con testo selezionabile';
+      if(status) status.textContent = '⚠ Nessun testo in ' + docName;
     }
   }
   var runBtn = document.getElementById('trRunBtn');
