@@ -32089,6 +32089,7 @@ document.addEventListener('DOMContentLoaded', function() {
 var TR_KEY = 'tabular_reviews_v1';
 var _trCurrentId = null;
 var _trExtractingCount = 0;
+var _trTextCache = {}; // docId → testo estratto (cache in-memoria per sessione)
 
 function trGetAll() {
   try { return JSON.parse(localStorage.getItem(TR_KEY) || '[]'); } catch(e) { return []; }
@@ -32226,7 +32227,7 @@ function trRenderTable(r) {
       + '<div class="tr-file-badge '+fi.cls+'" style="flex-shrink:0;">'+fi.label+'</div>'
       + '<div style="min-width:0;flex:1;">'
       + '<div class="tr-doc-name" onclick="trDocRename(\''+docIdEsc+'\')" title="Clicca per rinominare" style="font-size:12px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 4px;border-radius:5px;transition:background .12s;" onmouseover="this.style.background=\'var(--sur2)\'" onmouseout="this.style.background=\'\'">'+esc+'</div>'
-      + (!(doc.text||'').trim() ? '<div style="font-size:10px;color:#f59e0b;margin-top:2px;padding-left:4px;">⚠ nessun testo estratto</div>' : '')
+      + (!((doc.text||'').trim() || (_trTextCache[doc.id]||'').trim()) ? '<div style="font-size:10px;color:#f59e0b;margin-top:2px;padding-left:4px;">⚠ nessun testo estratto</div>' : '')
       + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')">✕ rimuovi</button>'
       + '</div>'
       + '</div>'
@@ -32447,7 +32448,9 @@ window.trDocInputChange = async function(ev) {
     _trExtractingCount--;
     // Salvataggio diretto nel localStorage — bypassa trUpdateCurrent per evitare silent fail
     var chars = (text||'').trim().length;
-    console.log('[TR] extracted', chars, 'chars from', docName, '| docId:', docId);
+    // Sempre salva in cache in-memoria (funziona anche se localStorage fallisce)
+    if (chars > 0) _trTextCache[docId] = text;
+    console.log('[TR] extracted', chars, 'chars | docId:', docId, '| _trCurrentId:', _trCurrentId);
     try {
       var _all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
       var _rev = _all.find(function(x){ return x.id === _trCurrentId; });
@@ -32456,14 +32459,14 @@ window.trDocInputChange = async function(ev) {
         if (_doc) {
           _doc.text = text;
           localStorage.setItem(TR_KEY, JSON.stringify(_all));
-          console.log('[TR] saved ok, doc.text len:', _doc.text.length);
+          console.log('[TR] localStorage saved, len:', _doc.text.length);
         } else {
-          console.error('[TR] doc not found in review! docId:', docId, 'docs:', _rev.docs.map(function(d){return d.id;}));
+          console.warn('[TR] doc not found in localStorage, using cache only. docId:', docId);
         }
       } else {
-        console.error('[TR] review not found! _trCurrentId:', _trCurrentId);
+        console.warn('[TR] review not found in localStorage. _trCurrentId:', _trCurrentId);
       }
-    } catch(saveErr) { console.error('[TR] save error:', saveErr); }
+    } catch(saveErr) { console.warn('[TR] localStorage save error:', saveErr); }
     trEditorRender();
     if (chars > 0) {
       if(status) status.textContent = '✓ ' + chars + ' caratteri estratti da ' + docName;
@@ -32647,9 +32650,9 @@ window.trEditorRun = async function() {
     alert('Estrazione testo ancora in corso. Attendi qualche secondo e riprova.');
     return;
   }
-  var docsWithoutText = r.docs.filter(function(d){ return !(d.text||'').trim(); });
+  var docsWithoutText = r.docs.filter(function(d){ return !((d.text||'').trim() || (_trTextCache[d.id]||'').trim()); });
   if (docsWithoutText.length === r.docs.length) {
-    alert('Nessun testo estratto dai documenti. Rimuovi il documento e ricaricalo. Se il problema persiste, il file potrebbe essere solo immagini (PDF scansionato, DOCX senza testo).');
+    alert('Nessun testo estratto dai documenti. Rimuovi il documento e ricaricalo.');
     return;
   }
   // Warn about docs without text but proceed
@@ -32684,7 +32687,7 @@ window.trEditorRun = async function() {
     trEditorRender();
 
     try {
-      var docText = (item.doc.text||'').trim();
+      var docText = (item.doc.text||'').trim() || (_trTextCache[item.doc.id]||'').trim();
       if (!docText) {
         // Skip docs with no text — mark cell with notice
         (function(k){ trUpdateCurrent(function(r2){ r2.cells[k] = '[testo non disponibile]'; }); })(loadingKey);
