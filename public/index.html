@@ -32746,33 +32746,44 @@ window.trEditorRun = async function() {
   if (status) status.textContent = '⏳ 0/' + emptyCells.length;
 
   function _trSaveCell(key, val) {
-    var saved = false;
-    try {
+    function _doWrite() {
       var _ra = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
       var _rr = _ra.find(function(x){ return x.id === _trCurrentId; });
-      if (_rr) {
-        if (val) { _rr.cells[key] = val; } else { delete _rr.cells[key]; }
-        localStorage.setItem(TR_KEY, JSON.stringify(_ra));
-        saved = true;
-      } else {
-        console.error('[TR] _trSaveCell: review non trovata! _trCurrentId=', _trCurrentId, 'key=', key);
-      }
-    } catch(_se) {
-      console.error('[TR] _trSaveCell eccezione:', _se, 'key=', key);
+      if (!_rr) { console.error('[TR] review non trovata _trCurrentId=', _trCurrentId); return false; }
+      if (val) { _rr.cells[key] = val; } else { delete _rr.cells[key]; }
+      localStorage.setItem(TR_KEY, JSON.stringify(_ra));
+      return true;
     }
-    // Fallback DOM diretto se localStorage fallisce — mostra errore nella cella
-    if (!saved) {
-      var tbl = document.getElementById('trTable');
-      if (tbl) {
-        var keyEsc = key.replace(/'/g, "\\'");
-        var parts = key.split('::');
-        var cells = tbl.querySelectorAll('td.tr-cell');
-        cells.forEach(function(td) {
-          var oc = td.getAttribute('onclick') || '';
-          if (oc.indexOf(parts[0]) !== -1 && oc.indexOf(parts[1]) !== -1) {
-            td.innerHTML = '<span style="color:#ef4444;font-size:11px;">⚠ salvataggio fallito</span>';
-          }
-        });
+    function _freeSpace() {
+      // 1) Svuota doc.text da tutte le review
+      _trPurgeDocText();
+      // 2) Taglia vecchie review — mantieni solo current + ultime 3
+      try {
+        var all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+        var cur = all.find(function(x){ return x.id === _trCurrentId; });
+        var rest = all.filter(function(x){ return x.id !== _trCurrentId; }).slice(-3);
+        var trimmed = cur ? [cur].concat(rest) : rest;
+        localStorage.setItem(TR_KEY, JSON.stringify(trimmed));
+      } catch(_e) {
+        // Ultima risorsa: salva solo la review corrente
+        try {
+          var all2 = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+          var cur2 = all2.find(function(x){ return x.id === _trCurrentId; });
+          if (cur2) localStorage.setItem(TR_KEY, JSON.stringify([cur2]));
+          else localStorage.removeItem(TR_KEY);
+        } catch(_e2) { localStorage.removeItem(TR_KEY); }
+      }
+    }
+    try {
+      _doWrite();
+    } catch(e) {
+      if (e.name === 'QuotaExceededError') {
+        console.warn('[TR] QuotaExceededError — libero spazio e riprovo...');
+        _freeSpace();
+        try { _doWrite(); }
+        catch(e2) { console.error('[TR] save fallito dopo purge:', e2.message, 'key=', key); }
+      } else {
+        console.error('[TR] _trSaveCell eccezione:', e, 'key=', key);
       }
     }
   }
