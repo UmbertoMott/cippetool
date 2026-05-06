@@ -7,13 +7,15 @@
     { "src": "api/gemini.js",          "use": "@vercel/node", "config": { "maxDuration": 30 } },
     { "src": "api/ocr-image.js",       "use": "@vercel/node", "config": { "maxDuration": 60 } },
     { "src": "api/tts.js",             "use": "@vercel/node", "config": { "maxDuration": 30 } },
-    { "src": "api/stt.js",             "use": "@vercel/node", "config": { "maxDuration": 30 } }
+    { "src": "api/stt.js",             "use": "@vercel/node", "config": { "maxDuration": 30 } },
+    { "src": "api/extract-text.js",    "use": "@vercel/node", "config": { "maxDuration": 30 } }
   ],
   "routes": [
-    { "src": "/api/gemini",       "dest": "/api/gemini.js" },
-    { "src": "/api/ocr-image",    "dest": "/api/ocr-image.js" },
-    { "src": "/api/tts",          "dest": "/api/tts.js" },
-    { "src": "/api/stt",          "dest": "/api/stt.js" },
+    { "src": "/api/gemini",        "dest": "/api/gemini.js" },
+    { "src": "/api/ocr-image",     "dest": "/api/ocr-image.js" },
+    { "src": "/api/tts",           "dest": "/api/tts.js" },
+    { "src": "/api/stt",           "dest": "/api/stt.js" },
+    { "src": "/api/extract-text",  "dest": "/api/extract-text.js" },
     { "src": "/api/(.*)",         "dest": "https://cipp-legal-api.onrender.com/api/$1" },
     { "src": "/previews/(.*)",    "dest": "/public/previews/$1" },
     { "src": "/lex-studio.html",  "dest": "/public/lex-studio.html" },

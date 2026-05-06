@@ -1,0 +1,8 @@
+{
+  "name": "cipp-legal-saas",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "mammoth": "^1.12.0"
+  }
+}

@@ -32532,46 +32532,35 @@ async function trExtractText(file) {
     });
   }
 
-  // DOCX
+  // DOCX — usa endpoint server (Node.js mammoth, 100% affidabile)
   if (name.endsWith('.docx') || name.endsWith('.doc')) {
     return new Promise(function(res) {
       var fr = new FileReader();
       fr.onerror = function() { res(''); };
       fr.onload = async function(e) {
         var ab = e.target.result;
-        var _trStatus = document.getElementById('trRunStatus');
-        // Try mammoth.extractRawText
+        // Prima: server-side extraction via /api/extract-text
+        try {
+          var b64 = btoa(String.fromCharCode.apply(null, new Uint8Array(ab)));
+          var resp = await fetch('/api/extract-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileBase64: b64, fileName: file.name })
+          });
+          if (resp.ok) {
+            var data = await resp.json();
+            console.log('[TR] server extract len:', (data.text||'').length);
+            if (data.text && data.text.trim()) { res(data.text); return; }
+          }
+        } catch(serverErr) { console.warn('[TR] server extract err:', serverErr); }
+        // Fallback browser: mammoth
         if (typeof mammoth !== 'undefined') {
           try {
-            if(_trStatus) _trStatus.textContent = 'mammoth in esecuzione…';
             var r = await mammoth.extractRawText({ arrayBuffer: ab });
-            console.log('[TR] mammoth extractRawText len:', (r.value||'').length);
-            if(_trStatus) _trStatus.textContent = 'mammoth ok — len=' + (r.value||'').length;
             if (r.value && r.value.trim()) { res(r.value); return; }
-          } catch(err) {
-            console.warn('[TR] mammoth extractRawText err:', err);
-            if(_trStatus) _trStatus.textContent = 'mammoth ERR: ' + err.message;
-          }
-          // Fallback: mammoth.convertToHtml → strip tags
-          try {
-            var h = await mammoth.convertToHtml({ arrayBuffer: ab });
-            console.log('[TR] mammoth convertToHtml len:', (h.value||'').length);
-            var txt = (h.value||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
-            if (txt) { res(txt); return; }
-          } catch(err2) { console.warn('[TR] mammoth convertToHtml err:', err2); }
-        } else {
-          console.warn('[TR] mammoth not loaded');
-          if(_trStatus) _trStatus.textContent = '⚠ mammoth non caricato — controlla connessione';
+          } catch(err) { console.warn('[TR] mammoth err:', err); }
         }
-        // Last resort: try to extract readable text from raw DOCX binary (finds <w:t> fragments if visible)
-        try {
-          var dec = new TextDecoder('utf-8', { fatal: false });
-          var raw = dec.decode(new Uint8Array(ab));
-          var matches = raw.match(/<w:t[^>]*>([^<]+)<\/w:t>/g) || [];
-          var fallbackTxt = matches.map(function(m){ return m.replace(/<[^>]+>/g,''); }).join(' ').trim();
-          console.log('[TR] raw XML fallback len:', fallbackTxt.length);
-          res(fallbackTxt);
-        } catch(e2) { res(''); }
+        res('');
       };
       fr.readAsArrayBuffer(file);
     });
