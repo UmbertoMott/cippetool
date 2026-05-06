@@ -7279,20 +7279,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </button>
 
-      <!-- ── TABULAR REVIEW ── -->
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}trPickerInit();showScreen('screenTabularReview')"
-        style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="overflow:hidden;height:220px;position:relative;background:linear-gradient(135deg,var(--sur2),var(--sur));display:flex;align-items:center;justify-content:center;">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-        </div>
-        <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;" data-i18n="tabular_name">Tabular Review</span>
-          <span style="font-size:16px;color:var(--muted);">→</span>
-        </div>
-      </button>
-
       <!-- ── OCR DOCUMENTO (full width) ── -->
       <button onclick="ocrOpen()"
         style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
@@ -7309,6 +7295,29 @@ document.addEventListener('DOMContentLoaded', function() {
       </button>
 
     </div>
+
+    <!-- ── SEZIONE STRUMENTI AVANZATI ──────────────────────────── -->
+    <div style="width:100%;max-width:860px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="flex:1;height:1px;background:var(--bdr);"></div>
+        <span style="font-size:10.5px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);white-space:nowrap;">Strumenti avanzati</span>
+        <div style="flex:1;height:1px;background:var(--bdr);"></div>
+      </div>
+      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}trPickerInit();showScreen('screenTabularReview')"
+        style="width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:row;align-items:center;overflow:hidden;transition:transform .18s,box-shadow .18s;"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="width:72px;height:72px;flex-shrink:0;background:var(--sur2);display:flex;align-items:center;justify-content:center;border-right:1px solid var(--bdr);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </div>
+        <div style="flex:1;padding:14px 18px;min-width:0;">
+          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:3px;">Tabular Review</div>
+          <div style="font-size:11.5px;color:var(--muted);line-height:1.4;">Analisi multi-documento con colonne AI personalizzabili · Export CSV · Condivisione</div>
+        </div>
+        <div style="padding:0 18px;font-size:16px;color:var(--muted);flex-shrink:0;">→</div>
+      </button>
+    </div>
+
     <div style="font-size:11px;color:var(--muted);opacity:.6">
       <span data-i18n="mode_footer">Puoi tornare qui in qualsiasi momento</span>
     </div>
