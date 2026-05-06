@@ -3,9 +3,9 @@
 // Body: { fileBase64: "<base64>", fileName: "doc.docx" }
 // Response: { text: "..." }
 
-const mammoth = require('mammoth');
+import mammoth from 'mammoth';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -31,4 +31,4 @@ module.exports = async function handler(req, res) {
     console.error('[extract-text] error:', err);
     return res.status(500).json({ error: err.message, text: '' });
   }
-};
+}
