@@ -1766,6 +1766,11 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 .btn-hamburger{background:none;border:1px solid var(--bdr);border-radius:8px;padding:7px 9px;cursor:pointer;color:var(--txt);display:none;flex-direction:column;gap:4px;align-items:center;justify-content:center;transition:border-color 0.15s}
 .btn-hamburger:hover{border-color:var(--acc)}
 .btn-hamburger span{display:block;width:16px;height:2px;background:currentColor;border-radius:2px}
+.lang-toggle{display:none;gap:2px;align-items:center}
+.lang-toggle.visible{display:flex}
+.lang-btn{background:none;border:1px solid var(--bdr);color:var(--muted);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px;line-height:1}
+.lang-btn.active{background:var(--acc);border-color:var(--acc);color:#fff}
+.lang-btn:not(.active):hover{border-color:var(--acc);color:var(--txt)}
 
 /* DASHBOARD */
 .dash-greeting{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px}
@@ -3809,41 +3814,57 @@ body.theme-light .wb-mob-tab.active{background:rgba(109,40,217,0.12);color:#5B21
   #screenMode > div{padding:24px 16px;gap:20px;min-height:auto;justify-content:flex-start;padding-top:40px}
 }
 @media(max-width:640px){
+  /* Hide desktop-only tools between 601-640px (2-col still fits) */
   .mode-card-desktop-only{display:none!important}
 }
 @media(max-width:600px){
-  /* Full-width single column, horizontal card layout */
-  #modeGrid{grid-template-columns:1fr!important;gap:10px!important}
-  #screenMode > div{padding:16px 14px;gap:14px}
-  /* Card: horizontal row */
+  /* ── Show ALL 5 tools on mobile (tapping desktop-only shows popup) */
+  .mode-card-desktop-only{display:flex!important;flex-direction:column}
+  /* Single column */
+  #modeGrid{grid-template-columns:1fr!important;gap:8px!important}
+  #screenMode > div{padding:14px 12px;gap:10px;min-height:auto;justify-content:flex-start;padding-top:28px}
+  /* Card: horizontal row — thumbnail left, name right */
   #modeGrid button{
     flex-direction:row!important;
-    align-items:center!important;
-    gap:14px!important;
-    padding:16px 18px!important;
-    border-radius:16px!important;
+    align-items:stretch!important;
+    padding:0!important;
+    border-radius:14px!important;
+    overflow:hidden!important;
+    min-height:66px;
   }
-  /* Emoji: smaller, fixed size */
+  /* Thumbnail (image div) */
   #modeGrid button > div:first-child{
-    font-size:28px!important;
-    flex-shrink:0;
-    width:44px;height:44px;
-    display:flex;align-items:center;justify-content:center;
-    background:rgba(255,255,255,.04);
-    border-radius:12px;
+    width:90px!important;
+    height:66px!important;
+    min-height:66px!important;
+    flex-shrink:0!important;
+    overflow:hidden!important;
+    border-radius:0!important;
+    position:relative;
   }
-  /* Text block */
-  #modeGrid button > div:nth-child(2){flex:1;min-width:0}
-  #modeGrid button > div:nth-child(2) > div:first-child{font-size:15px!important;margin-bottom:2px!important}
-  /* Description: hide on phone to keep cards compact */
-  #modeGrid button > div:nth-child(2) > div:last-child{display:none!important}
-  /* CTA: becomes arrow on the right */
-  #modeGrid button > div:last-child{
-    margin-top:0!important;
-    font-size:18px!important;
-    flex-shrink:0;
+  #modeGrid button > div:first-child img{
+    width:100%!important;height:100%!important;
+    object-fit:cover!important;object-position:top center!important;
+    display:block!important;
   }
-  #modeGrid button > div:last-child span:first-child{display:none}
+  /* Label bar */
+  #modeGrid button > div:nth-child(2){
+    flex:1!important;min-width:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    border-top:none!important;
+    border-left:1px solid var(--bdr)!important;
+    padding:10px 14px!important;
+  }
+  #modeGrid button > div:nth-child(2) span:first-child{
+    font-size:13px!important;font-weight:600!important;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    max-width:calc(100% - 22px);
+  }
+  #modeGrid button > div:nth-child(2) span:last-child{
+    font-size:14px!important;color:var(--muted);flex-shrink:0;
+  }
 }
 
 /* ── Dashboard ───────────────────────────────────────────────── */
@@ -4064,21 +4085,10 @@ button,a,[role="button"]{touch-action:manipulation;-webkit-tap-highlight-color:t
   }
 }
 
-/* ── 2. Mode cards — CTA text node hidden, emoji clean ──────── */
-@media(max-width:600px){
-  #modeGrid button > div:last-child{
-    font-size:0!important;letter-spacing:0!important;
-    margin-top:0!important;line-height:1;
-  }
-  #modeGrid button > div:last-child span{font-size:20px!important}
-  /* Emoji container: remove bg I might have added, keep it flat */
-  #modeGrid button > div:first-child{
-    background:none!important;width:auto!important;height:auto!important
-  }
-  /* Title stays readable */
-  #modeGrid button > div:nth-child(2) > div:first-child{
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-  }
+/* ── 2. Mode cards — mobile micro tweaks ────────────────────── */
+@media(max-width:380px){
+  #modeGrid button > div:first-child{width:72px!important}
+  #modeGrid button > div:nth-child(2) span:first-child{font-size:12px!important}
 }
 
 /* ── 3. .ai-panel min-width fix ──────────────────────────────── */
@@ -6526,7 +6536,11 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="user-dot"></div>
       <span id="userNameBadge"></span>
     </div>
-    <button class="btn-sm ghost" id="btnLogout" style="display:none" onclick="logout()">Logout</button>
+    <div class="lang-toggle" id="langToggle">
+      <button class="lang-btn active" data-lang="it" onclick="setLang('it')">IT</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="btn-sm ghost" id="btnLogout" style="display:none" onclick="logout()" data-i18n="logout">Logout</button>
     <button id="themeToggleBtn" onclick="toggleTheme()" title="Cambia tema" style="
       background:none;border:1px solid var(--bdr);color:var(--txt);
       width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:15px;
@@ -7077,19 +7091,19 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="form-group">
             <label>Username</label>
             <input type="text" id="inputUser" placeholder="Il tuo username" autocomplete="username"
-              onkeydown="if(event.key==='Enter') document.getElementById('inputPass').focus()">
+              onkeydown="if(event.key==='Enter') document.getElementById('inputPass').focus()" data-i18n-ph="login_user_ph">
           </div>
           <div class="form-group">
             <label>Password</label>
             <div class="pass-wrap">
               <input type="password" id="inputPass" placeholder="La tua password" autocomplete="current-password"
-                onkeydown="if(event.key==='Enter') doLogin()">
+                onkeydown="if(event.key==='Enter') doLogin()" data-i18n-ph="login_pass_ph">
               <button type="button" class="eye-btn" onclick="toggleEye('inputPass',this)" title="Mostra/nascondi">👁</button>
             </div>
           </div>
           <div class="login-err" id="loginErr"></div>
-          <button class="btn-login" onclick="doLogin()">Accedi →</button>
-          <div class="login-switch">Nessun account? <a onclick="showRegister()">Registrati</a></div>
+          <button class="btn-login" onclick="doLogin()" data-i18n="login_btn">Accedi →</button>
+          <div class="login-switch"><span data-i18n="login_switch">Nessun account?</span> <a onclick="showRegister()" data-i18n="login_switch_link">Registrati</a></div>
         </div>
 
         <!-- Register Form -->
@@ -7110,8 +7124,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
           <div class="login-err" id="regErr"></div>
-          <button class="btn-login" onclick="doRegister()">Crea Account →</button>
-          <div class="login-switch">Hai già un account? <a onclick="showLogin()">Accedi</a></div>
+          <button class="btn-login" onclick="doRegister()" data-i18n="reg_btn">Crea Account →</button>
+          <div class="login-switch"><span data-i18n="reg_switch">Hai già un account?</span> <a onclick="showLogin()" data-i18n="reg_switch_link">Accedi</a></div>
         </div>
       </div>
     </div>
@@ -7183,7 +7197,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="position:absolute;inset:0;background:rgba(0,0,0,.2);pointer-events:none;"></div>
         </div>
         <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;">Prof. Lex — AI Docente Vocale</span>
+          <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;" data-i18n="proflex_name">Prof. Lex — AI Docente Vocale</span>
           <span style="font-size:16px;color:var(--muted);">→</span>
         </div>
       </button>
@@ -7198,14 +7212,14 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="position:absolute;inset:0;background:rgba(0,0,0,.2);pointer-events:none;"></div>
         </div>
         <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;">OCR Documento</span>
+          <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;" data-i18n="ocr_name">OCR Documento</span>
           <span style="font-size:16px;color:var(--muted);">→</span>
         </div>
       </button>
 
     </div>
     <div style="font-size:11px;color:var(--muted);opacity:.6">
-      <span>Puoi tornare qui in qualsiasi momento</span>
+      <span data-i18n="mode_footer">Puoi tornare qui in qualsiasi momento</span>
     </div>
   </div>
 </div>
@@ -7232,11 +7246,11 @@ document.addEventListener('DOMContentLoaded', function() {
       </svg>
     </div>
     <!-- Title -->
-    <div style="font-family:'Geist',-apple-system,system-ui,sans-serif;font-size:17px;font-weight:700;color:#0F172A;letter-spacing:-.3px;margin-bottom:10px;line-height:1.25;">
+    <div style="font-family:'Geist',-apple-system,system-ui,sans-serif;font-size:17px;font-weight:700;color:#0F172A;letter-spacing:-.3px;margin-bottom:10px;line-height:1.25;" data-i18n="mobile_only_title">
       Disponibile solo su desktop
     </div>
     <!-- Body -->
-    <div style="font-family:'Geist',-apple-system,system-ui,sans-serif;font-size:13px;color:#64748B;line-height:1.6;margin-bottom:28px;">
+    <div style="font-family:'Geist',-apple-system,system-ui,sans-serif;font-size:13px;color:#64748B;line-height:1.6;margin-bottom:28px;" data-i18n-html="mobile_only_body">
       Questa sezione è ottimizzata per uno schermo più grande.<br>Accedi da computer per un'esperienza completa.
     </div>
     <!-- CTA -->
@@ -7248,7 +7262,7 @@ document.addEventListener('DOMContentLoaded', function() {
       box-shadow:0 2px 0 rgba(255,255,255,.18) inset,0 6px 20px rgba(79,70,229,.35);
       transition:all .15s;
     " onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
-      Ho capito
+      <span data-i18n="mobile_only_close">Ho capito</span>
     </button>
   </div>
 </div>
@@ -7577,21 +7591,21 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ══ WB SESSION PICKER ════════════════════════════════════════ -->
 <div class="screen" id="screenWBPicker">
   <div class="wbp-root">
-    <button class="wbp-back" onclick="goBack()">← Torna</button>
+    <button class="wbp-back" onclick="goBack()" data-i18n="back">← Torna</button>
     <div style="display:flex;align-items:center;justify-content:space-between;margin:28px 0 6px;">
       <div class="wbp-heading">AI Document Workbench</div>
-      <button class="wbp-new-btn" onclick="wbPickerNew()">＋ Nuova Sessione</button>
+      <button class="wbp-new-btn" onclick="wbPickerNew()" data-i18n="wb_new_session">＋ Nuova Sessione</button>
     </div>
-    <div class="wbp-sub">Riprendi una sessione salvata oppure iniziane una nuova</div>
+    <div class="wbp-sub" data-i18n="wb_sub">Riprendi una sessione salvata oppure iniziane una nuova</div>
     <div class="wbp-table-head">
-      <span>Nome</span>
-      <span>Data</span>
-      <span>Messaggi</span>
-      <span>Tool</span>
+      <span data-i18n="wb_col_name">Nome</span>
+      <span data-i18n="wb_col_date">Data</span>
+      <span data-i18n="wb_col_msgs">Messaggi</span>
+      <span data-i18n="wb_col_tools">Tool</span>
       <span></span><span></span>
     </div>
     <div class="wbp-grid" id="wbPickerList">
-      <div class="wbp-empty">Nessuna sessione salvata ancora.</div>
+      <div class="wbp-empty" data-i18n="wb_empty">Nessuna sessione salvata ancora.</div>
     </div>
   </div>
 </div>
@@ -7601,14 +7615,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="wb-header">
   <button class="wb-back" onclick="goBack()">
     <svg width="13" height="11" viewBox="0 0 13 11" fill="none"><path d="M7.5 1L2 5.5L7.5 10M2 5.5H12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span>Torna</span>
+    <span data-i18n="back_short">Torna</span>
   </button>
   <div class="wb-brand">
     <span class="wb-brand-name">AI Document Workbench</span>
     <span class="wb-brand-tag">Luminance Scholar</span>
   </div>
   <div class="wb-recenti">
-    <span class="wb-recenti-label">Recenti:</span>
+    <span class="wb-recenti-label" data-i18n="wb_recent">Recenti:</span>
     <div id="wbHistStrip" style="display:flex;gap:6px"></div>
   </div>
   <div class="wb-spacer"></div>
@@ -10036,7 +10050,7 @@ async function showDashboard(){
 
   // ── Update mode screen greeting (caller decides which screen to show) ──
   var modeGreet = document.getElementById('modeGreet');
-  if (modeGreet) modeGreet.textContent = 'Bentornato, ' + displayName + '! 👋';
+  if (modeGreet) modeGreet.textContent = t('mode_greet') + ', ' + displayName + '! 👋';
   // NOTE: showScreen() is intentionally NOT called here — each caller sets the screen
 }
 
@@ -10980,7 +10994,7 @@ async function callGeminiWithRetry(body /*, attempt — ignored, backend handles
 // ── GEMINI WEB SEARCH — routed through backend with googleSearch tool ─────────
 async function callGeminiWithSearch(systemPrompt, userQuery) {
   var result = await _llcBackendGemini({
-    system_instruction: { parts: [{ text: systemPrompt }] },
+    system_instruction: { parts: [{ text: systemPrompt + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] },
     contents: [{ role: 'user', parts: [{ text: userQuery }] }],
     tools: [{ googleSearch: {} }],
     generationConfig: { maxOutputTokens: 3500, temperature: 0.2 }
@@ -11003,7 +11017,7 @@ async function callGemini(systemPrompt, messages, maxTokens) {
     };
   });
   var body = {
-    system_instruction: { parts: [{ text: systemPrompt }] },
+    system_instruction: { parts: [{ text: systemPrompt + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] },
     contents: contents,
     safetySettings: GEMINI_SAFETY,
     generationConfig: {
@@ -11023,7 +11037,7 @@ async function callGeminiJSON(systemPrompt, messages, maxTokens) {
     };
   });
   var body = {
-    system_instruction: { parts: [{ text: systemPrompt }] },
+    system_instruction: { parts: [{ text: systemPrompt + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] },
     contents: contents,
     safetySettings: GEMINI_SAFETY,
     generationConfig: {
@@ -20328,7 +20342,7 @@ async function callGeminiMulti(systemPrompt, messages, maxTokens) {
     return { role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.content }] };
   });
   var body = {
-    system_instruction: { parts: [{ text: systemPrompt }] },
+    system_instruction: { parts: [{ text: systemPrompt + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] },
     contents: contents,
     generationConfig: { maxOutputTokens: maxTokens || 1500, temperature: 0.3 }
   };
@@ -20890,11 +20904,15 @@ function confirmClearData() {
 function showHeaderButtons() {
   document.getElementById('btnLogout').style.display = 'inline-flex';
   document.getElementById('btnSettings').style.display = 'flex';
+  var lt = document.getElementById('langToggle');
+  if (lt) lt.classList.add('visible');
 }
 
 function hideHeaderButtons() {
   document.getElementById('btnLogout').style.display = 'none';
   document.getElementById('btnSettings').style.display = 'none';
+  var lt = document.getElementById('langToggle');
+  if (lt) lt.classList.remove('visible');
 }
 
 
@@ -21583,6 +21601,113 @@ async function startQuizN(num) {
 }
 
 // ── Theme toggle ─────────────────────────────────────────────────
+
+// ══════════════════════════════════════════════════════════════════
+// INTERNATIONALISATION (IT / EN)
+// ══════════════════════════════════════════════════════════════════
+var _lang = localStorage.getItem('app_lang') || 'it';
+var _i18n = {
+  it: {
+    logout: 'Logout',
+    back: '← Torna',
+    back_short: 'Torna',
+    wb_heading: 'AI Document Workbench',
+    wb_new_session: '＋ Nuova Sessione',
+    wb_sub: 'Riprendi una sessione salvata oppure iniziane una nuova',
+    wb_col_name: 'Nome',
+    wb_col_date: 'Data',
+    wb_col_msgs: 'Messaggi',
+    wb_col_tools: 'Tool',
+    wb_empty: 'Nessuna sessione salvata ancora.',
+    wb_open: 'Apri →',
+    wb_recent: 'Recenti:',
+    proflex_name: 'Prof. Lex — AI Docente Vocale',
+    ocr_name: 'OCR Documento',
+    mode_footer: 'Puoi tornare qui in qualsiasi momento',
+    mobile_only_title: 'Disponibile solo su desktop',
+    mobile_only_body: 'Questa sezione è ottimizzata per uno schermo più grande.<br>Accedi da computer per un\'esperienza completa.',
+    mobile_only_close: 'Ho capito',
+    login_btn: 'Accedi →',
+    login_switch: 'Nessun account?',
+    login_switch_link: 'Registrati',
+    login_user_ph: 'Il tuo username',
+    login_pass_ph: 'La tua password',
+    reg_btn: 'Crea Account →',
+    reg_switch: 'Hai già un account?',
+    reg_switch_link: 'Accedi',
+    mode_greet: 'Bentornato',
+    ai_lang_suffix: '',
+    wbp_no_doc: 'Sessione senza documento'
+  },
+  en: {
+    logout: 'Logout',
+    back: '← Back',
+    back_short: 'Back',
+    wb_heading: 'AI Document Workbench',
+    wb_new_session: '＋ New Session',
+    wb_sub: 'Resume a saved session or start a new one',
+    wb_col_name: 'Name',
+    wb_col_date: 'Date',
+    wb_col_msgs: 'Messages',
+    wb_col_tools: 'Tools',
+    wb_empty: 'No saved sessions yet.',
+    wb_open: 'Open →',
+    wb_recent: 'Recent:',
+    proflex_name: 'Prof. Lex — AI Legal Tutor',
+    ocr_name: 'OCR Document',
+    mode_footer: 'You can return here at any time',
+    mobile_only_title: 'Desktop only',
+    mobile_only_body: 'This section is optimised for a larger screen.<br>Access from a computer for the full experience.',
+    mobile_only_close: 'Got it',
+    login_btn: 'Sign in →',
+    login_switch: 'No account yet?',
+    login_switch_link: 'Sign up',
+    login_user_ph: 'Your username',
+    login_pass_ph: 'Your password',
+    reg_btn: 'Create Account →',
+    reg_switch: 'Already have an account?',
+    reg_switch_link: 'Sign in',
+    mode_greet: 'Welcome back',
+    ai_lang_suffix: '\n\nRespond entirely in English.',
+    wbp_no_doc: 'Session without document'
+  }
+};
+
+function t(key) {
+  var d = _i18n[_lang] || _i18n['it'];
+  return d[key] !== undefined ? d[key] : (_i18n['it'][key] || key);
+}
+
+function setLang(lang) {
+  if (lang !== 'it' && lang !== 'en') return;
+  _lang = lang;
+  try { localStorage.setItem('app_lang', lang); } catch(e) {}
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+    el.innerHTML = t(el.getAttribute('data-i18n-html'));
+  });
+  document.querySelectorAll('.lang-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+  if (document.getElementById('wbPickerList')) wbPickerRender();
+}
+
+// Apply saved language after DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  if (_lang !== 'it') setLang(_lang);
+  else {
+    // still sync the toggle button active state
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === _lang);
+    });
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════
 // WB SESSION MANAGEMENT (Fix 2)
 // ══════════════════════════════════════════════════════════════════
@@ -21606,24 +21731,24 @@ function wbPickerRender() {
   if (!listEl) return;
   var sessions = wbSessionGetAll();
   if (!sessions.length) {
-    listEl.innerHTML = '<div class="wbp-empty">Nessuna sessione salvata ancora.<br><small>Clicca "Nuova Sessione" per iniziare.</small></div>';
+    listEl.innerHTML = '<div class="wbp-empty">' + t('wb_empty') + '</div>';
     return;
   }
-  var isLight = document.body.classList.contains('theme-light');
+  var locale = _lang === 'en' ? 'en-GB' : 'it-IT';
   listEl.innerHTML = sessions.map(function(s) {
     var date = '';
-    try { date = new Date(s.savedAt||s.createdAt).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}); } catch(e){}
+    try { date = new Date(s.savedAt||s.createdAt).toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'}); } catch(e){}
     var chatCount = (s.chatCount||0) > 0 ? s.chatCount : '—';
     var toolCount = (s.toolsGenerated||0) > 0 ? s.toolsGenerated : '—';
-    var name = (s.docName||'Sessione senza documento').replace(/^\d+\)\s*/,'');
+    var name = (s.docName||t('wbp_no_doc')).replace(/^\d+\)\s*/,'');
     return '<div class="wbp-card">'
-      + '<div class="wbp-card-body"><div class="wbp-card-name" title="Doppio click per rinominare" ondblclick="wbPickerStartRename(event,\''+s.id+'\')" style="cursor:text">' + name.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</div></div>'
+      + '<div class="wbp-card-body"><div class="wbp-card-name" title="' + (_lang==='en'?'Double-click to rename':'Doppio click per rinominare') + '" ondblclick="wbPickerStartRename(event,\''+s.id+'\')" style="cursor:text">' + name.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</div></div>'
       + '<div class="wbp-card-date">' + date + '</div>'
       + '<div class="wbp-card-chat">' + chatCount + '</div>'
       + '<div class="wbp-card-tools">' + toolCount + '</div>'
       + '<div class="wbp-card-actions">'
-      + '<button class="wbp-open-btn" onclick="wbPickerOpen(\''+s.id+'\')">Apri →</button>'
-      + '<button class="wbp-del-btn" onclick="wbPickerDelete(\''+s.id+'\')" title="Elimina"><svg width="12" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>'
+      + '<button class="wbp-open-btn" onclick="wbPickerOpen(\''+s.id+'\')">' + t('wb_open') + '</button>'
+      + '<button class="wbp-del-btn" onclick="wbPickerDelete(\''+s.id+'\')" title="' + (_lang==='en'?'Delete':'Elimina') + '"><svg width="12" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>'
       + '</div></div>';
   }).join('');
 }
@@ -23667,7 +23792,7 @@ async function wbRunTool(toolNum, overrideText) {
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
         generationConfig: { temperature: 0.4, maxOutputTokens: tokenBudget[toolNum] || 900 },
-        system_instruction: { parts: [{ text: 'Completa SEMPRE tutta la struttura richiesta prima di fermarti. Non troncare mai a metà un blocco, una domanda o una sezione. Se il testo è lungo, sintetizza i contenuti ma mantieni il numero esatto di elementi richiesti.' }] }
+        system_instruction: { parts: [{ text: 'Completa SEMPRE tutta la struttura richiesta prima di fermarti. Non troncare mai a metà un blocco, una domanda o una sezione. Se il testo è lungo, sintetizza i contenuti ma mantieni il numero esatto di elementi richiesti.' + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] }
       })
     });
     clearTimeout(tid);
@@ -24277,10 +24402,11 @@ async function wbRunScholar() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: ctrl.signal,
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 1800 }
-      })
+      body: JSON.stringify(Object.assign(
+        { contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1800 } },
+        (typeof _lang !== 'undefined' && _lang === 'en') ? { system_instruction: { parts: [{ text: 'Respond entirely in English.' }] } } : {}
+      ))
     });
     clearTimeout(tid);
     if (!resp.ok) throw new Error('API ' + resp.status);
