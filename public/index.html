@@ -32451,12 +32451,15 @@ window.trDocInputChange = async function(ev) {
         var d = (r.docs||[]).find(function(x){ return x.id === id; });
         if (d) d.text = t;
       });
+      trEditorRender(); // aggiorna badge stato nel documento
     })(docId, text);
-    if (text && text.trim()) {
-      if(status) status.textContent = '✓ Testo estratto da ' + docName;
-      setTimeout(function(){ if(status && !_trExtractingCount) status.textContent = ''; }, 2000);
+    var chars = (text||'').trim().length;
+    console.log('[TR] extracted', chars, 'chars from', docName);
+    if (chars > 0) {
+      if(status) status.textContent = '✓ ' + chars + ' caratteri estratti da ' + docName;
+      setTimeout(function(){ if(status && !_trExtractingCount) status.textContent = ''; }, 3000);
     } else {
-      if(status) status.textContent = '⚠ Nessun testo in ' + docName;
+      if(status) status.textContent = '⚠ Nessun testo in ' + docName + ' — prova PDF con testo selezionabile';
     }
   }
   var runBtn = document.getElementById('trRunBtn');
@@ -32593,6 +32596,7 @@ async function trExtractText(file) {
   if (name.endsWith('.pdf')) {
     if (typeof pdfjsLib !== 'undefined') {
       return new Promise(function(res) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         var fr = new FileReader();
         fr.onerror = function() { res(''); };
         fr.onload = async function(e) {
@@ -32602,10 +32606,13 @@ async function trExtractText(file) {
             for (var p = 1; p <= Math.min(pdf.numPages, 50); p++) {
               var pg = await pdf.getPage(p);
               var tc = await pg.getTextContent();
-              texts.push(tc.items.map(function(i){return i.str;}).join(' '));
+              var pageText = tc.items.map(function(i){return i.str;}).join(' ').trim();
+              if (pageText) texts.push(pageText);
             }
-            res(texts.join('\n'));
-          } catch(err) { res(''); }
+            var result = texts.join('\n').trim();
+            console.log('[TR] pdf pages:', pdf.numPages, 'text len:', result.length);
+            res(result);
+          } catch(err) { console.warn('[TR] pdf err:', err); res(''); }
         };
         fr.readAsArrayBuffer(file);
       });
