@@ -542,6 +542,83 @@ body.theme-light .llc-vchat-result {
 .wbp-del-btn { background: none; border: none; color: var(--muted); border-radius: 6px; width: 26px; height: 26px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color .15s; line-height: 1; }
 .wbp-del-btn:hover { color: #f87171; }
 .wbp-empty { text-align: center; color: var(--muted); padding: 48px 0; font-size: 13px; }
+
+/* ── Tabular Review ──────────────────────────────────────────── */
+#screenTabularReview{background:var(--bg);overflow-y:auto}
+#screenTabularEditor{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.tr-picker-root{max-width:900px;margin:0 auto;padding:28px 24px 60px}
+.tr-picker-back{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
+.tr-picker-back:hover{color:var(--txt)}
+.tr-picker-heading{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--txt)}
+.tr-picker-new{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:var(--acc);color:#fff;border:none;border-radius:10px;font:600 13px/1 'Inter',sans-serif;cursor:pointer;transition:background .15s}
+.tr-picker-new:hover{background:#7c3aed}
+.tr-picker-table-head{display:grid;grid-template-columns:minmax(0,1fr) 130px 90px 80px 36px;padding:6px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);border-bottom:1px solid var(--bdr);margin-top:16px}
+.tr-picker-card{display:grid;grid-template-columns:minmax(0,1fr) 130px 90px 80px 36px;padding:10px 12px;border-bottom:1px solid var(--bdr);align-items:center;gap:4px;transition:background .12s}
+.tr-picker-card:hover{background:var(--sur2)}
+.tr-picker-name{font-size:13px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.tr-picker-name:hover{color:var(--acc)}
+.tr-picker-meta{font-size:12px;color:var(--muted)}
+.tr-picker-open{background:none;border:none;color:var(--acc);font:600 12px/1 'Inter',sans-serif;cursor:pointer;padding:4px 8px;border-radius:8px;transition:background .15s}
+.tr-picker-open:hover{background:rgba(168,85,247,.1)}
+.tr-picker-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .15s}
+.tr-picker-del:hover{color:#ef4444}
+.tr-picker-empty{padding:48px 24px;text-align:center;color:var(--muted);font-size:14px}
+/* Editor header */
+.tr-editor-hdr{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 12px;border-bottom:1px solid var(--bdr);background:var(--sur);flex-shrink:0;flex-wrap:wrap}
+.tr-editor-back{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;padding:4px 8px;border-radius:8px;transition:all .15s;flex-shrink:0}
+.tr-editor-back:hover{color:var(--txt);background:var(--sur2)}
+.tr-editor-title-wrap{flex:1;min-width:0}
+.tr-editor-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:text;padding:2px 6px;border-radius:6px;transition:background .15s}
+.tr-editor-title:hover{background:var(--sur2)}
+.tr-editor-btns{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tr-ed-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:10px;font:600 12px/1 'Inter',sans-serif;cursor:pointer;transition:all .15s;border:1px solid var(--bdr);background:var(--sur2);color:var(--txt)}
+.tr-ed-btn:hover{border-color:var(--acc);color:var(--acc)}
+.tr-ed-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+.tr-ed-btn.primary:hover{background:#7c3aed}
+.tr-ed-btn:disabled{opacity:.45;cursor:default;pointer-events:none}
+/* Table area */
+.tr-table-area{flex:1;overflow:auto;padding:16px}
+.tr-table-wrap{overflow:auto;border:1px solid var(--bdr);border-radius:12px}
+.tr-table{border-collapse:collapse;min-width:100%;table-layout:fixed}
+.tr-table th,.tr-table td{border:1px solid var(--bdr);text-align:left;vertical-align:top}
+.tr-table thead th{background:var(--sur);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:8px 12px;position:sticky;top:0;z-index:2;white-space:nowrap}
+.tr-table thead th:first-child{position:sticky;left:0;z-index:3;background:var(--sur);min-width:180px;width:200px}
+.tr-table tbody td:first-child{position:sticky;left:0;z-index:1;background:var(--bg);font-size:12px;font-weight:500;color:var(--txt);padding:8px 12px;min-width:180px;width:200px}
+.tr-table tbody tr:hover td:first-child{background:var(--sur2)}
+.tr-table .tr-cell{padding:8px 12px;font-size:12px;color:var(--txt);line-height:1.5;min-width:220px;max-width:320px;cursor:pointer;transition:background .12s;min-height:60px;word-break:break-word}
+.tr-table .tr-cell:hover{background:var(--sur2)}
+.tr-table .tr-cell.loading{color:var(--muted);font-style:italic}
+.tr-table .tr-cell.done{color:var(--txt)}
+.tr-table .tr-cell.editing{padding:0;background:var(--sur2)}
+.tr-table .tr-cell textarea{width:100%;min-height:80px;padding:8px 12px;border:none;outline:none;background:transparent;color:var(--txt);font:13px/1.5 'Inter',sans-serif;resize:vertical;box-sizing:border-box}
+.tr-th-add{cursor:pointer;color:var(--acc);font-size:12px!important;text-transform:none!important;letter-spacing:0!important;padding:8px 12px!important;min-width:120px;width:140px;white-space:nowrap!important}
+.tr-th-add:hover{background:rgba(168,85,247,.08)!important}
+.tr-th-del{cursor:pointer;opacity:0;transition:opacity .15s}
+th:hover .tr-th-del{opacity:1}
+.tr-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;display:block;margin-top:4px;padding:0;transition:color .15s}
+.tr-doc-del:hover{color:#ef4444}
+.tr-table-foot{padding:10px 0;display:flex;gap:8px}
+.tr-add-doc-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:10px;border:1px dashed var(--bdr);background:none;color:var(--muted);font:500 12px/1 'Inter',sans-serif;cursor:pointer;transition:all .15s}
+.tr-add-doc-btn:hover{border-color:var(--acc);color:var(--acc)}
+/* Run progress */
+.tr-run-status{font-size:11px;color:var(--muted);padding:0 8px}
+/* Modal overlay */
+.tr-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+.tr-overlay.open{display:flex}
+.tr-modal{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.tr-modal-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--txt);margin-bottom:16px}
+.tr-modal-input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--sur2);color:var(--txt);font:400 13px/1 'Inter',sans-serif;outline:none;box-sizing:border-box;transition:border-color .15s}
+.tr-modal-input:focus{border-color:var(--acc)}
+.tr-modal-hint{font-size:11.5px;color:var(--muted);margin:8px 0 14px;line-height:1.5}
+.tr-modal-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:10px;background:var(--acc);color:#fff;border:none;font:600 13px/1 'Inter',sans-serif;cursor:pointer;transition:background .15s}
+.tr-modal-btn:hover{background:#7c3aed}
+.tr-modal-btn.ghost{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr)}
+.tr-modal-btn.ghost:hover{border-color:var(--acc);color:var(--acc)}
+.tr-member-chip{display:inline-flex;align-items:center;gap:6px;background:var(--sur2);border:1px solid var(--bdr);border-radius:20px;padding:3px 10px 3px 8px;font-size:12px;color:var(--txt);margin:4px 4px 0 0}
+.tr-member-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;padding:0}
+.tr-member-chip button:hover{color:#ef4444}
+.tr-copy-link{width:100%;margin-top:14px;padding:9px;border-radius:10px;border:1px solid var(--bdr);background:var(--sur2);color:var(--txt);font:500 12px/1 'Inter',sans-serif;cursor:pointer;text-align:center;transition:all .15s}
+.tr-copy-link:hover{border-color:var(--acc);color:var(--acc)}
 /* WB save button */
 #wbSaveBtn { background:none; border:1px solid var(--wb-border); color:var(--wb-meta); width:28px; height:28px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; flex-shrink:0; margin-right:2px; }
 #wbSaveBtn:hover { border-color:rgba(168,85,247,.45); color:#c084fc; background:rgba(168,85,247,.07); }
@@ -7202,6 +7279,20 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </button>
 
+      <!-- ── TABULAR REVIEW ── -->
+      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}trPickerInit();showScreen('screenTabularReview')"
+        style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="overflow:hidden;height:220px;position:relative;background:linear-gradient(135deg,var(--sur2),var(--sur));display:flex;align-items:center;justify-content:center;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </div>
+        <div style="padding:14px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;font-weight:600;letter-spacing:-.1px;" data-i18n="tabular_name">Tabular Review</span>
+          <span style="font-size:16px;color:var(--muted);">→</span>
+        </div>
+      </button>
+
       <!-- ── OCR DOCUMENTO (full width) ── -->
       <button onclick="ocrOpen()"
         style="background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;"
@@ -7584,6 +7675,98 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
 </div><!-- end #screenOcr -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TABULAR REVIEW — PICKER
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenTabularReview">
+  <div class="tr-picker-root">
+    <button class="tr-picker-back" onclick="goBack()">← <span data-i18n="back_short">Torna</span></button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:20px 0 6px;">
+      <div class="tr-picker-heading">Tabular Review</div>
+      <button class="tr-picker-new" onclick="trPickerNew()">＋ Nuova Review</button>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Analisi multi-documento con colonne AI personalizzabili</div>
+    <div class="tr-picker-table-head">
+      <span>Nome</span><span>Data</span><span>Documenti</span><span>Colonne</span><span></span>
+    </div>
+    <div id="trPickerList"><div class="tr-picker-empty">Nessuna review ancora.<br><small>Clicca "Nuova Review" per iniziare.</small></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TABULAR REVIEW — EDITOR
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenTabularEditor">
+  <!-- Header -->
+  <div class="tr-editor-hdr">
+    <button class="tr-editor-back" onclick="showScreen('screenTabularReview');trPickerInit()">
+      <svg width="13" height="11" viewBox="0 0 13 11" fill="none"><path d="M7.5 1L2 5.5L7.5 10M2 5.5H12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Review
+    </button>
+    <div class="tr-editor-title-wrap">
+      <div class="tr-editor-title" id="trEditorTitle" ondblclick="trStartRenameTitle()" title="Doppio click per rinominare">Review</div>
+    </div>
+    <span class="tr-run-status" id="trRunStatus"></span>
+    <div class="tr-editor-btns">
+      <button class="tr-ed-btn primary" id="trRunBtn" onclick="trEditorRun()">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,1 11,6 2,11"/></svg>
+        Run
+      </button>
+      <button class="tr-ed-btn" onclick="trEditorExport()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+      <button class="tr-ed-btn" onclick="trMembersOpen()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Membri
+      </button>
+    </div>
+  </div>
+  <!-- Table -->
+  <div class="tr-table-area">
+    <div class="tr-table-wrap">
+      <table class="tr-table" id="trTable"><thead><tr><th>Documento</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="tr-table-foot">
+      <button class="tr-add-doc-btn" onclick="document.getElementById('trDocInput').click()">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect x="5" y="0" width="2" height="12"/><rect x="0" y="5" width="12" height="2"/></svg>
+        Aggiungi documento
+      </button>
+      <input type="file" id="trDocInput" style="display:none" multiple accept=".pdf,.doc,.docx,.txt" onchange="trDocInputChange(event)">
+    </div>
+  </div>
+</div>
+
+<!-- ── TABULAR REVIEW MODALS ─────────────────────────────────────────── -->
+<!-- Members modal -->
+<div class="tr-overlay" id="trMembersOverlay" onclick="trMembersClose()">
+  <div class="tr-modal" onclick="event.stopPropagation()">
+    <div class="tr-modal-title">Membri &amp; Condivisione</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <input type="email" class="tr-modal-input" id="trMemberEmailInput" placeholder="email@esempio.com" onkeydown="if(event.key==='Enter') trMemberAdd()" style="flex:1">
+      <button class="tr-modal-btn" onclick="trMemberAdd()">Aggiungi</button>
+    </div>
+    <div id="trMemberChips" style="margin-bottom:16px;min-height:24px;"></div>
+    <button class="tr-copy-link" onclick="trCopyLink()">🔗 Copia link di condivisione</button>
+    <div style="margin-top:16px;text-align:right;">
+      <button class="tr-modal-btn ghost" onclick="trMembersClose()">Chiudi</button>
+    </div>
+  </div>
+</div>
+<!-- Add column modal -->
+<div class="tr-overlay" id="trColOverlay" onclick="trColClose()">
+  <div class="tr-modal" onclick="event.stopPropagation()">
+    <div class="tr-modal-title">Nuova colonna AI</div>
+    <input type="text" class="tr-modal-input" id="trColLabelInput" placeholder="es. Principi giuridici applicabili" onkeydown="if(event.key==='Enter') trColAdd()">
+    <div class="tr-modal-hint">L'AI risponderà a questa domanda per ogni documento. Puoi poi modificare le risposte cliccando su ogni cella.</div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="tr-modal-btn ghost" onclick="trColClose()">Annulla</button>
+      <button class="tr-modal-btn" onclick="trColAdd()">Aggiungi colonna</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ═══════════════════════════════════════════════════════════════════
      AI DOCUMENT WORKBENCH SCREEN
@@ -31878,6 +32061,412 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', _autoStart);
   document.addEventListener('keydown', _autoStart);
 });
+
+})();
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// TABULAR REVIEW
+// ══════════════════════════════════════════════════════════════════
+(function() {
+'use strict';
+
+var TR_KEY = 'tabular_reviews_v1';
+var _trCurrentId = null;
+
+function trGetAll() {
+  try { return JSON.parse(localStorage.getItem(TR_KEY) || '[]'); } catch(e) { return []; }
+}
+function trSaveAll(arr) {
+  try { localStorage.setItem(TR_KEY, JSON.stringify((arr||[]).slice(0,50))); } catch(e) {}
+}
+function trGetCurrent() {
+  var all = trGetAll();
+  return all.find(function(r){ return r.id === _trCurrentId; }) || null;
+}
+function trUpdateCurrent(fn) {
+  var all = trGetAll();
+  var idx = all.findIndex(function(r){ return r.id === _trCurrentId; });
+  if (idx < 0) return;
+  fn(all[idx]);
+  trSaveAll(all);
+}
+
+// ── Picker ────────────────────────────────────────────────────────
+window.trPickerInit = function() {
+  var list = document.getElementById('trPickerList');
+  if (!list) return;
+  var reviews = trGetAll();
+  if (!reviews.length) {
+    list.innerHTML = '<div class="tr-picker-empty">Nessuna review ancora.<br><small>Clicca "Nuova Review" per iniziare.</small></div>';
+    return;
+  }
+  list.innerHTML = reviews.map(function(r) {
+    var date = '';
+    try { date = new Date(r.createdAt).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}); } catch(e){}
+    var esc = (r.title||'Review senza titolo').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    return '<div class="tr-picker-card">'
+      + '<div class="tr-picker-name" onclick="trPickerOpen(\''+r.id+'\')">'+esc+'</div>'
+      + '<div class="tr-picker-meta">'+date+'</div>'
+      + '<div class="tr-picker-meta">'+(r.docs||[]).length+' doc</div>'
+      + '<div class="tr-picker-meta">'+(r.columns||[]).length+' col</div>'
+      + '<div style="display:flex;align-items:center;gap:4px;">'
+      + '<button class="tr-picker-open" onclick="trPickerOpen(\''+r.id+'\')">Apri →</button>'
+      + '<button class="tr-picker-del" onclick="trPickerDelete(\''+r.id+'\')" title="Elimina"><svg width="12" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>'
+      + '</div></div>';
+  }).join('');
+};
+
+window.trPickerNew = function() {
+  var r = {
+    id: 'tr_' + Date.now(),
+    title: 'Nuova Review',
+    createdAt: new Date().toISOString(),
+    members: [],
+    docs: [],
+    columns: [],
+    cells: {}
+  };
+  var all = trGetAll();
+  all.unshift(r);
+  trSaveAll(all);
+  trPickerOpen(r.id);
+};
+
+window.trPickerOpen = function(id) {
+  _trCurrentId = id;
+  if (typeof showScreen === 'function') showScreen('screenTabularEditor');
+  trEditorRender();
+};
+
+window.trPickerDelete = function(id) {
+  if (!confirm('Eliminare questa review?')) return;
+  trSaveAll(trGetAll().filter(function(r){ return r.id !== id; }));
+  trPickerInit();
+};
+
+// ── Editor render ─────────────────────────────────────────────────
+window.trEditorRender = function() {
+  var r = trGetCurrent();
+  if (!r) return;
+  var titleEl = document.getElementById('trEditorTitle');
+  if (titleEl) titleEl.textContent = r.title || 'Review';
+  trRenderTable(r);
+};
+
+function trRenderTable(r) {
+  var tbl = document.getElementById('trTable');
+  if (!tbl) return;
+
+  // THEAD
+  var thDoc = '<th style="position:sticky;left:0;top:0;z-index:3;background:var(--sur);min-width:180px;width:200px;">Documento</th>';
+  var thCols = (r.columns||[]).map(function(col) {
+    var lbl = col.label.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    var colIdEsc = col.id.replace(/'/g,"\\'");
+    return '<th style="min-width:220px;max-width:320px;width:240px;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+      + '<span style="overflow:hidden;text-overflow:ellipsis;">'+lbl+'</span>'
+      + '<button class="tr-th-del" onclick="trColDelete(\''+colIdEsc+'\')" title="Rimuovi colonna" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;flex-shrink:0;padding:0;">✕</button>'
+      + '</div></th>';
+  }).join('');
+  var thAdd = '<th class="tr-th-add" onclick="trColModalOpen()">＋ Colonna</th>';
+  tbl.querySelector('thead').innerHTML = '<tr>' + thDoc + thCols + thAdd + '</tr>';
+
+  // TBODY — cell key uses '::' separator to avoid ambiguity with underscores in ids
+  var rows = (r.docs||[]).map(function(doc) {
+    var esc = (doc.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    var docIdEsc = doc.id.replace(/'/g,"\\'");
+    var tdDoc = '<td style="position:sticky;left:0;z-index:1;background:var(--bg);padding:8px 12px;min-width:180px;width:200px;vertical-align:top;">'
+      + '<div style="font-size:12px;font-weight:500;color:var(--txt);word-break:break-all;">'+esc+'</div>'
+      + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')">✕ rimuovi</button>'
+      + '</td>';
+    var tdCells = (r.columns||[]).map(function(col) {
+      var key = doc.id + '::' + col.id;
+      var val = r.cells[key];
+      var cls = val ? 'done' : '';
+      var content = val
+        ? val.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')
+        : '<span style="color:var(--muted);font-style:italic;font-size:11px;">—</span>';
+      var colIdEsc = col.id.replace(/'/g,"\\'");
+      return '<td class="tr-cell '+cls+'" onclick="trCellEdit(\''+docIdEsc+'\',\''+colIdEsc+'\')" title="Clicca per modificare">'+content+'</td>';
+    }).join('');
+    return '<tr>' + tdDoc + tdCells + '</tr>';
+  }).join('');
+  tbl.querySelector('tbody').innerHTML = rows || '<tr><td colspan="99" style="padding:24px;text-align:center;color:var(--muted);font-size:13px;">Nessun documento. Clicca "Aggiungi documento" qui sotto.</td></tr>';
+}
+
+// ── Title rename ──────────────────────────────────────────────────
+window.trStartRenameTitle = function() {
+  var el = document.getElementById('trEditorTitle');
+  if (!el) return;
+  var cur = el.textContent.trim();
+  var inp = document.createElement('input');
+  inp.value = cur;
+  inp.style.cssText = 'width:100%;font:600 18px/1 "Cormorant Garamond",serif;border:none;border-bottom:1.5px solid var(--acc);outline:none;background:transparent;color:var(--txt);padding:2px 4px;box-sizing:border-box;';
+  el.textContent = '';
+  el.appendChild(inp);
+  inp.focus(); inp.select();
+  function save() {
+    var v = inp.value.trim() || cur;
+    trUpdateCurrent(function(r){ r.title = v; });
+    el.textContent = v;
+  }
+  inp.addEventListener('blur', save);
+  inp.addEventListener('keydown', function(e){ if(e.key==='Enter'){e.preventDefault();save();} if(e.key==='Escape'){el.textContent=cur;} });
+};
+
+// ── Cell edit (inline) ────────────────────────────────────────────
+window.trCellEdit = function(docId, colId) {
+  var r = trGetCurrent(); if(!r) return;
+  var key = docId + '::' + colId;
+  var cur = r.cells[key] || '';
+  // Find cell by iterating — safer than complex CSS attribute selectors
+  var tbl = document.getElementById('trTable');
+  if (!tbl) return;
+  var allCells = tbl.querySelectorAll('td.tr-cell');
+  var cellEl = null;
+  for (var i = 0; i < allCells.length; i++) {
+    var attr = allCells[i].getAttribute('onclick') || '';
+    if (attr.indexOf(docId) >= 0 && attr.indexOf(colId) >= 0) {
+      cellEl = allCells[i]; break;
+    }
+  }
+  if (!cellEl || cellEl.classList.contains('editing')) return;
+  cellEl.classList.add('editing');
+  var ta = document.createElement('textarea');
+  ta.value = cur;
+  ta.style.cssText = 'width:100%;min-height:80px;padding:8px 12px;border:none;outline:none;background:transparent;color:var(--txt);font:13px/1.5 "Inter",sans-serif;resize:vertical;box-sizing:border-box;';
+  cellEl.innerHTML = '';
+  cellEl.appendChild(ta);
+  ta.focus();
+  var saved = false;
+  function saveCell() {
+    if (saved) return; saved = true;
+    var v = ta.value.trim();
+    trUpdateCurrent(function(r){ if(v) r.cells[key]=v; else delete r.cells[key]; });
+    trEditorRender();
+  }
+  ta.addEventListener('blur', saveCell);
+  ta.addEventListener('keydown', function(e){ if(e.key==='Escape'){ saved=true; trEditorRender(); } });
+};
+
+// ── Add column modal ──────────────────────────────────────────────
+window.trColModalOpen = function() {
+  var ov = document.getElementById('trColOverlay');
+  if (ov) { ov.classList.add('open'); setTimeout(function(){ var inp=document.getElementById('trColLabelInput'); if(inp){inp.value='';inp.focus();} },50); }
+};
+window.trColClose = function() {
+  var ov = document.getElementById('trColOverlay'); if (ov) ov.classList.remove('open');
+};
+window.trColAdd = function() {
+  var inp = document.getElementById('trColLabelInput');
+  var label = (inp ? inp.value.trim() : '');
+  if (!label) { if(inp) inp.focus(); return; }
+  trUpdateCurrent(function(r){
+    r.columns = r.columns || [];
+    r.columns.push({ id: 'c_'+Date.now(), label: label });
+  });
+  trColClose();
+  trEditorRender();
+};
+window.trColDelete = function(colId) {
+  if (!confirm('Rimuovere questa colonna e tutti i dati?')) return;
+  trUpdateCurrent(function(r){
+    r.columns = (r.columns||[]).filter(function(c){ return c.id !== colId; });
+    // Key format: docId + '::' + colId — split on '::' gives exactly [docId, colId]
+    var nc = {};
+    Object.keys(r.cells).forEach(function(k){
+      var parts = k.split('::');
+      if (parts[1] !== colId) nc[k] = r.cells[k];
+    });
+    r.cells = nc;
+  });
+  trEditorRender();
+};
+
+// ── Add / remove documents ────────────────────────────────────────
+window.trDocInputChange = async function(ev) {
+  var files = Array.from(ev.target.files || []);
+  ev.target.value = '';
+  if (!files.length) return;
+  var status = document.getElementById('trRunStatus');
+  if(status) status.textContent = 'Estrazione testo…';
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    var text = await trExtractText(f);
+    var doc = { id: 'd_'+Date.now()+'_'+i, name: f.name, text: text };
+    trUpdateCurrent(function(r){ r.docs = r.docs || []; r.docs.push(doc); });
+    trEditorRender();
+  }
+  if(status) status.textContent = '';
+};
+
+window.trDocDelete = function(docId) {
+  trUpdateCurrent(function(r){
+    r.docs = (r.docs||[]).filter(function(d){ return d.id !== docId; });
+    // Key format: docId + '::' + colId
+    var nc = {};
+    Object.keys(r.cells).forEach(function(k){
+      var parts = k.split('::');
+      if (parts[0] !== docId) nc[k] = r.cells[k];
+    });
+    r.cells = nc;
+  });
+  trEditorRender();
+};
+
+async function trExtractText(file) {
+  var name = file.name.toLowerCase();
+  if (name.endsWith('.txt')) {
+    return new Promise(function(res){ var fr=new FileReader(); fr.onload=function(e){res(e.target.result||'');}; fr.readAsText(file); });
+  }
+  if (name.endsWith('.docx') || name.endsWith('.doc')) {
+    if (typeof mammoth !== 'undefined') {
+      return new Promise(function(res){
+        var fr = new FileReader();
+        fr.onload = async function(e) {
+          try { var r = await mammoth.extractRawText({arrayBuffer: e.target.result}); res(r.value||''); }
+          catch(err){ res(''); }
+        };
+        fr.readAsArrayBuffer(file);
+      });
+    }
+  }
+  if (name.endsWith('.pdf')) {
+    if (typeof pdfjsLib !== 'undefined') {
+      return new Promise(function(res){
+        var fr = new FileReader();
+        fr.onload = async function(e) {
+          try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            var pdf = await pdfjsLib.getDocument({data: e.target.result}).promise;
+            var texts = [];
+            for (var p = 1; p <= Math.min(pdf.numPages, 30); p++) {
+              var pg = await pdf.getPage(p);
+              var tc = await pg.getTextContent();
+              texts.push(tc.items.map(function(i){return i.str;}).join(' '));
+            }
+            res(texts.join('\n'));
+          } catch(err) { res(''); }
+        };
+        fr.readAsArrayBuffer(file);
+      });
+    }
+  }
+  // Fallback: read as plain text
+  return new Promise(function(res){ var fr=new FileReader(); fr.onload=function(e){res(e.target.result||'');}; fr.readAsText(file); });
+}
+
+// ── Run AI ────────────────────────────────────────────────────────
+var _trRunning = false;
+window.trEditorRun = async function() {
+  if (_trRunning) return;
+  var r = trGetCurrent(); if (!r) return;
+  if (!r.docs.length) { alert('Aggiungi almeno un documento prima di eseguire Run.'); return; }
+  if (!r.columns.length) { alert('Aggiungi almeno una colonna prima di eseguire Run.'); return; }
+
+  var emptyCells = [];
+  r.docs.forEach(function(doc) {
+    r.columns.forEach(function(col) {
+      var key = doc.id + '::' + col.id;
+      if (!r.cells[key]) emptyCells.push({ doc: doc, col: col, key: key });
+    });
+  });
+  if (!emptyCells.length) { alert('Tutte le celle sono già compilate. Elimina il contenuto di una cella per rieseguire.'); return; }
+
+  _trRunning = true;
+  var btn = document.getElementById('trRunBtn');
+  if (btn) btn.disabled = true;
+  var status = document.getElementById('trRunStatus');
+
+  var done = 0;
+  for (var i = 0; i < emptyCells.length; i++) {
+    var item = emptyCells[i];
+    if (status) status.textContent = (done+1) + '/' + emptyCells.length;
+    try {
+      var sysP = 'Sei un giurista professionista specializzato in diritto italiano. Rispondi in modo preciso e conciso basandoti esclusivamente sul testo del documento fornito. Non inventare informazioni non presenti nel testo.';
+      var docText = (item.doc.text||'').substring(0, 5000);
+      var userP = 'Documento: ' + item.doc.name + '\n\n' + docText + '\n\n---\nDomanda/Criterio: ' + item.col.label + '\n\nRispondi in modo conciso (max 150 parole).';
+      var resp = await (typeof callGemini === 'function' ? callGemini(sysP, [{role:'user',content:userP}], 400) : Promise.resolve(''));
+      if (resp && typeof resp === 'string' && resp.trim()) {
+        var cellKey = item.key;
+        trUpdateCurrent(function(r){ r.cells[cellKey] = resp.trim(); });
+      }
+    } catch(e) { console.warn('trEditorRun cell error:', e); }
+    done++;
+    trEditorRender();
+  }
+
+  _trRunning = false;
+  if (btn) btn.disabled = false;
+  if (status) status.textContent = '✓ Completato';
+  setTimeout(function(){ if(status) status.textContent=''; }, 3000);
+};
+
+// ── Export CSV ────────────────────────────────────────────────────
+window.trEditorExport = function() {
+  var r = trGetCurrent(); if (!r) return;
+  var rows = [];
+  var header = ['Documento'].concat((r.columns||[]).map(function(c){ return c.label; }));
+  rows.push(header);
+  (r.docs||[]).forEach(function(doc) {
+    var row = [doc.name];
+    (r.columns||[]).forEach(function(col) {
+      var key = doc.id + '::' + col.id;
+      row.push((r.cells[key]||'').replace(/\n/g,' '));
+    });
+    rows.push(row);
+  });
+  var csv = rows.map(function(row){
+    return row.map(function(v){ return '"' + String(v).replace(/"/g,'""') + '"'; }).join(',');
+  }).join('\n');
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (r.title||'tabular-review').replace(/[^a-z0-9]/gi,'_').toLowerCase() + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+};
+
+// ── Members modal ─────────────────────────────────────────────────
+window.trMembersOpen = function() {
+  var ov = document.getElementById('trMembersOverlay'); if(ov) ov.classList.add('open');
+  trMembersRender();
+};
+window.trMembersClose = function() {
+  var ov = document.getElementById('trMembersOverlay'); if(ov) ov.classList.remove('open');
+};
+function trMembersRender() {
+  var r = trGetCurrent(); if(!r) return;
+  var chips = document.getElementById('trMemberChips'); if(!chips) return;
+  chips.innerHTML = (r.members||[]).map(function(email) {
+    var esc = email.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/'/g,'&#39;');
+    return '<span class="tr-member-chip">'+esc+'<button onclick="trMemberRemove(\''+esc+'\')">✕</button></span>';
+  }).join('');
+}
+window.trMemberAdd = function() {
+  var inp = document.getElementById('trMemberEmailInput');
+  var email = (inp ? inp.value.trim() : '');
+  if (!email || !email.includes('@')) { if(inp) inp.focus(); return; }
+  trUpdateCurrent(function(r){
+    r.members = r.members || [];
+    if (!r.members.includes(email)) r.members.push(email);
+  });
+  if(inp) inp.value = '';
+  trMembersRender();
+};
+window.trMemberRemove = function(email) {
+  trUpdateCurrent(function(r){ r.members = (r.members||[]).filter(function(e){ return e !== email; }); });
+  trMembersRender();
+};
+window.trCopyLink = function() {
+  var r = trGetCurrent(); if(!r) return;
+  var link = location.origin + '/?tr_id=' + r.id;
+  navigator.clipboard.writeText(link).then(function(){
+    var btn = document.querySelector('.tr-copy-link');
+    if(btn){ var orig=btn.textContent; btn.textContent='✓ Link copiato!'; setTimeout(function(){btn.textContent=orig;},2000); }
+  }).catch(function(){ prompt('Copia questo link:', link); });
+};
 
 })();
 </script>
