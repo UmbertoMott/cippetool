@@ -579,10 +579,10 @@ body.theme-light .llc-vchat-result {
 .tr-ed-btn:disabled{opacity:.45;cursor:default;pointer-events:none}
 /* Table area */
 .tr-table-area{flex:1;overflow:auto;padding:16px}
-.tr-table-wrap{overflow:auto;border:1px solid var(--bdr);border-radius:12px}
+.tr-table-wrap{width:100%;overflow:auto;border:1px solid var(--bdr);border-radius:12px;box-sizing:border-box}
 .tr-table{border-collapse:collapse;min-width:100%;table-layout:fixed}
 .tr-table th,.tr-table td{border:1px solid var(--bdr);text-align:left;vertical-align:top}
-.tr-table thead th{background:var(--sur);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:8px 12px;position:sticky;top:0;z-index:2;white-space:nowrap}
+.tr-table thead th{background:var(--sur);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--txt);padding:8px 12px;position:sticky;top:0;z-index:2;white-space:nowrap}
 .tr-table thead th:first-child{position:sticky;left:0;z-index:3;background:var(--sur);min-width:180px;width:200px}
 .tr-table tbody td:first-child{position:sticky;left:0;z-index:1;background:var(--bg);font-size:12px;font-weight:500;color:var(--txt);padding:8px 12px;min-width:180px;width:200px}
 .tr-table tbody tr:hover td:first-child{background:var(--sur2)}
@@ -32088,6 +32088,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 var TR_KEY = 'tabular_reviews_v1';
 var _trCurrentId = null;
+var _trExtractingCount = 0;
 
 function trGetAll() {
   try { return JSON.parse(localStorage.getItem(TR_KEY) || '[]'); } catch(e) { return []; }
@@ -32434,12 +32435,15 @@ window.trDocInputChange = async function(ev) {
     (function(id, name) {
       trUpdateCurrent(function(r) { r.docs = r.docs || []; r.docs.push({ id: id, name: name, text: '' }); });
       trEditorRender();
-      console.log('[TR] card added immediately:', name, '| total:', (trGetCurrent()||{docs:[]}).docs.length);
     })(docId, docName);
     // Extract text
-    if(status) status.textContent = 'Elaborazione ' + docName + '…';
+    _trExtractingCount++;
+    var btn = document.getElementById('trRunBtn');
+    if (btn) btn.disabled = true;
+    if(status) status.textContent = 'Estrazione testo: ' + docName + '…';
     var text = '';
     try { text = await trExtractText(f); } catch(e) { console.warn('[TR] extract err', e); }
+    _trExtractingCount--;
     // Update stored text
     (function(id, t) {
       trUpdateCurrent(function(r) {
@@ -32447,8 +32451,16 @@ window.trDocInputChange = async function(ev) {
         if (d) d.text = t;
       });
     })(docId, text);
+    if (text && text.trim()) {
+      if(status) status.textContent = '✓ Testo estratto da ' + docName;
+      setTimeout(function(){ if(status && !_trExtractingCount) status.textContent = ''; }, 2000);
+    } else {
+      if(status) status.textContent = '⚠ Nessun testo in ' + docName;
+    }
   }
-  if(status) status.textContent = '';
+  var runBtn = document.getElementById('trRunBtn');
+  if (runBtn) runBtn.disabled = false;
+  if (_trExtractingCount === 0 && status) setTimeout(function(){ status.textContent = ''; }, 2000);
 };
 
 window.trDocDelete = function(docId) {
@@ -32596,7 +32608,11 @@ window.trEditorRun = async function() {
   // Check if any doc has text extracted
   var docsWithoutText = r.docs.filter(function(d){ return !(d.text||'').trim(); });
   if (docsWithoutText.length === r.docs.length) {
-    alert('Nessun testo estratto dai documenti. Controlla che i file siano leggibili (PDF con testo selezionabile, DOCX, XLSX).');
+    if (_trExtractingCount > 0) {
+      alert('Estrazione testo ancora in corso. Attendi qualche secondo e riprova.');
+    } else {
+      alert('Nessun testo estratto dai documenti. Controlla che i file siano leggibili (PDF con testo selezionabile, DOCX, XLSX).');
+    }
     return;
   }
 
