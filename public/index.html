@@ -6145,6 +6145,7 @@ if (window.pdfjsLib) {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -7688,7 +7689,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect x="5" y="0" width="2" height="12"/><rect x="0" y="5" width="12" height="2"/></svg>
         Aggiungi documento
       </button>
-      <input type="file" id="trDocInput" style="display:none" multiple accept=".pdf,.doc,.docx,.txt" onchange="trDocInputChange(event)">
+      <input type="file" id="trDocInput" style="display:none" multiple accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.csv" onchange="trDocInputChange(event)">
     </div>
   </div>
 </div>
@@ -32256,10 +32257,11 @@ window.trDocInputChange = async function(ev) {
   ev.target.value = '';
   if (!files.length) return;
   var status = document.getElementById('trRunStatus');
-  if(status) status.textContent = 'Estrazione testo…';
   for (var i = 0; i < files.length; i++) {
     var f = files[i];
-    var text = await trExtractText(f);
+    if(status) status.textContent = 'Caricamento ' + f.name + '…';
+    var text = '';
+    try { text = await trExtractText(f); } catch(e) { text = ''; }
     var doc = { id: 'd_'+Date.now()+'_'+i, name: f.name, text: text };
     trUpdateCurrent(function(r){ r.docs = r.docs || []; r.docs.push(doc); });
     trEditorRender();
@@ -32283,31 +32285,65 @@ window.trDocDelete = function(docId) {
 
 async function trExtractText(file) {
   var name = file.name.toLowerCase();
-  if (name.endsWith('.txt')) {
-    return new Promise(function(res){ var fr=new FileReader(); fr.onload=function(e){res(e.target.result||'');}; fr.readAsText(file); });
+
+  // Plain text / CSV
+  if (name.endsWith('.txt') || name.endsWith('.csv')) {
+    return new Promise(function(res, rej) {
+      var fr = new FileReader();
+      fr.onerror = function() { res(''); };
+      fr.onload = function(e) { res(e.target.result || ''); };
+      fr.readAsText(file);
+    });
   }
-  if (name.endsWith('.docx') || name.endsWith('.doc')) {
+
+  // DOCX (mammoth handles this well; DOC binary falls through to readAsText fallback)
+  if (name.endsWith('.docx')) {
     if (typeof mammoth !== 'undefined') {
-      return new Promise(function(res){
+      return new Promise(function(res) {
         var fr = new FileReader();
+        fr.onerror = function() { res(''); };
         fr.onload = async function(e) {
-          try { var r = await mammoth.extractRawText({arrayBuffer: e.target.result}); res(r.value||''); }
-          catch(err){ res(''); }
+          try { var r = await mammoth.extractRawText({arrayBuffer: e.target.result}); res(r.value || ''); }
+          catch(err) { res(''); }
         };
         fr.readAsArrayBuffer(file);
       });
     }
   }
+
+  // Excel (SheetJS)
+  if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+    if (typeof XLSX !== 'undefined') {
+      return new Promise(function(res) {
+        var fr = new FileReader();
+        fr.onerror = function() { res(''); };
+        fr.onload = function(e) {
+          try {
+            var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+            var lines = [];
+            wb.SheetNames.forEach(function(sn) {
+              var csv = XLSX.utils.sheet_to_csv(wb.Sheets[sn]);
+              if (csv.trim()) lines.push('[Foglio: ' + sn + ']\n' + csv);
+            });
+            res(lines.join('\n\n'));
+          } catch(err) { res(''); }
+        };
+        fr.readAsArrayBuffer(file);
+      });
+    }
+  }
+
+  // PDF (pdf.js)
   if (name.endsWith('.pdf')) {
     if (typeof pdfjsLib !== 'undefined') {
-      return new Promise(function(res){
+      return new Promise(function(res) {
         var fr = new FileReader();
+        fr.onerror = function() { res(''); };
         fr.onload = async function(e) {
           try {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            var pdf = await pdfjsLib.getDocument({data: e.target.result}).promise;
+            var pdf = await pdfjsLib.getDocument({data: new Uint8Array(e.target.result)}).promise;
             var texts = [];
-            for (var p = 1; p <= Math.min(pdf.numPages, 30); p++) {
+            for (var p = 1; p <= Math.min(pdf.numPages, 50); p++) {
               var pg = await pdf.getPage(p);
               var tc = await pg.getTextContent();
               texts.push(tc.items.map(function(i){return i.str;}).join(' '));
@@ -32319,8 +32355,14 @@ async function trExtractText(file) {
       });
     }
   }
-  // Fallback: read as plain text
-  return new Promise(function(res){ var fr=new FileReader(); fr.onload=function(e){res(e.target.result||'');}; fr.readAsText(file); });
+
+  // Fallback: read as plain text (covers .doc binary — garbled but at least not empty)
+  return new Promise(function(res) {
+    var fr = new FileReader();
+    fr.onerror = function() { res(''); };
+    fr.onload = function(e) { res(e.target.result || ''); };
+    fr.readAsText(file);
+  });
 }
 
 // ── Run AI ────────────────────────────────────────────────────────
