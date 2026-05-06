@@ -619,15 +619,25 @@ th:hover .tr-th-del{opacity:1}
 /* Modal overlay */
 .tr-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
 .tr-overlay.open{display:flex}
-.tr-modal{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 16px 48px rgba(0,0,0,.2)}
-.tr-modal-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--txt);margin-bottom:16px}
-.tr-modal-input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--sur2);color:var(--txt);font:400 13px/1 'Inter',sans-serif;outline:none;box-sizing:border-box;transition:border-color .15s}
+.tr-modal{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:24px;width:90%;max-width:480px;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.tr-modal-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--txt);margin-bottom:20px}
+.tr-modal-label{display:block;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tr-modal-input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--sur2);color:var(--txt);font:400 13px/1.4 'Inter',sans-serif;outline:none;box-sizing:border-box;transition:border-color .15s;margin-bottom:14px}
 .tr-modal-input:focus{border-color:var(--acc)}
+textarea.tr-modal-input{resize:vertical;min-height:90px;line-height:1.5;margin-bottom:0}
 .tr-modal-hint{font-size:11.5px;color:var(--muted);margin:8px 0 14px;line-height:1.5}
 .tr-modal-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:10px;background:var(--acc);color:#fff;border:none;font:600 13px/1 'Inter',sans-serif;cursor:pointer;transition:background .15s}
 .tr-modal-btn:hover{background:#7c3aed}
 .tr-modal-btn.ghost{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr)}
 .tr-modal-btn.ghost:hover{border-color:var(--acc);color:var(--acc)}
+.tr-modal-btn.danger{background:none;color:#ef4444;border:none;padding:7px 4px}
+.tr-modal-btn.danger:hover{color:#b91c1c}
+.tr-autogen-btn{background:none;border:none;color:var(--acc);font:500 11.5px/1 'Inter',sans-serif;cursor:pointer;padding:0;transition:opacity .15s}
+.tr-autogen-btn:hover{opacity:.7}
+/* Column header dots menu */
+.tr-th-dots{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:5px;transition:color .15s;opacity:0;flex-shrink:0}
+th:hover .tr-th-dots{opacity:1}
+.tr-th-dots:hover{color:var(--txt)}
 .tr-member-chip{display:inline-flex;align-items:center;gap:6px;background:var(--sur2);border:1px solid var(--bdr);border-radius:20px;padding:3px 10px 3px 8px;font-size:12px;color:var(--txt);margin:4px 4px 0 0}
 .tr-member-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;padding:0}
 .tr-member-chip button:hover{color:#ef4444}
@@ -7726,12 +7736,37 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Add column modal -->
 <div class="tr-overlay" id="trColOverlay" onclick="trColClose()">
   <div class="tr-modal" onclick="event.stopPropagation()">
-    <div class="tr-modal-title">Nuova colonna AI</div>
-    <input type="text" class="tr-modal-input" id="trColLabelInput" placeholder="es. Principi giuridici applicabili" onkeydown="if(event.key==='Enter') trColAdd()">
-    <div class="tr-modal-hint">L'AI risponderà a questa domanda per ogni documento. Puoi poi modificare le risposte cliccando su ogni cella.</div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;">
-      <button class="tr-modal-btn ghost" onclick="trColClose()">Annulla</button>
-      <button class="tr-modal-btn" onclick="trColAdd()">Aggiungi colonna</button>
+    <input type="hidden" id="trColEditId">
+    <div class="tr-modal-title" id="trColModalTitle">Nuova colonna AI</div>
+
+    <label class="tr-modal-label" for="trColLabelInput">Label</label>
+    <input type="text" class="tr-modal-input" id="trColLabelInput" placeholder="es. concetti chiave">
+
+    <label class="tr-modal-label" for="trColFormatSelect">Format</label>
+    <select class="tr-modal-input" id="trColFormatSelect" style="appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;">
+      <option value="free_text">≡  Free Text</option>
+      <option value="bulleted_list">•  Bulleted list</option>
+      <option value="number">#  Number</option>
+      <option value="percentage">%  Percentage</option>
+      <option value="monetary">💳  Monetary Amount</option>
+      <option value="currency">$  Currency</option>
+      <option value="yes_no">◎  Yes / No</option>
+      <option value="date">📅  Date</option>
+      <option value="tags">🏷  Tags</option>
+    </select>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <label class="tr-modal-label" style="margin:0;" for="trColPromptInput">Prompt</label>
+      <button class="tr-autogen-btn" onclick="trColAutoGenerate()">+ Auto-generate</button>
+    </div>
+    <textarea class="tr-modal-input" id="trColPromptInput" placeholder="es. estrai i concetti principali per ogni paragrafo"></textarea>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;">
+      <button class="tr-modal-btn danger" id="trColDeleteBtn" onclick="trColDeleteFromModal()" style="display:none;">🗑 Delete</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="tr-modal-btn ghost" onclick="trColClose()">Annulla</button>
+        <button class="tr-modal-btn" onclick="trColSave()">Save</button>
+      </div>
     </div>
   </div>
 </div>
@@ -32172,9 +32207,9 @@ function trRenderTable(r) {
     var lbl = col.label.replace(/&/g,'&amp;').replace(/</g,'&lt;');
     var colIdEsc = col.id.replace(/'/g,"\\'");
     return '<th style="min-width:220px;max-width:320px;width:240px;">'
-      + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">'
-      + '<span style="overflow:hidden;text-overflow:ellipsis;">'+lbl+'</span>'
-      + '<button class="tr-th-del" onclick="trColDelete(\''+colIdEsc+'\')" title="Rimuovi colonna" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;flex-shrink:0;padding:0;">✕</button>'
+      + '<div style="display:flex;align-items:center;gap:6px;">'
+      + '<span style="overflow:hidden;text-overflow:ellipsis;flex:1;text-transform:none;letter-spacing:0;font-weight:500;font-size:12px;">'+lbl+'</span>'
+      + '<button class="tr-th-dots" onclick="event.stopPropagation();trColModalOpen(\''+colIdEsc+'\')" title="Modifica colonna">···</button>'
       + '</div></th>';
   }).join('');
   var thAdd = '<th class="tr-th-add" onclick="trColModalOpen()">＋ Colonna</th>';
@@ -32268,37 +32303,120 @@ window.trCellEdit = function(docId, colId) {
 };
 
 // ── Add column modal ──────────────────────────────────────────────
-window.trColModalOpen = function() {
-  var ov = document.getElementById('trColOverlay');
-  if (ov) { ov.classList.add('open'); setTimeout(function(){ var inp=document.getElementById('trColLabelInput'); if(inp){inp.value='';inp.focus();} },50); }
+var TR_FORMATS = {
+  free_text:    { label: 'Free Text',       instruction: '' },
+  bulleted_list:{ label: 'Bulleted list',   instruction: 'Rispondi come lista puntata, ogni punto su nuova riga con • davanti.' },
+  number:       { label: 'Number',          instruction: 'Rispondi solo con un numero (cifre, nessun testo aggiuntivo).' },
+  percentage:   { label: 'Percentage',      instruction: 'Rispondi solo con una percentuale (es. 75%).' },
+  monetary:     { label: 'Monetary Amount', instruction: 'Rispondi solo con un importo monetario (es. €1.200).' },
+  currency:     { label: 'Currency',        instruction: 'Rispondi solo con il nome o codice valuta (es. EUR).' },
+  yes_no:       { label: 'Yes / No',        instruction: 'Rispondi solo con Sì o No.' },
+  date:         { label: 'Date',            instruction: 'Rispondi solo con una data (es. 15/03/2024).' },
+  tags:         { label: 'Tags',            instruction: 'Rispondi come elenco di tag separati da virgola (es. tag1, tag2, tag3).' }
 };
+
+window.trColModalOpen = function(colId) {
+  var ov = document.getElementById('trColOverlay'); if (!ov) return;
+  var titleEl = document.getElementById('trColModalTitle');
+  var editIdEl = document.getElementById('trColEditId');
+  var labelEl  = document.getElementById('trColLabelInput');
+  var fmtEl    = document.getElementById('trColFormatSelect');
+  var promptEl = document.getElementById('trColPromptInput');
+  var delBtn   = document.getElementById('trColDeleteBtn');
+
+  if (colId) {
+    // Edit mode
+    var r = trGetCurrent();
+    var col = r && (r.columns||[]).find(function(c){ return c.id === colId; });
+    if (!col) return;
+    if (titleEl) titleEl.textContent = 'Edit Column';
+    editIdEl.value = colId;
+    labelEl.value  = col.label || '';
+    fmtEl.value    = col.format || 'free_text';
+    promptEl.value = col.prompt || '';
+    if (delBtn) delBtn.style.display = 'inline-flex';
+  } else {
+    // New mode
+    if (titleEl) titleEl.textContent = 'Nuova colonna AI';
+    editIdEl.value = '';
+    labelEl.value  = '';
+    fmtEl.value    = 'free_text';
+    promptEl.value = '';
+    if (delBtn) delBtn.style.display = 'none';
+  }
+  ov.classList.add('open');
+  setTimeout(function(){ labelEl.focus(); }, 50);
+};
+
 window.trColClose = function() {
   var ov = document.getElementById('trColOverlay'); if (ov) ov.classList.remove('open');
 };
-window.trColAdd = function() {
-  var inp = document.getElementById('trColLabelInput');
-  var label = (inp ? inp.value.trim() : '');
-  if (!label) { if(inp) inp.focus(); return; }
-  trUpdateCurrent(function(r){
-    r.columns = r.columns || [];
-    r.columns.push({ id: 'c_'+Date.now(), label: label });
-  });
+
+window.trColSave = function() {
+  var editId  = (document.getElementById('trColEditId')||{}).value || '';
+  var label   = ((document.getElementById('trColLabelInput')||{}).value||'').trim();
+  var format  = (document.getElementById('trColFormatSelect')||{}).value || 'free_text';
+  var prompt  = ((document.getElementById('trColPromptInput')||{}).value||'').trim();
+  if (!label) { var el = document.getElementById('trColLabelInput'); if(el) el.focus(); return; }
+  if (!prompt) { var el2 = document.getElementById('trColPromptInput'); if(el2) el2.focus(); return; }
+
+  if (editId) {
+    trUpdateCurrent(function(r){
+      var col = (r.columns||[]).find(function(c){ return c.id === editId; });
+      if (col) { col.label = label; col.format = format; col.prompt = prompt; }
+    });
+  } else {
+    trUpdateCurrent(function(r){
+      r.columns = r.columns || [];
+      r.columns.push({ id: 'c_'+Date.now(), label: label, format: format, prompt: prompt });
+    });
+  }
   trColClose();
   trEditorRender();
 };
-window.trColDelete = function(colId) {
+
+window.trColDeleteFromModal = function() {
+  var colId = (document.getElementById('trColEditId')||{}).value;
+  if (!colId) return;
   if (!confirm('Rimuovere questa colonna e tutti i dati?')) return;
+  trColClose();
   trUpdateCurrent(function(r){
     r.columns = (r.columns||[]).filter(function(c){ return c.id !== colId; });
-    // Key format: docId + '::' + colId — split on '::' gives exactly [docId, colId]
     var nc = {};
-    Object.keys(r.cells).forEach(function(k){
-      var parts = k.split('::');
-      if (parts[1] !== colId) nc[k] = r.cells[k];
-    });
+    Object.keys(r.cells).forEach(function(k){ if (k.split('::')[1] !== colId) nc[k] = r.cells[k]; });
     r.cells = nc;
   });
   trEditorRender();
+};
+
+window.trColDelete = function(colId) {
+  if (!confirm('Rimuovere questa colonna?')) return;
+  trUpdateCurrent(function(r){
+    r.columns = (r.columns||[]).filter(function(c){ return c.id !== colId; });
+    var nc = {};
+    Object.keys(r.cells).forEach(function(k){ if (k.split('::')[1] !== colId) nc[k] = r.cells[k]; });
+    r.cells = nc;
+  });
+  trEditorRender();
+};
+
+window.trColAutoGenerate = async function() {
+  var labelEl  = document.getElementById('trColLabelInput');
+  var fmtEl    = document.getElementById('trColFormatSelect');
+  var promptEl = document.getElementById('trColPromptInput');
+  var label = (labelEl ? labelEl.value.trim() : '');
+  if (!label) { if(labelEl) labelEl.focus(); return; }
+  var format = fmtEl ? fmtEl.value : 'free_text';
+  var fmtName = (TR_FORMATS[format]||{}).label || format;
+  var btn = document.querySelector('.tr-autogen-btn');
+  if (btn) btn.textContent = '⏳';
+  try {
+    var sys = 'Sei un esperto di analisi documentale. Genera prompt precisi per analisi AI di documenti legali/accademici.';
+    var usr = 'Genera un prompt in italiano per una colonna di analisi tabulare. Label: "' + label + '". Formato output atteso: ' + fmtName + '. Il prompt deve istruire l\'AI su cosa estrarre dal documento. Rispondi SOLO con il testo del prompt, senza spiegazioni.';
+    var resp = await callGemini(sys, [{role:'user', content: usr}], 200);
+    if (promptEl && resp) promptEl.value = resp.trim();
+  } catch(e) { console.warn('autogen error', e); }
+  if (btn) btn.textContent = '+ Auto-generate';
 };
 
 // ── Add / remove documents ────────────────────────────────────────
@@ -32514,8 +32632,10 @@ window.trEditorRun = async function() {
         errors++;
         continue;
       }
+      var colPrompt = (item.col.prompt || item.col.label || '').trim();
+      var fmtInstr = (TR_FORMATS[item.col.format] || TR_FORMATS.free_text).instruction;
       var sysP = 'Sei un giurista professionista specializzato in diritto italiano. Il tuo stile è preciso, autorevole e diretto. Rispondi basandoti esclusivamente sul testo del documento fornito.';
-      var userP = 'DOCUMENTO: ' + item.doc.name + '\n\n' + docText.substring(0, 6000) + '\n\n---\nCRITERIO DI ANALISI: ' + item.col.label + '\n\nFornisci una risposta concisa (max 120 parole) basata esclusivamente sul testo sopra.';
+      var userP = 'DOCUMENTO: ' + item.doc.name + '\n\n' + docText.substring(0, 6000) + '\n\n---\nISTRUZIONE: ' + colPrompt + (fmtInstr ? '\n\nFORMATO: ' + fmtInstr : '') + '\n\nRispondi in modo conciso (max 150 parole).';
 
       if (typeof callGemini !== 'function') throw new Error('callGemini non disponibile');
       var resp = await callGemini(sysP, [{role:'user', content: userP}], 500);
