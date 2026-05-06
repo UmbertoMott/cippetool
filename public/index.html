@@ -32131,6 +32131,24 @@ var _trCurrentId = null;
 var _trExtractingCount = 0;
 var _trTextCache = {}; // docId → testo estratto (cache in-memoria per sessione)
 
+function _trPurgeDocText() {
+  // Rimuove doc.text da TUTTE le review in localStorage — libera quota
+  try {
+    var all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+    var changed = false;
+    all.forEach(function(r) {
+      (r.docs||[]).forEach(function(d) {
+        if (d.text) { d.text = ''; changed = true; }
+      });
+    });
+    if (changed) localStorage.setItem(TR_KEY, JSON.stringify(all));
+  } catch(e) {
+    // Se anche la pulizia fallisce per quota, elimina i dati TR e ricomincia
+    console.warn('[TR] purge failed, clearing TR storage:', e);
+    try { localStorage.removeItem(TR_KEY); } catch(_e) {}
+  }
+}
+
 function trGetAll() {
   try { return JSON.parse(localStorage.getItem(TR_KEY) || '[]'); } catch(e) { return []; }
 }
@@ -32151,6 +32169,7 @@ function trUpdateCurrent(fn) {
 
 // ── Picker ────────────────────────────────────────────────────────
 window.trPickerInit = function() {
+  _trPurgeDocText(); // libera quota prima di tutto
   var list = document.getElementById('trPickerList');
   if (!list) return;
   var reviews = trGetAll();
@@ -32191,6 +32210,7 @@ window.trPickerNew = function() {
 };
 
 window.trPickerOpen = function(id) {
+  _trPurgeDocText(); // libera quota prima di aprire
   _trCurrentId = id;
   if (typeof showScreen === 'function') showScreen('screenTabularEditor');
   trEditorRender();
