@@ -32130,6 +32130,7 @@ var TR_KEY = 'tabular_reviews_v1';
 var _trCurrentId = null;
 var _trExtractingCount = 0;
 var _trTextCache = {}; // docId → testo estratto (cache in-memoria per sessione)
+var _trCellCache = {}; // cellKey → valore (cache in-memoria — fonte di verità per render)
 
 function _trPurgeDocText() {
   // Rimuove doc.text da TUTTE le review in localStorage — libera quota
@@ -32294,8 +32295,9 @@ function trRenderTable(r) {
       + '</td>';
     var tdCells = (r.columns||[]).map(function(col) {
       var key = doc.id + '::' + col.id;
-      var val = r.cells[key];
-      var cls = val ? 'done' : '';
+      // _trCellCache ha precedenza su localStorage — funziona anche se localStorage è pieno
+      var val = (_trCellCache[key] !== undefined) ? _trCellCache[key] : r.cells[key];
+      var cls = (val && val !== '⏳') ? 'done' : '';
       var isLoading = val === '⏳';
       var content = isLoading
         ? '<span style="color:var(--acc);font-size:11px;animation:trPulse .8s infinite alternate;">Elaborazione…</span>'
@@ -32731,60 +32733,46 @@ window.trEditorRun = async function() {
   var status = document.getElementById('trRunStatus');
   var completed = 0, errors = 0;
 
-  // Marca tutte le celle come "in carico" e ripulisce doc.text da vecchie sessioni
+  // Marca tutte le celle come ⏳ — in cache e in localStorage
+  emptyCells.forEach(function(item) { _trCellCache[item.key] = '⏳'; });
   try {
     var _la0 = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
     var _lr0 = _la0.find(function(x){ return x.id === _trCurrentId; });
     if (_lr0) {
-      // Rimuovi doc.text da vecchie sessioni — causa QuotaExceededError
       (_lr0.docs||[]).forEach(function(d){ d.text = ''; });
       emptyCells.forEach(function(item) { _lr0.cells[item.key] = '⏳'; });
       localStorage.setItem(TR_KEY, JSON.stringify(_la0));
     }
-  } catch(_e0) { console.warn('[TR] init mark error:', _e0); }
+  } catch(_e0) { /* localStorage best-effort — _trCellCache basta per il render */ }
   trEditorRender();
   if (status) status.textContent = '⏳ 0/' + emptyCells.length;
 
   function _trSaveCell(key, val) {
+    // 1. Aggiorna sempre la cache in-memoria — il render usa questa, non localStorage
+    if (val) { _trCellCache[key] = val; } else { delete _trCellCache[key]; }
+
+    // 2. Prova a persistere in localStorage (best-effort)
     function _doWrite() {
       var _ra = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
       var _rr = _ra.find(function(x){ return x.id === _trCurrentId; });
-      if (!_rr) { console.error('[TR] review non trovata _trCurrentId=', _trCurrentId); return false; }
+      if (!_rr) return false;
       if (val) { _rr.cells[key] = val; } else { delete _rr.cells[key]; }
       localStorage.setItem(TR_KEY, JSON.stringify(_ra));
       return true;
     }
-    function _freeSpace() {
-      // 1) Svuota doc.text da tutte le review
-      _trPurgeDocText();
-      // 2) Taglia vecchie review — mantieni solo current + ultime 3
-      try {
-        var all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
-        var cur = all.find(function(x){ return x.id === _trCurrentId; });
-        var rest = all.filter(function(x){ return x.id !== _trCurrentId; }).slice(-3);
-        var trimmed = cur ? [cur].concat(rest) : rest;
-        localStorage.setItem(TR_KEY, JSON.stringify(trimmed));
-      } catch(_e) {
-        // Ultima risorsa: salva solo la review corrente
-        try {
-          var all2 = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
-          var cur2 = all2.find(function(x){ return x.id === _trCurrentId; });
-          if (cur2) localStorage.setItem(TR_KEY, JSON.stringify([cur2]));
-          else localStorage.removeItem(TR_KEY);
-        } catch(_e2) { localStorage.removeItem(TR_KEY); }
-      }
-    }
     try {
       _doWrite();
     } catch(e) {
-      if (e.name === 'QuotaExceededError') {
-        console.warn('[TR] QuotaExceededError — libero spazio e riprovo...');
-        _freeSpace();
-        try { _doWrite(); }
-        catch(e2) { console.error('[TR] save fallito dopo purge:', e2.message, 'key=', key); }
-      } else {
-        console.error('[TR] _trSaveCell eccezione:', e, 'key=', key);
-      }
+      if (e.name !== 'QuotaExceededError') return;
+      // Libera spazio: strip doc.text + riduci a solo review corrente
+      try {
+        _trPurgeDocText();
+        var all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+        var cur = all.find(function(x){ return x.id === _trCurrentId; });
+        if (cur) localStorage.setItem(TR_KEY, JSON.stringify([cur]));
+      } catch(_e) { try { localStorage.removeItem(TR_KEY); } catch(_e2) {} }
+      // Riprova — se fallisce ancora, la cache in-memoria basta per questa sessione
+      try { _doWrite(); } catch(_e3) {}
     }
   }
 
