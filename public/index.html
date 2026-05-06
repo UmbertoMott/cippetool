@@ -598,6 +598,18 @@ body.theme-light .llc-vchat-result {
 th:hover .tr-th-del{opacity:1}
 .tr-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;display:block;margin-top:4px;padding:0;transition:color .15s}
 .tr-doc-del:hover{color:#ef4444}
+/* Doc cards strip */
+.tr-doc-cards{padding:12px 16px 0;display:flex;flex-wrap:wrap;gap:8px;flex-shrink:0}
+.tr-doc-card{display:flex;align-items:center;gap:8px;background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:7px 10px;max-width:220px;min-width:0;transition:border-color .15s}
+.tr-doc-card:hover{border-color:var(--acc)}
+.tr-file-badge{flex-shrink:0;width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;border:1px solid}
+.tr-file-badge.fi-pdf{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.3);color:#ef4444}
+.tr-file-badge.fi-word{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.3);color:#3b82f6}
+.tr-file-badge.fi-excel{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.3);color:#16a34a}
+.tr-file-badge.fi-txt{background:var(--sur2);border-color:var(--bdr);color:var(--muted)}
+.tr-doc-card-name{font-size:11.5px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.tr-doc-card-del{flex-shrink:0;background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:5px;font-size:13px;line-height:1;transition:color .15s}
+.tr-doc-card-del:hover{color:#ef4444}
 .tr-table-foot{padding:10px 0;display:flex;gap:8px}
 .tr-add-doc-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:10px;border:1px dashed var(--bdr);background:none;color:var(--muted);font:500 12px/1 'Inter',sans-serif;cursor:pointer;transition:all .15s}
 .tr-add-doc-btn:hover{border-color:var(--acc);color:var(--acc)}
@@ -7679,6 +7691,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </button>
     </div>
   </div>
+  <!-- Doc cards strip -->
+  <div class="tr-doc-cards" id="trDocCards"></div>
   <!-- Table -->
   <div class="tr-table-area">
     <div class="tr-table-wrap">
@@ -32113,11 +32127,38 @@ window.trPickerDelete = function(id) {
 };
 
 // ── Editor render ─────────────────────────────────────────────────
+function trFileInfo(name) {
+  var ext = (name || '').split('.').pop().toLowerCase();
+  if (ext === 'pdf')  return { cls: 'fi-pdf',   label: 'PDF' };
+  if (ext === 'docx') return { cls: 'fi-word',  label: 'DOCX' };
+  if (ext === 'doc')  return { cls: 'fi-word',  label: 'DOC' };
+  if (ext === 'xlsx' || ext === 'xls') return { cls: 'fi-excel', label: ext.toUpperCase() };
+  if (ext === 'csv')  return { cls: 'fi-txt',   label: 'CSV' };
+  return { cls: 'fi-txt', label: ext.toUpperCase() || 'TXT' };
+}
+
+function trRenderDocCards(r) {
+  var wrap = document.getElementById('trDocCards');
+  if (!wrap) return;
+  if (!r.docs || !r.docs.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = r.docs.map(function(doc) {
+    var fi = trFileInfo(doc.name);
+    var nameEsc = (doc.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    var idEsc = doc.id.replace(/'/g,"\\'");
+    return '<div class="tr-doc-card">'
+      + '<div class="tr-file-badge '+fi.cls+'">'+fi.label+'</div>'
+      + '<span class="tr-doc-card-name" title="'+nameEsc+'">'+nameEsc+'</span>'
+      + '<button class="tr-doc-card-del" onclick="trDocDelete(\''+idEsc+'\')" title="Rimuovi">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
 window.trEditorRender = function() {
   var r = trGetCurrent();
   if (!r) return;
   var titleEl = document.getElementById('trEditorTitle');
   if (titleEl) titleEl.textContent = r.title || 'Review';
+  trRenderDocCards(r);
   trRenderTable(r);
 };
 
@@ -32256,15 +32297,19 @@ window.trDocInputChange = async function(ev) {
   var files = Array.from(ev.target.files || []);
   ev.target.value = '';
   if (!files.length) return;
+  if (!_trCurrentId) { console.error('[TR] _trCurrentId null — review not open'); return; }
   var status = document.getElementById('trRunStatus');
   for (var i = 0; i < files.length; i++) {
     var f = files[i];
     if(status) status.textContent = 'Caricamento ' + f.name + '…';
     var text = '';
-    try { text = await trExtractText(f); } catch(e) { text = ''; }
-    var doc = { id: 'd_'+Date.now()+'_'+i, name: f.name, text: text };
-    trUpdateCurrent(function(r){ r.docs = r.docs || []; r.docs.push(doc); });
-    trEditorRender();
+    try { text = await trExtractText(f); } catch(e) { console.warn('[TR] extract error', e); text = ''; }
+    (function(docName, docText, idx) {
+      var doc = { id: 'd_'+Date.now()+'_'+idx, name: docName, text: docText };
+      trUpdateCurrent(function(r){ r.docs = r.docs || []; r.docs.push(doc); });
+      console.log('[TR] doc added:', docName, '| docs now:', (trGetCurrent()||{docs:[]}).docs.length);
+      trEditorRender();
+    })(f.name, text, i);
   }
   if(status) status.textContent = '';
 };
