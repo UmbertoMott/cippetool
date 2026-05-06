@@ -32706,7 +32706,9 @@ window.trEditorRun = async function() {
   r.docs.forEach(function(doc) {
     r.columns.forEach(function(col) {
       var key = doc.id + '::' + col.id;
-      if (!r.cells[key]) emptyCells.push({ doc: doc, col: col, key: key });
+      // Include celle vuote E celle bloccate su ⏳ da run precedenti falliti
+      var v = r.cells[key];
+      if (!v || v === '⏳') emptyCells.push({ doc: doc, col: col, key: key });
     });
   });
   if (!emptyCells.length) { alert('Tutte le celle sono già compilate. Clicca su una cella per modificarla.'); return; }
@@ -32730,14 +32732,35 @@ window.trEditorRun = async function() {
   if (status) status.textContent = '⏳ 0/' + emptyCells.length;
 
   function _trSaveCell(key, val) {
+    var saved = false;
     try {
       var _ra = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
       var _rr = _ra.find(function(x){ return x.id === _trCurrentId; });
       if (_rr) {
         if (val) { _rr.cells[key] = val; } else { delete _rr.cells[key]; }
         localStorage.setItem(TR_KEY, JSON.stringify(_ra));
+        saved = true;
+      } else {
+        console.error('[TR] _trSaveCell: review non trovata! _trCurrentId=', _trCurrentId, 'key=', key);
       }
-    } catch(_se) {}
+    } catch(_se) {
+      console.error('[TR] _trSaveCell eccezione:', _se, 'key=', key);
+    }
+    // Fallback DOM diretto se localStorage fallisce — mostra errore nella cella
+    if (!saved) {
+      var tbl = document.getElementById('trTable');
+      if (tbl) {
+        var keyEsc = key.replace(/'/g, "\\'");
+        var parts = key.split('::');
+        var cells = tbl.querySelectorAll('td.tr-cell');
+        cells.forEach(function(td) {
+          var oc = td.getAttribute('onclick') || '';
+          if (oc.indexOf(parts[0]) !== -1 && oc.indexOf(parts[1]) !== -1) {
+            td.innerHTML = '<span style="color:#ef4444;font-size:11px;">⚠ salvataggio fallito</span>';
+          }
+        });
+      }
+    }
   }
 
   async function _trRunCell(item) {
@@ -32754,10 +32777,14 @@ window.trEditorRun = async function() {
       var sysP = 'Sei un giurista professionista specializzato in diritto italiano. Il tuo stile è preciso, autorevole e diretto. Rispondi basandoti esclusivamente sul testo del documento fornito.';
       var userP = 'DOCUMENTO: ' + item.doc.name + '\n\n' + docText.substring(0, 6000) + '\n\n---\nISTRUZIONE: ' + colPrompt + (fmtInstr ? '\n\nFORMATO: ' + fmtInstr : '') + '\n\nRispondi in modo conciso (max 150 parole).';
       if (typeof callGemini !== 'function') throw new Error('callGemini non disponibile');
-      var resp = await callGemini(sysP, [{role:'user', content: userP}], 500);
-      var cellVal = (resp && typeof resp === 'string' && resp.trim()) ? resp.trim() : null;
-      if (!cellVal) errors++;
-      _trSaveCell(key, cellVal);
+      // Timeout per cella: 40s — oltre quello segna errore e va avanti
+      var cellResp = await Promise.race([
+        callGemini(sysP, [{role:'user', content: userP}], 500),
+        new Promise(function(_, rej) { setTimeout(function(){ rej(new Error('Timeout 40s')); }, 40000); })
+      ]);
+      var cellVal = (cellResp && typeof cellResp === 'string' && cellResp.trim()) ? cellResp.trim() : null;
+      if (!cellVal) { _trSaveCell(key, '[risposta vuota]'); errors++; }
+      else _trSaveCell(key, cellVal);
     } catch(e) {
       console.error('[TR] Run error cell', key, e.message);
       _trSaveCell(key, '[errore: ' + (e.message||String(e)) + ']');
