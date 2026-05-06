@@ -613,6 +613,7 @@ th:hover .tr-th-del{opacity:1}
 .tr-table-foot{padding:10px 0;display:flex;gap:8px}
 .tr-add-doc-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:10px;border:1px dashed var(--bdr);background:none;color:var(--muted);font:500 12px/1 'Inter',sans-serif;cursor:pointer;transition:all .15s}
 .tr-add-doc-btn:hover{border-color:var(--acc);color:var(--acc)}
+@keyframes trPulse{from{opacity:.4}to{opacity:1}}
 /* Run progress */
 .tr-run-status{font-size:11px;color:var(--muted);padding:0 8px}
 /* Modal overlay */
@@ -7699,10 +7700,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <table class="tr-table" id="trTable"><thead><tr><th>Documento</th></tr></thead><tbody></tbody></table>
     </div>
     <div class="tr-table-foot">
-      <button class="tr-add-doc-btn" onclick="document.getElementById('trDocInput').click()">
+      <label class="tr-add-doc-btn" for="trDocInput" style="cursor:pointer;">
         <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect x="5" y="0" width="2" height="12"/><rect x="0" y="5" width="12" height="2"/></svg>
         Aggiungi documento
-      </button>
+      </label>
       <input type="file" id="trDocInput" style="display:none" multiple accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.csv" onchange="trDocInputChange(event)">
     </div>
   </div>
@@ -32145,9 +32146,11 @@ function trRenderDocCards(r) {
     var fi = trFileInfo(doc.name);
     var nameEsc = (doc.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
     var idEsc = doc.id.replace(/'/g,"\\'");
+    var loadingDot = doc.loading ? '<span style="width:6px;height:6px;border-radius:50%;background:var(--acc);opacity:.7;flex-shrink:0;animation:trPulse 1s infinite alternate;"></span>' : '';
     return '<div class="tr-doc-card">'
       + '<div class="tr-file-badge '+fi.cls+'">'+fi.label+'</div>'
       + '<span class="tr-doc-card-name" title="'+nameEsc+'">'+nameEsc+'</span>'
+      + loadingDot
       + '<button class="tr-doc-card-del" onclick="trDocDelete(\''+idEsc+'\')" title="Rimuovi">✕</button>'
       + '</div>';
   }).join('');
@@ -32297,19 +32300,29 @@ window.trDocInputChange = async function(ev) {
   var files = Array.from(ev.target.files || []);
   ev.target.value = '';
   if (!files.length) return;
-  if (!_trCurrentId) { console.error('[TR] _trCurrentId null — review not open'); return; }
+  if (!_trCurrentId) { console.error('[TR] _trCurrentId null'); return; }
   var status = document.getElementById('trRunStatus');
   for (var i = 0; i < files.length; i++) {
     var f = files[i];
-    if(status) status.textContent = 'Caricamento ' + f.name + '…';
-    var text = '';
-    try { text = await trExtractText(f); } catch(e) { console.warn('[TR] extract error', e); text = ''; }
-    (function(docName, docText, idx) {
-      var doc = { id: 'd_'+Date.now()+'_'+idx, name: docName, text: docText };
-      trUpdateCurrent(function(r){ r.docs = r.docs || []; r.docs.push(doc); });
-      console.log('[TR] doc added:', docName, '| docs now:', (trGetCurrent()||{docs:[]}).docs.length);
+    // Add doc card immediately — text extracted in background
+    var docId = 'd_' + Date.now() + '_' + i;
+    var docName = f.name;
+    (function(id, name) {
+      trUpdateCurrent(function(r) { r.docs = r.docs || []; r.docs.push({ id: id, name: name, text: '' }); });
       trEditorRender();
-    })(f.name, text, i);
+      console.log('[TR] card added immediately:', name, '| total:', (trGetCurrent()||{docs:[]}).docs.length);
+    })(docId, docName);
+    // Extract text
+    if(status) status.textContent = 'Elaborazione ' + docName + '…';
+    var text = '';
+    try { text = await trExtractText(f); } catch(e) { console.warn('[TR] extract err', e); }
+    // Update stored text
+    (function(id, t) {
+      trUpdateCurrent(function(r) {
+        var d = (r.docs||[]).find(function(x){ return x.id === id; });
+        if (d) d.text = t;
+      });
+    })(docId, text);
   }
   if(status) status.textContent = '';
 };
