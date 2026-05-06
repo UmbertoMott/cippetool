@@ -32715,64 +32715,71 @@ window.trEditorRun = async function() {
   var btn = document.getElementById('trRunBtn');
   if (btn) btn.disabled = true;
   var status = document.getElementById('trRunStatus');
+  var completed = 0, errors = 0;
 
-  var errors = 0;
-  for (var i = 0; i < emptyCells.length; i++) {
-    var item = emptyCells[i];
-    if (status) status.textContent = '⏳ ' + (i+1) + '/' + emptyCells.length;
+  // Marca tutte le celle come "in carico" subito
+  try {
+    var _la0 = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+    var _lr0 = _la0.find(function(x){ return x.id === _trCurrentId; });
+    if (_lr0) {
+      emptyCells.forEach(function(item) { _lr0.cells[item.key] = '⏳'; });
+      localStorage.setItem(TR_KEY, JSON.stringify(_la0));
+    }
+  } catch(_e0) {}
+  trEditorRender();
+  if (status) status.textContent = '⏳ 0/' + emptyCells.length;
 
-    // Mark cell as loading — save diretto
-    var loadingKey = item.key;
+  function _trSaveCell(key, val) {
     try {
-      var _la = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
-      var _lr = _la.find(function(x){ return x.id === _trCurrentId; });
-      if (_lr) { _lr.cells[loadingKey] = '⏳'; localStorage.setItem(TR_KEY, JSON.stringify(_la)); }
-    } catch(_le) {}
-    trEditorRender();
+      var _ra = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+      var _rr = _ra.find(function(x){ return x.id === _trCurrentId; });
+      if (_rr) {
+        if (val) { _rr.cells[key] = val; } else { delete _rr.cells[key]; }
+        localStorage.setItem(TR_KEY, JSON.stringify(_ra));
+      }
+    } catch(_se) {}
+  }
 
+  async function _trRunCell(item) {
+    var key = item.key;
     try {
       var docText = (item.doc.text||'').trim() || (_trTextCache[item.doc.id]||'').trim();
       if (!docText) {
-        // Skip docs with no text — mark cell with notice
-        (function(k){ trUpdateCurrent(function(r2){ r2.cells[k] = '[testo non disponibile]'; }); })(loadingKey);
+        _trSaveCell(key, '[testo non disponibile]');
         errors++;
-        continue;
+        return;
       }
       var colPrompt = (item.col.prompt || item.col.label || '').trim();
       var fmtInstr = (TR_FORMATS[item.col.format] || TR_FORMATS.free_text).instruction;
       var sysP = 'Sei un giurista professionista specializzato in diritto italiano. Il tuo stile è preciso, autorevole e diretto. Rispondi basandoti esclusivamente sul testo del documento fornito.';
       var userP = 'DOCUMENTO: ' + item.doc.name + '\n\n' + docText.substring(0, 6000) + '\n\n---\nISTRUZIONE: ' + colPrompt + (fmtInstr ? '\n\nFORMATO: ' + fmtInstr : '') + '\n\nRispondi in modo conciso (max 150 parole).';
-
       if (typeof callGemini !== 'function') throw new Error('callGemini non disponibile');
       var resp = await callGemini(sysP, [{role:'user', content: userP}], 500);
-
-      console.log('[TR] Gemini resp len:', (resp||'').length, '| key:', loadingKey);
       var cellVal = (resp && typeof resp === 'string' && resp.trim()) ? resp.trim() : null;
       if (!cellVal) errors++;
-      // Salvataggio diretto — bypassa trUpdateCurrent per evitare silent fail
-      try {
-        var _ra = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
-        var _rr = _ra.find(function(x){ return x.id === _trCurrentId; });
-        if (_rr) {
-          if (cellVal) { _rr.cells[loadingKey] = cellVal; }
-          else { delete _rr.cells[loadingKey]; }
-          localStorage.setItem(TR_KEY, JSON.stringify(_ra));
-          console.log('[TR] cell saved:', loadingKey, cellVal ? cellVal.substring(0,50) : '(deleted)');
-        } else {
-          console.warn('[TR] review not found for cell save, _trCurrentId:', _trCurrentId);
-        }
-      } catch(saveErr) { console.warn('[TR] cell save err:', saveErr); }
+      _trSaveCell(key, cellVal);
     } catch(e) {
-      console.error('[TR] Run error cell', loadingKey, e.message);
-      try {
-        var _ra2 = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
-        var _rr2 = _ra2.find(function(x){ return x.id === _trCurrentId; });
-        if (_rr2) { _rr2.cells[loadingKey] = '[errore: ' + (e.message||String(e)) + ']'; localStorage.setItem(TR_KEY, JSON.stringify(_ra2)); }
-      } catch(_e) {}
+      console.error('[TR] Run error cell', key, e.message);
+      _trSaveCell(key, '[errore: ' + (e.message||String(e)) + ']');
       errors++;
     }
+    completed++;
+    if (status) status.textContent = '⏳ ' + completed + '/' + emptyCells.length;
     trEditorRender();
   }
+
+  // Esecuzione parallela — max 3 contemporanee
+  var _idx = 0;
+  async function _worker() {
+    while (_idx < emptyCells.length) {
+      var cell = emptyCells[_idx++];
+      await _trRunCell(cell);
+    }
+  }
+  var CONCURRENCY = Math.min(3, emptyCells.length);
+  var workers = [];
+  for (var w = 0; w < CONCURRENCY; w++) workers.push(_worker());
+  await Promise.all(workers);
 
   _trRunning = false;
   if (btn) btn.disabled = false;
