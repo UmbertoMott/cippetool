@@ -32681,9 +32681,13 @@ window.trEditorRun = async function() {
     var item = emptyCells[i];
     if (status) status.textContent = '⏳ ' + (i+1) + '/' + emptyCells.length;
 
-    // Mark cell as loading
+    // Mark cell as loading — save diretto
     var loadingKey = item.key;
-    trUpdateCurrent(function(r2){ r2.cells[loadingKey] = '⏳'; });
+    try {
+      var _la = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+      var _lr = _la.find(function(x){ return x.id === _trCurrentId; });
+      if (_lr) { _lr.cells[loadingKey] = '⏳'; localStorage.setItem(TR_KEY, JSON.stringify(_la)); }
+    } catch(_le) {}
     trEditorRender();
 
     try {
@@ -32702,15 +32706,29 @@ window.trEditorRun = async function() {
       if (typeof callGemini !== 'function') throw new Error('callGemini non disponibile');
       var resp = await callGemini(sysP, [{role:'user', content: userP}], 500);
 
-      if (resp && typeof resp === 'string' && resp.trim()) {
-        (function(k, txt){ trUpdateCurrent(function(r2){ r2.cells[k] = txt; }); })(loadingKey, resp.trim());
-      } else {
-        (function(k){ trUpdateCurrent(function(r2){ delete r2.cells[k]; }); })(loadingKey);
-        errors++;
-      }
+      console.log('[TR] Gemini resp len:', (resp||'').length, '| key:', loadingKey);
+      var cellVal = (resp && typeof resp === 'string' && resp.trim()) ? resp.trim() : null;
+      if (!cellVal) errors++;
+      // Salvataggio diretto — bypassa trUpdateCurrent per evitare silent fail
+      try {
+        var _ra = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+        var _rr = _ra.find(function(x){ return x.id === _trCurrentId; });
+        if (_rr) {
+          if (cellVal) { _rr.cells[loadingKey] = cellVal; }
+          else { delete _rr.cells[loadingKey]; }
+          localStorage.setItem(TR_KEY, JSON.stringify(_ra));
+          console.log('[TR] cell saved:', loadingKey, cellVal ? cellVal.substring(0,50) : '(deleted)');
+        } else {
+          console.warn('[TR] review not found for cell save, _trCurrentId:', _trCurrentId);
+        }
+      } catch(saveErr) { console.warn('[TR] cell save err:', saveErr); }
     } catch(e) {
-      console.error('[TR] Run error cell', loadingKey, e);
-      (function(k, msg){ trUpdateCurrent(function(r2){ r2.cells[k] = '[errore: ' + msg + ']'; }); })(loadingKey, e.message || String(e));
+      console.error('[TR] Run error cell', loadingKey, e.message);
+      try {
+        var _ra2 = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+        var _rr2 = _ra2.find(function(x){ return x.id === _trCurrentId; });
+        if (_rr2) { _rr2.cells[loadingKey] = '[errore: ' + (e.message||String(e)) + ']'; localStorage.setItem(TR_KEY, JSON.stringify(_ra2)); }
+      } catch(_e) {}
       errors++;
     }
     trEditorRender();
