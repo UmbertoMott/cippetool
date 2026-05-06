@@ -7692,8 +7692,6 @@ document.addEventListener('DOMContentLoaded', function() {
       </button>
     </div>
   </div>
-  <!-- Doc cards strip -->
-  <div class="tr-doc-cards" id="trDocCards"></div>
   <!-- Table -->
   <div class="tr-table-area">
     <div class="tr-table-wrap">
@@ -32161,7 +32159,6 @@ window.trEditorRender = function() {
   if (!r) return;
   var titleEl = document.getElementById('trEditorTitle');
   if (titleEl) titleEl.textContent = r.title || 'Review';
-  trRenderDocCards(r);
   trRenderTable(r);
 };
 
@@ -32185,11 +32182,17 @@ function trRenderTable(r) {
 
   // TBODY — cell key uses '::' separator to avoid ambiguity with underscores in ids
   var rows = (r.docs||[]).map(function(doc) {
+    var fi = trFileInfo(doc.name);
     var esc = (doc.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
     var docIdEsc = doc.id.replace(/'/g,"\\'");
-    var tdDoc = '<td style="position:sticky;left:0;z-index:1;background:var(--bg);padding:8px 12px;min-width:180px;width:200px;vertical-align:top;">'
-      + '<div style="font-size:12px;font-weight:500;color:var(--txt);word-break:break-all;">'+esc+'</div>'
+    var tdDoc = '<td style="position:sticky;left:0;z-index:1;background:var(--bg);padding:10px 12px;min-width:180px;width:200px;vertical-align:top;">'
+      + '<div style="display:flex;align-items:center;gap:8px;">'
+      + '<div class="tr-file-badge '+fi.cls+'" style="flex-shrink:0;">'+fi.label+'</div>'
+      + '<div style="min-width:0;flex:1;">'
+      + '<div class="tr-doc-name" onclick="trDocRename(\''+docIdEsc+'\')" title="Clicca per rinominare" style="font-size:12px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 4px;border-radius:5px;transition:background .12s;" onmouseover="this.style.background=\'var(--sur2)\'" onmouseout="this.style.background=\'\'">'+esc+'</div>'
       + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')">✕ rimuovi</button>'
+      + '</div>'
+      + '</div>'
       + '</td>';
     var tdCells = (r.columns||[]).map(function(col) {
       var key = doc.id + '::' + col.id;
@@ -32330,15 +32333,53 @@ window.trDocInputChange = async function(ev) {
 window.trDocDelete = function(docId) {
   trUpdateCurrent(function(r){
     r.docs = (r.docs||[]).filter(function(d){ return d.id !== docId; });
-    // Key format: docId + '::' + colId
     var nc = {};
     Object.keys(r.cells).forEach(function(k){
-      var parts = k.split('::');
-      if (parts[0] !== docId) nc[k] = r.cells[k];
+      if (k.split('::')[0] !== docId) nc[k] = r.cells[k];
     });
     r.cells = nc;
   });
   trEditorRender();
+};
+
+window.trDocRename = function(docId) {
+  var r = trGetCurrent(); if (!r) return;
+  var doc = (r.docs||[]).find(function(d){ return d.id === docId; });
+  if (!doc) return;
+  var tbl = document.getElementById('trTable'); if (!tbl) return;
+  // Find the name div in the sticky column
+  var rows = tbl.querySelectorAll('tbody tr');
+  var nameEl = null;
+  for (var i = 0; i < rows.length; i++) {
+    var nd = rows[i].querySelector('.tr-doc-name');
+    if (nd) {
+      var btn = rows[i].querySelector('.tr-doc-del');
+      if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(docId) > -1) {
+        nameEl = nd; break;
+      }
+    }
+  }
+  if (!nameEl) return;
+  var cur = doc.name || '';
+  var inp = document.createElement('input');
+  inp.value = cur;
+  inp.style.cssText = 'width:100%;font:500 12px/1 "Inter",sans-serif;border:none;border-bottom:1.5px solid var(--acc);outline:none;background:transparent;color:var(--txt);padding:2px 4px;box-sizing:border-box;';
+  nameEl.innerHTML = '';
+  nameEl.appendChild(inp);
+  inp.focus(); inp.select();
+  function save() {
+    var v = inp.value.trim() || cur;
+    trUpdateCurrent(function(r2){
+      var d = (r2.docs||[]).find(function(x){ return x.id === docId; });
+      if (d) d.name = v;
+    });
+    trEditorRender();
+  }
+  inp.addEventListener('blur', save);
+  inp.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') { e.preventDefault(); save(); }
+    if (e.key === 'Escape') { trEditorRender(); }
+  });
 };
 
 async function trExtractText(file) {
