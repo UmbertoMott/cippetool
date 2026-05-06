@@ -32486,27 +32486,19 @@ window.trDocInputChange = async function(ev) {
     var text = '';
     try { text = await trExtractText(f); } catch(e) { console.warn('[TR] extract err', e); }
     _trExtractingCount--;
-    // Salvataggio diretto nel localStorage — bypassa trUpdateCurrent per evitare silent fail
     var chars = (text||'').trim().length;
-    // Sempre salva in cache in-memoria (funziona anche se localStorage fallisce)
+    // Testo estratto → solo in cache in-memoria (NON in localStorage: causa QuotaExceededError)
     if (chars > 0) _trTextCache[docId] = text;
-    console.log('[TR] extracted', chars, 'chars | docId:', docId, '| _trCurrentId:', _trCurrentId);
+    // In localStorage salviamo solo doc.text = '' per non eccedere il quota (5MB)
+    // La cache in-memoria basta per il Run della sessione corrente
     try {
       var _all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
       var _rev = _all.find(function(x){ return x.id === _trCurrentId; });
       if (_rev) {
         var _doc = (_rev.docs||[]).find(function(x){ return x.id === docId; });
-        if (_doc) {
-          _doc.text = text;
-          localStorage.setItem(TR_KEY, JSON.stringify(_all));
-          console.log('[TR] localStorage saved, len:', _doc.text.length);
-        } else {
-          console.warn('[TR] doc not found in localStorage, using cache only. docId:', docId);
-        }
-      } else {
-        console.warn('[TR] review not found in localStorage. _trCurrentId:', _trCurrentId);
+        if (_doc) { _doc.text = ''; localStorage.setItem(TR_KEY, JSON.stringify(_all)); }
       }
-    } catch(saveErr) { console.warn('[TR] localStorage save error:', saveErr); }
+    } catch(saveErr) { /* ignora — _trTextCache è sufficiente */ }
     trEditorRender();
     if (chars > 0) {
       if(status) status.textContent = '✓ ' + chars + ' caratteri estratti da ' + docName;
@@ -32719,15 +32711,17 @@ window.trEditorRun = async function() {
   var status = document.getElementById('trRunStatus');
   var completed = 0, errors = 0;
 
-  // Marca tutte le celle come "in carico" subito
+  // Marca tutte le celle come "in carico" e ripulisce doc.text da vecchie sessioni
   try {
     var _la0 = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
     var _lr0 = _la0.find(function(x){ return x.id === _trCurrentId; });
     if (_lr0) {
+      // Rimuovi doc.text da vecchie sessioni — causa QuotaExceededError
+      (_lr0.docs||[]).forEach(function(d){ d.text = ''; });
       emptyCells.forEach(function(item) { _lr0.cells[item.key] = '⏳'; });
       localStorage.setItem(TR_KEY, JSON.stringify(_la0));
     }
-  } catch(_e0) {}
+  } catch(_e0) { console.warn('[TR] init mark error:', _e0); }
   trEditorRender();
   if (status) status.textContent = '⏳ 0/' + emptyCells.length;
 
