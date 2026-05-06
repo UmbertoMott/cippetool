@@ -32226,6 +32226,7 @@ function trRenderTable(r) {
       + '<div class="tr-file-badge '+fi.cls+'" style="flex-shrink:0;">'+fi.label+'</div>'
       + '<div style="min-width:0;flex:1;">'
       + '<div class="tr-doc-name" onclick="trDocRename(\''+docIdEsc+'\')" title="Clicca per rinominare" style="font-size:12px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 4px;border-radius:5px;transition:background .12s;" onmouseover="this.style.background=\'var(--sur2)\'" onmouseout="this.style.background=\'\'">'+esc+'</div>'
+      + (!(doc.text||'').trim() ? '<div style="font-size:10px;color:#f59e0b;margin-top:2px;padding-left:4px;">⚠ nessun testo estratto</div>' : '')
       + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')">✕ rimuovi</button>'
       + '</div>'
       + '</div>'
@@ -32528,19 +32529,42 @@ async function trExtractText(file) {
     });
   }
 
-  // DOCX (mammoth handles this well; DOC binary falls through to readAsText fallback)
-  if (name.endsWith('.docx')) {
-    if (typeof mammoth !== 'undefined') {
-      return new Promise(function(res) {
-        var fr = new FileReader();
-        fr.onerror = function() { res(''); };
-        fr.onload = async function(e) {
-          try { var r = await mammoth.extractRawText({arrayBuffer: e.target.result}); res(r.value || ''); }
-          catch(err) { res(''); }
-        };
-        fr.readAsArrayBuffer(file);
-      });
-    }
+  // DOCX
+  if (name.endsWith('.docx') || name.endsWith('.doc')) {
+    return new Promise(function(res) {
+      var fr = new FileReader();
+      fr.onerror = function() { res(''); };
+      fr.onload = async function(e) {
+        var ab = e.target.result;
+        // Try mammoth.extractRawText
+        if (typeof mammoth !== 'undefined') {
+          try {
+            var r = await mammoth.extractRawText({ arrayBuffer: ab });
+            console.log('[TR] mammoth extractRawText len:', (r.value||'').length, 'messages:', r.messages);
+            if (r.value && r.value.trim()) { res(r.value); return; }
+          } catch(err) { console.warn('[TR] mammoth extractRawText err:', err); }
+          // Fallback: mammoth.convertToHtml → strip tags
+          try {
+            var h = await mammoth.convertToHtml({ arrayBuffer: ab });
+            console.log('[TR] mammoth convertToHtml len:', (h.value||'').length);
+            var txt = (h.value||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+            if (txt) { res(txt); return; }
+          } catch(err2) { console.warn('[TR] mammoth convertToHtml err:', err2); }
+        } else {
+          console.warn('[TR] mammoth not loaded');
+        }
+        // Last resort: try to extract readable text from raw DOCX binary (finds <w:t> fragments if visible)
+        try {
+          var dec = new TextDecoder('utf-8', { fatal: false });
+          var raw = dec.decode(new Uint8Array(ab));
+          var matches = raw.match(/<w:t[^>]*>([^<]+)<\/w:t>/g) || [];
+          var fallbackTxt = matches.map(function(m){ return m.replace(/<[^>]+>/g,''); }).join(' ').trim();
+          console.log('[TR] raw XML fallback len:', fallbackTxt.length);
+          res(fallbackTxt);
+        } catch(e2) { res(''); }
+      };
+      fr.readAsArrayBuffer(file);
+    });
   }
 
   // Excel (SheetJS)
@@ -32606,14 +32630,20 @@ window.trEditorRun = async function() {
   if (!r.columns || !r.columns.length) { alert('Aggiungi almeno una colonna prima di eseguire Run.'); return; }
 
   // Check if any doc has text extracted
+  if (_trExtractingCount > 0) {
+    alert('Estrazione testo ancora in corso. Attendi qualche secondo e riprova.');
+    return;
+  }
   var docsWithoutText = r.docs.filter(function(d){ return !(d.text||'').trim(); });
   if (docsWithoutText.length === r.docs.length) {
-    if (_trExtractingCount > 0) {
-      alert('Estrazione testo ancora in corso. Attendi qualche secondo e riprova.');
-    } else {
-      alert('Nessun testo estratto dai documenti. Controlla che i file siano leggibili (PDF con testo selezionabile, DOCX, XLSX).');
-    }
+    alert('Nessun testo estratto dai documenti. Rimuovi il documento e ricaricalo. Se il problema persiste, il file potrebbe essere solo immagini (PDF scansionato, DOCX senza testo).');
     return;
+  }
+  // Warn about docs without text but proceed
+  if (docsWithoutText.length > 0) {
+    var names = docsWithoutText.map(function(d){ return d.name; }).join(', ');
+    var ok = confirm('Attenzione: ' + docsWithoutText.length + ' documento/i senza testo estratto (' + names + '). Le celle relative saranno saltate. Continuare?');
+    if (!ok) return;
   }
 
   var emptyCells = [];
