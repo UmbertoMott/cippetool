@@ -32539,13 +32539,19 @@ async function trExtractText(file) {
       fr.onerror = function() { res(''); };
       fr.onload = async function(e) {
         var ab = e.target.result;
+        var _trStatus = document.getElementById('trRunStatus');
         // Try mammoth.extractRawText
         if (typeof mammoth !== 'undefined') {
           try {
+            if(_trStatus) _trStatus.textContent = 'mammoth in esecuzione…';
             var r = await mammoth.extractRawText({ arrayBuffer: ab });
-            console.log('[TR] mammoth extractRawText len:', (r.value||'').length, 'messages:', r.messages);
+            console.log('[TR] mammoth extractRawText len:', (r.value||'').length);
+            if(_trStatus) _trStatus.textContent = 'mammoth ok — len=' + (r.value||'').length;
             if (r.value && r.value.trim()) { res(r.value); return; }
-          } catch(err) { console.warn('[TR] mammoth extractRawText err:', err); }
+          } catch(err) {
+            console.warn('[TR] mammoth extractRawText err:', err);
+            if(_trStatus) _trStatus.textContent = 'mammoth ERR: ' + err.message;
+          }
           // Fallback: mammoth.convertToHtml → strip tags
           try {
             var h = await mammoth.convertToHtml({ arrayBuffer: ab });
@@ -32555,6 +32561,7 @@ async function trExtractText(file) {
           } catch(err2) { console.warn('[TR] mammoth convertToHtml err:', err2); }
         } else {
           console.warn('[TR] mammoth not loaded');
+          if(_trStatus) _trStatus.textContent = '⚠ mammoth non caricato — controlla connessione';
         }
         // Last resort: try to extract readable text from raw DOCX binary (finds <w:t> fragments if visible)
         try {
