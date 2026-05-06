@@ -545,7 +545,8 @@ body.theme-light .llc-vchat-result {
 
 /* ── Tabular Review ──────────────────────────────────────────── */
 #screenTabularReview{background:var(--bg);overflow-y:auto}
-#screenTabularEditor{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+#screenTabularEditor{background:var(--bg);overflow:hidden}
+#screenTabularEditor.active{display:flex!important;flex-direction:column}
 .tr-picker-root{max-width:900px;margin:0 auto;padding:28px 24px 60px}
 .tr-picker-back{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
 .tr-picker-back:hover{color:var(--txt)}
