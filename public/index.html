@@ -7682,7 +7682,7 @@ document.addEventListener('DOMContentLoaded', function() {
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="screen" id="screenTabularReview">
   <div class="tr-picker-root">
-    <button class="tr-picker-back" onclick="showScreen('screenLanding')">← Sezioni</button>
+    <button class="tr-picker-back" onclick="showScreen('screenMode')">← Sezioni</button>
     <div style="display:flex;align-items:center;justify-content:space-between;margin:20px 0 6px;">
       <div class="tr-picker-heading">Tabular Review</div>
       <button class="tr-picker-new" onclick="trPickerNew()">＋ Nuova Review</button>
@@ -24321,7 +24321,7 @@ function wbRenderTool02(text, resultEl) {
     algBox.appendChild(algLabel);
     var algText = document.createElement('div');
     algText.style.cssText = 'font-family:"Courier New",monospace;font-size:15px;color:' + (isLight ? '#5B21B6' : '#d394ff') + ';font-weight:700;letter-spacing:.03em';
-    algText.textContent = alg;
+    algText.innerHTML = alg.replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>').replace(/\*/g,'');
     algBox.appendChild(algText);
     resultEl.appendChild(algBox);
   }
@@ -24338,13 +24338,13 @@ function wbRenderTool02(text, resultEl) {
       kcBox.appendChild(conLabel);
       var conTitle = document.createElement('div');
       conTitle.style.cssText = 'font-size:14px;font-weight:800;color:' + (isLight ? '#1a1a1a' : '#ffffff') + ';margin-bottom:8px';
-      conTitle.textContent = con;
+      conTitle.innerHTML = con.replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>').replace(/\*/g,'');
       kcBox.appendChild(conTitle);
     }
     if (def) {
       var defText = document.createElement('div');
       defText.style.cssText = 'font-size:12.5px;color:' + (isLight ? '#374151' : '#a0aec0') + ';line-height:1.75';
-      defText.textContent = def;
+      defText.innerHTML = _wbMdToHtml(def);
       kcBox.appendChild(defText);
     }
     resultEl.appendChild(kcBox);
@@ -24459,7 +24459,7 @@ function wbRenderTool04(text, resultEl) {
     var qDiv = document.createElement('div');
     qDiv.style.cssText = 'padding:14px 16px 10px;border-bottom:1px solid ' + (isLight04?'rgba(0,0,0,.07)':'rgba(255,255,255,.06)');
     qDiv.innerHTML = '<div style="font-size:9px;color:rgba(168,85,247,.6);font-family:\'Space Grotesk\',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Q ' + (qi+1) + '</div>'
-      + '<div style="font-size:13px;font-weight:700;color:' + (isLight04?'#1a1a1a':'#ffffff') + ';line-height:1.5">' + q + '</div>';
+      + '<div style="font-size:13px;font-weight:700;color:' + (isLight04?'#1a1a1a':'#ffffff') + ';line-height:1.5">' + q.replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>').replace(/\*/g,'') + '</div>';
     card.appendChild(qDiv);
 
     var optWrap = document.createElement('div');
@@ -24473,7 +24473,7 @@ function wbRenderTool04(text, resultEl) {
       opt.setAttribute('data-key', key);
       opt.setAttribute('data-correct', isCorrect ? '1' : '0');
       opt.innerHTML = '<div style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:transparent;transition:all .15s"></div>'
-        + '<span style="font-size:12.5px;color:' + (isLight04?'#1a1a1a':'#cccccc') + '">' + key + '. ' + opts[key] + '</span>';
+        + '<span style="font-size:12.5px;color:' + (isLight04?'#1a1a1a':'#cccccc') + '">' + key + '. ' + opts[key].replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>').replace(/\*/g,'') + '</span>';
       opt.onclick = function() {
         var isLightNow = document.body.classList.contains('theme-light');
         var clickedKey = key;
@@ -24508,7 +24508,7 @@ function wbRenderTool04(text, resultEl) {
           var splDiv = document.createElement('div');
           splDiv.className = 'wb-ar-spl';
           splDiv.style.cssText = 'margin:0 16px 14px;padding:10px 14px;background:' + (isLightNow?'rgba(22,163,74,.07)':'rgba(52,211,153,.07)') + ';border-radius:7px;border-left:3px solid ' + (isLightNow?'#16a34a':'#34d399') + ';font-size:12px;color:' + (isLightNow?'#1C1612':'#a7f3d0') + ';line-height:1.6';
-          splDiv.textContent = spl;
+          splDiv.innerHTML = _wbMdToHtml(spl);
           card.appendChild(splDiv);
         }
       };
@@ -24784,7 +24784,7 @@ function _wbMdToHtml(text) {
     .replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*([^*\n]+?)\*/g,'<em>$1</em>')
     .replace(/^#{1,3}\s+(.+)$/gm,'<div style="font-weight:700;color:#c084fc;margin:10px 0 4px;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em">$1</div>')
-    .replace(/^[-•]\s+(.+)$/gm,'<div style="padding-left:14px;margin:2px 0">• $1</div>')
+    .replace(/^[-•*]\s+(.+)$/gm,'<div style="padding-left:14px;margin:2px 0">• $1</div>')
     .replace(/^\d+\.\s+(.+)$/gm,'<div style="padding-left:14px;margin:2px 0">$1</div>')
     .replace(/\n{2,}/g,'</p><p style="margin:8px 0">')
     .replace(/\n/g,'<br>');
@@ -32454,8 +32454,10 @@ function trRenderTable(r) {
                 return ln;
               }).join('\n');
               return v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-                      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+                      .replace(/\*\*\*([\s\S]+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+                      .replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>')
                       .replace(/\*([^*\n]+?)\*/g,'<em>$1</em>')
+                      .replace(/^[*\-]\s+(.+)$/gm,'• $1')
                       .replace(/\n/g,'<br>');
             })(val)
           : '<span style="color:var(--muted);font-style:italic;font-size:11px;">—</span>';
