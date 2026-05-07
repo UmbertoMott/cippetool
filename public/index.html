@@ -579,14 +579,14 @@ body.theme-light .llc-vchat-result {
 .tr-ed-btn:disabled{opacity:.45;cursor:default;pointer-events:none}
 /* Table area */
 .tr-table-area{flex:1;overflow:auto;padding:16px}
-.tr-table-wrap{width:100%;overflow:auto;border:1px solid var(--bdr);border-radius:12px;box-sizing:border-box}
+.tr-table-wrap{width:100%;overflow:hidden;border:1px solid var(--bdr);border-radius:12px;box-sizing:border-box}
 .tr-table{border-collapse:collapse;width:100%;table-layout:fixed}
 .tr-table th,.tr-table td{border:1px solid var(--bdr);text-align:left;vertical-align:top}
 .tr-table thead th{background:var(--sur);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--txt);padding:8px 12px;position:sticky;top:0;z-index:2;white-space:nowrap}
 .tr-table thead th:first-child{position:sticky;left:0;z-index:3;background:var(--sur);min-width:180px;width:200px}
 .tr-table tbody td:first-child{position:sticky;left:0;z-index:1;background:var(--bg);font-size:12px;font-weight:500;color:var(--txt);padding:8px 12px;min-width:180px;width:200px}
 .tr-table tbody tr:hover td:first-child{background:var(--sur2)}
-.tr-table .tr-cell{padding:8px 12px;font-size:12px;color:var(--txt);line-height:1.5;min-width:180px;cursor:pointer;transition:background .12s;min-height:60px;word-break:break-word;text-align:justify}
+.tr-table .tr-cell{padding:8px 12px;font-size:12px;color:var(--txt);line-height:1.5;cursor:pointer;transition:background .12s;min-height:60px;word-break:break-word;text-align:justify;overflow:hidden}
 .tr-table .tr-cell:hover{background:var(--sur2)}
 .tr-table .tr-cell.loading{color:var(--muted);font-style:italic}
 .tr-table .tr-cell.done{color:var(--txt)}
@@ -32355,7 +32355,7 @@ function trRenderTable(r) {
   var thCols = (r.columns||[]).map(function(col) {
     var lbl = col.label.replace(/&/g,'&amp;').replace(/</g,'&lt;');
     var colIdEsc = col.id.replace(/'/g,"\\'");
-    return '<th style="min-width:180px;">'
+    return '<th>'
       + '<div style="display:flex;align-items:center;gap:6px;">'
       + '<span style="overflow:hidden;text-overflow:ellipsis;flex:1;text-transform:none;letter-spacing:0;font-weight:500;font-size:12px;">'+lbl+'</span>'
       + '<button class="tr-th-dots" onclick="event.stopPropagation();trColModalOpen(\''+colIdEsc+'\')" title="Modifica colonna">···</button>'
