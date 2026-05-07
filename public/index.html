@@ -596,17 +596,21 @@ body.theme-light .llc-vchat-result {
 .tr-th-add:hover{background:rgba(168,85,247,.08)!important}
 .tr-th-del{cursor:pointer;opacity:0;transition:opacity .15s}
 th:hover .tr-th-del{opacity:1}
-.tr-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;display:block;margin-top:4px;padding:0;transition:color .15s}
+.tr-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;width:18px;height:18px;padding:0;border-radius:4px;margin-top:4px;opacity:0;transition:opacity .15s,color .15s}
+td:hover .tr-doc-del,.tr-doc-del:focus{opacity:1}
 .tr-doc-del:hover{color:#ef4444}
 /* Doc cards strip */
 .tr-doc-cards{padding:12px 16px 0;display:flex;flex-wrap:wrap;gap:8px;flex-shrink:0}
 .tr-doc-card{display:flex;align-items:center;gap:8px;background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:7px 10px;max-width:220px;min-width:0;transition:border-color .15s}
 .tr-doc-card:hover{border-color:var(--acc)}
-.tr-file-badge{flex-shrink:0;width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;border:1px solid}
-.tr-file-badge.fi-pdf{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.3);color:#ef4444}
-.tr-file-badge.fi-word{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.3);color:#3b82f6}
-.tr-file-badge.fi-excel{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.3);color:#16a34a}
-.tr-file-badge.fi-txt{background:var(--sur2);border-color:var(--bdr);color:var(--muted)}
+.tr-file-badge{flex-shrink:0;position:relative;width:34px;height:42px;border-radius:4px 0 4px 4px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:5px;gap:3px;clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,0 100%)}
+.tr-file-badge::before{content:'';position:absolute;top:0;right:0;width:11px;height:11px;background:rgba(0,0,0,.18);clip-path:polygon(100% 0,100% 100%,0 100%)}
+.tr-file-badge svg{flex-shrink:0}
+.tr-file-badge span{font-size:7px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;line-height:1}
+.tr-file-badge.fi-pdf{background:rgba(220,38,38,.12);color:#ef4444}
+.tr-file-badge.fi-word{background:rgba(37,99,235,.12);color:#3b82f6}
+.tr-file-badge.fi-excel{background:rgba(22,163,74,.12);color:#16a34a}
+.tr-file-badge.fi-txt{background:var(--sur2);color:var(--muted)}
 .tr-doc-card-name{font-size:11.5px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .tr-doc-card-del{flex-shrink:0;background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:5px;font-size:13px;line-height:1;transition:color .15s}
 .tr-doc-card-del:hover{color:#ef4444}
@@ -1734,7 +1738,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-he
 .wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px}
 
 /* HEADER */
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--bdr)}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:16px;padding-left:20px;border-bottom:1px solid var(--bdr)}
 .logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.2px}
 .logo span{color:var(--acc)}
 .hdr-right{display:flex;align-items:center;gap:12px}
@@ -32343,14 +32347,18 @@ window.trPickerDelete = function(id) {
 };
 
 // ── Editor render ─────────────────────────────────────────────────
+var _TR_FILE_ICON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="opacity:.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/></svg>';
 function trFileInfo(name) {
   var ext = (name || '').split('.').pop().toLowerCase();
-  if (ext === 'pdf')  return { cls: 'fi-pdf',   label: 'PDF' };
-  if (ext === 'docx') return { cls: 'fi-word',  label: 'DOCX' };
-  if (ext === 'doc')  return { cls: 'fi-word',  label: 'DOC' };
-  if (ext === 'xlsx' || ext === 'xls') return { cls: 'fi-excel', label: ext.toUpperCase() };
-  if (ext === 'csv')  return { cls: 'fi-txt',   label: 'CSV' };
-  return { cls: 'fi-txt', label: ext.toUpperCase() || 'TXT' };
+  var _badge = function(cls, lbl) {
+    return { cls: cls, label: lbl, html: '<div class="tr-file-badge '+cls+'">'+_TR_FILE_ICON_SVG+'<span>'+lbl+'</span></div>' };
+  };
+  if (ext === 'pdf')  return _badge('fi-pdf',   'PDF');
+  if (ext === 'docx') return _badge('fi-word',  'DOCX');
+  if (ext === 'doc')  return _badge('fi-word',  'DOC');
+  if (ext === 'xlsx' || ext === 'xls') return _badge('fi-excel', ext.toUpperCase());
+  if (ext === 'csv')  return _badge('fi-txt',   'CSV');
+  return _badge('fi-txt', ext.toUpperCase() || 'TXT');
 }
 
 function trRenderDocCards(r) {
@@ -32363,7 +32371,7 @@ function trRenderDocCards(r) {
     var idEsc = doc.id.replace(/'/g,"\\'");
     var loadingDot = doc.loading ? '<span style="width:6px;height:6px;border-radius:50%;background:var(--acc);opacity:.7;flex-shrink:0;animation:trPulse 1s infinite alternate;"></span>' : '';
     return '<div class="tr-doc-card">'
-      + '<div class="tr-file-badge '+fi.cls+'">'+fi.label+'</div>'
+      + fi.html
       + '<span class="tr-doc-card-name" title="'+nameEsc+'">'+nameEsc+'</span>'
       + loadingDot
       + '<button class="tr-doc-card-del" onclick="trDocDelete(\''+idEsc+'\')" title="Rimuovi">✕</button>'
@@ -32417,11 +32425,11 @@ function trRenderTable(r) {
     var docIdEsc = doc.id.replace(/'/g,"\\'");
     var tdDoc = '<td style="position:sticky;left:0;z-index:1;background:var(--bg);padding:10px 12px;min-width:180px;width:200px;vertical-align:top;">'
       + '<div style="display:flex;align-items:center;gap:8px;">'
-      + '<div class="tr-file-badge '+fi.cls+'" style="flex-shrink:0;">'+fi.label+'</div>'
+      + fi.html
       + '<div style="min-width:0;flex:1;">'
       + '<div class="tr-doc-name" ondblclick="trDocRename(\''+docIdEsc+'\')" title="Doppio clic per rinominare" style="font-size:12px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;padding:2px 4px;border-radius:5px;transition:background .12s;" onmouseover="this.style.background=\'var(--sur2)\'" onmouseout="this.style.background=\'\'">'+esc+'</div>'
       + (!((doc.text||'').trim() || (_trTextCache[doc.id]||'').trim()) && !doc.hadText ? '<div style="font-size:10px;color:#f59e0b;margin-top:2px;padding-left:4px;">⚠ nessun testo estratto</div>' : '')
-      + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')">✕ rimuovi</button>'
+      + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')" title="Rimuovi documento"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>'
       + '</div>'
       + '</div>'
       + '</td>';
@@ -33187,7 +33195,10 @@ The ideal output is: SHORT + DENSE + PRECISE + IMMEDIATELY UNDERSTANDABLE.
 CRITICAL FORMATTING RULE:
 NEVER use markdown tables (|col1|col2| format) in your output. NEVER.
 Use plain text, numbered lists (1. 2. 3.), or bullet points (•) instead.
-A cell must be plain prose or a list — never a table inside a table.`;
+A cell must be plain prose or a list — never a table inside a table.
+
+RESPONSE START RULE:
+NEVER begin your response by repeating, quoting, or echoing the column label/name in any form (uppercase, lowercase, bold, or colon-prefixed). Start DIRECTLY with the analytical content.`;
       var userP = 'DOCUMENTO: ' + item.doc.name + '\n\n' + docText.substring(0, 6000) + '\n\n---\nCOLONNA: ' + (item.col.label||colPrompt) + '\nISTRUZIONE COLONNA: ' + colPrompt + (fmtInstr ? '\n\nFORMATO RICHIESTO: ' + fmtInstr : '') + '\n\nAnalizza il documento e genera la risposta per questa colonna specifica. Sii conciso (max 150 parole).';
       if (typeof callGemini !== 'function') throw new Error('callGemini non disponibile');
       // Timeout per cella: 40s — oltre quello segna errore e va avanti
