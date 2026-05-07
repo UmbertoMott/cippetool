@@ -32754,10 +32754,26 @@ window.trDocMenuAIGenerate = async function() {
   // Collect document texts from the current review
   var r = trGetCurrent();
   var docs = r ? (r.docs || []) : [];
+
+  // Smart sampling: inizio + sezioni centrali + fine per coprire doc lunghi (50+ pagine)
+  function _sampleDocText(text) {
+    var t = text.trim();
+    var len = t.length;
+    if (len <= 20000) return t; // doc corto: tutto intero
+    // Doc lungo: campiona 4 zone per avere visione completa
+    var head   = t.substring(0, 8000);                              // inizio (definizioni, parti)
+    var mid1   = t.substring(Math.floor(len * 0.28), Math.floor(len * 0.28) + 4000); // 28%
+    var mid2   = t.substring(Math.floor(len * 0.55), Math.floor(len * 0.55) + 4000); // 55%
+    var tail   = t.substring(Math.max(0, len - 5000));              // fine (clausole finali)
+    return head + '\n\n[… sezione centrale 1 …]\n\n' + mid1
+         + '\n\n[… sezione centrale 2 …]\n\n' + mid2
+         + '\n\n[… sezione finale …]\n\n' + tail;
+  }
+
   var docSnippets = docs.map(function(doc) {
     var text = (_trTextCache[doc.id] || doc.text || '').trim();
     if (!text) return null;
-    return '=== ' + doc.name + ' ===\n' + text.substring(0, 4000);
+    return '=== ' + doc.name + ' ===\n' + _sampleDocText(text);
   }).filter(Boolean);
 
   if (!docSnippets.length) {
@@ -32769,7 +32785,8 @@ window.trDocMenuAIGenerate = async function() {
   _trDocMenuShowLoading();
 
   try {
-    var docContext = docSnippets.join('\n\n').substring(0, 14000);
+    // Fino a 60k chars totali — Gemini Flash gestisce 1M token di contesto
+    var docContext = docSnippets.join('\n\n').substring(0, 60000);
 
     var sys = `Sei un docente universitario di diritto italiano con specializzazione in analisi documentale giuridica e accademica.
 Il tuo compito è leggere attentamente il contenuto dei documenti forniti, comprenderne la natura giuridica, le sfaccettature normative, i soggetti coinvolti, gli obblighi, i diritti, le responsabilità, le clausole rilevanti e qualsiasi altro profilo di interesse analitico.
@@ -32784,7 +32801,7 @@ Non aggiungere testo prima o dopo il JSON. Non usare markdown o backtick.`;
       + (desc ? '\n\nINDICAZIONI AGGIUNTIVE DELL\'UTENTE: ' + desc : '')
       + '\n\nAnalizza il contenuto e genera ALMENO 10 colonne analitiche ottimali per questi documenti.';
 
-    var rawJson = await callGeminiJSON(sys, [{role:'user', content: usr}], 2500);
+    var rawJson = await callGeminiJSON(sys, [{role:'user', content: usr}], 4000);
 
     var cols;
     try {
