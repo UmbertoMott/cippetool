@@ -1700,7 +1700,7 @@ body.theme-light{
   --ok:#166534;--err:#991b1b;--acc:#0f0f0e;
 }
 /* Superfici e layout */
-body.theme-light .hdr{background:#f5f3ef;border-bottom:0.5px solid rgba(0,0,0,0.08)}
+body.theme-light .hdr{background:#f5f3ef;border-bottom:none}
 body.theme-light .wrap{background:transparent}
 /* Rimuove glow viola solo sugli elementi che lo usano come effetto decorativo */
 body.theme-light .ai-panel,
@@ -1735,7 +1735,7 @@ body.theme-light input::placeholder,body.theme-light textarea::placeholder{color
 /* Score/result screen */
 body.theme-light .score-ring-text,.theme-light .score-label{color:var(--txt)}
 /* Navbar header dell'app */
-body.theme-light .hdr-right .user-badge{background:var(--sur2);border:0.5px solid var(--bdr)}
+body.theme-light .hdr-right .user-badge{background:transparent;border:none}
 
 /* ── LEGORA: typography, borders, buttons, cards ──────────────── */
 /* No noise texture */
@@ -3742,7 +3742,7 @@ body.theme-light .llc-btn:hover { background: rgba(0,0,0,0.08) !important; borde
 body.theme-light .llc-btn.active { background: rgba(0,0,0,0.10) !important; border-color: rgba(0,0,0,0.25) !important; color: #0f0f0e !important; }
 /* App header (dark mode): semplifica shadow pesante */
 .hdr { box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 2px 16px rgba(0,0,0,0.28) !important; }
-body.theme-light .hdr { box-shadow: 0 1px 0 rgba(0,0,0,0.06) !important; }
+body.theme-light .hdr { box-shadow: none !important; }
 
 body.theme-light #fcToggleBtn{background:#1a1a1a !important;
   box-shadow:0 3px 14px rgba(0,0,0,.25)}
@@ -5156,11 +5156,11 @@ body {
   box-shadow: 0 1px 0 rgba(255,255,255,0.035), 0 6px 32px rgba(0,0,0,0.45);
 }
 body.theme-light .hdr {
-  background: rgba(245,243,239,0.97) !important;
-  backdrop-filter: blur(24px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
-  border-bottom: 1px solid rgba(0,0,0,0.08) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.95), 0 2px 20px rgba(0,0,0,0.06) !important;
+  background: #f5f3ef !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 body.theme-light .logo { color: var(--txt) !important; }
 body.theme-light .logo span { color: var(--acc) !important; }
