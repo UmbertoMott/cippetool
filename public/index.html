@@ -638,6 +638,12 @@ textarea.tr-modal-input{resize:vertical;min-height:90px;line-height:1.5;margin-b
 .tr-th-dots{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:5px;transition:color .15s;opacity:0;flex-shrink:0}
 th:hover .tr-th-dots{opacity:1}
 .tr-th-dots:hover{color:var(--txt)}
+/* Column resize handle */
+.tr-col-resize{position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;z-index:4;border-radius:0 3px 3px 0;transition:background .12s}
+.tr-col-resize:hover,.tr-col-resize.resizing{background:var(--acc);opacity:.55}
+.tr-table thead th{position:relative}
+/* Doc-menu overlay (AI column generator) */
+#trDocMenuOverlay .tr-modal{max-width:520px}
 .tr-member-chip{display:inline-flex;align-items:center;gap:6px;background:var(--sur2);border:1px solid var(--bdr);border-radius:20px;padding:3px 10px 3px 8px;font-size:12px;color:var(--txt);margin:4px 4px 0 0}
 .tr-member-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;padding:0}
 .tr-member-chip button:hover{color:#ef4444}
@@ -7781,6 +7787,27 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TABULAR REVIEW — DOC MENU MODAL (AI column generator)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="tr-overlay" id="trDocMenuOverlay" onclick="trDocMenuClose()">
+  <div class="tr-modal" onclick="event.stopPropagation()">
+    <div class="tr-modal-title">Genera colonne con AI</div>
+    <label class="tr-modal-label" for="trDocMenuAIDesc">Descrivi le colonne che vuoi</label>
+    <textarea class="tr-modal-input" id="trDocMenuAIDesc" style="min-height:110px;" placeholder="es. Vorrei 3 colonne: una per le parti del contratto, una per le date chiave, una per le clausole di rescissione. Le colonne devono essere in formato lista puntata."></textarea>
+    <div class="tr-modal-hint">L'AI genererà le colonne con label, formato e prompt, sostituendo quelle esistenti.</div>
+    <div id="trDocMenuConflicts" style="display:none;background:var(--sur2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--bdr);">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Colonne già esistenti con lo stesso nome</div>
+      <div id="trDocMenuConflictList"></div>
+    </div>
+    <div id="trDocMenuStatus" style="font-size:12px;color:var(--muted);min-height:16px;margin-bottom:8px;"></div>
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:4px;">
+      <button class="tr-modal-btn ghost" onclick="trDocMenuClose()">Annulla</button>
+      <button class="tr-modal-btn" id="trDocMenuGenBtn" onclick="trDocMenuAIGenerate()">✦ Genera con AI</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      AI DOCUMENT WORKBENCH SCREEN
@@ -32351,15 +32378,28 @@ function trRenderTable(r) {
   if (!tbl) return;
 
   // THEAD
-  var thDoc = '<th style="position:sticky;left:0;top:0;z-index:3;background:var(--sur);min-width:180px;width:200px;">Documento</th>';
+  var thDoc = '<th style="position:sticky;left:0;top:0;z-index:3;background:var(--sur);min-width:180px;width:200px;">'
+    + '<div style="display:flex;align-items:center;gap:6px;">'
+    + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0;font-weight:500;font-size:12px;">Documento</span>'
+    + '<button class="tr-th-dots" onclick="event.stopPropagation();trDocMenuOpen()" title="Genera colonne con AI" style="opacity:1;">···</button>'
+    + '</div></th>';
+
+  // Load saved column widths
+  var _colWidths = {};
+  try { _colWidths = JSON.parse(localStorage.getItem('tr_col_widths_' + r.id) || '{}'); } catch(_e) {}
+
   var thCols = (r.columns||[]).map(function(col) {
     var lbl = col.label.replace(/&/g,'&amp;').replace(/</g,'&lt;');
     var colIdEsc = col.id.replace(/'/g,"\\'");
-    return '<th>'
+    var w = _colWidths[col.id];
+    var wStyle = w ? 'width:'+w+'px;min-width:'+w+'px;' : '';
+    return '<th style="'+wStyle+'">'
       + '<div style="display:flex;align-items:center;gap:6px;">'
       + '<span style="overflow:hidden;text-overflow:ellipsis;flex:1;text-transform:none;letter-spacing:0;font-weight:500;font-size:12px;">'+lbl+'</span>'
       + '<button class="tr-th-dots" onclick="event.stopPropagation();trColModalOpen(\''+colIdEsc+'\')" title="Modifica colonna">···</button>'
-      + '</div></th>';
+      + '</div>'
+      + '<div class="tr-col-resize" onmousedown="event.preventDefault();event.stopPropagation();trColResizeStart(event,\''+colIdEsc+'\')"></div>'
+      + '</th>';
   }).join('');
   var thAdd = '<th class="tr-th-add" onclick="trColModalOpen()">＋ Colonna</th>';
   tbl.querySelector('thead').innerHTML = '<tr>' + thDoc + thCols + thAdd + '</tr>';
@@ -32373,7 +32413,7 @@ function trRenderTable(r) {
       + '<div style="display:flex;align-items:center;gap:8px;">'
       + '<div class="tr-file-badge '+fi.cls+'" style="flex-shrink:0;">'+fi.label+'</div>'
       + '<div style="min-width:0;flex:1;">'
-      + '<div class="tr-doc-name" onclick="trDocRename(\''+docIdEsc+'\')" title="Clicca per rinominare" style="font-size:12px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 4px;border-radius:5px;transition:background .12s;" onmouseover="this.style.background=\'var(--sur2)\'" onmouseout="this.style.background=\'\'">'+esc+'</div>'
+      + '<div class="tr-doc-name" ondblclick="trDocRename(\''+docIdEsc+'\')" title="Doppio clic per rinominare" style="font-size:12px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;padding:2px 4px;border-radius:5px;transition:background .12s;" onmouseover="this.style.background=\'var(--sur2)\'" onmouseout="this.style.background=\'\'">'+esc+'</div>'
       + (!((doc.text||'').trim() || (_trTextCache[doc.id]||'').trim()) && !doc.hadText ? '<div style="font-size:10px;color:#f59e0b;margin-top:2px;padding-left:4px;">⚠ nessun testo estratto</div>' : '')
       + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')">✕ rimuovi</button>'
       + '</div>'
@@ -32437,7 +32477,7 @@ window.trStartRenameTitle = function() {
 window.trCellEdit = function(docId, colId) {
   var r = trGetCurrent(); if(!r) return;
   var key = docId + '::' + colId;
-  var cur = r.cells[key] || '';
+  var cur = (_trCellCache[key] !== undefined) ? _trCellCache[key] : (r.cells[key] || '');
   // Find cell by iterating — safer than complex CSS attribute selectors
   var tbl = document.getElementById('trTable');
   if (!tbl) return;
@@ -32453,10 +32493,14 @@ window.trCellEdit = function(docId, colId) {
   cellEl.classList.add('editing');
   var ta = document.createElement('textarea');
   ta.value = cur;
-  ta.style.cssText = 'width:100%;min-height:80px;padding:8px 12px;border:none;outline:none;background:transparent;color:var(--txt);font:13px/1.5 "Inter",sans-serif;resize:vertical;box-sizing:border-box;';
+  ta.style.cssText = 'width:100%;min-height:80px;padding:8px 12px;border:none;outline:none;background:transparent;color:var(--txt);font:13px/1.5 "Inter",sans-serif;resize:vertical;box-sizing:border-box;overflow:hidden;';
   cellEl.innerHTML = '';
   cellEl.appendChild(ta);
+  // Auto-height to show full content — set after append so scrollHeight is accurate
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(80, ta.scrollHeight) + 'px';
   ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
   var saved = false;
   function saveCell() {
     if (saved) return; saved = true;
@@ -32565,6 +32609,166 @@ window.trColDelete = function(colId) {
   });
   trEditorRender();
 };
+
+// ── Column resize ─────────────────────────────────────────────────
+var _trResizeState = null;
+
+window.trColResizeStart = function(e, colId) {
+  var handle = e.target;
+  var th = handle.parentElement;
+  _trResizeState = { colId: colId, th: th, startX: e.clientX, startW: th.offsetWidth };
+  handle.classList.add('resizing');
+  document.addEventListener('mousemove', _trColResizeMove);
+  document.addEventListener('mouseup', _trColResizeEnd);
+};
+
+function _trColResizeMove(e) {
+  if (!_trResizeState) return;
+  var dx = e.clientX - _trResizeState.startX;
+  var newW = Math.max(80, _trResizeState.startW + dx);
+  _trResizeState.th.style.width = newW + 'px';
+  _trResizeState.th.style.minWidth = newW + 'px';
+}
+
+function _trColResizeEnd() {
+  if (!_trResizeState) return;
+  var colId = _trResizeState.colId;
+  var newW = _trResizeState.th.offsetWidth;
+  var handle = _trResizeState.th.querySelector('.tr-col-resize');
+  if (handle) handle.classList.remove('resizing');
+  document.removeEventListener('mousemove', _trColResizeMove);
+  document.removeEventListener('mouseup', _trColResizeEnd);
+  var r = trGetCurrent();
+  if (r) {
+    try {
+      var storKey = 'tr_col_widths_' + r.id;
+      var widths = JSON.parse(localStorage.getItem(storKey) || '{}');
+      widths[colId] = newW;
+      localStorage.setItem(storKey, JSON.stringify(widths));
+    } catch(_e) {}
+  }
+  _trResizeState = null;
+}
+
+// ── Document menu (AI column generator) ──────────────────────────
+var _trDocMenuPendingCols = null;
+
+window.trDocMenuOpen = function() {
+  var ov = document.getElementById('trDocMenuOverlay'); if (!ov) return;
+  var descEl = document.getElementById('trDocMenuAIDesc');
+  var conflEl = document.getElementById('trDocMenuConflicts');
+  var statusEl = document.getElementById('trDocMenuStatus');
+  var genBtn = document.getElementById('trDocMenuGenBtn');
+  if (descEl) descEl.value = '';
+  if (conflEl) conflEl.style.display = 'none';
+  if (statusEl) statusEl.textContent = '';
+  if (genBtn) { genBtn.textContent = '✦ Genera con AI'; genBtn.disabled = false; genBtn.onclick = trDocMenuAIGenerate; }
+  _trDocMenuPendingCols = null;
+  ov.classList.add('open');
+  setTimeout(function(){ if (descEl) descEl.focus(); }, 50);
+};
+
+window.trDocMenuClose = function() {
+  var ov = document.getElementById('trDocMenuOverlay'); if (ov) ov.classList.remove('open');
+};
+
+window.trDocMenuAIGenerate = async function() {
+  var descEl = document.getElementById('trDocMenuAIDesc');
+  var statusEl = document.getElementById('trDocMenuStatus');
+  var genBtn = document.getElementById('trDocMenuGenBtn');
+  var desc = (descEl ? descEl.value.trim() : '');
+  if (!desc) { if (descEl) descEl.focus(); return; }
+
+  if (genBtn) { genBtn.textContent = '⏳ Generazione…'; genBtn.disabled = true; }
+  if (statusEl) statusEl.textContent = '';
+
+  try {
+    var sys = 'Sei un esperto di analisi documentale. Genera definizioni di colonne per una tabella di analisi AI di documenti legali.';
+    var usr = 'L\'utente vuole queste colonne: "' + desc + '"\n\n'
+      + 'Rispondi con un array JSON di colonne nel formato:\n'
+      + '[{"label":"Nome colonna","format":"free_text","prompt":"Istruzione per l\'AI..."}]\n\n'
+      + 'Formati disponibili: free_text, bulleted_list, number, percentage, monetary, currency, yes_no, date, tags.\n'
+      + 'Ogni colonna deve avere: label (nome breve), format, prompt (istruzione precisa in italiano su cosa estrarre dal documento).\n'
+      + 'IMPORTANTE: Non usare tabelle markdown nei prompt. Rispondi SOLO con l\'array JSON, senza testo aggiuntivo.';
+    var cols = await callGeminiJSON(sys, [{role:'user', content: usr}], 900);
+    if (!Array.isArray(cols)) throw new Error('risposta AI non è un array');
+    var validFormats = Object.keys(TR_FORMATS);
+    cols = cols.filter(function(c){ return c && c.label && c.prompt; }).map(function(c) {
+      return {
+        label: String(c.label).trim(),
+        format: validFormats.indexOf(c.format) >= 0 ? c.format : 'free_text',
+        prompt: String(c.prompt).trim()
+      };
+    });
+    if (!cols.length) throw new Error('nessuna colonna generata');
+
+    var r = trGetCurrent();
+    var existing = r ? (r.columns || []) : [];
+    var conflicts = cols.filter(function(c) {
+      return existing.some(function(e){ return e.label.toLowerCase() === c.label.toLowerCase(); });
+    });
+
+    if (conflicts.length > 0) {
+      _trDocMenuPendingCols = cols;
+      _trDocMenuShowConflicts(conflicts);
+      if (genBtn) { genBtn.textContent = '✦ Genera con AI'; genBtn.disabled = false; }
+      return;
+    }
+    _trDocMenuApply(cols);
+  } catch(err) {
+    if (statusEl) statusEl.textContent = '⚠ ' + (err.message || err);
+    if (genBtn) { genBtn.textContent = '✦ Genera con AI'; genBtn.disabled = false; }
+  }
+};
+
+function _trDocMenuShowConflicts(conflicts) {
+  var conflEl = document.getElementById('trDocMenuConflicts');
+  var listEl = document.getElementById('trDocMenuConflictList');
+  if (!conflEl || !listEl) return;
+  var safeLabels = conflicts.map(function(c){
+    return '• ' + c.label.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  }).join('<br>');
+  listEl.innerHTML = '<div style="font-size:12px;color:var(--txt);margin-bottom:10px;line-height:1.7;">' + safeLabels + '</div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button class="tr-modal-btn ghost" style="font-size:11px;" onclick="_trDocMenuResolveAll(\'existing\')">Mantieni le esistenti</button>'
+    + '<button class="tr-modal-btn" style="font-size:11px;" onclick="_trDocMenuResolveAll(\'ai\')">Usa quelle dell\'AI</button>'
+    + '</div>';
+  conflEl.style.display = 'block';
+}
+
+window._trDocMenuResolveAll = function(choice) {
+  if (!_trDocMenuPendingCols) return;
+  var r = trGetCurrent(); if (!r) return;
+  var existing = r.columns || [];
+  var finalCols = _trDocMenuPendingCols.map(function(c) {
+    var isConflict = existing.some(function(e){ return e.label.toLowerCase() === c.label.toLowerCase(); });
+    if (isConflict && choice === 'existing') {
+      return existing.find(function(e){ return e.label.toLowerCase() === c.label.toLowerCase(); });
+    }
+    return c;
+  }).filter(Boolean);
+  _trDocMenuApply(finalCols);
+};
+
+function _trDocMenuApply(cols) {
+  var r = trGetCurrent(); if (!r) return;
+  var finalCols = cols.map(function(c, i) {
+    if (c.id) return c; // existing column — keep as-is with its id
+    return { id: 'c_' + Date.now() + '_' + i, label: c.label, format: c.format, prompt: c.prompt };
+  });
+  var finalIds = finalCols.map(function(c){ return c.id; });
+  trUpdateCurrent(function(rev) {
+    rev.columns = finalCols;
+    var nc = {};
+    Object.keys(rev.cells).forEach(function(k){
+      if (finalIds.indexOf(k.split('::')[1]) >= 0) nc[k] = rev.cells[k];
+    });
+    rev.cells = nc;
+  });
+  trDocMenuClose();
+  _trDocMenuPendingCols = null;
+  trEditorRender();
+}
 
 window.trColAutoGenerate = async function() {
   var labelEl  = document.getElementById('trColLabelInput');
