@@ -648,6 +648,9 @@ th:hover .tr-th-dots{opacity:1}
 .tr-table thead th{position:relative}
 /* Doc-menu overlay (AI column generator) */
 #trDocMenuOverlay .tr-modal{max-width:520px}
+/* Doc menu loading dots */
+.tr-doc-loading-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);animation:trDocDotPulse 1.1s ease-in-out infinite}
+@keyframes trDocDotPulse{0%,80%,100%{transform:scale(.55);opacity:.35}40%{transform:scale(1);opacity:1}}
 /* Screens that need full viewport width — break out of .wrap max-width:900px */
 .wrap.fullscreen-mode{max-width:100%!important;padding:0!important}
 .tr-member-chip{display:inline-flex;align-items:center;gap:6px;background:var(--sur2);border:1px solid var(--bdr);border-radius:20px;padding:3px 10px 3px 8px;font-size:12px;color:var(--txt);margin:4px 4px 0 0}
@@ -7798,19 +7801,32 @@ document.addEventListener('DOMContentLoaded', function() {
      TABULAR REVIEW — DOC MENU MODAL (AI column generator)
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="tr-overlay" id="trDocMenuOverlay" onclick="trDocMenuClose()">
-  <div class="tr-modal" onclick="event.stopPropagation()">
-    <div class="tr-modal-title">Genera colonne con AI</div>
-    <label class="tr-modal-label" for="trDocMenuAIDesc">Descrivi le colonne che vuoi</label>
-    <textarea class="tr-modal-input" id="trDocMenuAIDesc" style="min-height:110px;" placeholder="es. Vorrei 3 colonne: una per le parti del contratto, una per le date chiave, una per le clausole di rescissione. Le colonne devono essere in formato lista puntata."></textarea>
-    <div class="tr-modal-hint">L'AI genererà le colonne con label, formato e prompt, sostituendo quelle esistenti.</div>
-    <div id="trDocMenuConflicts" style="display:none;background:var(--sur2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--bdr);">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Colonne già esistenti con lo stesso nome</div>
-      <div id="trDocMenuConflictList"></div>
+  <div class="tr-modal" onclick="event.stopPropagation()" style="max-width:500px;">
+    <!-- Form view -->
+    <div id="trDocMenuForm">
+      <div class="tr-modal-title">Genera colonne con AI</div>
+      <label class="tr-modal-label" for="trDocMenuAIDesc">Indicazioni aggiuntive <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;">(opzionale)</span></label>
+      <textarea class="tr-modal-input" id="trDocMenuAIDesc" style="min-height:80px;" placeholder="es. Focalizzati sulle clausole contrattuali e le responsabilità delle parti. Lascia vuoto per analisi automatica completa."></textarea>
+      <div class="tr-modal-hint">L'AI legge i documenti caricati, li analizza come docente di diritto e genera almeno 10 colonne ottimali. Sostituisce le colonne esistenti.</div>
+      <div id="trDocMenuConflicts" style="display:none;background:var(--sur2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--bdr);">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Colonne già esistenti con lo stesso nome</div>
+        <div id="trDocMenuConflictList"></div>
+      </div>
+      <div id="trDocMenuStatus" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:4px;">
+        <button class="tr-modal-btn ghost" onclick="trDocMenuClose()">Annulla</button>
+        <button class="tr-modal-btn" id="trDocMenuGenBtn" onclick="trDocMenuAIGenerate()">✦ Analizza e genera</button>
+      </div>
     </div>
-    <div id="trDocMenuStatus" style="font-size:12px;color:var(--muted);min-height:16px;margin-bottom:8px;"></div>
-    <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:4px;">
-      <button class="tr-modal-btn ghost" onclick="trDocMenuClose()">Annulla</button>
-      <button class="tr-modal-btn" id="trDocMenuGenBtn" onclick="trDocMenuAIGenerate()">✦ Genera con AI</button>
+    <!-- Loading view (hidden by default) -->
+    <div id="trDocMenuLoading" style="display:none;padding:8px 0 4px;text-align:center;">
+      <div style="display:flex;justify-content:center;align-items:center;gap:5px;margin-bottom:20px;">
+        <span class="tr-doc-loading-dot"></span>
+        <span class="tr-doc-loading-dot" style="animation-delay:.18s"></span>
+        <span class="tr-doc-loading-dot" style="animation-delay:.36s"></span>
+      </div>
+      <div id="trDocMenuLoadingMsg" style="font-size:12.5px;color:var(--muted);line-height:1.6;min-height:40px;transition:opacity .3s;font-family:'Inter',sans-serif;"></div>
+      <div style="margin-top:20px;font-size:10.5px;color:var(--muted);opacity:.45;letter-spacing:.04em;">Analisi in corso — potrebbe richiedere alcuni secondi</div>
     </div>
   </div>
 </div>
@@ -32671,52 +32687,113 @@ var _trDocMenuPendingCols = null;
 
 window.trDocMenuOpen = function() {
   var ov = document.getElementById('trDocMenuOverlay'); if (!ov) return;
-  var descEl = document.getElementById('trDocMenuAIDesc');
-  var conflEl = document.getElementById('trDocMenuConflicts');
+  var descEl   = document.getElementById('trDocMenuAIDesc');
+  var conflEl  = document.getElementById('trDocMenuConflicts');
   var statusEl = document.getElementById('trDocMenuStatus');
-  var genBtn = document.getElementById('trDocMenuGenBtn');
-  if (descEl) descEl.value = '';
+  if (descEl)  descEl.value = '';
   if (conflEl) conflEl.style.display = 'none';
   if (statusEl) statusEl.textContent = '';
-  if (genBtn) { genBtn.textContent = '✦ Genera con AI'; genBtn.disabled = false; genBtn.onclick = trDocMenuAIGenerate; }
+  _trDocMenuHideLoading();
   _trDocMenuPendingCols = null;
   ov.classList.add('open');
   setTimeout(function(){ if (descEl) descEl.focus(); }, 50);
 };
 
 window.trDocMenuClose = function() {
+  _trDocMenuHideLoading();
   var ov = document.getElementById('trDocMenuOverlay'); if (ov) ov.classList.remove('open');
 };
 
-window.trDocMenuAIGenerate = async function() {
-  var descEl = document.getElementById('trDocMenuAIDesc');
-  var statusEl = document.getElementById('trDocMenuStatus');
-  var genBtn = document.getElementById('trDocMenuGenBtn');
-  var desc = (descEl ? descEl.value.trim() : '');
-  if (!desc) { if (descEl) descEl.focus(); return; }
+var _trDocMenuLoadingTimer = null;
 
-  if (genBtn) { genBtn.textContent = '⏳ Generazione…'; genBtn.disabled = true; }
-  if (statusEl) statusEl.textContent = '';
+function _trDocMenuShowLoading() {
+  var formEl    = document.getElementById('trDocMenuForm');
+  var loadingEl = document.getElementById('trDocMenuLoading');
+  var msgEl     = document.getElementById('trDocMenuLoadingMsg');
+  if (formEl)    formEl.style.display    = 'none';
+  if (loadingEl) loadingEl.style.display = 'block';
+
+  var msgs = [
+    'Lettura del documento in corso…',
+    'Identificazione delle aree tematiche…',
+    'Analisi della struttura normativa…',
+    'Valutazione delle sfaccettature giuridiche…',
+    'Individuazione dei profili di rischio…',
+    'Analisi dei soggetti e delle responsabilità…',
+    'Mappatura degli obblighi e dei diritti…',
+    'Definizione delle colonne più rilevanti…',
+    'Calibrazione dei prompt analitici…',
+    'Elaborazione finale in corso…'
+  ];
+  var idx = 0;
+  if (msgEl) msgEl.textContent = msgs[0];
+  _trDocMenuLoadingTimer = setInterval(function() {
+    idx = (idx + 1) % msgs.length;
+    if (msgEl) {
+      msgEl.style.opacity = '0';
+      setTimeout(function() {
+        if (msgEl) { msgEl.textContent = msgs[idx]; msgEl.style.opacity = '1'; }
+      }, 200);
+    }
+  }, 2200);
+}
+
+function _trDocMenuHideLoading() {
+  if (_trDocMenuLoadingTimer) { clearInterval(_trDocMenuLoadingTimer); _trDocMenuLoadingTimer = null; }
+  var formEl    = document.getElementById('trDocMenuForm');
+  var loadingEl = document.getElementById('trDocMenuLoading');
+  if (formEl)    formEl.style.display    = 'block';
+  if (loadingEl) loadingEl.style.display = 'none';
+}
+
+window.trDocMenuAIGenerate = async function() {
+  var descEl   = document.getElementById('trDocMenuAIDesc');
+  var statusEl = document.getElementById('trDocMenuStatus');
+  var desc = descEl ? descEl.value.trim() : '';
+
+  // Collect document texts from the current review
+  var r = trGetCurrent();
+  var docs = r ? (r.docs || []) : [];
+  var docSnippets = docs.map(function(doc) {
+    var text = (_trTextCache[doc.id] || doc.text || '').trim();
+    if (!text) return null;
+    return '=== ' + doc.name + ' ===\n' + text.substring(0, 4000);
+  }).filter(Boolean);
+
+  if (!docSnippets.length) {
+    if (statusEl) statusEl.textContent = '⚠ Nessun testo estratto dai documenti. Carica prima i documenti.';
+    return;
+  }
+
+  // Show loading
+  _trDocMenuShowLoading();
 
   try {
-    var sys = 'Sei un esperto di analisi documentale. Genera definizioni di colonne per una tabella di analisi AI di documenti legali.';
-    var usr = 'L\'utente vuole queste colonne: "' + desc + '"\n\n'
-      + 'Rispondi con un array JSON di colonne nel formato:\n'
-      + '[{"label":"Nome colonna","format":"free_text","prompt":"Istruzione per l\'AI..."}]\n\n'
-      + 'Formati disponibili: free_text, bulleted_list, number, percentage, monetary, currency, yes_no, date, tags.\n'
-      + 'Ogni colonna deve avere: label (nome breve), format, prompt (istruzione precisa in italiano su cosa estrarre dal documento).\n'
-      + 'IMPORTANTE: Non usare tabelle markdown nei prompt. Rispondi SOLO con l\'array JSON, senza testo aggiuntivo.';
-    var rawJson = await callGeminiJSON(sys, [{role:'user', content: usr}], 900);
-    // callGeminiJSON returns raw text (string), not parsed — parse manually
+    var docContext = docSnippets.join('\n\n').substring(0, 14000);
+
+    var sys = `Sei un docente universitario di diritto italiano con specializzazione in analisi documentale giuridica e accademica.
+Il tuo compito è leggere attentamente il contenuto dei documenti forniti, comprenderne la natura giuridica, le sfaccettature normative, i soggetti coinvolti, gli obblighi, i diritti, le responsabilità, le clausole rilevanti e qualsiasi altro profilo di interesse analitico.
+Devi generare ALMENO 10 colonne analitiche ottimali per una tabella di revisione multi-documento, pensate per uno studioso o professionista del diritto.
+Ogni colonna deve essere genuinamente utile, specifica al tipo di documento analizzato, e non generica.
+Formati disponibili: free_text, bulleted_list, number, percentage, monetary, currency, yes_no, date, tags.
+Rispondi ESCLUSIVAMENTE con un array JSON nel formato: [{"label":"...","format":"...","prompt":"..."}]
+Il prompt di ogni colonna deve essere un'istruzione precisa in italiano per un'AI che analizzerà il documento.
+Non aggiungere testo prima o dopo il JSON. Non usare markdown o backtick.`;
+
+    var usr = 'DOCUMENTI DA ANALIZZARE:\n\n' + docContext
+      + (desc ? '\n\nINDICAZIONI AGGIUNTIVE DELL\'UTENTE: ' + desc : '')
+      + '\n\nAnalizza il contenuto e genera ALMENO 10 colonne analitiche ottimali per questi documenti.';
+
+    var rawJson = await callGeminiJSON(sys, [{role:'user', content: usr}], 2500);
+
     var cols;
     try {
-      var _clean = (rawJson||'').replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/i,'').trim();
-      // Extract first JSON array from the response
-      var _arrStart = _clean.indexOf('[');
-      var _arrEnd   = _clean.lastIndexOf(']');
-      if (_arrStart >= 0 && _arrEnd > _arrStart) _clean = _clean.slice(_arrStart, _arrEnd + 1);
+      var _clean = (rawJson || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/i,'').trim();
+      var _s = _clean.indexOf('['), _e = _clean.lastIndexOf(']');
+      if (_s >= 0 && _e > _s) _clean = _clean.slice(_s, _e + 1);
       cols = JSON.parse(_clean);
-    } catch(_pe) { throw new Error('JSON non valido dalla risposta AI: ' + _pe.message); }
+    } catch(_pe) { throw new Error('JSON non valido: ' + _pe.message); }
+
     if (!Array.isArray(cols)) throw new Error('risposta AI non è un array');
     var validFormats = Object.keys(TR_FORMATS);
     cols = cols.filter(function(c){ return c && c.label && c.prompt; }).map(function(c) {
@@ -32728,7 +32805,8 @@ window.trDocMenuAIGenerate = async function() {
     });
     if (!cols.length) throw new Error('nessuna colonna generata');
 
-    var r = trGetCurrent();
+    _trDocMenuHideLoading();
+
     var existing = r ? (r.columns || []) : [];
     var conflicts = cols.filter(function(c) {
       return existing.some(function(e){ return e.label.toLowerCase() === c.label.toLowerCase(); });
@@ -32737,13 +32815,13 @@ window.trDocMenuAIGenerate = async function() {
     if (conflicts.length > 0) {
       _trDocMenuPendingCols = cols;
       _trDocMenuShowConflicts(conflicts);
-      if (genBtn) { genBtn.textContent = '✦ Genera con AI'; genBtn.disabled = false; }
       return;
     }
     _trDocMenuApply(cols);
+
   } catch(err) {
+    _trDocMenuHideLoading();
     if (statusEl) statusEl.textContent = '⚠ ' + (err.message || err);
-    if (genBtn) { genBtn.textContent = '✦ Genera con AI'; genBtn.disabled = false; }
   }
 };
 
