@@ -32704,7 +32704,17 @@ window.trDocMenuAIGenerate = async function() {
       + 'Formati disponibili: free_text, bulleted_list, number, percentage, monetary, currency, yes_no, date, tags.\n'
       + 'Ogni colonna deve avere: label (nome breve), format, prompt (istruzione precisa in italiano su cosa estrarre dal documento).\n'
       + 'IMPORTANTE: Non usare tabelle markdown nei prompt. Rispondi SOLO con l\'array JSON, senza testo aggiuntivo.';
-    var cols = await callGeminiJSON(sys, [{role:'user', content: usr}], 900);
+    var rawJson = await callGeminiJSON(sys, [{role:'user', content: usr}], 900);
+    // callGeminiJSON returns raw text (string), not parsed — parse manually
+    var cols;
+    try {
+      var _clean = (rawJson||'').replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/i,'').trim();
+      // Extract first JSON array from the response
+      var _arrStart = _clean.indexOf('[');
+      var _arrEnd   = _clean.lastIndexOf(']');
+      if (_arrStart >= 0 && _arrEnd > _arrStart) _clean = _clean.slice(_arrStart, _arrEnd + 1);
+      cols = JSON.parse(_clean);
+    } catch(_pe) { throw new Error('JSON non valido dalla risposta AI: ' + _pe.message); }
     if (!Array.isArray(cols)) throw new Error('risposta AI non è un array');
     var validFormats = Object.keys(TR_FORMATS);
     cols = cols.filter(function(c){ return c && c.label && c.prompt; }).map(function(c) {
