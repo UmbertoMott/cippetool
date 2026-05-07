@@ -32211,8 +32211,21 @@ window.trPickerNew = function() {
 };
 
 window.trPickerOpen = function(id) {
-  _trPurgeDocText(); // libera quota prima di aprire
+  _trPurgeDocText();
   _trCurrentId = id;
+  _trCellCache = {}; // reset cache in-memoria per la nuova sessione
+  // Pulisce celle bloccate su ⏳ da run precedenti non completati
+  try {
+    var _all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
+    var _rev = _all.find(function(x){ return x.id === id; });
+    if (_rev && _rev.cells) {
+      var changed = false;
+      Object.keys(_rev.cells).forEach(function(k) {
+        if (_rev.cells[k] === '⏳') { delete _rev.cells[k]; changed = true; }
+      });
+      if (changed) localStorage.setItem(TR_KEY, JSON.stringify(_all));
+    }
+  } catch(_e) {}
   if (typeof showScreen === 'function') showScreen('screenTabularEditor');
   trEditorRender();
 };
@@ -32288,7 +32301,7 @@ function trRenderTable(r) {
       + '<div class="tr-file-badge '+fi.cls+'" style="flex-shrink:0;">'+fi.label+'</div>'
       + '<div style="min-width:0;flex:1;">'
       + '<div class="tr-doc-name" onclick="trDocRename(\''+docIdEsc+'\')" title="Clicca per rinominare" style="font-size:12px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 4px;border-radius:5px;transition:background .12s;" onmouseover="this.style.background=\'var(--sur2)\'" onmouseout="this.style.background=\'\'">'+esc+'</div>'
-      + (!((doc.text||'').trim() || (_trTextCache[doc.id]||'').trim()) ? '<div style="font-size:10px;color:#f59e0b;margin-top:2px;padding-left:4px;">⚠ nessun testo estratto</div>' : '')
+      + (!((doc.text||'').trim() || (_trTextCache[doc.id]||'').trim()) && !doc.hadText ? '<div style="font-size:10px;color:#f59e0b;margin-top:2px;padding-left:4px;">⚠ nessun testo estratto</div>' : '')
       + '<button class="tr-doc-del" onclick="trDocDelete(\''+docIdEsc+'\')">✕ rimuovi</button>'
       + '</div>'
       + '</div>'
@@ -32509,18 +32522,16 @@ window.trDocInputChange = async function(ev) {
     try { text = await trExtractText(f); } catch(e) { console.warn('[TR] extract err', e); }
     _trExtractingCount--;
     var chars = (text||'').trim().length;
-    // Testo estratto → solo in cache in-memoria (NON in localStorage: causa QuotaExceededError)
     if (chars > 0) _trTextCache[docId] = text;
-    // In localStorage salviamo solo doc.text = '' per non eccedere il quota (5MB)
-    // La cache in-memoria basta per il Run della sessione corrente
+    // In localStorage salva solo il flag hadText (piccolo) — testo non salvato per quota
     try {
       var _all = JSON.parse(localStorage.getItem(TR_KEY) || '[]');
       var _rev = _all.find(function(x){ return x.id === _trCurrentId; });
       if (_rev) {
         var _doc = (_rev.docs||[]).find(function(x){ return x.id === docId; });
-        if (_doc) { _doc.text = ''; localStorage.setItem(TR_KEY, JSON.stringify(_all)); }
+        if (_doc) { _doc.text = ''; if (chars > 0) _doc.hadText = true; localStorage.setItem(TR_KEY, JSON.stringify(_all)); }
       }
-    } catch(saveErr) { /* ignora — _trTextCache è sufficiente */ }
+    } catch(saveErr) { if (chars > 0) { try { _trTextCache[docId] = text; } catch(_e){} } }
     trEditorRender();
     if (chars > 0) {
       if(status) status.textContent = '✓ ' + chars + ' caratteri estratti da ' + docName;
@@ -32704,12 +32715,12 @@ window.trEditorRun = async function() {
     alert('Estrazione testo ancora in corso. Attendi qualche secondo e riprova.');
     return;
   }
-  var docsWithoutText = r.docs.filter(function(d){ return !((d.text||'').trim() || (_trTextCache[d.id]||'').trim()); });
+  // Doc senza testo = nessun testo in cache E nessun flag hadText (testo estratto in sessione precedente)
+  var docsWithoutText = r.docs.filter(function(d){ return !((d.text||'').trim() || (_trTextCache[d.id]||'').trim()) && !d.hadText; });
   if (docsWithoutText.length === r.docs.length) {
     alert('Nessun testo estratto dai documenti. Rimuovi il documento e ricaricalo.');
     return;
   }
-  // Warn about docs without text but proceed
   if (docsWithoutText.length > 0) {
     var names = docsWithoutText.map(function(d){ return d.name; }).join(', ');
     var ok = confirm('Attenzione: ' + docsWithoutText.length + ' documento/i senza testo estratto (' + names + '). Le celle relative saranno saltate. Continuare?');
@@ -32780,8 +32791,14 @@ window.trEditorRun = async function() {
     var key = item.key;
     try {
       var docText = (item.doc.text||'').trim() || (_trTextCache[item.doc.id]||'').trim();
-      if (!docText) {
-        _trSaveCell(key, '[testo non disponibile]');
+      if (!docText && !item.doc.hadText) {
+        _trSaveCell(key, '[testo non disponibile — ricarica il file]');
+        errors++;
+        return;
+      }
+      if (!docText && item.doc.hadText) {
+        // Sessione ripresa: testo non in cache, ma esisteva → chiedi di ricaricare
+        _trSaveCell(key, '[ricarica il file per rielaborare]');
         errors++;
         return;
       }
