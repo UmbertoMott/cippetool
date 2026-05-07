@@ -644,8 +644,8 @@ th:hover .tr-th-dots{opacity:1}
 .tr-table thead th{position:relative}
 /* Doc-menu overlay (AI column generator) */
 #trDocMenuOverlay .tr-modal{max-width:520px}
-/* TR editor — break out of .wrap max-width:900px */
-.wrap.tr-fullscreen{max-width:100%!important;padding:0!important}
+/* Screens that need full viewport width — break out of .wrap max-width:900px */
+.wrap.fullscreen-mode{max-width:100%!important;padding:0!important}
 .tr-member-chip{display:inline-flex;align-items:center;gap:6px;background:var(--sur2);border:1px solid var(--bdr);border-radius:20px;padding:3px 10px 3px 8px;font-size:12px;color:var(--txt);margin:4px 4px 0 0}
 .tr-member-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;padding:0}
 .tr-member-chip button:hover{color:#ef4444}
@@ -10007,9 +10007,10 @@ function showScreen(id, _skipHistory) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   var el = document.getElementById(id);
   if (el) el.classList.add('active');
-  // TR editor needs full viewport width — break out of .wrap max-width
+  // Some screens need full viewport width — break out of .wrap max-width:900px
+  var _fullscreenScreens = ['screenLanding', 'screenTabularEditor'];
   var wrapEl = document.querySelector('.wrap');
-  if (wrapEl) wrapEl.classList.toggle('tr-fullscreen', id === 'screenTabularEditor');
+  if (wrapEl) wrapEl.classList.toggle('fullscreen-mode', _fullscreenScreens.indexOf(id) >= 0);
 }
 
 function goBack() {
