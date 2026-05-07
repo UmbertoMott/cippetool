@@ -4331,10 +4331,150 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 #lrlSection{display:none;animation:lrlFadeIn .3s ease}
 @keyframes lrlFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── LRL MAIN LAYOUT ── */
-/* ═══ LEGAL LEARNING SAAS V.CORE ═══ */
-#screenLRL{padding:0;display:none;flex-direction:column}
-#screenLRL.active{display:flex;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50;flex-direction:column;background:#0d0d14}
+/* ── RESEARCH LAB ──────────────────────────────────────────── */
+#screenLRL{padding:0;display:none}
+#screenLRL.active{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50}
+/* Dashboard */
+.rl-dash{display:flex;flex-direction:column;height:100vh;background:var(--bg);overflow-y:auto}
+.rl-dash-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:0.5px solid var(--bdr);background:var(--sur)}
+.rl-dash-body{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:40px 24px}
+.rl-dash-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px}
+.rl-dash-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--txt)}
+.rl-dash-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.rl-btn-new-prj{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:9px 18px;font:600 13px 'Inter',sans-serif;cursor:pointer;transition:opacity .15s}
+.rl-btn-new-prj:hover{opacity:.82}
+.rl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.rl-card{background:var(--sur);border:0.5px solid var(--bdr);border-radius:12px;padding:20px;cursor:pointer;transition:box-shadow .18s,border-color .18s;display:flex;flex-direction:column;gap:6px}
+.rl-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.10);border-color:rgba(0,0,0,.18)}
+.rl-card-name{font-size:14px;font-weight:700;color:var(--txt)}
+.rl-card-date{font-size:11px;color:var(--muted)}
+.rl-card-meta{display:flex;align-items:center;gap:8px;margin-top:8px}
+.rl-card-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;display:flex;align-items:center;gap:4px}
+.rl-card-badge.shared{background:rgba(44,122,123,.12);color:#2C7A7B;border:0.5px solid rgba(44,122,123,.3)}
+.rl-card-badge.private{background:var(--sur2);color:var(--muted);border:0.5px solid var(--bdr)}
+.rl-card-docs{font-size:11px;color:var(--muted);margin-left:auto}
+.rl-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:12px;text-align:center}
+.rl-empty-icon{font-size:40px;margin-bottom:4px}
+.rl-empty-title{font-size:16px;font-weight:700;color:var(--txt)}
+.rl-empty-sub{font-size:13px;color:var(--muted)}
+/* Workspace 3-pane */
+.rl-workspace{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
+.rl-sidebar{width:240px;flex-shrink:0;background:var(--sur);border-right:0.5px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.rl-sb-hdr{padding:14px 14px 10px;border-bottom:0.5px solid var(--bdr);flex-shrink:0}
+.rl-sb-back{background:none;border:none;color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;padding:0;letter-spacing:.3px}
+.rl-sb-back:hover{color:var(--txt)}
+.rl-sb-prj{font-size:13px;font-weight:700;color:var(--txt);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rl-sb-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px;cursor:pointer;transition:all .15s}
+.rl-sb-badge.shared{background:rgba(44,122,123,.12);color:#2C7A7B;border:0.5px solid rgba(44,122,123,.3)}
+.rl-sb-badge.private{background:var(--sur2);color:var(--muted);border:0.5px solid var(--bdr)}
+.rl-sb-section{font-size:9.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);padding:12px 14px 4px;flex-shrink:0}
+.rl-sb-docs{flex:0 0 auto;max-height:180px;overflow-y:auto;padding:0 8px}
+.rl-sb-doc{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--txt);transition:background .13s}
+.rl-sb-doc:hover{background:var(--sur2)}
+.rl-sb-doc.active{background:var(--sur2);font-weight:600}
+.rl-sb-doc-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
+.rl-sb-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:0 2px;opacity:0;transition:opacity .13s;line-height:1}
+.rl-sb-doc:hover .rl-sb-doc-del{opacity:1}
+.rl-sb-upload{margin:8px;border:0.5px dashed var(--bdr);border-radius:8px;padding:9px;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s}
+.rl-sb-upload:hover{border-color:var(--acc);background:var(--sur2);color:var(--txt)}
+.rl-sb-chats{flex:1;overflow-y:auto;padding:0 8px;min-height:40px}
+.rl-sb-chat{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--muted);transition:background .13s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rl-sb-chat:hover{background:var(--sur2);color:var(--txt)}
+.rl-sb-chat.active{background:var(--sur2);color:var(--txt);font-weight:600}
+.rl-sb-new-chat{margin:8px;background:none;border:0.5px solid var(--bdr);border-radius:7px;padding:8px;font:600 11px 'Inter',sans-serif;color:var(--muted);cursor:pointer;width:calc(100% - 16px);transition:all .13s}
+.rl-sb-new-chat:hover{border-color:var(--acc);color:var(--txt)}
+/* Chat pane */
+.rl-chat-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.rl-chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--bdr);background:var(--sur);flex-shrink:0;gap:12px}
+.rl-chat-hdr-title{font-size:13px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.rl-dt-wrap{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.rl-dt-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+.rl-dt-toggle{width:34px;height:19px;border-radius:10px;background:var(--sur2);border:0.5px solid var(--bdr);cursor:pointer;position:relative;transition:background .2s,border-color .2s;flex-shrink:0}
+.rl-dt-toggle.on{background:#ECC94B;border-color:#d4ad30}
+.rl-dt-knob{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.rl-dt-toggle.on .rl-dt-knob{transform:translateX(15px)}
+.rl-chat-pane.dt-on .rl-chat-hdr{border-bottom-color:#ECC94B}
+.rl-chat-pane.dt-on .rl-input-box{border-color:#ECC94B!important}
+/* Messages */
+.rl-msgs{flex:1;overflow-y:auto;padding:20px 18px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.rl-msg{max-width:84%;display:flex;flex-direction:column;gap:6px}
+.rl-msg.user{align-self:flex-end;align-items:flex-end}
+.rl-msg.ai{align-self:flex-start;align-items:flex-start}
+.rl-msg-bubble{padding:11px 15px;border-radius:14px;font-size:13px;line-height:1.65;color:var(--txt)}
+.rl-msg.user .rl-msg-bubble{background:var(--acc);color:#fff;border-bottom-right-radius:4px}
+.rl-msg.ai .rl-msg-bubble{background:var(--sur);border:0.5px solid var(--bdr);border-bottom-left-radius:4px;border-left:2.5px solid #2C7A7B}
+.rl-msg.ai.dt-msg .rl-msg-bubble{border-left-color:#ECC94B}
+.rl-cit{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:4px;background:rgba(44,122,123,.15);color:#2C7A7B;font-size:9.5px;font-weight:800;cursor:pointer;transition:background .13s;vertical-align:super;margin:0 1px;line-height:1}
+.rl-cit:hover{background:rgba(44,122,123,.3)}
+.rl-sources{display:flex;flex-direction:column;gap:6px;margin-top:4px;max-width:460px;width:100%}
+.rl-src{background:var(--sur);border:0.5px solid var(--bdr);border-radius:9px;padding:10px 12px;cursor:pointer;transition:border-color .15s}
+.rl-src:hover{border-color:rgba(44,122,123,.4)}
+.rl-src-num{font-size:9.5px;font-weight:800;color:#2C7A7B;text-transform:uppercase;letter-spacing:.5px}
+.rl-src-title{font-size:12px;font-weight:600;color:var(--txt);margin:2px 0}
+.rl-src-snip{font-size:11px;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rl-src-rel{display:flex;align-items:center;gap:7px;margin-top:7px}
+.rl-src-rel-bar{height:3px;border-radius:2px;background:var(--sur2);flex:1}
+.rl-src-rel-fill{height:100%;border-radius:2px;background:#2C7A7B}
+.rl-src-rel-pct{font-size:10px;font-weight:700;color:#2C7A7B;flex-shrink:0}
+/* Thinking/loading states */
+.rl-thinking{display:flex;align-items:center;gap:10px;padding:12px 15px;border-radius:12px;background:var(--sur);border:0.5px solid var(--bdr);border-left:2.5px solid #ECC94B;font-size:12px;color:var(--muted);align-self:flex-start}
+.rl-thinking-dots{display:flex;gap:4px}
+.rl-thinking-dots span{width:5px;height:5px;border-radius:50%;background:#ECC94B;animation:rlDot 1.2s ease-in-out infinite}
+.rl-thinking-dots span:nth-child(2){animation-delay:.2s}
+.rl-thinking-dots span:nth-child(3){animation-delay:.4s}
+@keyframes rlDot{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
+/* Research steps */
+.rl-steps{background:var(--sur);border:0.5px solid var(--bdr);border-radius:12px;padding:14px 16px;align-self:flex-start;min-width:300px}
+.rl-steps-lbl{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.rl-step{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12px;color:var(--muted);border-bottom:0.5px solid var(--bdr)}
+.rl-step:last-child{border-bottom:none}
+.rl-step.done{color:var(--txt)}
+.rl-step.running{color:var(--txt);font-weight:600}
+.rl-step-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.rl-step.done .rl-step-ico{background:#2C7A7B;color:#fff}
+.rl-step.running .rl-step-ico{border:1.5px solid #ECC94B}
+.rl-step.pending .rl-step-ico{background:var(--sur2)}
+.rl-step-spinner{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--sur2);border-top-color:#ECC94B;animation:rlSpin .7s linear infinite}
+@keyframes rlSpin{to{transform:rotate(360deg)}}
+/* Input area */
+.rl-input-area{flex-shrink:0;padding:12px 14px;border-top:0.5px solid var(--bdr);background:var(--sur)}
+.rl-ctx-docs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;min-height:0}
+.rl-ctx-pill{display:flex;align-items:center;gap:5px;background:var(--sur2);border:0.5px solid var(--bdr);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--txt)}
+.rl-ctx-pill button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0;line-height:1}
+.rl-input-box{display:flex;align-items:center;gap:7px;background:var(--bg);border:0.5px solid var(--bdr);border-radius:12px;padding:7px 9px;transition:border-color .15s}
+.rl-input-box:focus-within{border-color:var(--acc)}
+.rl-attach{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;transition:color .13s}
+.rl-attach:hover{color:var(--txt)}
+.rl-input{flex:1;background:none;border:none;outline:none;font:14px 'Inter',sans-serif;color:var(--txt);resize:none;max-height:120px;line-height:1.5}
+.rl-input::placeholder{color:var(--muted)}
+.rl-send-grp{display:flex;gap:4px;align-items:center}
+.rl-research-btn{width:30px;height:30px;border-radius:7px;border:0.5px solid var(--bdr);background:var(--sur2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s}
+.rl-research-btn:hover{border-color:#2C7A7B;color:#2C7A7B;background:rgba(44,122,123,.08)}
+.rl-send-btn{width:30px;height:30px;border-radius:7px;border:none;background:var(--acc);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .13s}
+.rl-send-btn:hover{opacity:.84}
+.rl-send-btn:disabled{opacity:.35;cursor:not-allowed}
+.rl-input-hint{font-size:10px;color:var(--muted);margin-top:6px;text-align:center;letter-spacing:.1px}
+/* Viewer */
+.rl-viewer{width:340px;flex-shrink:0;border-left:0.5px solid var(--bdr);background:var(--sur);display:flex;flex-direction:column;overflow:hidden}
+.rl-viewer-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center;padding:24px}
+.rl-viewer-doc{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.rl-viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:0.5px solid var(--bdr);flex-shrink:0;gap:8px}
+.rl-viewer-name{font-size:12px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.rl-vbtn{background:none;border:0.5px solid var(--bdr);border-radius:5px;width:24px;height:24px;cursor:pointer;color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .13s}
+.rl-vbtn:hover{border-color:var(--acc);color:var(--txt)}
+.rl-viewer-content{flex:1;overflow-y:auto;padding:16px;font-size:12.5px;line-height:1.8;color:var(--txt);white-space:pre-wrap;font-family:'Inter',sans-serif;word-break:break-word}
+.rl-viewer-content mark{background:#FEF08A;color:#1a1200;border-radius:2px;padding:1px 2px}
+/* Misc */
+.rl-nav-back{background:none;border:none;color:var(--muted);font:600 12px 'Inter',sans-serif;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color .13s}
+.rl-nav-back:hover{color:var(--txt)}
+.rl-chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;text-align:center;padding:20px;background:var(--bg)}
+.rl-chat-empty-icon{font-size:32px;margin-bottom:4px}
+.rl-chat-empty-title{font-size:15px;font-weight:700;color:var(--txt)}
+.rl-chat-empty-sub{font-size:12px;color:var(--muted);max-width:300px;line-height:1.5}
+.rl-suggestions{display:flex;flex-direction:column;gap:7px;margin-top:18px;width:100%;max-width:380px}
+.rl-sugg{background:var(--sur);border:0.5px solid var(--bdr);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--txt);cursor:pointer;text-align:left;transition:border-color .13s;font-family:'Inter',sans-serif}
+.rl-sugg:hover{border-color:rgba(44,122,123,.4)}
+/* LRL MAIN LAYOUT — legacy override */
 /* Top bar */
 .llc-topbar{display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(15,15,25,.95);flex-shrink:0;height:46px;backdrop-filter:blur(8px)}
 .llc-topbar-brand{font-size:13px;font-weight:800;color:#a78bfa;letter-spacing:.3px;display:flex;align-items:center;gap:7px}
@@ -8244,557 +8384,117 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ═══ LEGAL LEARNING SAAS V.CORE ═══ -->
 <div class="screen" id="screenLRL" style="padding:0">
 
-  <!-- TOP BAR -->
-  <div class="llc-topbar">
-    <button onclick="lrlGoMode('choice')" class="llc-btn" style="flex-shrink:0;font-size:11px">&larr; Back</button>
-    <div style="width:1px;height:22px;background:rgba(255,255,255,.08);margin:0 4px"></div>
-    <div class="llc-topbar-brand">&#x2696;&#xFE0F; Legal Learning Lab <span class="llc-topbar-sub">V.Core</span></div>
-    <div class="llc-topbar-domains" style="font-size:10px;color:rgba(167,139,250,.3);margin-left:2px">GDPR &middot; EDPB &middot; CJEU &middot; AI Act</div>
-    <div style="flex:1"></div>
-    <button id="themeToggleBtnLRL" onclick="toggleTheme()" title="Cambia tema" style="
-      background:none;border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.75);
-      width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:13px;
-      display:flex;align-items:center;justify-content:center;
-      transition:all .2s;flex-shrink:0;">☀️</button>
-    <button onclick="llcCmdKOpen()" class="llc-btn" style="font-size:11px;display:flex;align-items:center;gap:5px">
-      &#x1F50D; <span style="opacity:.55;font-size:10px">&#x2318;K</span>
-    </button>
-    <button id="llcDeepWorkBtn" onclick="llcToggleDeepWork()" class="llc-btn" title="Deep Work &#x2014; collassa le colonne laterali">&#x1F3AF; Deep Work</button>
-    <button id="llcHlToggleBtn" onclick="llcToggleHighlights()" class="llc-btn active">&#x2728; Highlights ON</button>
-    <button onclick="llcGlobalChatToggle()" class="llc-btn" style="color:#22d3ee;border-color:rgba(6,182,212,.3)">&#x1F4AC; Chat</button>
-  </div>
-
-  <!-- 3-COLUMN ROOT -->
-  <div class="llc-root" id="llcRoot">
-
-    <!-- &#x2550;&#x2550;&#x2550; COLUMN A &#x2014; THE BRAIN &#x2550;&#x2550;&#x2550; -->
-    <!-- ═══ COLUMN A — THE BRAIN ═══ -->
-    <div class="llc-col-a" id="llcColA">
-      <div class="llc-col-resize-handle" id="llcColAResizeHandle" style="right:0" title="Trascina per ridimensionare"></div>
-      <div class="llc-col-hdr" onclick="llcToggleCol('a')" title="Comprimi/Espandi">
-        <span class="llc-col-title">Lo Scheletro Cognitivo</span>
-        <span class="llc-col-sub" style="margin-left:auto;font-size:10px;color:rgba(167,139,250,.35)">Nav &amp; Context</span>
-        <span id="llcColAChev" style="font-size:10px;color:rgba(167,139,250,.35);flex-shrink:0;margin-left:4px">&#9664;</span>
-      </div>
-
-      <div class="llc-col-a-content" id="llcColAContent">
-
-        <!-- SECTION 0: Chat per Documento (storico persistente) -->
-        <div class="llc-section">
-          <div class="llc-section-hdr" onclick="llcToggleSec('chathist',event)">
-            <span class="llc-section-icon">💬</span>
-            <span class="llc-section-title">Chat per Documento</span>
-            <span class="llc-section-badge" id="llcPanelHistBadge">—</span>
-            <span class="llc-section-chevron" id="llcSecChev-chathist">&#9654;</span>
-          </div>
-          <div class="llc-section-body collapsed" id="llcSecBody-chathist">
-            <div style="padding:4px 4px 2px;display:flex;justify-content:flex-end">
-              <button onclick="_llcSessionClearAll()" title="Cancella tutte le chat" style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);border-radius:4px;padding:2px 7px;font-size:9px;cursor:pointer">🗑 Cancella tutto</button>
-            </div>
-            <div id="llcPanelHistList" style="padding:4px 4px 6px;display:flex;flex-direction:column;gap:3px;max-height:260px;overflow-y:auto">
-              <div class="llc-phi-empty">Nessuna chat salvata</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 1: Mappa Concettuale D3 -->
-        <div class="llc-section">
-          <div class="llc-section-hdr" onclick="llcToggleSec('graph',event)">
-            <span class="llc-section-icon">&#x1F578;</span>
-            <span class="llc-section-title">Mappa Concettuale</span>
-            <span class="llc-section-badge" id="llcGraphBadge">0 nodi</span>
-            <button class="llc-graph-expand-btn" onclick="llcExpandGraph(event)" title="Espandi mappa">&#x26F6;</button>
-            <span class="llc-section-chevron" id="llcSecChev-graph">&#9660;</span>
-          </div>
-          <div class="llc-section-body" id="llcSecBody-graph">
-            <div class="llc-sec-graph-inner">
-              <div class="llc-graph-status" id="llcGraphStatus">Apri un documento per costruire la mappa concettuale</div>
-              <svg id="llcGraph" style="width:100%;flex:1"></svg>
-              <!-- Legend -->
-              <div class="llc-graph-legend" id="llcGraphLegend" style="display:none">
-                <span class="llc-graph-legend-item"><span class="llc-graph-legend-dot" style="background:#818cf8"></span>Articolo</span>
-                <span class="llc-graph-legend-item"><span class="llc-graph-legend-dot" style="background:#34d399"></span>Concetto</span>
-                <span class="llc-graph-legend-item"><span class="llc-graph-legend-dot" style="background:#f472b6"></span>Soggetto</span>
-                <span class="llc-graph-legend-item"><span class="llc-graph-legend-dot" style="background:#fbbf24"></span>Principio</span>
-              </div>
-            </div>
-            <!-- Search bar — visible only when section expanded -->
-            <div class="llc-graph-search" id="llcGraphSearchBar" style="display:none">
-              <input id="llcGraphSearchInput" type="text" placeholder="Approfondisci un concetto… (es. consenso, DPO, Art. 6)" onkeydown="if(event.key==='Enter')llcGraphSearchGo()">
-              <button onclick="llcGraphSearchGo()">&#x1F9E0; Mappa</button>
-            </div>
-          </div>
-
-          <!-- Graph fullscreen modal -->
-          <div id="llcGraphModal" style="display:none;position:fixed;inset:0;background:rgba(5,5,15,.97);z-index:200;flex-direction:column">
-            <div style="display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid rgba(124,58,237,.2);flex-shrink:0;gap:10px">
-              <span style="font-size:13px;font-weight:700;color:#c4b5fd">&#x1F578; Mappa Concettuale</span>
-              <span id="llcGraphModalBadge" style="font-size:10px;color:rgba(167,139,250,.5)"></span>
-              <span style="font-size:10px;color:rgba(167,139,250,.3);margin-left:4px">&#x1F50D; Scroll per zoom &middot; Trascina per spostarti &middot; Clicca un nodo per dettagli</span>
-              <button onclick="llcCollapseGraph()" style="margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e2e0ff;border-radius:6px;padding:4px 14px;cursor:pointer;font-size:12px">&#x2715; Chiudi</button>
-            </div>
-            <!-- SVG + node info panel share this relative container -->
-            <div style="flex:1;position:relative;overflow:hidden">
-              <svg id="llcGraphFull" style="width:100%;height:100%"></svg>
-              <!-- Node info overlay (shown on node click) -->
-              <div id="llcNodeInfoPanel" class="llc-node-info" style="display:none">
-                <div class="llc-node-info-header">
-                  <div id="llcNodeInfoDot" class="llc-node-info-dot"></div>
-                  <div style="flex:1">
-                    <div id="llcNodeInfoTitle" class="llc-node-info-title"></div>
-                    <div id="llcNodeInfoType" class="llc-node-info-type"></div>
-                  </div>
-                  <button class="llc-node-info-close" onclick="llcCloseNodeInfo()">&#x2715;</button>
-                </div>
-                <div id="llcNodeInfoConnections" class="llc-node-info-connections"></div>
-                <div id="llcNodeInfoBody" class="llc-node-info-body">
-                  <div class="llc-loading"><div class="llc-spinner"></div>Caricamento spiegazione&hellip;</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 2: Documenti (unified search + upload + file list) -->
-        <div class="llc-section">
-          <div class="llc-section-hdr" onclick="llcToggleSec('library',event)">
-            <span class="llc-section-icon">&#x1F4C1;</span>
-            <span class="llc-section-title">Documenti</span>
-            <span class="llc-section-badge" id="llcApiBadge">&#x25CF; Connesso</span>
-            <span class="llc-section-chevron" id="llcSecChev-library">&#9660;</span>
-          </div>
-          <div class="llc-section-body" id="llcSecBody-library">
-            <!-- Search bar -->
-            <div class="llc-lib-top">
-              <input class="llc-search llc-lib-search" id="llcDocSearch" placeholder="&#x1F50D; Cerca documento&#x2026;" oninput="llcFilterDocs()">
-            </div>
-            <!-- Upload progress (shown during upload) -->
-            <input type="file" id="llcLibFileInput" style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" onchange="_llcLibFileSelected(this)">
-            <div id="llcLibUpProgress" style="display:none" class="llc-lib-up-progress">
-              <div class="llc-lib-up-bar-wrap"><div id="llcLibUpBar" class="llc-lib-up-bar"></div></div>
-              <div id="llcLibUpLbl" class="llc-lib-up-lbl">Caricamento…</div>
-            </div>
-            <!-- Multi-select action bar (hidden until selection active) -->
-            <div class="llc-lib-sel-bar" id="llcSelBar">
-              <span id="llcSelCount">0 selezionati</span>
-              <button class="llc-lib-sel-del" onclick="_llcDeleteSelected()">🗑 Elimina selezionati</button>
-              <button style="background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:12px;padding:2px 4px" onclick="_llcClearSelection()" title="Annulla selezione">✕</button>
-            </div>
-            <!-- File list -->
-            <div class="llc-doc-list" id="llcDocList">
-            </div>
-            <!-- Upload button — flat, at the bottom, no overlap -->
-            <button class="llc-upload-fab" onclick="document.getElementById('llcLibFileInput').click()" title="Carica file">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
-              </svg>
-              Carica file
-            </button>
-          </div>
-        </div>
-
-        <!-- Modal preview -->
-        <div id="llcPreviewModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);align-items:center;justify-content:center">
-          <div style="background:#0f172a;border:1px solid rgba(124,58,237,.3);border-radius:16px;width:90vw;max-width:960px;height:85vh;display:flex;flex-direction:column;overflow:hidden">
-            <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);gap:10px">
-              <span id="llcPreviewTitle" style="flex:1;font-size:13px;font-weight:600;color:#e2e0ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-              <button onclick="llcPreviewClose()" style="background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.25);color:#f87171;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px">&#x2715; Chiudi</button>
-            </div>
-            <iframe id="llcPreviewIframe" src="" style="flex:1;border:none;background:#fff"></iframe>
-          </div>
-        </div>
-
-        <!-- SECTION 3: Visual Analogy Module (Stanford Design Thinking) -->
-        <div class="llc-section" id="llcAnalogySec">
-          <div class="llc-section-hdr" onclick="llcToggleSec('analogy',event)">
-            <span class="llc-section-icon">&#x1F3A8;</span>
-            <span class="llc-section-title">Analogie Visive</span>
-            <span class="llc-section-badge" id="llcAnalogyBadge">Stanford Design</span>
-            <button class="llc-analogy-expand-btn" onclick="event.stopPropagation();llcAnalogyOpenModal()" title="Espandi analogie a schermo intero">&#x26F6;</button>
-            <span class="llc-section-chevron" id="llcSecChev-analogy">&#9654;</span>
-          </div>
-          <div class="llc-section-body collapsed" id="llcSecBody-analogy">
-            <!-- Query input for custom analogies -->
-            <div class="llc-analogy-query-wrap">
-              <div class="llc-analogy-query-label">&#x1F50D; Cerca analogia visiva</div>
-              <div class="llc-analogy-query-row">
-                <input class="llc-analogy-query-input" id="llcAnalogyQueryInput"
-                  placeholder="es. accountability GDPR, consenso, DPIA, trasferimento dati..."
-                  onkeydown="if(event.key==='Enter')llcAnalogyFromQuery()">
-                <button class="llc-analogy-query-btn" onclick="llcAnalogyFromQuery()" id="llcAnalogyQueryBtn">&#x25B6;</button>
-              </div>
-            </div>
-            <!-- Quick trigger buttons (doc-based) -->
-            <div class="llc-analogy-triggers">
-              <button class="llc-analogy-btn llc-analogy-btn-concept" onclick="llcAnalogyContextual()" title="Analogia su testo selezionato">
-                <span class="llc-analogy-btn-icon">&#x1F50D;</span>
-                <span class="llc-analogy-btn-label">TESTO<br>SELEZIONATO</span>
-              </button>
-              <button class="llc-analogy-btn llc-analogy-btn-page" onclick="llcAnalogyPageWide()" title="Mappa pagina corrente">
-                <span class="llc-analogy-btn-icon">&#x1F4A1;</span>
-                <span class="llc-analogy-btn-label">PAGINA<br>CORRENTE</span>
-              </button>
-            </div>
-            <div class="llc-analogy-status" id="llcAnalogyStatus">Digita un concetto sopra oppure seleziona testo nel documento</div>
-            <div class="llc-analogy-cards" id="llcAnalogyCards"></div>
-          </div>
-        </div>
-
-        <!-- Full-screen Analogy Modal -->
-        <div class="llc-analogy-modal" id="llcAnalogyModal">
-          <div class="llc-analogy-modal-hdr">
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:18px">&#x1F3A8;</span>
-              <span style="font-size:14px;font-weight:800;color:#a78bfa;letter-spacing:.3px">Analogie Visive</span>
-              <span style="font-size:10px;color:rgba(167,139,250,.45);font-weight:600">Stanford Design Thinking</span>
-            </div>
-            <div class="llc-analogy-modal-search">
-              <input class="llc-analogy-modal-input" id="llcAnalogyModalInput"
-                placeholder="Inserisci il concetto giuridico da visualizzare..."
-                onkeydown="if(event.key==='Enter')llcAnalogyFromQuery(true)">
-              <button class="llc-analogy-modal-btn" onclick="llcAnalogyFromQuery(true)">&#x25B6; Genera</button>
-            </div>
-            <button class="llc-analogy-modal-close" onclick="llcAnalogyCloseModal()">&#x2715;</button>
-          </div>
-          <div class="llc-analogy-modal-body" id="llcAnalogyModalBody">
-            <div class="llc-analogy-modal-placeholder">
-              <div style="font-size:48px;margin-bottom:16px">&#x1F3A8;</div>
-              <div style="font-size:16px;font-weight:700;color:rgba(167,139,250,.7);margin-bottom:8px">Visualizza i concetti giuridici</div>
-              <div style="font-size:13px;color:rgba(255,255,255,.3);max-width:400px;line-height:1.7">Digita un concetto GDPR nella barra sopra per generare un'analogia visiva accademica con schema comparativo, metafora concettuale e mappa dei principi.</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
+  <!-- RESEARCH LAB DASHBOARD -->
+  <div id="rlDash" class="rl-dash">
+    <div class="rl-dash-nav">
+      <button class="rl-nav-back" onclick="showScreen('screenMode')">← Sezioni</button>
+      <div style="font-size:12px;font-weight:700;color:var(--txt)">Research Lab</div>
+      <button class="rl-nav-back" onclick="toggleTheme()" title="Tema">☀</button>
     </div>
-
-    <!-- &#x2550;&#x2550;&#x2550; COLUMN B &#x2014; THE SURGEON &#x2550;&#x2550;&#x2550; -->
-    <div class="llc-col-b">
-
-      <!-- Browser chrome bar -->
-      <div class="llc-b-chrome">
-        <div class="llc-b-chrome-dots">
-          <div class="llc-b-chrome-dot" style="background:#ff5f56"></div>
-          <div class="llc-b-chrome-dot" style="background:#ffbd2e"></div>
-          <div class="llc-b-chrome-dot" style="background:#27c93f"></div>
-        </div>
-        <div class="llc-b-chrome-nav">
-          <button class="llc-b-chrome-navbtn">&larr;</button>
-          <button class="llc-b-chrome-navbtn">&rarr;</button>
-        </div>
-        <div class="llc-b-doctitle" id="llcViewerTitle">Seleziona un documento dalla libreria &rarr;</div>
-        <div class="llc-b-chrome-actions">
-          <button class="llc-b-chrome-icon" onclick="llcAnalyzeDoc()" id="llcAnalyzeBtn" style="display:none" title="Analisi stratificata AI">&#x26A1;</button>
-          <button class="llc-b-chrome-icon" onclick="llcSaveHighlight()" id="llcSaveHlBtn" style="display:none" title="Salva selezione come flashcard">&#x1F4CC;</button>
-          <button class="llc-b-chrome-icon" title="Cerca nel documento">&#x1F50D;</button>
-        </div>
-      </div>
-
-
-      <!-- AI Tools activation bar — shown only when a doc is loaded -->
-      <div class="llc-doc-tools-bar" id="llcDocToolsBar" style="display:none">
-        <span class="llc-doc-tools-label">Strumenti AI:</span>
-        <button class="llc-doc-tool-btn" id="llcToolBtnMap" onclick="llcActivateTool('map')" title="Genera mappa concettuale semantica del documento">
-          <span class="llc-dtb-icon">🗺️</span>
-          <span class="llc-dtb-label">Mappa Concettuale</span>
-        </button>
-        <button class="llc-doc-tool-btn" id="llcToolBtnTutor" onclick="llcActivateTool('tutor')" title="Attiva il Tutor AI Socratico">
-          <span class="llc-dtb-icon">🎓</span>
-          <span class="llc-dtb-label">Tutor Socratico</span>
-        </button>
-        <button class="llc-doc-tool-btn" id="llcToolBtnDocai" onclick="llcActivateTool('docai')" title="Inizializza l'Assistente AI documento">
-          <span class="llc-dtb-icon">🤖</span>
-          <span class="llc-dtb-label">Assistente AI</span>
-        </button>
-      </div>
-
-      <!-- PDF page navigation bar -->
-      <div class="llc-pdf-nav" id="llcPdfNav" style="display:none">
-        <button class="llc-pdf-nav-btn" onclick="llcPdfGo(-1)" title="Pagina precedente">&#9664;</button>
-        <input class="llc-pdf-page-input" id="llcPdfPageInput" value="1" min="1"
-               onchange="llcPdfGoTo(parseInt(this.value)||1)"
-               onkeydown="if(event.key==='Enter'){llcPdfGoTo(parseInt(this.value)||1);this.blur()}">
-        <span class="llc-pdf-nav-total" id="llcPdfNavTotal">/ —</span>
-        <button class="llc-pdf-nav-btn" onclick="llcPdfGo(1)" title="Pagina successiva">&#9654;</button>
-        <span class="llc-pdf-nav-title" id="llcPdfNavTitle"></span>
-        <div class="llc-pdf-zoom-group">
-          <button class="llc-pdf-zoom-btn" onclick="llcPdfZoom(-1)" title="Riduci zoom">&#x2212;</button>
-          <span class="llc-pdf-zoom-label" id="llcPdfZoomLabel">100%</span>
-          <button class="llc-pdf-zoom-btn" onclick="llcPdfZoom(+1)" title="Aumenta zoom">&#x2B;</button>
-        </div>
-      </div>
-
-      <!-- Document viewer + PDF renderer -->
-      <div class="llc-viewer" id="llcViewer" onmouseup="llcOnTextSelect(event)">
-        <div class="llc-placeholder" id="llcPlaceholder">
-          <div class="llc-placeholder-icon">&#x2696;&#xFE0F;</div>
-          <div class="llc-placeholder-title">Il Focus Attivo</div>
-          <div class="llc-placeholder-sub">Seleziona un documento dalla libreria G-Cloud. Il documento viene renderizzato visivamente con PDF.js — scrivi nella barra sotto per trovare e sottolineare concetti in tempo reale.</div>
-        </div>
-        <!-- PDF.js canvas rendering container -->
-        <div id="llcPdfContainer" style="display:none"></div>
-        <!-- Fallback HTML body for static docs -->
-        <div id="llcDocBody" style="display:none;padding:20px"></div>
-      </div>
-
-      <!-- Floating viewer chat bar (anchored bottom of center column) -->
-      <div class="llc-viewer-chatbar" id="llcViewerChatBar" style="display:none">
-        <!-- Chat history slide-up panel -->
-        <div class="llc-chat-hist-panel" id="llcChatHistPanel">
-          <div class="llc-chat-hist-hdr">
-            &#x2630; Cronologia chat
-            <span class="llc-chat-hist-hdr-close" onclick="llcChatHistClose()" title="Chiudi">&#x2715;</span>
-          </div>
-          <div class="llc-chat-hist-list" id="llcChatHistList"></div>
-        </div>
-        <div class="llc-vchat-input-row">
-          <button class="llc-chat-hist-btn" id="llcChatHistBtn" onclick="llcChatHistToggle()" title="Cronologia chat">
-            &#x2630;<span class="llc-chat-hist-badge" id="llcChatHistBadge" style="display:none">0</span>
-          </button>
-          <input class="llc-vchat-input" id="llcVchatInput"
-                 placeholder="Fai una domanda sul documento&#x2026; es. 'Qual \xe8 la base giuridica del trattamento?'"
-                 onkeydown="if(event.key==='Enter')llcViewerChatSend()">
-          <button class="llc-btn" onclick="llcViewerChatSend()" style="display:none" id="llcVchatBtn">&#x26A1;</button>
-          <button class="llc-btn" onclick="llcClearPdfHighlights()" style="display:none" title="Rimuovi evidenziazioni">&#x2715;</button>
-        </div>
-        <div class="llc-vchat-result" id="llcVchatResult" style="display:none"></div>
-      </div>
-    </div>
-
-    <!-- ═══ COLUMN C — MEMORY FORGE ═══ -->
-    <div class="llc-col-c" id="llcColC">
-      <div class="llc-col-resize-handle" id="llcColCResizeHandle" style="left:0" title="Trascina per ridimensionare"></div>
-      <div class="llc-col-hdr" onclick="llcToggleCol('c')" title="Comprimi/Espandi">
-        <span class="llc-col-title">La Fucina della Memoria</span>
-        <span class="llc-col-sub" style="margin-left:auto;font-size:10px;color:rgba(167,139,250,.35)">Cornell &middot; SRS</span>
-        <span id="llcColCChev" style="font-size:10px;color:rgba(167,139,250,.35);flex-shrink:0;margin-left:4px">&#9654;</span>
-      </div>
-
-      <div class="llc-col-c-content" id="llcColCContent">
-        <!-- ═══ STRUMENTI SEZIONE ═══ -->
-        <div class="llc-ctx-wrap" id="llcCtxWrap">
-          <div class="llc-ctx-hdr">
-            <span class="llc-ctx-label">🛠 Strumenti Sezione</span>
-            <span class="llc-ctx-segname" id="llcCtxSegName">—</span>
-          </div>
-          <div class="llc-ctx-grid">
-            <button class="llc-ctx-btn" id="llcCtxBtnFlash" onclick="llcRunSegTool('flashcard')">
-              <span class="llc-ctx-btn-icon">🃏</span>
-              <span class="llc-ctx-btn-label">Crea Flashcard</span>
-            </button>
-            <button class="llc-ctx-btn" id="llcCtxBtnQ" onclick="llcRunSegTool('question')">
-              <span class="llc-ctx-btn-icon">🎓</span>
-              <span class="llc-ctx-btn-label">Domanda Recall</span>
-            </button>
-            <button class="llc-ctx-btn" id="llcCtxBtnExp" onclick="llcRunSegTool('explain')">
-              <span class="llc-ctx-btn-icon">💡</span>
-              <span class="llc-ctx-btn-label">Spiega</span>
-            </button>
-            <button class="llc-ctx-btn" id="llcCtxBtnCorn" onclick="llcRunSegTool('cornell')">
-              <span class="llc-ctx-btn-icon">📝</span>
-              <span class="llc-ctx-btn-label">Note Cornell</span>
-            </button>
-            <button class="llc-ctx-btn llc-ctx-btn-scholar" id="llcCtxBtnScholar" onclick="llcRunScholarAnalysis()" style="grid-column:1/-1;background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.35)">
-              <span class="llc-ctx-btn-icon">📚</span>
-              <span class="llc-ctx-btn-label">Analisi Scholar</span>
-            </button>
-          </div>
-          <div class="llc-ctx-output" id="llcCtxOutput"></div>
-          <div class="llc-scholar-output" id="llcScholarOutput" style="display:none"></div>
-        </div>
-        <!-- Deep Work panel switch — only visible in deep-work mode -->
-        <div class="llc-dw-switch" id="llcDwSwitch">
-          <button class="llc-dw-switch-btn active" id="llcDwBtnTutor" onclick="llcDwSwitchPanel('tutor')">
-            &#x1F4AC; Chat Documento
-          </button>
-          <button class="llc-dw-switch-btn" id="llcDwBtnDocai" onclick="llcDwSwitchPanel('docai')">
-            &#x1F916; Assistente AI
-          </button>
-        </div>
-        <!-- Deep Work chat host: viewer chatbar moves here in DW mode -->
-        <div class="llc-dw-chat-host" id="llcDwChatHost"></div>
-
-        <!-- SECTION 1: IA Tutor Socratico (espanso di default) -->
-        <div class="llc-section">
-          <div class="llc-section-hdr" onclick="llcToggleSec('tutor',event)">
-            <span class="llc-section-icon">&#x1F393;</span>
-            <span class="llc-section-title">IA Tutor &#x2014; Metodo Socratico</span>
-            <span class="llc-section-badge" style="color:rgba(251,146,60,.7);border-color:rgba(251,146,60,.2);background:rgba(251,146,60,.07)">Active Recall</span>
-            <span class="llc-section-chevron" id="llcSecChev-tutor">&#9660;</span>
-          </div>
-          <div class="llc-section-body" id="llcSecBody-tutor">
-            <div class="llc-sec-tutor-inner">
-              <div style="padding:5px 12px 4px;font-size:10px;color:rgba(167,139,250,.4);border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0">
-                Se sbagli &rarr; il nodo nella Mappa lampeggia rosso &#x26A0;&#xFE0F;
-              </div>
-              <div class="llc-recall-msgs" id="llcRecallMsgs">
-                <div class="llc-recall-msg ai">Apri un documento e ti interrogher&#xF2; con il metodo socratico. Pronto?</div>
-              </div>
-              <div class="llc-recall-input-row">
-                <textarea class="llc-recall-input" id="llcRecallInput" rows="2" placeholder="Scrivi la tua risposta&#x2026;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();llcRecallSend()}"></textarea>
-                <button class="llc-btn" onclick="llcRecallSend()" style="align-self:flex-end;padding:7px 11px">&uarr;</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 2: Document-Aware AI Assistant -->
-        <div class="llc-section" id="llcDocAiSection">
-          <div class="llc-section-hdr" onclick="llcToggleSec('docai',event)">
-            <span class="llc-section-icon">&#x1F916;</span>
-            <span class="llc-section-title">AI Assistente Documento</span>
-            <span class="llc-section-badge" id="llcDocAiBadge" style="color:rgba(34,197,94,.8);border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.07)">Pronto</span>
-            <button class="llc-docai-expand-btn" id="llcDocAiExpandBtn" onclick="event.stopPropagation();llcDocAiToggleExpand()" title="Espandi pannello">&#x26F6;</button>
-            <span class="llc-section-chevron" id="llcSecChev-docai">&#9654;</span>
-          </div>
-          <div class="llc-section-body collapsed" id="llcSecBody-docai">
-            <div class="llc-docai-inner">
-              <!-- Research mode toggles -->
-              <div class="llc-ai-toggles" id="llcAiToggles">
-                <div class="llc-ai-toggle-card" id="llcToggleCardWeb" onclick="llcToggleAiMode('web')">
-                  <div class="llc-ai-toggle-top">
-                    <span class="llc-ai-toggle-icon">&#x1F310;</span>
-                    <div class="llc-ai-toggle-sw" id="llcToggleSwWeb"></div>
-                  </div>
-                  <div class="llc-ai-toggle-title">Web search</div>
-                  <div class="llc-ai-toggle-desc">Ricerca web per ogni risposta</div>
-                </div>
-                <div class="llc-ai-toggle-card" id="llcToggleCardDb" onclick="llcToggleAiMode('db')">
-                  <div class="llc-ai-toggle-top">
-                    <span class="llc-ai-toggle-icon">&#x1F5C4;&#xFE0F;</span>
-                    <div class="llc-ai-toggle-sw" id="llcToggleSwDb"></div>
-                  </div>
-                  <div class="llc-ai-toggle-title">Analisi comparata</div>
-                  <div class="llc-ai-toggle-desc">Confronta con tutte le fonti del repository</div>
-                </div>
-                <div class="llc-ai-toggle-card" id="llcToggleCardLr" onclick="llcToggleAiMode('lr')">
-                  <div class="llc-ai-toggle-top">
-                    <span class="llc-ai-toggle-icon">&#x1F4D6;</span>
-                    <div class="llc-ai-toggle-sw" id="llcToggleSwLr"></div>
-                  </div>
-                  <div class="llc-ai-toggle-title">Legal research</div>
-                  <div class="llc-ai-toggle-desc">Fonti giuridiche curate</div>
-                </div>
-              </div>
-              <!-- Status / loading area -->
-              <div class="llc-docai-status" id="llcDocAiStatus">
-                <div class="llc-docai-status-icon">&#x1F4DA;</div>
-                <div class="llc-docai-status-text">Seleziona un documento dalla libreria.<br>L'AI analizzer&#xE0; il contenuto completo e risponder&#xE0; alle tue domande.</div>
-              </div>
-              <!-- Chat messages -->
-              <div class="llc-docai-msgs" id="llcDocAiMsgs"></div>
-              <!-- Input row -->
-              <div class="llc-docai-input-row" id="llcDocAiInputRow" style="display:none">
-                <textarea class="llc-docai-input" id="llcDocAiInput" rows="2"
-                  placeholder="Chiedi qualcosa sul documento&#x2026; es. 'Qual&#x27;è la base giuridica?'"
-                  onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();llcDocAiSend()}"></textarea>
-                <button class="llc-docai-send-btn" onclick="llcDocAiSend()" id="llcDocAiBtn">↑</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 3: Flashcard SRS (collassato) -->
-        <div class="llc-section">
-          <div class="llc-section-hdr" onclick="llcToggleSec('cards',event)">
-            <span class="llc-section-icon">&#x1F0CF;</span>
-            <span class="llc-section-title">Flashcard SRS</span>
-            <span class="llc-section-badge" id="llcFcStatus">0 card nel mazzo</span>
-            <span class="llc-section-chevron" id="llcSecChev-cards">&#9654;</span>
-          </div>
-          <div class="llc-section-body collapsed" id="llcSecBody-cards">
-            <!-- AI Flashcard generator chat -->
-            <div class="llc-fc-gen">
-              <div style="font-size:10px;color:rgba(167,139,250,.6);margin-bottom:6px;font-weight:600;letter-spacing:.4px">&#x2728; Genera flashcard su un argomento</div>
-              <div style="display:flex;gap:6px">
-                <input id="llcFcGenInput" class="llc-fc-gen-input"
-                       placeholder="es. consenso GDPR, Art. 6, DPIA, legittimo interesse&#x2026;"
-                       onkeydown="if(event.key==='Enter')llcFcGenFromPrompt()">
-                <button class="llc-btn" onclick="llcFcGenFromPrompt()" id="llcFcGenBtn" style="white-space:nowrap;padding:5px 11px;font-size:11px">Genera</button>
-              </div>
-              <div id="llcFcGenStatus" style="font-size:10px;color:rgba(167,139,250,.5);margin-top:5px;min-height:14px"></div>
-            </div>
-            <!-- Toolbar -->
-            <div style="padding:5px 12px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <button class="llc-btn" onclick="llcFcClear()" style="font-size:10px">Svuota</button>
-            </div>
-            <div class="llc-fc-wrap" id="llcFcWrap">
-              <div style="color:rgba(167,139,250,.4);font-size:11px;text-align:center;padding:20px;line-height:1.7">
-                Scrivi un argomento sopra oppure seleziona testo nel viewer e clicca<br>
-                <span style="color:#a78bfa">&#x1F4CC; Salva HL</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- MOBILE BOTTOM TAB BAR — only visible ≤900px -->
-  <div id="llcMobileTabBar">
-    <button class="llc-mob-tab active" onclick="llcMobileShowPanel('a')" data-panel="a">
-      <span class="llc-mob-tab-icon">🧠</span>
-      <span class="llc-mob-tab-label">Scheletro</span>
-    </button>
-    <button class="llc-mob-tab" onclick="llcMobileShowPanel('b')" data-panel="b">
-      <span class="llc-mob-tab-icon">📄</span>
-      <span class="llc-mob-tab-label">Documenti</span>
-    </button>
-    <button class="llc-mob-tab" onclick="llcMobileShowPanel('c')" data-panel="c">
-      <span class="llc-mob-tab-icon">🤖</span>
-      <span class="llc-mob-tab-label">Strumenti</span>
-    </button>
-  </div>
-
-  <!-- AI POPUP (text selection contextual) -->
-  <div id="llcAiPopup">
-    <div class="llc-popup-hdr">
-      <div style="display:flex;align-items:center;gap:7px">
-        <span style="font-size:16px">&#x26A1;</span>
+    <div class="rl-dash-body">
+      <div class="rl-dash-hdr">
         <div>
-          <div style="font-size:11px;font-weight:800;color:#c4b5fd">IA CONTESTUALE</div>
-          <div style="font-size:9px;color:rgba(167,139,250,.5)">'Il Chirurgo del Testo'</div>
+          <div class="rl-dash-title">Research Lab</div>
+          <div class="rl-dash-sub">AI-powered legal research workspace</div>
+        </div>
+        <button class="rl-btn-new-prj" onclick="rlNewProject()">+ New Project</button>
+      </div>
+      <div id="rlGrid" class="rl-grid"></div>
+      <div id="rlEmpty" class="rl-empty-state" style="display:none">
+        <div class="rl-empty-icon">⚖️</div>
+        <div class="rl-empty-title">No research projects yet</div>
+        <div class="rl-empty-sub">Create your first project to start AI-powered legal research</div>
+        <button class="rl-btn-new-prj" style="margin-top:8px" onclick="rlNewProject()">+ New Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESEARCH LAB WORKSPACE (3-pane) -->
+  <div id="rlWorkspace" class="rl-workspace" style="display:none">
+
+    <!-- LEFT: Sidebar -->
+    <div class="rl-sidebar" id="rlSidebar">
+      <div class="rl-sb-hdr">
+        <button class="rl-sb-back" onclick="rlBackToDash()">← Projects</button>
+        <div class="rl-sb-prj" id="rlSbPrjName"></div>
+        <div id="rlSbBadge" class="rl-sb-badge private" onclick="rlToggleShare()" title="Toggle sharing"></div>
+      </div>
+      <div class="rl-sb-section">Documents</div>
+      <div id="rlSbDocs" class="rl-sb-docs"></div>
+      <div class="rl-sb-upload" onclick="document.getElementById('rlFileInput').click()"
+           ondragover="event.preventDefault()" ondrop="rlDropFile(event)">
+        + Upload / Drop document
+      </div>
+      <input type="file" id="rlFileInput" accept=".pdf,.docx,.txt,.doc,.md" style="display:none" onchange="rlHandleFile(event)" multiple>
+      <div class="rl-sb-section">Chats</div>
+      <div id="rlSbChats" class="rl-sb-chats"></div>
+      <button class="rl-sb-new-chat" onclick="rlNewChat()">+ New Chat</button>
+    </div>
+
+    <!-- CENTER: Chat pane -->
+    <div class="rl-chat-pane" id="rlChatPane">
+      <div class="rl-chat-hdr">
+        <div class="rl-chat-hdr-title" id="rlChatTitle">New Chat</div>
+        <div class="rl-dt-wrap">
+          <span class="rl-dt-label">Deep Think</span>
+          <div class="rl-dt-toggle" id="rlDTToggle" onclick="rlToggleDT()">
+            <div class="rl-dt-knob"></div>
+          </div>
         </div>
       </div>
-      <button onclick="llcClosePopup()" style="background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:18px;line-height:1;padding:0">&times;</button>
+      <div id="rlMsgs" class="rl-msgs">
+        <div class="rl-chat-empty" id="rlChatEmpty">
+          <div class="rl-chat-empty-icon">⚖️</div>
+          <div class="rl-chat-empty-title">Research Lab</div>
+          <div class="rl-chat-empty-sub">Ask a legal question, upload documents for analysis, or use Agentic Research for multi-source synthesis</div>
+          <div class="rl-suggestions" id="rlSuggestions">
+            <button class="rl-sugg" onclick="rlUseSugg(this)">What are the lawful bases for processing under GDPR Art. 6?</button>
+            <button class="rl-sugg" onclick="rlUseSugg(this)">Analyze the accountability obligations under Art. 24 GDPR</button>
+            <button class="rl-sugg" onclick="rlUseSugg(this)">Summarize the key requirements of the EU AI Act for high-risk systems</button>
+          </div>
+        </div>
+      </div>
+      <div class="rl-input-area">
+        <div class="rl-ctx-docs" id="rlCtxDocs"></div>
+        <div class="rl-input-box" id="rlInputBox">
+          <button class="rl-attach" onclick="document.getElementById('rlFileInput').click()" title="Attach document">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <textarea id="rlInput" class="rl-input" placeholder="Ask a legal question…" rows="1"
+            onkeydown="rlKeydown(event)" oninput="rlAutoResize(this)"></textarea>
+          <div class="rl-send-grp">
+            <button class="rl-research-btn" id="rlAgentBtn" onclick="rlSendAgentic()" title="Agentic Research — multi-step synthesis">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+            <button class="rl-send-btn" id="rlSendBtn" onclick="rlSend()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="rl-input-hint">↵ Send · Shift+↵ New line · 🔍 Agentic multi-source research</div>
+      </div>
     </div>
-    <div class="llc-popup-body" id="llcAiPopupBody">
-      <div class="llc-loading"><div class="llc-spinner"></div>Analisi in corso&#x2026;</div>
-    </div>
-    <div class="llc-popup-actions">
-      <button class="llc-popup-btn" onclick="llcPopupApplySyntax()">APPLICA SINTESI</button>
-      <button class="llc-popup-btn" onclick="llcPopupViewRelated()">VEDI CORRELATI</button>
-      <button class="llc-popup-btn" onclick="llcSaveHighlight()">&#x1F4CC; SALVA HL</button>
-    </div>
-  </div>
 
-  <!-- CMD+K PALETTE -->
-  <div id="llcCmdK" onclick="if(event.target===this)llcCmdKClose()">
-    <div class="llc-cmdk-box">
-      <input class="llc-cmdk-input" id="llcCmdKInput" placeholder="Cerca documenti, concetti, articoli GDPR&#x2026;" oninput="llcCmdKSearch()" onkeydown="llcCmdKKey(event)">
-      <div class="llc-cmdk-results" id="llcCmdKResults"></div>
-    </div>
-  </div>
-
-  <!-- CHAT GLOBALE / IA RICERCATRICE (floating bottom-right) -->
-  <div id="llcGlobalChat">
-    <div class="llc-gchat-hdr">
-      <div style="display:flex;align-items:center;gap:7px">
-        <span style="font-size:13px">&#x1F310;</span>
+    <!-- RIGHT: Document viewer -->
+    <div class="rl-viewer" id="rlViewer">
+      <div class="rl-viewer-empty" id="rlViewerEmpty">
         <div>
-          <div style="font-size:11px;font-weight:800;color:#22d3ee">Chat Globale</div>
-          <div style="font-size:9px;color:rgba(6,182,212,.5)">IA Ricercatrice</div>
+          <div style="font-size:26px;margin-bottom:10px;opacity:.4">📄</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:4px">No document open</div>
+          <div style="font-size:11px;opacity:.45;line-height:1.5">Click a citation [1] in the chat<br>or upload a document</div>
         </div>
       </div>
-      <button onclick="llcGlobalChatToggle()" style="background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:16px">&times;</button>
-    </div>
-    <div class="llc-gchat-msgs" id="llcGchatMsgs">
-      <div class="llc-gchat-msg ai">Ciao! Cerca sentenze recenti, interpreta normative o trova correlazioni tra documenti.</div>
-    </div>
-    <div class="llc-gchat-input-row">
-      <input class="llc-gchat-input" id="llcGchatInput" placeholder="Es: sentenze CJEU su trasferimenti dati&#x2026;" onkeydown="if(event.key==='Enter')llcGchatSend()">
-      <button class="llc-btn" onclick="llcGchatSend()" style="padding:6px 10px">&uarr;</button>
+      <div class="rl-viewer-doc" id="rlViewerDoc" style="display:none">
+        <div class="rl-viewer-bar">
+          <span class="rl-viewer-name" id="rlViewerName"></span>
+          <div style="display:flex;gap:5px">
+            <button class="rl-vbtn" id="rlVPrev" onclick="rlNavMark(-1)" title="Previous match">↑</button>
+            <button class="rl-vbtn" id="rlVNext" onclick="rlNavMark(1)" title="Next match">↓</button>
+            <button class="rl-vbtn" onclick="rlCloseViewer()">✕</button>
+          </div>
+        </div>
+        <div id="rlViewerContent" class="rl-viewer-content"></div>
+      </div>
     </div>
   </div>
 
@@ -12578,7 +12278,658 @@ var LRL_DOCS = [
 ];
 
 // ── Init ────────────────────────────────────────────────────────────────────
-function lrlInit() { llcInit(); }
+function lrlInit() { rlInit(); }
+
+// ═══════════════════════════════════════════════════════════════════
+// RESEARCH LAB — full implementation
+// ═══════════════════════════════════════════════════════════════════
+var _rl = {
+  prjs: [],        // [{id,name,shared,docs:[],chats:[],created}]
+  cur:  null,      // current project id
+  curChat: null,   // current chat id
+  msgs: [],        // current chat messages [{role,content,sources,isDT}]
+  docs: [],        // [{id,name,text,size}] for current project
+  ctxDocs: [],     // doc ids currently in context
+  deepThink: false,
+  busy: false,
+  viewerDocId: null,
+  viewerMarks: [],
+  viewerMarkIdx: 0
+};
+
+var _RL_KEY = 'rl_projects_v1';
+
+function _rlSave() {
+  try { localStorage.setItem(_RL_KEY, JSON.stringify(_rl.prjs)); } catch(_e) {}
+}
+
+function _rlLoad() {
+  try { _rl.prjs = JSON.parse(localStorage.getItem(_RL_KEY) || '[]'); } catch(_e) { _rl.prjs = []; }
+}
+
+function _rlId() { return 'rl_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+function rlInit() {
+  _rlLoad();
+  _rl.cur = null;
+  _rl.curChat = null;
+  _rl.msgs = [];
+  _rl.docs = [];
+  _rl.ctxDocs = [];
+  _rl.deepThink = false;
+  _rl.busy = false;
+  document.getElementById('rlWorkspace').style.display = 'none';
+  document.getElementById('rlDash').style.display = 'flex';
+  rlRenderDash();
+}
+
+function rlRenderDash() {
+  var grid = document.getElementById('rlGrid');
+  var empty = document.getElementById('rlEmpty');
+  if (!_rl.prjs.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = _rl.prjs.slice().reverse().map(function(p) {
+    var docCount = (p.docs || []).length;
+    var chatCount = (p.chats || []).length;
+    var date = new Date(p.created).toLocaleDateString('it-IT', {day:'2-digit',month:'short',year:'numeric'});
+    var badge = p.shared
+      ? '<span class="rl-card-badge shared">👥 Shared</span>'
+      : '<span class="rl-card-badge private">🔒 Private</span>';
+    return '<div class="rl-card" onclick="rlOpenProject(\'' + p.id + '\')">'
+      + '<div class="rl-card-name">' + _rlEsc(p.name) + '</div>'
+      + '<div class="rl-card-date">' + date + '</div>'
+      + '<div class="rl-card-meta">' + badge
+      + '<span class="rl-card-docs">' + docCount + ' doc' + (docCount !== 1 ? 's' : '') + ' · ' + chatCount + ' chat' + (chatCount !== 1 ? 's' : '') + '</span>'
+      + '</div></div>';
+  }).join('');
+}
+
+function rlNewProject() {
+  var name = prompt('Project name:', 'New Research Project');
+  if (!name || !name.trim()) return;
+  var p = { id: _rlId(), name: name.trim(), shared: false, docs: [], chats: [], created: Date.now() };
+  _rl.prjs.push(p);
+  _rlSave();
+  rlRenderDash();
+  rlOpenProject(p.id);
+}
+
+function rlOpenProject(id) {
+  var p = _rl.prjs.find(function(x){ return x.id === id; });
+  if (!p) return;
+  _rl.cur = id;
+  _rl.docs = p.docs || [];
+  _rl.ctxDocs = [];
+  // Start or restore last chat
+  if (!p.chats || !p.chats.length) {
+    _rlNewChatObj(p);
+  }
+  _rl.curChat = p.chats[p.chats.length - 1].id;
+  _rl.msgs = p.chats[p.chats.length - 1].msgs || [];
+  _rl.deepThink = false;
+  document.getElementById('rlDash').style.display = 'none';
+  document.getElementById('rlWorkspace').style.display = 'flex';
+  _rlRenderSidebar();
+  _rlRenderChat();
+  document.getElementById('rlInput').value = '';
+  document.getElementById('rlDTToggle').classList.remove('on');
+  document.getElementById('rlChatPane').classList.remove('dt-on');
+  rlCloseViewer();
+}
+
+function rlBackToDash() {
+  _rl.cur = null;
+  document.getElementById('rlWorkspace').style.display = 'none';
+  document.getElementById('rlDash').style.display = 'flex';
+  rlRenderDash();
+}
+
+function _rlNewChatObj(p) {
+  var chat = { id: _rlId(), title: 'New Chat', msgs: [] };
+  if (!p.chats) p.chats = [];
+  p.chats.push(chat);
+  _rlSave();
+  return chat;
+}
+
+function rlNewChat() {
+  var p = _rlCurPrj(); if (!p) return;
+  var chat = _rlNewChatObj(p);
+  _rl.curChat = chat.id;
+  _rl.msgs = [];
+  _rl.ctxDocs = [];
+  _rlRenderSidebar();
+  _rlRenderChat();
+  document.getElementById('rlInput').focus();
+}
+
+function _rlCurPrj() { return _rl.prjs.find(function(x){ return x.id === _rl.cur; }); }
+function _rlCurChat() {
+  var p = _rlCurPrj(); if (!p) return null;
+  return (p.chats || []).find(function(x){ return x.id === _rl.curChat; });
+}
+
+function rlToggleShare() {
+  var p = _rlCurPrj(); if (!p) return;
+  p.shared = !p.shared;
+  _rlSave();
+  _rlRenderSidebar();
+}
+
+function _rlRenderSidebar() {
+  var p = _rlCurPrj(); if (!p) return;
+  document.getElementById('rlSbPrjName').textContent = p.name;
+  var badge = document.getElementById('rlSbBadge');
+  badge.textContent = p.shared ? '👥 Shared' : '🔒 Private';
+  badge.className = 'rl-sb-badge ' + (p.shared ? 'shared' : 'private');
+
+  // Docs
+  var docsEl = document.getElementById('rlSbDocs');
+  docsEl.innerHTML = (_rl.docs || []).map(function(d) {
+    var active = _rl.viewerDocId === d.id;
+    var ext = d.name.split('.').pop().toLowerCase();
+    var icon = ext === 'pdf' ? '📕' : ext === 'docx' || ext === 'doc' ? '📘' : '📄';
+    return '<div class="rl-sb-doc' + (active?' active':'') + '" onclick="rlViewDoc(\'' + d.id + '\')">'
+      + icon + '<span class="rl-sb-doc-name">' + _rlEsc(d.name) + '</span>'
+      + '<button class="rl-sb-doc-del" onclick="event.stopPropagation();rlDelDoc(\'' + d.id + '\')" title="Remove">✕</button>'
+      + '</div>';
+  }).join('');
+
+  // Chats
+  var chatsEl = document.getElementById('rlSbChats');
+  chatsEl.innerHTML = ((p.chats || []).slice().reverse()).map(function(ch) {
+    var active = ch.id === _rl.curChat;
+    return '<div class="rl-sb-chat' + (active?' active':'') + '" onclick="rlSwitchChat(\'' + ch.id + '\')">'
+      + '💬 <span style="overflow:hidden;text-overflow:ellipsis;flex:1">' + _rlEsc(ch.title) + '</span></div>';
+  }).join('');
+}
+
+function rlSwitchChat(chatId) {
+  var p = _rlCurPrj(); if (!p) return;
+  var chat = (p.chats || []).find(function(x){ return x.id === chatId; });
+  if (!chat) return;
+  _rl.curChat = chatId;
+  _rl.msgs = chat.msgs || [];
+  _rl.ctxDocs = [];
+  _rlRenderChat();
+  _rlRenderSidebar();
+  document.getElementById('rlInput').focus();
+}
+
+function rlDelDoc(docId) {
+  var p = _rlCurPrj(); if (!p) return;
+  p.docs = (p.docs || []).filter(function(d){ return d.id !== docId; });
+  _rl.docs = p.docs;
+  _rl.ctxDocs = _rl.ctxDocs.filter(function(id){ return id !== docId; });
+  _rlSave();
+  _rlRenderSidebar();
+  _rlRenderCtxPills();
+  if (_rl.viewerDocId === docId) rlCloseViewer();
+}
+
+function _rlRenderChat() {
+  var empty = document.getElementById('rlChatEmpty');
+  var msgsEl = document.getElementById('rlMsgs');
+  var title = document.getElementById('rlChatTitle');
+  var chat = _rlCurChat();
+  title.textContent = chat ? chat.title : 'New Chat';
+  if (!_rl.msgs.length) {
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+  var existingMsgs = msgsEl.querySelectorAll('.rl-msg');
+  existingMsgs.forEach(function(el){ el.remove(); });
+  _rl.msgs.forEach(function(msg, idx) {
+    msgsEl.appendChild(_rlBuildMsgEl(msg, idx));
+  });
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function _rlBuildMsgEl(msg, idx) {
+  var div = document.createElement('div');
+  div.className = 'rl-msg ' + msg.role + (msg.isDT ? ' dt-msg' : '');
+  var html = '';
+  if (msg.role === 'user') {
+    html = '<div class="rl-msg-bubble">' + _rlEsc(msg.content).replace(/\n/g,'<br>') + '</div>';
+  } else {
+    // Render markdown + citations
+    var rendered = _rlRenderMarkdown(msg.content, msg.sources || [], idx);
+    html = '<div class="rl-msg-bubble">' + rendered + '</div>';
+    // Source cards
+    if (msg.sources && msg.sources.length) {
+      html += '<div class="rl-sources">' + msg.sources.map(function(s) {
+        var rel = Math.round((s.reliability || 0.8) * 100);
+        return '<div class="rl-src" onclick="rlSrcClick(' + idx + ',' + s.id + ')">'
+          + '<div class="rl-src-num">Source [' + s.id + ']</div>'
+          + '<div class="rl-src-title">' + _rlEsc(s.title || '') + '</div>'
+          + '<div class="rl-src-snip">' + _rlEsc(s.snippet || '') + '</div>'
+          + '<div class="rl-src-rel"><div class="rl-src-rel-bar"><div class="rl-src-rel-fill" style="width:' + rel + '%"></div></div>'
+          + '<span class="rl-src-rel-pct">' + rel + '%</span></div>'
+          + '</div>';
+      }).join('') + '</div>';
+    }
+  }
+  div.innerHTML = html;
+  return div;
+}
+
+function _rlRenderMarkdown(text, sources, msgIdx) {
+  var t = _rlEsc(text)
+    .replace(/\*\*\*([\s\S]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([\s\S]+?)\*/g, '<em>$1</em>')
+    .replace(/^#{3}\s+(.+)$/gm, '<strong>$1</strong>')
+    .replace(/^#{1,2}\s+(.+)$/gm, '<strong>$1</strong>')
+    .replace(/^[-*]\s+(.+)$/gm, '• $1')
+    .replace(/\n/g, '<br>');
+  // Replace [n] with clickable citation tags
+  t = t.replace(/\[(\d+)\]/g, function(match, num) {
+    return '<span class="rl-cit" onclick="rlCitClick(' + msgIdx + ',' + num + ')">' + num + '</span>';
+  });
+  return t;
+}
+
+function _rlEsc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function rlCitClick(msgIdx, srcId) {
+  var msg = _rl.msgs[msgIdx];
+  if (!msg || !msg.sources) return;
+  var src = msg.sources.find(function(s){ return s.id === srcId; });
+  if (!src) return;
+  // If source has a docId, show in viewer with highlight
+  if (src.docId) {
+    rlShowInViewer(src.docId, src.snippet || '');
+  } else if (src.snippet) {
+    // Show snippet as web result in viewer
+    rlShowWebSnippet(src);
+  }
+}
+
+function rlSrcClick(msgIdx, srcId) { rlCitClick(msgIdx, srcId); }
+
+// ── Input handling ──────────────────────────────────────────────────
+function rlKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    rlSend();
+  }
+}
+
+function rlAutoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function rlUseSugg(btn) {
+  document.getElementById('rlInput').value = btn.textContent;
+  document.getElementById('rlChatEmpty').style.display = 'none';
+  document.getElementById('rlInput').focus();
+}
+
+function rlToggleDT() {
+  _rl.deepThink = !_rl.deepThink;
+  var toggle = document.getElementById('rlDTToggle');
+  var pane = document.getElementById('rlChatPane');
+  toggle.classList.toggle('on', _rl.deepThink);
+  pane.classList.toggle('dt-on', _rl.deepThink);
+}
+
+// ── Send (standard chat) ────────────────────────────────────────────
+async function rlSend() {
+  var input = document.getElementById('rlInput');
+  var q = input.value.trim();
+  if (!q || _rl.busy) return;
+  _rl.busy = true;
+  document.getElementById('rlSendBtn').disabled = true;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('rlChatEmpty').style.display = 'none';
+  // Add user message
+  _rlAddMsg({ role: 'user', content: q });
+  // Add thinking indicator
+  var thinkEl = _rlAddThinking(_rl.deepThink ? 'Deep Think reasoning…' : 'Researching…');
+  try {
+    var sys = _rlBuildSysPrompt();
+    var msgs = _rl.msgs.filter(function(m){ return m.role !== 'thinking'; }).slice(-10).map(function(m){
+      return { role: m.role === 'ai' ? 'assistant' : 'user', content: m.content };
+    });
+    var model = _rl.deepThink ? 'gemini-2.5-pro' : 'gemini-2.5-flash-lite';
+    var body = {
+      model: model,
+      deepThink: _rl.deepThink,
+      system_instruction: { parts: [{ text: sys }] },
+      contents: msgs.map(function(m){
+        return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] };
+      }),
+      generationConfig: { maxOutputTokens: _rl.deepThink ? 8192 : 4096, temperature: _rl.deepThink ? 0.3 : 0.5 }
+    };
+    var raw = await _llcBackendGemini(body);
+    var parsed = _rlParseResponse(raw);
+    thinkEl.remove();
+    _rlAddMsg({ role: 'ai', content: parsed.text, sources: parsed.sources, isDT: _rl.deepThink });
+    _rlPersistMsgs();
+  } catch(e) {
+    thinkEl.remove();
+    _rlAddMsg({ role: 'ai', content: '⚠️ Errore: ' + e.message, sources: [] });
+  }
+  _rl.busy = false;
+  document.getElementById('rlSendBtn').disabled = false;
+  document.getElementById('rlInput').focus();
+}
+
+// ── Agentic research ────────────────────────────────────────────────
+async function rlSendAgentic() {
+  var input = document.getElementById('rlInput');
+  var q = input.value.trim();
+  if (!q || _rl.busy) return;
+  _rl.busy = true;
+  document.getElementById('rlAgentBtn').disabled = true;
+  document.getElementById('rlSendBtn').disabled = true;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('rlChatEmpty').style.display = 'none';
+  _rlAddMsg({ role: 'user', content: q });
+  // Show research steps UI
+  var stepsEl = _rlAddSteps([
+    { label: 'Generating search queries', state: 'running' },
+    { label: 'Searching legal sources', state: 'pending' },
+    { label: 'Evaluating & filtering', state: 'pending' },
+    { label: 'Synthesizing answer', state: 'pending' }
+  ]);
+  try {
+    // Step 1: build search plan (fast model)
+    _rlSetStep(stepsEl, 0, 'done');
+    _rlSetStep(stepsEl, 1, 'running');
+    // Step 2: search with Gemini + googleSearch
+    var searchSys = 'You are an expert EU/Italian legal research assistant. '
+      + 'Search the web for authoritative legal sources (GDPR, EDPB, CJEU, Italian DPA, official EU documents, law firm analyses). '
+      + 'Provide a comprehensive, well-cited answer. '
+      + 'After your answer, add ---SOURCES--- followed by a JSON array: '
+      + '[{"id":1,"title":"Source Title","snippet":"Brief excerpt","url":"https://...","reliability":0.95},...] '
+      + 'Base reliability on source authority (official EU/government = 0.9-1.0, major law firms = 0.8-0.9, others = 0.6-0.8). '
+      + 'Use [1], [2] etc. citation markers in your answer text. NEVER start by echoing the question.';
+    var searchResult = await callGeminiWithSearch(searchSys, q);
+    _rlSetStep(stepsEl, 1, 'done');
+    _rlSetStep(stepsEl, 2, 'running');
+    // Small delay for UX
+    await new Promise(function(r){ setTimeout(r, 400); });
+    _rlSetStep(stepsEl, 2, 'done');
+    _rlSetStep(stepsEl, 3, 'running');
+    await new Promise(function(r){ setTimeout(r, 300); });
+    _rlSetStep(stepsEl, 3, 'done');
+    var parsed = _rlParseResponse(searchResult.text || searchResult || '');
+    stepsEl.remove();
+    _rlAddMsg({ role: 'ai', content: parsed.text, sources: parsed.sources, isDT: false, isAgentic: true });
+    _rlPersistMsgs();
+  } catch(e) {
+    stepsEl.remove();
+    _rlAddMsg({ role: 'ai', content: '⚠️ Research error: ' + e.message, sources: [] });
+  }
+  _rl.busy = false;
+  document.getElementById('rlAgentBtn').disabled = false;
+  document.getElementById('rlSendBtn').disabled = false;
+  document.getElementById('rlInput').focus();
+}
+
+function _rlAddSteps(steps) {
+  var msgsEl = document.getElementById('rlMsgs');
+  var div = document.createElement('div');
+  div.className = 'rl-steps';
+  div.innerHTML = '<div class="rl-steps-lbl">🔍 Agentic Research Plan</div>'
+    + steps.map(function(s, i) {
+      var ico = s.state === 'done' ? '✓'
+              : s.state === 'running' ? '<div class="rl-step-spinner"></div>'
+              : '';
+      return '<div class="rl-step ' + s.state + '" id="rlStep_' + i + '">'
+        + '<div class="rl-step-ico">' + ico + '</div>'
+        + '<span>' + s.label + '</span></div>';
+    }).join('');
+  msgsEl.appendChild(div);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+  return div;
+}
+
+function _rlSetStep(stepsEl, idx, state) {
+  var el = stepsEl.querySelector('#rlStep_' + idx);
+  if (!el) return;
+  el.className = 'rl-step ' + state;
+  var ico = el.querySelector('.rl-step-ico');
+  if (!ico) return;
+  ico.innerHTML = state === 'done' ? '✓' : state === 'running' ? '<div class="rl-step-spinner"></div>' : '';
+}
+
+// ── Response parsing ────────────────────────────────────────────────
+function _rlParseResponse(raw) {
+  var text = raw || '';
+  var sources = [];
+  var sep = text.indexOf('---SOURCES---');
+  if (sep >= 0) {
+    var jsonPart = text.slice(sep + 13).trim();
+    text = text.slice(0, sep).trim();
+    try {
+      var s = jsonPart.indexOf('['), e = jsonPart.lastIndexOf(']');
+      if (s >= 0 && e > s) sources = JSON.parse(jsonPart.slice(s, e + 1));
+    } catch(_e) {}
+  }
+  // Assign sequential ids if missing
+  sources.forEach(function(s, i){ if (!s.id) s.id = i + 1; });
+  return { text: text, sources: sources };
+}
+
+// ── System prompt ───────────────────────────────────────────────────
+function _rlBuildSysPrompt() {
+  var base = 'Sei un assistente di ricerca giuridica esperto in diritto UE e italiano (GDPR, AI Act, diritto privacy, normativa nazionale). '
+    + 'Rispondi con stile professionale, preciso e autorevole come un avvocato specializzato. '
+    + 'Usa i marcatori di citazione [1], [2] ecc. per riferimenti alle fonti quando disponibili. '
+    + 'Alla FINE della risposta aggiungi ---SOURCES--- seguito da un array JSON: '
+    + '[{"id":1,"title":"Fonte","snippet":"Testo citato verbatim","reliability":0.9},...] '
+    + 'NON iniziare mai ripetendo la domanda. NON aggiungere "---SOURCES---" se non hai citazioni.';
+  // Inject document context
+  var activeDocs = _rl.docs.filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
+  if (activeDocs.length) {
+    base += '\n\nDOCUMENTI IN CONTESTO:\n';
+    activeDocs.forEach(function(d) {
+      var excerpt = (d.text || '').slice(0, 6000);
+      base += '\n=== ' + d.name + ' ===\n' + excerpt + '\n';
+    });
+    base += '\nCita i documenti sopra usando [1], [2] ecc. e indica il nome del file nella source.';
+  }
+  return base;
+}
+
+// ── Message helpers ─────────────────────────────────────────────────
+function _rlAddMsg(msg) {
+  _rl.msgs.push(msg);
+  var msgsEl = document.getElementById('rlMsgs');
+  document.getElementById('rlChatEmpty').style.display = 'none';
+  msgsEl.appendChild(_rlBuildMsgEl(msg, _rl.msgs.length - 1));
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function _rlAddThinking(label) {
+  var msgsEl = document.getElementById('rlMsgs');
+  var div = document.createElement('div');
+  div.className = 'rl-thinking';
+  div.innerHTML = '<div class="rl-thinking-dots"><span></span><span></span><span></span></div>'
+    + '<span style="font-size:12px">' + (label || 'Thinking…') + '</span>';
+  msgsEl.appendChild(div);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+  return div;
+}
+
+function _rlPersistMsgs() {
+  var p = _rlCurPrj(); if (!p) return;
+  var chat = _rlCurChat(); if (!chat) return;
+  chat.msgs = _rl.msgs.slice();
+  // Auto-title from first user message
+  if (chat.title === 'New Chat') {
+    var firstUser = _rl.msgs.find(function(m){ return m.role === 'user'; });
+    if (firstUser) chat.title = firstUser.content.slice(0, 42) + (firstUser.content.length > 42 ? '…' : '');
+  }
+  _rlSave();
+  _rlRenderSidebar();
+  document.getElementById('rlChatTitle').textContent = chat.title;
+}
+
+// ── Document upload ─────────────────────────────────────────────────
+function rlDropFile(e) {
+  e.preventDefault();
+  var files = e.dataTransfer ? e.dataTransfer.files : null;
+  if (files && files.length) rlProcessFiles(files);
+}
+
+function rlHandleFile(e) {
+  if (e.target.files && e.target.files.length) rlProcessFiles(e.target.files);
+  e.target.value = '';
+}
+
+async function rlProcessFiles(files) {
+  var p = _rlCurPrj(); if (!p) return;
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    var text = await _rlExtractText(file);
+    var doc = { id: _rlId(), name: file.name, text: text, size: file.size, created: Date.now() };
+    if (!p.docs) p.docs = [];
+    p.docs.push(doc);
+    _rl.docs = p.docs;
+    // Auto-add to context
+    _rl.ctxDocs.push(doc.id);
+    _rlSave();
+  }
+  _rlRenderSidebar();
+  _rlRenderCtxPills();
+}
+
+async function _rlExtractText(file) {
+  var ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'txt' || ext === 'md') {
+    return await new Promise(function(res) {
+      var reader = new FileReader();
+      reader.onload = function(e){ res(e.target.result || ''); };
+      reader.onerror = function(){ res(''); };
+      reader.readAsText(file);
+    });
+  }
+  if ((ext === 'docx' || ext === 'doc') && typeof mammoth !== 'undefined') {
+    return await new Promise(function(res) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        mammoth.extractRawText({ arrayBuffer: e.target.result })
+          .then(function(r){ res(r.value || ''); })
+          .catch(function(){ res(''); });
+      };
+      reader.onerror = function(){ res(''); };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+  if (ext === 'pdf' && typeof pdfjsLib !== 'undefined') {
+    return await new Promise(function(res) {
+      var reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          var pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+          var text = '';
+          for (var p = 1; p <= Math.min(pdf.numPages, 100); p++) {
+            var page = await pdf.getPage(p);
+            var content = await page.getTextContent();
+            text += content.items.map(function(i){ return i.str; }).join(' ') + '\n\n';
+          }
+          res(text);
+        } catch(_e) { res(''); }
+      };
+      reader.onerror = function(){ res(''); };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+  return '[File type not supported for text extraction: ' + file.name + ']';
+}
+
+function _rlRenderCtxPills() {
+  var container = document.getElementById('rlCtxDocs');
+  var activeDocs = _rl.docs.filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
+  container.innerHTML = activeDocs.map(function(d) {
+    return '<div class="rl-ctx-pill">📄 ' + _rlEsc(d.name.length > 18 ? d.name.slice(0,16)+'…' : d.name)
+      + '<button onclick="rlRemoveCtx(\'' + d.id + '\')" title="Remove from context">×</button></div>';
+  }).join('');
+  container.style.display = activeDocs.length ? 'flex' : 'none';
+}
+
+function rlRemoveCtx(docId) {
+  _rl.ctxDocs = _rl.ctxDocs.filter(function(id){ return id !== docId; });
+  _rlRenderCtxPills();
+}
+
+// ── Viewer ──────────────────────────────────────────────────────────
+function rlViewDoc(docId) {
+  var doc = (_rl.docs || []).find(function(d){ return d.id === docId; });
+  if (!doc) return;
+  rlShowInViewer(docId, null);
+  // Add to context if not already
+  if (_rl.ctxDocs.indexOf(docId) < 0) {
+    _rl.ctxDocs.push(docId);
+    _rlRenderCtxPills();
+  }
+  _rlRenderSidebar();
+}
+
+function rlShowInViewer(docId, snippet) {
+  var doc = (_rl.docs || []).find(function(d){ return d.id === docId; });
+  if (!doc) { rlShowWebSnippet({ title: 'Source', snippet: snippet || '' }); return; }
+  _rl.viewerDocId = docId;
+  document.getElementById('rlViewerEmpty').style.display = 'none';
+  document.getElementById('rlViewerDoc').style.display = 'flex';
+  document.getElementById('rlViewerName').textContent = doc.name;
+  var content = document.getElementById('rlViewerContent');
+  var text = doc.text || '';
+  if (snippet) {
+    // Highlight the snippet
+    var escaped = _rlEsc(text);
+    var escapedSnip = _rlEsc(snippet.trim().slice(0, 200));
+    if (escapedSnip && escaped.indexOf(escapedSnip) >= 0) {
+      escaped = escaped.split(escapedSnip).join('<mark>' + escapedSnip + '</mark>');
+    }
+    content.innerHTML = escaped;
+    // Scroll to first mark
+    var firstMark = content.querySelector('mark');
+    if (firstMark) setTimeout(function(){ firstMark.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+  } else {
+    content.innerHTML = _rlEsc(text);
+  }
+  // Build mark navigation
+  _rl.viewerMarks = Array.from(content.querySelectorAll('mark'));
+  _rl.viewerMarkIdx = 0;
+  _rlRenderSidebar();
+}
+
+function rlShowWebSnippet(src) {
+  document.getElementById('rlViewerEmpty').style.display = 'none';
+  document.getElementById('rlViewerDoc').style.display = 'flex';
+  document.getElementById('rlViewerName').textContent = src.title || 'Web Source';
+  var content = document.getElementById('rlViewerContent');
+  var url = src.url ? '<a href="' + _rlEsc(src.url) + '" target="_blank" style="color:#2C7A7B;font-size:11px;text-decoration:none">' + _rlEsc(src.url) + '</a><br><br>' : '';
+  content.innerHTML = url + '<mark>' + _rlEsc(src.snippet || '') + '</mark>';
+}
+
+function rlNavMark(dir) {
+  if (!_rl.viewerMarks.length) return;
+  _rl.viewerMarkIdx = (_rl.viewerMarkIdx + dir + _rl.viewerMarks.length) % _rl.viewerMarks.length;
+  var mark = _rl.viewerMarks[_rl.viewerMarkIdx];
+  if (mark) mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function rlCloseViewer() {
+  _rl.viewerDocId = null;
+  _rl.viewerMarks = [];
+  document.getElementById('rlViewerEmpty').style.display = 'flex';
+  document.getElementById('rlViewerDoc').style.display = 'none';
+}
 
 function llcGuessTag(name) {
   var n = (name || '').toLowerCase();

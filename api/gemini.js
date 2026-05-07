@@ -33,10 +33,10 @@ export default async function handler(req, res) {
   let lastErr = '';
   for (const model of modelsToTry) {
     try {
-      // Disable thinking for 2.5 models — halves latency
       const gc = { ...baseGenConfig };
       if (THINKING_MODELS.has(model)) {
-        gc.thinkingConfig = { thinkingBudget: 0 };
+        // deepThink flag enables extended reasoning; default disables for speed
+        gc.thinkingConfig = { thinkingBudget: body.deepThink ? 8192 : 0 };
       } else {
         delete gc.thinkingConfig;
       }
