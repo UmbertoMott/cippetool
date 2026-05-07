@@ -32339,10 +32339,22 @@ function trRenderTable(r) {
       var content = isLoading
         ? '<span style="color:var(--acc);font-size:11px;animation:trPulse .8s infinite alternate;">Elaborazione…</span>'
         : val
-          ? val.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-               .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-               .replace(/\*([^*\n]+?)\*/g,'<em>$1</em>')
-               .replace(/\n/g,'<br>')
+          ? (function(v) {
+              // Strip markdown table separator rows (|---|---| etc.) and render pipes as row-starts
+              v = v.split('\n').filter(function(ln) {
+                return !/^\s*\|[-:| ]+\|\s*$/.test(ln);  // remove |---|---| lines
+              }).map(function(ln) {
+                // Convert table rows | cell1 | cell2 | → bullet points
+                if (/^\s*\|(.+)\|\s*$/.test(ln)) {
+                  return ln.replace(/^\s*\|\s*/, '').replace(/\s*\|\s*$/, '').replace(/\s*\|\s*/g, ' · ');
+                }
+                return ln;
+              }).join('\n');
+              return v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+                      .replace(/\*([^*\n]+?)\*/g,'<em>$1</em>')
+                      .replace(/\n/g,'<br>');
+            })(val)
           : '<span style="color:var(--muted);font-style:italic;font-size:11px;">—</span>';
       var colIdEsc = col.id.replace(/'/g,"\\'");
       return '<td class="tr-cell '+cls+'" onclick="trCellEdit(\''+docIdEsc+'\',\''+colIdEsc+'\')" title="Clicca per modificare">'+content+'</td>';
@@ -32911,7 +32923,12 @@ OUTPUT QUALITY STANDARD
 
 The output must resemble elite law school notes, concorso-level synthesis, top-tier oral exam preparation.
 Every generated cell must: contain maximum legal value, minimum unnecessary wording, immediate conceptual clarity, clear practical utility.
-The ideal output is: SHORT + DENSE + PRECISE + IMMEDIATELY UNDERSTANDABLE.`;
+The ideal output is: SHORT + DENSE + PRECISE + IMMEDIATELY UNDERSTANDABLE.
+
+CRITICAL FORMATTING RULE:
+NEVER use markdown tables (|col1|col2| format) in your output. NEVER.
+Use plain text, numbered lists (1. 2. 3.), or bullet points (•) instead.
+A cell must be plain prose or a list — never a table inside a table.`;
       var userP = 'DOCUMENTO: ' + item.doc.name + '\n\n' + docText.substring(0, 6000) + '\n\n---\nCOLONNA: ' + (item.col.label||colPrompt) + '\nISTRUZIONE COLONNA: ' + colPrompt + (fmtInstr ? '\n\nFORMATO RICHIESTO: ' + fmtInstr : '') + '\n\nAnalizza il documento e genera la risposta per questa colonna specifica. Sii conciso (max 150 parole).';
       if (typeof callGemini !== 'function') throw new Error('callGemini non disponibile');
       // Timeout per cella: 40s — oltre quello segna errore e va avanti
