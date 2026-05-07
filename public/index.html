@@ -28474,8 +28474,9 @@ window.ocrHandleFiles = function(files) {
     }
     newPages.push(page);
     _ocrPages.push(page);
-    _ocrActivePageId = _ocrActivePageId || id;
   });
+  // Always set active to first of the new batch — not conditional on previous state
+  if (newPages.length > 0) _ocrActivePageId = newPages[0].id;
   _ocrRenderPhotos();
   var ci = document.getElementById('ocrCameraInput'); if (ci) ci.value = '';
   var fi = document.getElementById('ocrFileInput');   if (fi) fi.value = '';
@@ -29026,6 +29027,10 @@ function _ocrCheckAllDone() {
     clearInterval(_ocrTickId); _ocrTickId = null;
     _ocrSetStatus('completed');
     _ocrUpdateExportButtons(true);
+    // After extraction, ensure active page is page 1 (not stale from previous session)
+    if (!_ocrPages.find(function(p) { return p.id === _ocrActivePageId; })) {
+      _ocrActivePageId = _ocrPages[0] ? _ocrPages[0].id : null;
+    }
     var titleEl = document.getElementById('ocrSessionTitle');
     _ocrCurrentHistoryId = _ocrSaveToHistory(titleEl ? titleEl.value : 'Sessione OCR', _ocrPages.length);
     _ocrRenderHistory(_ocrLoadHistory());
@@ -29619,6 +29624,8 @@ function _ocrRvMove(direction) {
   var iA = _ocrPages.findIndex(function(p) { return p.id === idA; });
   var iB = _ocrPages.findIndex(function(p) { return p.id === idB; });
   if (iA >= 0 && iB >= 0) { var t2 = _ocrPages[iA]; _ocrPages[iA] = _ocrPages[iB]; _ocrPages[iB] = t2; }
+  // Active page always tracks position 0 of review order (first page = first extracted)
+  _ocrActivePageId = _ocrRvPages[0].id;
   _ocrRvSetPage(newIdx);
 }
 
