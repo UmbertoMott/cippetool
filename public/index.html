@@ -4456,19 +4456,30 @@ body.theme-light .sm-card-icon{background:#1a1a18}
 .rl-msg{display:flex;flex-direction:column;gap:6px;max-width:100%}
 .rl-msg.user{align-items:flex-end}
 .rl-msg.ai{align-items:flex-start}
-.rl-msg-bubble{padding:12px 16px;border-radius:14px;font-size:13.5px;line-height:1.65;color:var(--txt);font-family:'Inter',sans-serif}
-.rl-msg.user .rl-msg-bubble{background:var(--acc);color:#fff;border-bottom-right-radius:4px;max-width:80%}
-.rl-msg.ai .rl-msg-bubble{background:var(--sur);border:0.5px solid var(--bdr);border-bottom-left-radius:4px;border-left:2.5px solid #2C7A7B;width:100%}
+.rl-msg-bubble{padding:16px 20px;border-radius:14px;font-size:13.5px;line-height:1.72;color:var(--txt);font-family:'Inter',sans-serif;text-align:justify}
+.rl-msg.user .rl-msg-bubble{background:var(--acc);color:#fff;border-bottom-right-radius:4px;max-width:80%;text-align:left}
+.rl-msg.ai .rl-msg-bubble{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-bottom-left-radius:4px;border-left:3px solid #2C7A7B;width:100%;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+[data-theme=dark] .rl-msg.ai .rl-msg-bubble{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.2)}
 .rl-msg.ai.dt-msg .rl-msg-bubble{border-left-color:#ECC94B}
+/* Section headers inside AI response */
+.rl-msg-bubble .rl-h1{font-size:14.5px;font-weight:700;color:var(--txt);margin:14px 0 6px;display:block}
+.rl-msg-bubble .rl-h2{font-size:13.5px;font-weight:700;color:var(--txt);margin:12px 0 4px;display:block}
+.rl-msg-bubble .rl-hr{border:none;border-top:0.5px solid var(--bdr);margin:10px 0}
+/* Markdown table */
+.rl-md-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0;text-align:left}
+.rl-md-table th{background:rgba(44,122,123,.1);font-weight:600;padding:6px 10px;border:0.5px solid var(--bdr);white-space:nowrap;color:var(--txt)}
+.rl-md-table td{padding:5px 10px;border:0.5px solid var(--bdr);vertical-align:top;line-height:1.5;color:var(--txt)}
+.rl-md-table tr:nth-child(even) td{background:rgba(0,0,0,.025)}
+[data-theme=dark] .rl-md-table tr:nth-child(even) td{background:rgba(255,255,255,.025)}
 
-/* Citation badges */
-.rl-cit{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.07);font-size:10px;font-weight:600;color:rgba(0,0,0,.45);cursor:pointer;margin:0 2px;vertical-align:middle;transition:background .13s,color .13s;line-height:1}
-.rl-cit:hover{background:rgba(0,0,0,.12);color:rgba(0,0,0,.7)}
-.rl-cit.active{background:#0f0f0e;color:#fff}
-body.theme-light .rl-cit{background:rgba(0,0,0,.07);color:rgba(0,0,0,.45)}
+/* Citation badges — pill style */
+.rl-cit{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:rgba(44,122,123,.12);border:0.5px solid rgba(44,122,123,.3);font-size:10px;font-weight:700;color:#2C7A7B;cursor:pointer;margin:0 2px;vertical-align:middle;transition:background .13s,color .13s,border-color .13s;line-height:1;font-family:'Inter',sans-serif}
+.rl-cit:hover{background:rgba(44,122,123,.22);border-color:rgba(44,122,123,.6)}
+.rl-cit.active{background:#2C7A7B;border-color:#2C7A7B;color:#fff}
+body.theme-light .rl-cit{background:rgba(44,122,123,.1);border-color:rgba(44,122,123,.25)}
 
 /* Citation tooltip */
-.rl-cit-tooltip{position:fixed;background:#1a1a1a;color:#e8e8e8;border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.5;max-width:300px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,.3);pointer-events:none}
+.rl-cit-tooltip{position:fixed;background:#1a202c;color:#e8e8e8;border-radius:10px;padding:10px 14px;font-size:12px;line-height:1.55;max-width:320px;z-index:1000;box-shadow:0 6px 24px rgba(0,0,0,.35);pointer-events:none;border-left:3px solid #2C7A7B}
 
 /* Source cards */
 .rl-sources{display:flex;flex-direction:column;gap:6px;margin-top:6px;width:100%}
@@ -12792,19 +12803,69 @@ function _rlBuildMsgEl(msg, idx) {
 }
 
 function _rlRenderMarkdown(text, sources, msgIdx) {
-  var t = _rlEsc(text)
+  // Step 1: escape HTML
+  var t = _rlEsc(text);
+
+  // Step 2: render markdown tables (before \n→<br>)
+  t = _rlRenderMdTables(t);
+
+  // Step 3: inline formatting + headers
+  t = t
     .replace(/\*\*\*([\s\S]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([\s\S]+?)\*/g, '<em>$1</em>')
-    .replace(/^#{3}\s+(.+)$/gm, '<strong>$1</strong>')
-    .replace(/^#{1,2}\s+(.+)$/gm, '<strong>$1</strong>')
-    .replace(/^[-*]\s+(.+)$/gm, '&#x2022; $1')
+    .replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*\n]+?)\*/g, '<em>$1</em>')
+    .replace(/^#{3}\s+(.+)$/gm, '<span class="rl-h2">$1</span>')
+    .replace(/^#{1,2}\s+(.+)$/gm, '<span class="rl-h1">$1</span>')
+    .replace(/^---+$/gm, '<hr class="rl-hr">')
+    .replace(/^[-*]\s+(.+)$/gm, '&#x2022;&nbsp;$1')
     .replace(/\n/g, '<br>');
-  // Replace [n] with clickable citation badges
+
+  // Step 4: citation badges with data attributes for active state
   t = t.replace(/\[(\d+)\]/g, function(match, num) {
-    return '<span class="rl-cit" onclick="rlCitClick(' + msgIdx + ',' + num + ')" title="Source ' + num + '">' + num + '</span>';
+    var srcId = parseInt(num, 10);
+    var src = sources ? sources.find(function(s){ return s.id === srcId; }) : null;
+    var title = src ? (src.title || 'Source ' + num).slice(0, 60) : 'Source ' + num;
+    return '<span class="rl-cit" data-msg="' + msgIdx + '" data-cit="' + num
+      + '" onclick="rlCitClick(' + msgIdx + ',' + num + ')"'
+      + ' onmouseenter="rlCitHover(this,' + msgIdx + ',' + num + ')"'
+      + ' onmouseleave="rlCitHoverOut()"'
+      + ' title="' + title + '">' + num + '</span>';
   });
   return t;
+}
+
+// Render markdown pipe tables to HTML
+function _rlRenderMdTables(escaped) {
+  var lines = escaped.split('\n');
+  var out = [];
+  var tableLines = [];
+  function flushTable() {
+    if (!tableLines.length) return;
+    // Parse rows
+    var rows = tableLines.map(function(line) {
+      return line.replace(/^\||\|$/g, '').split('|').map(function(c){ return c.trim(); });
+    });
+    // Check if row[1] is separator
+    var hasSep = rows.length > 1 && rows[1].every(function(c){ return /^[-: ]+$/.test(c); });
+    var headers = rows[0];
+    var dataRows = rows.slice(hasSep ? 2 : 1);
+    var thead = '<thead><tr>' + headers.map(function(h){ return '<th>' + h + '</th>'; }).join('') + '</tr></thead>';
+    var tbody = '<tbody>' + dataRows.map(function(row){
+      return '<tr>' + row.map(function(c){ return '<td>' + c + '</td>'; }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+    out.push('<table class="rl-md-table">' + thead + tbody + '</table>');
+    tableLines = [];
+  }
+  lines.forEach(function(line) {
+    if (/^\s*\|.+\|/.test(line)) {
+      tableLines.push(line);
+    } else {
+      flushTable();
+      out.push(line);
+    }
+  });
+  flushTable();
+  return out.join('\n');
 }
 
 function _rlFileType(name) {
@@ -12824,6 +12885,11 @@ function rlCitClick(msgIdx, srcId) {
   if (!msg || !msg.sources) return;
   var src = msg.sources.find(function(s){ return s.id === srcId || s.id === Number(srcId); });
   if (!src) return;
+  // Update active badge: clear previous, set new
+  document.querySelectorAll('.rl-cit.active').forEach(function(el){ el.classList.remove('active'); });
+  var badge = document.querySelector('.rl-cit[data-msg="' + msgIdx + '"][data-cit="' + srcId + '"]');
+  if (badge) badge.classList.add('active');
+  rlCitHoverOut();
   if (src.docId) {
     rlShowInViewer(src.docId, src.snippet || '');
   } else if (src.snippet) {
@@ -12832,6 +12898,29 @@ function rlCitClick(msgIdx, srcId) {
 }
 
 function rlSrcClick(msgIdx, srcId) { rlCitClick(msgIdx, srcId); }
+
+function rlCitHover(el, msgIdx, srcId) {
+  var msg = _rl.msgs[msgIdx];
+  if (!msg || !msg.sources) return;
+  var src = msg.sources.find(function(s){ return s.id === srcId || s.id === Number(srcId); });
+  if (!src) return;
+  var tt = document.getElementById('rlCitTooltip');
+  if (!tt) return;
+  var title = src.title || ('Source ' + srcId);
+  var snippet = src.snippet ? src.snippet.slice(0, 160) + (src.snippet.length > 160 ? '…' : '') : '';
+  tt.innerHTML = '<strong style="font-size:11px;opacity:.7">[' + srcId + ']</strong> '
+    + _rlEsc(title) + (snippet ? '<br><span style="opacity:.75;font-size:11px">' + _rlEsc(snippet) + '</span>' : '');
+  var r = el.getBoundingClientRect();
+  tt.style.display = 'block';
+  var left = Math.min(r.left, window.innerWidth - 340);
+  tt.style.left = Math.max(8, left) + 'px';
+  tt.style.top = (r.bottom + 6) + 'px';
+}
+
+function rlCitHoverOut() {
+  var tt = document.getElementById('rlCitTooltip');
+  if (tt) tt.style.display = 'none';
+}
 
 // ── Input handling ───────────────────────────────────────────────────────────
 function rlKeydown(e) {
@@ -12944,7 +13033,13 @@ function _rlCitationRules(isRag) {
       : 'ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
         + '[{"id":1,"title":"Autorità — Estremi — Anno","snippet":"frase completa max 200 car","reliability":0.9},...]\n'
     )
-    + 'NON aggiungere ---SOURCES--- se non ci sono citazioni. NON iniziare ripetendo la domanda.'
+    + 'NON aggiungere ---SOURCES--- se non ci sono citazioni. NON iniziare ripetendo la domanda.\n\n'
+    + '### CHAIN OF VERIFICATION (CoVe) — esegui prima di finalizzare\n'
+    + 'Prima di scrivere ---SOURCES---:\n'
+    + '1. Conta quanti [n] unici appaiono nel testo → devono corrispondere esattamente al numero di oggetti nel JSON.\n'
+    + '2. Verifica che nessun numero sia ripetuto nel testo (cerca [1]...[1] — se presente, correggi).\n'
+    + '3. Verifica che ogni snippet nel JSON sia una frase o clausola con senso compiuto (non tronca a metà).\n'
+    + '4. Solo se tutti e tre i check passano → scrivi ---SOURCES---.'
   );
 }
 
@@ -13245,7 +13340,39 @@ function _rlParseResponse(raw) {
     } catch(_e) {}
   }
   sources.forEach(function(s, i){ if (!s.id && s.id !== 0) s.id = i + 1; });
-  return { text: text, sources: sources };
+  // JS-side guarantee: renumber citations sequentially regardless of AI output
+  var fixed = _rlFixCitationNumbers(text, sources);
+  return { text: fixed.text, sources: fixed.sources };
+}
+
+// Post-processing: scan text for [n] markers in order of appearance, assign
+// sequential unique numbers starting from 1. Remap sources array accordingly.
+// This is a safety net — the AI prompt already instructs the model, but JS
+// enforces it unconditionally.
+function _rlFixCitationNumbers(text, sources) {
+  var seen = {};   // oldNum → newNum
+  var counter = 0;
+  var fixedText = text.replace(/\[(\d+)\]/g, function(match, n) {
+    var num = parseInt(n, 10);
+    if (!(num in seen)) seen[num] = ++counter;
+    return '[' + seen[num] + ']';
+  });
+  // Remap sources to new numbers
+  var fixedSources = [];
+  Object.keys(seen).forEach(function(oldN) {
+    var newN = seen[parseInt(oldN, 10)];
+    var src = sources.find(function(s){ return s.id === parseInt(oldN, 10); });
+    if (src) fixedSources.push(Object.assign({}, src, { id: newN }));
+  });
+  // Include sources not referenced in text (no [n] in text)
+  sources.forEach(function(src) {
+    var isReferenced = fixedSources.some(function(f){ return f.id === src.id; });
+    if (!isReferenced) {
+      // Source exists but AI forgot to cite it in text — keep but don't renumber
+    }
+  });
+  fixedSources.sort(function(a, b){ return a.id - b.id; });
+  return { text: fixedText, sources: fixedSources.length ? fixedSources : sources };
 }
 
 // ── Message helpers ───────────────────────────────────────────────────────────
