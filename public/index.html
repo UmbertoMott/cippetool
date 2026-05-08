@@ -12918,6 +12918,36 @@ function rlChunk(text, docId) {
   return chunks;
 }
 
+// ── Citation rules block (shared) ────────────────────────────────────────────
+function _rlCitationRules(isRag) {
+  return (
+    '## REGOLE CITAZIONI — LEGGI CON ATTENZIONE\n\n'
+    + '### REGOLA 1 — Ogni numero è usato UNA SOLA VOLTA, in ordine crescente\n'
+    + 'Il contatore delle citazioni è un registro globale: parte da [1] e sale sempre di 1.\n'
+    + 'Ogni volta che citi qualcosa di NUOVO assegni il numero successivo disponibile.\n'
+    + 'CORRETTO:\n'
+    + '  "...disposizione del codice [1]... obbligo di trasparenza [2]... la PA sceglie il contraente [3]..."\n'
+    + 'SBAGLIATO (vietato):\n'
+    + '  "...codice [1]... trasparenza [2]... il codice [1] prevede anche..." ← [1] usato due volte → ERRORE\n'
+    + '  "...codice [1]... codice [1]... codice [1]..." ← stesso numero ripetuto → ERRORE GRAVE\n'
+    + 'Se devi richiamare un concetto già citato, scrivi il testo senza aggiungere un numero.\n\n'
+    + '### REGOLA 2 — Lo snippet deve avere senso compiuto (frase o clausola intera)\n'
+    + 'Nel JSON ---SOURCES--- il campo "snippet" deve contenere una frase o clausola COMPLETA.\n'
+    + 'CORRETTO: "la stazione appaltante è qualsiasi soggetto, pubblico o privato, che affida contratti di appalto"\n'
+    + 'SBAGLIATO: "stazione appaltante è qualsiasi sogg" ← tronco a metà → ERRORE\n'
+    + 'SBAGLIATO: "privato, che affida" ← inizia a metà frase → ERRORE\n'
+    + 'Minimo: una clausola relativa completa. Massimo: 200 caratteri.\n\n'
+    + (isRag
+      ? 'ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
+        + '[{"id":1,"title":"Titolo documento","snippet":"frase completa max 200 car","page":1,"docId":"ID_REALE_DEL_CHUNK"},...]\n'
+        + '"docId" = valore docId= del chunk copiato esatto (NON "doc_id" letterale).\n'
+      : 'ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
+        + '[{"id":1,"title":"Autorità — Estremi — Anno","snippet":"frase completa max 200 car","reliability":0.9},...]\n'
+    )
+    + 'NON aggiungere ---SOURCES--- se non ci sono citazioni. NON iniziare ripetendo la domanda.'
+  );
+}
+
 // ── Output section builder (shared between RAG and no-doc prompts) ───────────
 function _rlBuildOutputSections() {
   var m = _rl.modes || {};
@@ -12967,14 +12997,7 @@ function _rlBuildRagPrompt(query, topChunks) {
     + '- Se l\'informazione richiesta NON è nei chunk E non è di dominio pubblico verificabile, scrivi: '
     + '"L\'informazione non è reperibile nelle fonti fornite o verificate."\n\n'
     + _rlBuildOutputSections()
-    + '## REGOLE CITAZIONI [CRITICO]\n'
-    + 'Ogni [n] identifica UN UNICO pezzo di testo — usalo UNA SOLA VOLTA nel testo. '
-    + 'Non ripetere lo stesso numero per rinviare allo stesso chunk.\n'
-    + 'Primo riferimento=[1], secondo=[2], etc. Ogni numero cita un chunk DIVERSO.\n'
-    + 'ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
-    + '[{"id":1,"title":"Titolo documento","snippet":"testo verbatim max 150 car","page":1,"docId":"ID_REALE_DEL_CHUNK"},...]\n'
-    + 'Il campo "docId" DEVE essere il valore docId= del chunk (copia esatto — non "doc_id" letterale).\n'
-    + 'NON iniziare ripetendo la domanda.'
+    + _rlCitationRules(true)
   );
 }
 
@@ -13015,15 +13038,7 @@ function _rlBuildSysPrompt() {
     + 'scrivi "Dato non verificabile con certezza". Non parafrasare norme inesistenti.\n'
     + '- CITAZIONE ESATTA: Autorità + numero + data/anno + massima/principio di diritto.\n\n'
     + '## STRUTTURA OUTPUT\n' + sections
-    + '## REGOLE CITAZIONI [CRITICO]\n'
-    + 'Ogni numero [n] identifica UN UNICO pezzo di contenuto — usalo UNA SOLA VOLTA nel testo.\n'
-    + 'Esempio CORRETTO: "L\'art. 1 [1] stabilisce X. L\'art. 2 [2] prevede Y. La Cass. [3] ha sancito Z."\n'
-    + 'Esempio SBAGLIATO: "L\'art. 1 [1] stabilisce X ... come già visto [1] ..." ← VIETATO ripetere [1].\n'
-    + 'Se devi rimandare a una fonte già citata, integra il concetto nel testo senza aggiungere un nuovo [n].\n'
-    + 'Sequenza: primo riferimento=[1], secondo=[2], etc. Non saltare numeri.\n'
-    + 'ALLA FINE scrivi ---SOURCES--- con JSON:\n'
-    + '[{"id":1,"title":"Autorità — Estremi — Anno","snippet":"testo verbatim max 150 car","reliability":0.9},...]\n'
-    + 'NON aggiungere ---SOURCES--- se non ci sono citazioni. NON iniziare ripetendo la domanda.'
+    + _rlCitationRules(false)
   );
 }
 
