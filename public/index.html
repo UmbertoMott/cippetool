@@ -4331,6 +4331,23 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 #lrlSection{display:none;animation:lrlFadeIn .3s ease}
 @keyframes lrlFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
+/* ── SCREEN MODE — TOOL GRID ──────────────────────────────── */
+.sm-wrap{display:flex;flex-direction:column;align-items:center;padding:56px 32px 48px;min-height:100vh;background:var(--bg)}
+.sm-header{width:100%;max-width:960px;margin-bottom:36px}
+.sm-greet{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--txt);letter-spacing:-.3px;line-height:1.2}
+.sm-sub{font-size:12px;color:var(--muted);margin-top:5px;font-family:'Inter',sans-serif}
+.sm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:960px}
+@media(max-width:860px){.sm-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.sm-grid{grid-template-columns:1fr}}
+.sm-card{background:var(--sur);border:0.5px solid var(--bdr);border-radius:16px;padding:26px 24px 24px;text-align:left;cursor:pointer;color:var(--txt);font-family:inherit;transition:box-shadow .18s,transform .18s;display:flex;flex-direction:column;gap:18px}
+.sm-card:hover{box-shadow:0 6px 28px rgba(0,0,0,.09);transform:translateY(-2px)}
+body.theme-light .sm-card:hover{box-shadow:0 6px 28px rgba(0,0,0,.08)}
+.sm-card-icon{width:40px;height:40px;border-radius:10px;background:#0f0f0e;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+body.theme-light .sm-card-icon{background:#1a1a18}
+.sm-card-body{display:flex;flex-direction:column;gap:5px}
+.sm-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--txt);line-height:1.2;letter-spacing:-.1px}
+.sm-card-desc{font-size:12px;color:var(--muted);line-height:1.5;font-family:'Inter',sans-serif}
+
 /* ── RESEARCH LAB ──────────────────────────────────────────── */
 #screenLRL{padding:0;display:none}
 #screenLRL.active{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50}
@@ -7489,113 +7506,80 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- MODE CHOICE SCREEN ─────────────────────────────────────────────── -->
 <div class="screen" id="screenMode">
-  <div id="modeWrap" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:20px;padding:40px 20px">
-    <div style="text-align:left;width:100%;max-width:860px;">
-      <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;letter-spacing:-.2px;" id="modeGreet">Bentornato!</div>
-    </div>
-    <div id="modeGrid" style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:860px;">
-
-      <!-- ── QUIZ & TRAINING ── -->
-      <button onclick="lrlGoMode('quiz')"
-        style="width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:row;align-items:center;overflow:hidden;transition:transform .18s,box-shadow .18s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="width:72px;height:72px;flex-shrink:0;overflow:hidden;border-right:1px solid var(--bdr);">
-          <img src="/previews/prev_quiz.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
-        </div>
-        <div style="flex:1;padding:14px 18px;min-width:0;">
-          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:3px;">Quiz &amp; Training</div>
-          <div style="font-size:11.5px;color:var(--muted);line-height:1.4;" data-i18n="quiz_desc">Simulazioni d'esame, flashcard e ripasso guidato</div>
-        </div>
-        <div style="padding:0 18px;font-size:16px;color:var(--muted);flex-shrink:0;">→</div>
-      </button>
-
-      <!-- ── LEGAL RESEARCH LAB ── -->
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}lrlGoMode('research')"
-        style="width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:row;align-items:center;overflow:hidden;transition:transform .18s,box-shadow .18s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="width:72px;height:72px;flex-shrink:0;overflow:hidden;border-right:1px solid var(--bdr);">
-          <img src="/previews/prev_research.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
-        </div>
-        <div style="flex:1;padding:14px 18px;min-width:0;">
-          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:3px;">Legal Research Lab</div>
-          <div style="font-size:11.5px;color:var(--muted);line-height:1.4;" data-i18n="lrl_desc">Ricerca multifonti, analisi normativa e dottrina</div>
-        </div>
-        <div style="padding:0 18px;font-size:16px;color:var(--muted);flex-shrink:0;">→</div>
-      </button>
-
-      <!-- ── AI DOCUMENT WORKBENCH ── -->
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}showScreen('screenWBPicker');wbPickerInit()"
-        style="width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:row;align-items:center;overflow:hidden;transition:transform .18s,box-shadow .18s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="width:72px;height:72px;flex-shrink:0;overflow:hidden;border-right:1px solid var(--bdr);">
-          <img src="/previews/prev_workbench.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
-        </div>
-        <div style="flex:1;padding:14px 18px;min-width:0;">
-          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:3px;">AI Document Workbench</div>
-          <div style="font-size:11.5px;color:var(--muted);line-height:1.4;" data-i18n="wb_desc">Lettura attiva, annotazioni e analisi AI di documenti</div>
-        </div>
-        <div style="padding:0 18px;font-size:16px;color:var(--muted);flex-shrink:0;">→</div>
-      </button>
-
-      <!-- ── PROF. LEX ── -->
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}profOpen()"
-        style="width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:row;align-items:center;overflow:hidden;transition:transform .18s,box-shadow .18s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="width:72px;height:72px;flex-shrink:0;overflow:hidden;border-right:1px solid var(--bdr);">
-          <img src="/previews/prev_proflex.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
-        </div>
-        <div style="flex:1;padding:14px 18px;min-width:0;">
-          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:3px;" data-i18n="proflex_name">Prof. Lex — AI Docente Vocale</div>
-          <div style="font-size:11.5px;color:var(--muted);line-height:1.4;" data-i18n="proflex_desc">Lezioni vocali, dialogo socratico e spiegazioni interattive</div>
-        </div>
-        <div style="padding:0 18px;font-size:16px;color:var(--muted);flex-shrink:0;">→</div>
-      </button>
-
-      <!-- ── OCR DOCUMENTO ── -->
-      <button onclick="ocrOpen()"
-        style="width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:row;align-items:center;overflow:hidden;transition:transform .18s,box-shadow .18s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="width:72px;height:72px;flex-shrink:0;overflow:hidden;border-right:1px solid var(--bdr);">
-          <img src="/previews/prev_ocr.jpg" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;">
-        </div>
-        <div style="flex:1;padding:14px 18px;min-width:0;">
-          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:3px;" data-i18n="ocr_name">OCR Documento</div>
-          <div style="font-size:11.5px;color:var(--muted);line-height:1.4;" data-i18n="ocr_desc">Scansione e digitalizzazione di documenti cartacei</div>
-        </div>
-        <div style="padding:0 18px;font-size:16px;color:var(--muted);flex-shrink:0;">→</div>
-      </button>
-
+  <div class="sm-wrap">
+    <div class="sm-header">
+      <div class="sm-greet" id="modeGreet">Bentornato!</div>
+      <div class="sm-sub">Seleziona uno strumento per iniziare</div>
     </div>
 
-    <!-- ── SEZIONE STRUMENTI AVANZATI ──────────────────────────── -->
-    <div style="width:100%;max-width:860px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <div style="flex:1;height:1px;background:var(--bdr);"></div>
-        <span style="font-size:10.5px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);white-space:nowrap;">Strumenti avanzati</span>
-        <div style="flex:1;height:1px;background:var(--bdr);"></div>
-      </div>
-      <button class="mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}trPickerInit();showScreen('screenTabularReview')"
-        style="width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:0;cursor:pointer;text-align:left;color:var(--txt);font-family:inherit;display:flex;flex-direction:row;align-items:center;overflow:hidden;transition:transform .18s,box-shadow .18s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.08)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="width:72px;height:72px;flex-shrink:0;background:var(--sur2);display:flex;align-items:center;justify-content:center;border-right:1px solid var(--bdr);">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-        </div>
-        <div style="flex:1;padding:14px 18px;min-width:0;">
-          <div style="font-size:13px;font-weight:600;letter-spacing:-.1px;margin-bottom:3px;">Tabular Review</div>
-          <div style="font-size:11.5px;color:var(--muted);line-height:1.4;">Analisi multi-documento con colonne AI personalizzabili · Export CSV · Condivisione</div>
-        </div>
-        <div style="padding:0 18px;font-size:16px;color:var(--muted);flex-shrink:0;">→</div>
-      </button>
-    </div>
+    <div class="sm-grid" id="modeGrid">
 
-    <div style="font-size:11px;color:var(--muted);opacity:.6">
-      <span data-i18n="mode_footer">Puoi tornare qui in qualsiasi momento</span>
+      <!-- Quiz & Training -->
+      <button class="sm-card" onclick="lrlGoMode('quiz')">
+        <div class="sm-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="sm-card-body">
+          <div class="sm-card-title">Quiz &amp; Training</div>
+          <div class="sm-card-desc">Simulazioni d'esame e ripasso guidato</div>
+        </div>
+      </button>
+
+      <!-- Legal Research Lab -->
+      <button class="sm-card mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}lrlGoMode('research')">
+        <div class="sm-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="sm-card-body">
+          <div class="sm-card-title">Legal Research Lab</div>
+          <div class="sm-card-desc">Analisi multifonti, normativa e dottrina</div>
+        </div>
+      </button>
+
+      <!-- AI Document Workbench -->
+      <button class="sm-card mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}showScreen('screenWBPicker');wbPickerInit()">
+        <div class="sm-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        </div>
+        <div class="sm-card-body">
+          <div class="sm-card-title">AI Document Workbench</div>
+          <div class="sm-card-desc">Lettura attiva e analisi AI di documenti</div>
+        </div>
+      </button>
+
+      <!-- Prof. Lex -->
+      <button class="sm-card mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}profOpen()">
+        <div class="sm-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <div class="sm-card-body">
+          <div class="sm-card-title" data-i18n="proflex_name">Prof. Lex</div>
+          <div class="sm-card-desc" data-i18n="proflex_desc">AI Docente Vocale — dialogo socratico</div>
+        </div>
+      </button>
+
+      <!-- OCR Documento -->
+      <button class="sm-card" onclick="ocrOpen()">
+        <div class="sm-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="sm-card-body">
+          <div class="sm-card-title" data-i18n="ocr_name">OCR Documento</div>
+          <div class="sm-card-desc" data-i18n="ocr_desc">Scansione e digitalizzazione cartacea</div>
+        </div>
+      </button>
+
+      <!-- Tabular Review -->
+      <button class="sm-card mode-card-desktop-only" onclick="if(window.innerWidth<640){_mobileDesktopOnly(event);return;}trPickerInit();showScreen('screenTabularReview')">
+        <div class="sm-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </div>
+        <div class="sm-card-body">
+          <div class="sm-card-title">Tabular Review</div>
+          <div class="sm-card-desc">Analisi multi-documento con colonne AI</div>
+        </div>
+      </button>
+
     </div>
   </div>
 </div>
