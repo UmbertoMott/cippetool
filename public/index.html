@@ -4498,6 +4498,7 @@ body.theme-light .rl-modal-btn.confirm{background:#111}
 .rl-cit{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:rgba(44,122,123,.12);border:0.5px solid rgba(44,122,123,.3);font-size:10px;font-weight:700;color:#2C7A7B;cursor:pointer;margin:0 2px;vertical-align:middle;transition:background .13s,color .13s,border-color .13s;line-height:1;font-family:'Inter',sans-serif}
 .rl-cit:hover{background:rgba(44,122,123,.22);border-color:rgba(44,122,123,.6)}
 .rl-cit.active{background:#2C7A7B;border-color:#2C7A7B;color:#fff}
+.rl-cit-nf{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:rgba(150,150,150,.1);border:0.5px solid rgba(150,150,150,.3);font-size:10px;font-weight:700;color:var(--muted);margin:0 2px;vertical-align:middle;line-height:1;font-family:'Inter',sans-serif;cursor:default;opacity:.55}
 body.theme-light .rl-cit{background:rgba(44,122,123,.1);border-color:rgba(44,122,123,.25)}
 
 /* Citation tooltip */
@@ -12948,6 +12949,10 @@ function _rlRenderMarkdown(text, sources, msgIdx) {
     var srcId = parseInt(num, 10);
     var src = sources ? sources.find(function(s){ return s.id === srcId; }) : null;
     var title = src ? (src.title || 'Source ' + num).slice(0, 60) : 'Source ' + num;
+    // If snippet couldn't be located in document, render as non-interactive
+    if (src && src._found === false) {
+      return '<span class="rl-cit rl-cit-nf" title="Testo non localizzabile nel documento">' + num + '</span>';
+    }
     return '<span class="rl-cit" data-msg="' + msgIdx + '" data-cit="' + num
       + '" onclick="rlCitClick(' + msgIdx + ',' + num + ')"'
       + ' onmouseenter="rlCitHover(this,' + msgIdx + ',' + num + ')"'
@@ -13143,15 +13148,17 @@ function _rlCitationRules(isRag) {
     + '  "...codice [1]... trasparenza [2]... il codice [1] prevede anche..." ← [1] usato due volte → ERRORE\n'
     + '  "...codice [1]... codice [1]... codice [1]..." ← stesso numero ripetuto → ERRORE GRAVE\n'
     + 'Se devi richiamare un concetto già citato, scrivi il testo senza aggiungere un numero.\n\n'
-    + '### REGOLA 2 — Lo snippet deve avere senso compiuto (frase o clausola intera)\n'
-    + 'Nel JSON ---SOURCES--- il campo "snippet" deve contenere una frase o clausola COMPLETA.\n'
+    + '### REGOLA 2 — Lo snippet deve essere VERBATIM e avere senso compiuto\n'
+    + 'Nel JSON ---SOURCES--- il campo "snippet" deve essere una copia LETTERALE (copia-incolla) dal testo del chunk.\n'
+    + 'NON parafrasare, NON riscrivere, NON riassumere: copia esattamente le parole che trovi nel chunk.\n'
+    + 'Lo snippet deve essere una frase o clausola COMPLETA che finisce con punto, virgola o altro segno.\n'
     + 'CORRETTO: "la stazione appaltante è qualsiasi soggetto, pubblico o privato, che affida contratti di appalto"\n'
     + 'SBAGLIATO: "stazione appaltante è qualsiasi sogg" ← tronco a metà → ERRORE\n'
-    + 'SBAGLIATO: "privato, che affida" ← inizia a metà frase → ERRORE\n'
+    + 'SBAGLIATO: "il soggetto deve rispettare i principi" ← parafrasato, non verbatim → ERRORE\n'
     + 'Minimo: una clausola relativa completa. Massimo: 200 caratteri.\n\n'
     + (isRag
       ? 'ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
-        + '[{"id":1,"title":"Titolo documento","snippet":"frase completa max 200 car","page":1,"docId":"ID_REALE_DEL_CHUNK"},...]\n'
+        + '[{"id":1,"title":"Titolo documento","snippet":"frase VERBATIM dal chunk max 200 car","page":1,"docId":"ID_REALE_DEL_CHUNK"},...]\n'
         + '"docId" = valore docId= del chunk copiato esatto (NON "doc_id" letterale).\n'
       : 'ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
         + '[{"id":1,"title":"Autorità — Estremi — Anno","snippet":"frase completa max 200 car","reliability":0.9},...]\n'
@@ -13161,8 +13168,9 @@ function _rlCitationRules(isRag) {
     + 'Prima di scrivere ---SOURCES---:\n'
     + '1. Conta quanti [n] unici appaiono nel testo → devono corrispondere esattamente al numero di oggetti nel JSON.\n'
     + '2. Verifica che nessun numero sia ripetuto nel testo (cerca [1]...[1] — se presente, correggi).\n'
-    + '3. Verifica che ogni snippet nel JSON sia una frase o clausola con senso compiuto (non tronca a metà).\n'
-    + '4. Solo se tutti e tre i check passano → scrivi ---SOURCES---.'
+    + '3. Verifica che ogni snippet finisca con punto, virgola o altro segno di punteggiatura (senso compiuto).\n'
+    + '4. Verifica che ogni snippet sia copiato LETTERALMENTE dal chunk (non parafrasato).\n'
+    + '5. Solo se tutti i check passano → scrivi ---SOURCES---.'
   );
 }
 
@@ -13180,16 +13188,23 @@ function _rlFixSources(sources) {
       var doc = (_rl.docs || []).find(function(d){ return d.id === s.docId; });
       if (doc) s.title = doc.name;
     }
-    // Extend snippet to sentence boundary using actual document text
+    // Validate snippet: find verbatim match in doc, extend to sentence boundary
     if (s.docId && s.snippet && s.snippet.length > 10) {
-      var doc = (_rl.docs || []).find(function(d){ return d.id === s.docId; });
-      if (doc && doc.text) {
-        var found = _rlFindSnippet(doc.text, s.snippet);
+      var doc2 = (_rl.docs || []).find(function(d){ return d.id === s.docId; });
+      if (doc2 && doc2.text) {
+        var found = _rlFindSnippet(doc2.text, s.snippet);
         if (found) {
-          var extended = _rlExtendToSentence(doc.text, found);
-          if (extended && extended.length > found.length) s.snippet = extended;
+          s._found = true;
+          var extended = _rlExtendToSentence(doc2.text, found);
+          s.snippet = (extended && extended.length > found.length) ? extended : found;
+        } else {
+          s._found = false; // snippet not locatable — badge will be non-interactive
         }
+      } else {
+        s._found = true; // no doc text to validate against, assume ok
       }
+    } else if (!s.docId) {
+      s._found = true; // web/external source always shown
     }
   });
 }
@@ -13779,12 +13794,11 @@ function _rlFindSnippet(text, snippet) {
 function _rlExtendToSentence(text, found) {
   var idx = text.indexOf(found);
   if (idx < 0) return found;
-  // Walk backward to previous sentence-ending punctuation
+  // Walk backward to previous sentence-ending punctuation (default: keep found start)
   var start = idx;
   for (var si = idx - 1; si >= Math.max(0, idx - 300); si--) {
     var c = text[si];
     if (c === '.' || c === '!' || c === '?' || c === '\n') { start = si + 1; break; }
-    if (si === Math.max(0, idx - 300)) start = si;
   }
   // Walk forward to next sentence-ending punctuation
   var end = idx + found.length;
@@ -13838,13 +13852,18 @@ function _rlMarkSnippetInHtml(html, snippet) {
           var c = candidates[ci]; if (!c) continue;
           var idx = val.indexOf(c);
           if (idx >= 0) {
+            // Extend endIdx to next sentence-ending punctuation within this text node
+            var endIdx = idx + c.length;
+            for (var fi = endIdx; fi < Math.min(val.length, endIdx + 400); fi++) {
+              if ('.!?,'.indexOf(val[fi]) >= 0) { endIdx = fi + 1; break; }
+            }
             var mark = tmpDoc.createElement('mark');
             mark.className = 'rl-highlight';
-            mark.textContent = val.slice(idx, idx + c.length);
+            mark.textContent = val.slice(idx, endIdx);
             var parent = node.parentNode;
             if (idx > 0) parent.insertBefore(tmpDoc.createTextNode(val.slice(0, idx)), node);
             parent.insertBefore(mark, node);
-            if (idx + c.length < val.length) parent.insertBefore(tmpDoc.createTextNode(val.slice(idx + c.length)), node);
+            if (endIdx < val.length) parent.insertBefore(tmpDoc.createTextNode(val.slice(endIdx)), node);
             parent.removeChild(node);
             marked = true;
             return;
