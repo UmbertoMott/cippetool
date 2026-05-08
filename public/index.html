@@ -11891,9 +11891,9 @@ async function eapDoWebSearch(userText, questionContext) {
     eapAppend('assistant', fullHtml, true);
 
     var _topicHint = _esbExtractTopic(result.text || '');
-    _esbAutoSession(' + (_topicHint || 'Web Research'));
-    _esbRenameIfGeneric(' + (_topicHint || 'Web Research'));
-    _esbAddMemory(' + (result.text||'').replace(/<[^>]+>/g,'').trim().substring(0,90));
+    _esbAutoSession(_topicHint || 'Web Research');
+    _esbRenameIfGeneric(_topicHint || 'Web Research');
+    _esbAddMemory((result.text||'').replace(/<[^>]+>/g,'').trim().substring(0,90));
     _esbSaveCurrent();
 
     // Attach norm tooltips
@@ -11941,7 +11941,7 @@ async function eapQuery(userText) {
 
   // Deep Research mode — intercept and route to web search
   if (_eapWebActive && !eapAttachedFile) {
-    eapAppend('user', ' + (userText || 'Web Research'), false);
+    eapAppend('user', userText || 'Web Research', false);
     eapHistory.push({ role: 'user', content: userText });
     // Build rich question context for deep research
     var drCtx = '';
