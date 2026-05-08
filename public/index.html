@@ -2994,18 +2994,13 @@ body.theme-light .ld-footer-link:hover { color: rgba(28,22,18,0.75) !important; 
   display: flex; align-items: center; gap: 9px;
   text-decoration: none; color: var(--ld-text);
 }
-.ld-logo-mark {
-  width: 26px; height: 26px;
-  background: var(--ld-violet);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: #fff; font-weight: 700; flex-shrink: 0;
-}
+.ld-logo-mark { display: none; }
 .ld-logo-text {
-  font-size: 14px; font-weight: 600; letter-spacing: -0.2px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600; letter-spacing: .1px;
   color: var(--ld-text);
 }
-.ld-logo-thin { font-weight: 400; color: var(--ld-text2); }
+.ld-logo-thin { display: none; }
 .ld-nav-links {
   display: flex; align-items: center; gap: 2px;
   margin: 0 auto;
@@ -3936,7 +3931,7 @@ body.theme-light .wb-mob-tab.active{background:rgba(0,0,0,0.08);color:#0f0f0e}
 }
 @media(max-width:480px){
   .ld-nav{padding:0 14px;height:52px}
-  .ld-logo-text{font-size:13px}
+  .ld-logo-text{font-size:18px}
   .ld-btn-nav{font-size:12px;padding:6px 12px}
   .ld-hero{padding:86px 16px 48px}
   .ld-hero-badge{font-size:10.5px;padding:4px 11px 4px 7px}
@@ -7055,8 +7050,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- NAV -->
 <nav class="ld-nav">
   <div class="ld-logo">
-    <div class="ld-logo-mark">◈</div>
-    <span class="ld-logo-text">CIPP/E<span class="ld-logo-thin"> Prep</span></span>
+    <span class="ld-logo-text">PassIapp</span>
   </div>
   <div class="ld-nav-links">
     <a class="ld-nav-link" href="#features">Funzionalità</a>
