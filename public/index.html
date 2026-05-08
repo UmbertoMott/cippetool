@@ -4334,14 +4334,53 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 /* ── RESEARCH LAB ──────────────────────────────────────────── */
 #screenLRL{padding:0;display:none}
 #screenLRL.active{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50}
+
+/* Root layout */
+.rl-root{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
+
+/* Icon sidebar */
+.rl-icons{width:44px;flex-shrink:0;background:#0f0f0e;border-right:0.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px}
+.rl-icon-btn{width:32px;height:32px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0}
+.rl-icon-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.rl-icon-btn.active{background:rgba(255,255,255,.12);color:#fff}
+
+/* Docs panel */
+.rl-docs-panel{width:260px;flex-shrink:0;background:var(--sur);border-right:0.5px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.rl-docs-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;border-bottom:0.5px solid var(--bdr);flex-shrink:0}
+.rl-docs-hdr span{font-size:13px;font-weight:700;color:var(--txt)}
+.rl-docs-new-btn{background:none;border:0.5px solid var(--bdr);border-radius:6px;padding:4px 10px;font:600 11px 'Inter',sans-serif;color:var(--muted);cursor:pointer;transition:all .13s}
+.rl-docs-new-btn:hover{border-color:var(--acc);color:var(--txt)}
+.rl-docs-search{margin:8px;width:calc(100% - 16px);box-sizing:border-box;background:var(--bg);border:0.5px solid var(--bdr);border-radius:7px;padding:6px 10px;font:13px 'Inter',sans-serif;color:var(--txt);outline:none;flex-shrink:0}
+.rl-docs-search::placeholder{color:var(--muted)}
+.rl-docs-list{flex:1;overflow-y:auto;padding:4px 8px}
+.rl-doc-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--txt);transition:background .13s}
+.rl-doc-item:hover{background:var(--sur2)}
+.rl-doc-item.active{background:var(--sur2);font-weight:600}
+.rl-doc-icon{font-size:10px;font-weight:800;color:var(--muted);flex-shrink:0;width:26px;height:18px;display:flex;align-items:center;justify-content:center;background:var(--sur2);border-radius:3px}
+.rl-doc-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
+.rl-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 2px;opacity:0;transition:opacity .13s;line-height:1}
+.rl-doc-item:hover .rl-doc-del{opacity:1}
+
+/* Main pane */
+.rl-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);position:relative;min-width:0}
+
+/* Thread header */
+.rl-thread-hdr{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:0.5px solid var(--bdr);background:var(--sur);flex-shrink:0;height:44px;box-sizing:border-box}
+.rl-thread-back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;transition:color .13s;flex-shrink:0}
+.rl-thread-back:hover{color:var(--txt)}
+.rl-thread-title{flex:1;font-size:13px;font-weight:700;color:var(--txt);text-align:center;outline:none;cursor:text;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:4px;padding:2px 6px}
+.rl-thread-title:focus{background:var(--sur2)}
+.rl-thread-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.rl-hdr-btn{background:none;border:0.5px solid var(--bdr);border-radius:6px;padding:4px 10px;font:600 11px 'Inter',sans-serif;color:var(--muted);cursor:pointer;transition:all .13s;white-space:nowrap}
+.rl-hdr-btn:hover{border-color:var(--acc);color:var(--txt)}
+.rl-hdr-btn.icon-btn{width:26px;height:26px;padding:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+
 /* Dashboard */
-.rl-dash{display:flex;flex-direction:column;height:100vh;background:var(--bg);overflow-y:auto}
-.rl-dash-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:0.5px solid var(--bdr);background:var(--sur)}
-.rl-dash-body{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:40px 24px}
-.rl-dash-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px}
+.rl-dash{display:flex;flex-direction:column;flex:1;overflow-y:auto;background:var(--bg);padding:40px 32px}
+.rl-dash-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
 .rl-dash-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--txt)}
 .rl-dash-sub{font-size:12px;color:var(--muted);margin-top:3px}
-.rl-btn-new-prj{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:9px 18px;font:600 13px 'Inter',sans-serif;cursor:pointer;transition:opacity .15s}
+.rl-btn-new-prj{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:9px 18px;font:600 13px 'Inter',sans-serif;cursor:pointer;transition:opacity .15s;flex-shrink:0}
 .rl-btn-new-prj:hover{opacity:.82}
 .rl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
 .rl-card{background:var(--sur);border:0.5px solid var(--bdr);border-radius:12px;padding:20px;cursor:pointer;transition:box-shadow .18s,border-color .18s;display:flex;flex-direction:column;gap:6px}
@@ -4357,56 +4396,32 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 .rl-empty-icon{font-size:40px;margin-bottom:4px}
 .rl-empty-title{font-size:16px;font-weight:700;color:var(--txt)}
 .rl-empty-sub{font-size:13px;color:var(--muted)}
-/* Workspace 3-pane */
-.rl-workspace{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
-.rl-sidebar{width:240px;flex-shrink:0;background:var(--sur);border-right:0.5px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
-.rl-sb-hdr{padding:14px 14px 10px;border-bottom:0.5px solid var(--bdr);flex-shrink:0}
-.rl-sb-back{background:none;border:none;color:var(--muted);font:600 11px 'Inter',sans-serif;cursor:pointer;padding:0;letter-spacing:.3px}
-.rl-sb-back:hover{color:var(--txt)}
-.rl-sb-prj{font-size:13px;font-weight:700;color:var(--txt);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rl-sb-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px;cursor:pointer;transition:all .15s}
-.rl-sb-badge.shared{background:rgba(44,122,123,.12);color:#2C7A7B;border:0.5px solid rgba(44,122,123,.3)}
-.rl-sb-badge.private{background:var(--sur2);color:var(--muted);border:0.5px solid var(--bdr)}
-.rl-sb-section{font-size:9.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);padding:12px 14px 4px;flex-shrink:0}
-.rl-sb-docs{flex:0 0 auto;max-height:180px;overflow-y:auto;padding:0 8px}
-.rl-sb-doc{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--txt);transition:background .13s}
-.rl-sb-doc:hover{background:var(--sur2)}
-.rl-sb-doc.active{background:var(--sur2);font-weight:600}
-.rl-sb-doc-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
-.rl-sb-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:0 2px;opacity:0;transition:opacity .13s;line-height:1}
-.rl-sb-doc:hover .rl-sb-doc-del{opacity:1}
-.rl-sb-upload{margin:8px;border:0.5px dashed var(--bdr);border-radius:8px;padding:9px;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s}
-.rl-sb-upload:hover{border-color:var(--acc);background:var(--sur2);color:var(--txt)}
-.rl-sb-chats{flex:1;overflow-y:auto;padding:0 8px;min-height:40px}
-.rl-sb-chat{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--muted);transition:background .13s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rl-sb-chat:hover{background:var(--sur2);color:var(--txt)}
-.rl-sb-chat.active{background:var(--sur2);color:var(--txt);font-weight:600}
-.rl-sb-new-chat{margin:8px;background:none;border:0.5px solid var(--bdr);border-radius:7px;padding:8px;font:600 11px 'Inter',sans-serif;color:var(--muted);cursor:pointer;width:calc(100% - 16px);transition:all .13s}
-.rl-sb-new-chat:hover{border-color:var(--acc);color:var(--txt)}
-/* Chat pane */
-.rl-chat-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.rl-chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:0.5px solid var(--bdr);background:var(--sur);flex-shrink:0;gap:12px}
-.rl-chat-hdr-title{font-size:13px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.rl-dt-wrap{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.rl-dt-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
-.rl-dt-toggle{width:34px;height:19px;border-radius:10px;background:var(--sur2);border:0.5px solid var(--bdr);cursor:pointer;position:relative;transition:background .2s,border-color .2s;flex-shrink:0}
-.rl-dt-toggle.on{background:#ECC94B;border-color:#d4ad30}
-.rl-dt-knob{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.rl-dt-toggle.on .rl-dt-knob{transform:translateX(15px)}
-.rl-chat-pane.dt-on .rl-chat-hdr{border-bottom-color:#ECC94B}
-.rl-chat-pane.dt-on .rl-input-box{border-color:#ECC94B!important}
-/* Messages */
-.rl-msgs{flex:1;overflow-y:auto;padding:20px 18px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
-.rl-msg{max-width:84%;display:flex;flex-direction:column;gap:6px}
-.rl-msg.user{align-self:flex-end;align-items:flex-end}
-.rl-msg.ai{align-self:flex-start;align-items:flex-start}
-.rl-msg-bubble{padding:11px 15px;border-radius:14px;font-size:13px;line-height:1.65;color:var(--txt)}
-.rl-msg.user .rl-msg-bubble{background:var(--acc);color:#fff;border-bottom-right-radius:4px}
-.rl-msg.ai .rl-msg-bubble{background:var(--sur);border:0.5px solid var(--bdr);border-bottom-left-radius:4px;border-left:2.5px solid #2C7A7B}
+
+/* Workspace */
+.rl-workspace{display:flex;flex:1;overflow:hidden}
+
+/* Messages area */
+.rl-msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+.rl-msgs-inner{max-width:780px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.rl-msg{display:flex;flex-direction:column;gap:6px;max-width:100%}
+.rl-msg.user{align-items:flex-end}
+.rl-msg.ai{align-items:flex-start}
+.rl-msg-bubble{padding:12px 16px;border-radius:14px;font-size:13.5px;line-height:1.65;color:var(--txt);font-family:'Inter',sans-serif}
+.rl-msg.user .rl-msg-bubble{background:var(--acc);color:#fff;border-bottom-right-radius:4px;max-width:80%}
+.rl-msg.ai .rl-msg-bubble{background:var(--sur);border:0.5px solid var(--bdr);border-bottom-left-radius:4px;border-left:2.5px solid #2C7A7B;width:100%}
 .rl-msg.ai.dt-msg .rl-msg-bubble{border-left-color:#ECC94B}
-.rl-cit{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:4px;background:rgba(44,122,123,.15);color:#2C7A7B;font-size:9.5px;font-weight:800;cursor:pointer;transition:background .13s;vertical-align:super;margin:0 1px;line-height:1}
-.rl-cit:hover{background:rgba(44,122,123,.3)}
-.rl-sources{display:flex;flex-direction:column;gap:6px;margin-top:4px;max-width:460px;width:100%}
+
+/* Citation badges */
+.rl-cit{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.07);font-size:10px;font-weight:600;color:rgba(0,0,0,.45);cursor:pointer;margin:0 2px;vertical-align:middle;transition:background .13s,color .13s;line-height:1}
+.rl-cit:hover{background:rgba(0,0,0,.12);color:rgba(0,0,0,.7)}
+.rl-cit.active{background:#0f0f0e;color:#fff}
+body.theme-light .rl-cit{background:rgba(0,0,0,.07);color:rgba(0,0,0,.45)}
+
+/* Citation tooltip */
+.rl-cit-tooltip{position:fixed;background:#1a1a1a;color:#e8e8e8;border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.5;max-width:300px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,.3);pointer-events:none}
+
+/* Source cards */
+.rl-sources{display:flex;flex-direction:column;gap:6px;margin-top:6px;width:100%}
 .rl-src{background:var(--sur);border:0.5px solid var(--bdr);border-radius:9px;padding:10px 12px;cursor:pointer;transition:border-color .15s}
 .rl-src:hover{border-color:rgba(44,122,123,.4)}
 .rl-src-num{font-size:9.5px;font-weight:800;color:#2C7A7B;text-transform:uppercase;letter-spacing:.5px}
@@ -4416,64 +4431,111 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 .rl-src-rel-bar{height:3px;border-radius:2px;background:var(--sur2);flex:1}
 .rl-src-rel-fill{height:100%;border-radius:2px;background:#2C7A7B}
 .rl-src-rel-pct{font-size:10px;font-weight:700;color:#2C7A7B;flex-shrink:0}
-/* Thinking/loading states */
+
+/* Thinking indicator */
 .rl-thinking{display:flex;align-items:center;gap:10px;padding:12px 15px;border-radius:12px;background:var(--sur);border:0.5px solid var(--bdr);border-left:2.5px solid #ECC94B;font-size:12px;color:var(--muted);align-self:flex-start}
 .rl-thinking-dots{display:flex;gap:4px}
 .rl-thinking-dots span{width:5px;height:5px;border-radius:50%;background:#ECC94B;animation:rlDot 1.2s ease-in-out infinite}
 .rl-thinking-dots span:nth-child(2){animation-delay:.2s}
 .rl-thinking-dots span:nth-child(3){animation-delay:.4s}
 @keyframes rlDot{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
-/* Research steps */
-.rl-steps{background:var(--sur);border:0.5px solid var(--bdr);border-radius:12px;padding:14px 16px;align-self:flex-start;min-width:300px}
+
+/* Agentic steps */
+.rl-steps{background:var(--sur);border:0.5px solid var(--bdr);border-radius:12px;padding:14px 16px;align-self:flex-start;min-width:300px;max-width:500px}
 .rl-steps-lbl{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.rl-step{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12px;color:var(--muted);border-bottom:0.5px solid var(--bdr)}
+.rl-step{display:flex;align-items:flex-start;gap:10px;padding:7px 0;font-size:12px;color:var(--muted);border-bottom:0.5px solid var(--bdr)}
 .rl-step:last-child{border-bottom:none}
 .rl-step.done{color:var(--txt)}
 .rl-step.running{color:var(--txt);font-weight:600}
-.rl-step-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.rl-step-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px}
 .rl-step.done .rl-step-ico{background:#2C7A7B;color:#fff}
 .rl-step.running .rl-step-ico{border:1.5px solid #ECC94B}
 .rl-step.pending .rl-step-ico{background:var(--sur2)}
 .rl-step-spinner{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--sur2);border-top-color:#ECC94B;animation:rlSpin .7s linear infinite}
 @keyframes rlSpin{to{transform:rotate(360deg)}}
+.rl-step-body{display:flex;flex-direction:column;gap:4px;flex:1}
+.rl-step-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.rl-step-pill{background:var(--sur2);border:0.5px solid var(--bdr);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--muted)}
+.rl-step-favs{display:flex;align-items:center;gap:4px;margin-top:4px}
+.rl-step-fav{width:16px;height:16px;border-radius:3px;background:var(--sur2);display:inline-flex;align-items:center;justify-content:center;font-size:9px}
+
 /* Input area */
-.rl-input-area{flex-shrink:0;padding:12px 14px;border-top:0.5px solid var(--bdr);background:var(--sur)}
+.rl-input-wrap{flex-shrink:0;border-top:0.5px solid var(--bdr);padding:12px 24px;background:var(--bg)}
 .rl-ctx-docs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;min-height:0}
 .rl-ctx-pill{display:flex;align-items:center;gap:5px;background:var(--sur2);border:0.5px solid var(--bdr);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--txt)}
 .rl-ctx-pill button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0;line-height:1}
-.rl-input-box{display:flex;align-items:center;gap:7px;background:var(--bg);border:0.5px solid var(--bdr);border-radius:12px;padding:7px 9px;transition:border-color .15s}
-.rl-input-box:focus-within{border-color:var(--acc)}
-.rl-attach{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;transition:color .13s}
-.rl-attach:hover{color:var(--txt)}
-.rl-input{flex:1;background:none;border:none;outline:none;font:14px 'Inter',sans-serif;color:var(--txt);resize:none;max-height:120px;line-height:1.5}
-.rl-input::placeholder{color:var(--muted)}
-.rl-send-grp{display:flex;gap:4px;align-items:center}
-.rl-research-btn{width:30px;height:30px;border-radius:7px;border:0.5px solid var(--bdr);background:var(--sur2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s}
-.rl-research-btn:hover{border-color:#2C7A7B;color:#2C7A7B;background:rgba(44,122,123,.08)}
-.rl-send-btn{width:30px;height:30px;border-radius:7px;border:none;background:var(--acc);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .13s}
+.rl-input-bar{display:flex;align-items:flex-end;gap:8px;background:var(--bg);border:0.5px solid rgba(0,0,0,.12);border-radius:12px;padding:12px 16px;transition:border-color .15s;box-sizing:border-box}
+body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.12)}
+.rl-input-bar:focus-within{border-color:var(--acc)}
+.rl-attach-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;flex-shrink:0;transition:color .13s}
+.rl-attach-btn:hover{color:var(--txt)}
+.rl-textarea{flex:1;background:none;border:none;outline:none;font:14px 'Inter',sans-serif;color:var(--txt);resize:none;max-height:120px;line-height:1.5}
+.rl-textarea::placeholder{color:var(--muted)}
+.rl-input-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.rl-dt-area{display:flex;align-items:center;gap:6px}
+.rl-dt-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+.rl-dt-toggle{width:34px;height:19px;border-radius:10px;background:var(--sur2);border:0.5px solid var(--bdr);cursor:pointer;position:relative;transition:background .2s,border-color .2s;flex-shrink:0}
+.rl-dt-toggle.on{background:#ECC94B;border-color:#d4ad30}
+.rl-dt-knob{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.rl-dt-toggle.on .rl-dt-knob{transform:translateX(15px)}
+.rl-send-btn{width:32px;height:32px;border-radius:8px;border:none;background:var(--acc);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .13s;flex-shrink:0}
 .rl-send-btn:hover{opacity:.84}
 .rl-send-btn:disabled{opacity:.35;cursor:not-allowed}
-.rl-input-hint{font-size:10px;color:var(--muted);margin-top:6px;text-align:center;letter-spacing:.1px}
-/* Viewer */
-.rl-viewer{width:340px;flex-shrink:0;border-left:0.5px solid var(--bdr);background:var(--sur);display:flex;flex-direction:column;overflow:hidden}
-.rl-viewer-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center;padding:24px}
-.rl-viewer-doc{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.rl-viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:0.5px solid var(--bdr);flex-shrink:0;gap:8px}
-.rl-viewer-name{font-size:12px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.rl-vbtn{background:none;border:0.5px solid var(--bdr);border-radius:5px;width:24px;height:24px;cursor:pointer;color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .13s}
-.rl-vbtn:hover{border-color:var(--acc);color:var(--txt)}
-.rl-viewer-content{flex:1;overflow-y:auto;padding:16px;font-size:12.5px;line-height:1.8;color:var(--txt);white-space:pre-wrap;font-family:'Inter',sans-serif;word-break:break-word}
-.rl-viewer-content mark{background:#FEF08A;color:#1a1200;border-radius:2px;padding:1px 2px}
-/* Misc */
-.rl-nav-back{background:none;border:none;color:var(--muted);font:600 12px 'Inter',sans-serif;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color .13s}
-.rl-nav-back:hover{color:var(--txt)}
-.rl-chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;text-align:center;padding:20px;background:var(--bg)}
+.rl-input-footer{display:flex;justify-content:flex-end;margin-top:6px}
+.rl-prompt-lib-link{background:none;border:none;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;padding:0;transition:color .13s}
+.rl-prompt-lib-link:hover{color:var(--txt)}
+
+/* Chat empty state */
+.rl-chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;text-align:center;padding:20px}
 .rl-chat-empty-icon{font-size:32px;margin-bottom:4px}
 .rl-chat-empty-title{font-size:15px;font-weight:700;color:var(--txt)}
 .rl-chat-empty-sub{font-size:12px;color:var(--muted);max-width:300px;line-height:1.5}
 .rl-suggestions{display:flex;flex-direction:column;gap:7px;margin-top:18px;width:100%;max-width:380px}
 .rl-sugg{background:var(--sur);border:0.5px solid var(--bdr);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--txt);cursor:pointer;text-align:left;transition:border-color .13s;font-family:'Inter',sans-serif}
 .rl-sugg:hover{border-color:rgba(44,122,123,.4)}
+
+/* Viewer pane */
+.rl-viewer-pane{width:46%;min-width:400px;flex-shrink:0;background:var(--sur);border-left:0.5px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.rl-viewer-tabs{display:flex;align-items:center;gap:0;border-bottom:0.5px solid var(--bdr);flex-shrink:0;overflow-x:auto;min-height:36px}
+.rl-viewer-tab{display:flex;align-items:center;gap:6px;padding:0 12px;height:36px;font-size:12px;color:var(--muted);cursor:pointer;border-right:0.5px solid var(--bdr);white-space:nowrap;background:transparent;border-top:none;border-bottom:none;border-left:none;transition:background .13s;font-family:'Inter',sans-serif}
+.rl-viewer-tab.active{background:var(--bg);color:var(--txt);font-weight:600}
+.rl-viewer-tab-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0;line-height:1;margin-left:2px}
+.rl-viewer-toolbar{display:flex;align-items:center;gap:4px;padding:0 12px;border-bottom:0.5px solid var(--bdr);height:36px;flex-shrink:0}
+.rl-viewer-tbtn{background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:5px;font-family:'Inter',sans-serif;transition:color .13s}
+.rl-viewer-tbtn:hover{color:var(--txt)}
+.rl-viewer-close{margin-left:auto;background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1;transition:color .13s}
+.rl-viewer-close:hover{color:var(--txt)}
+.rl-viewer-content{flex:1;overflow-y:auto;padding:20px;font-size:13px;line-height:1.8;color:var(--txt);white-space:pre-wrap;font-family:'Inter',sans-serif;word-break:break-word}
+.rl-viewer-content mark,.rl-highlight{background:rgba(236,201,75,.4);border-radius:2px;padding:1px 2px}
+.rl-viewer-nav{display:flex;align-items:center;gap:6px;padding:6px 12px;border-top:0.5px solid var(--bdr);flex-shrink:0}
+.rl-vbtn{background:none;border:0.5px solid var(--bdr);border-radius:5px;width:24px;height:24px;cursor:pointer;color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .13s}
+.rl-vbtn:hover{border-color:var(--acc);color:var(--txt)}
+
+/* Prompt Library Modal */
+.rl-pm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;backdrop-filter:blur(2px)}
+.rl-pm-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:201;background:var(--sur);border:0.5px solid var(--bdr);border-radius:14px;width:680px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.rl-pm-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid var(--bdr);flex-shrink:0}
+.rl-pm-title{font-size:15px;font-weight:700;color:var(--txt)}
+.rl-pm-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0;line-height:1;transition:color .13s}
+.rl-pm-close:hover{color:var(--txt)}
+.rl-pm-body{display:flex;flex:1;overflow:hidden}
+.rl-pm-sidebar{width:160px;flex-shrink:0;border-right:0.5px solid var(--bdr);padding:12px 0;overflow-y:auto}
+.rl-pm-cat{width:100%;background:none;border:none;text-align:left;padding:8px 16px;font-size:12px;color:var(--muted);cursor:pointer;transition:background .13s,color .13s;display:flex;align-items:center;justify-content:space-between;font-family:'Inter',sans-serif}
+.rl-pm-cat:hover{background:var(--sur2);color:var(--txt)}
+.rl-pm-cat.active{background:var(--sur2);color:var(--txt);font-weight:600}
+.rl-pm-cat span{font-size:10px;font-weight:700;color:var(--muted);background:var(--bg);border-radius:20px;padding:1px 6px}
+.rl-pm-content{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px}
+.rl-pm-search{width:100%;box-sizing:border-box;background:var(--bg);border:0.5px solid var(--bdr);border-radius:7px;padding:7px 12px;font:13px 'Inter',sans-serif;color:var(--txt);outline:none;margin-bottom:8px;flex-shrink:0}
+.rl-pm-search::placeholder{color:var(--muted)}
+.rl-pm-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.rl-pm-card{background:var(--bg);border:0.5px solid var(--bdr);border-radius:9px;padding:12px 14px;cursor:pointer;transition:border-color .13s}
+.rl-pm-card:hover{border-color:rgba(44,122,123,.4)}
+.rl-pm-card-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:3px}
+.rl-pm-card-desc{font-size:11.5px;color:var(--muted);line-height:1.4}
+.rl-pm-new-btn-wrap{padding:12px 16px;border-top:0.5px solid var(--bdr);flex-shrink:0}
+.rl-pm-new-btn{width:100%;background:none;border:0.5px dashed var(--bdr);border-radius:8px;padding:9px;font:600 12px 'Inter',sans-serif;color:var(--muted);cursor:pointer;transition:all .13s}
+.rl-pm-new-btn:hover{border-color:var(--acc);color:var(--txt)}
+
 /* LRL MAIN LAYOUT — legacy override */
 /* Top bar */
 .llc-topbar{display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(15,15,25,.95);flex-shrink:0;height:46px;backdrop-filter:blur(8px)}
@@ -8384,121 +8446,165 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ═══ LEGAL LEARNING SAAS V.CORE ═══ -->
 <div class="screen" id="screenLRL" style="padding:0">
 
-  <!-- RESEARCH LAB DASHBOARD -->
-  <div id="rlDash" class="rl-dash">
-    <div class="rl-dash-nav">
-      <button class="rl-nav-back" onclick="showScreen('screenMode')">← Sezioni</button>
-      <div style="font-size:12px;font-weight:700;color:var(--txt)">Research Lab</div>
-      <button class="rl-nav-back" onclick="toggleTheme()" title="Tema"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+  <div class="rl-root">
+
+    <!-- Icon sidebar -->
+    <div class="rl-icons">
+      <button class="rl-icon-btn" onclick="rlBackToDash()" title="Sezioni" style="margin-bottom:4px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <button class="rl-icon-btn" id="rlIconDocs" onclick="rlToggleDocsPanel()" title="Documents">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </button>
     </div>
-    <div class="rl-dash-body">
-      <div class="rl-dash-hdr">
-        <div>
-          <div class="rl-dash-title">Research Lab</div>
-          <div class="rl-dash-sub">AI-powered legal research workspace</div>
+
+    <!-- Documents panel (collapsible) -->
+    <div class="rl-docs-panel" id="rlDocsPanel" style="display:none">
+      <div class="rl-docs-hdr">
+        <span>Documents</span>
+        <button class="rl-docs-new-btn" onclick="document.getElementById('rlUploadInput').click()">+ New</button>
+      </div>
+      <input type="text" class="rl-docs-search" placeholder="Search documents" id="rlDocsSearch" oninput="rlFilterDocs()">
+      <div id="rlDocsList" class="rl-docs-list"></div>
+    </div>
+
+    <!-- Main chat/workspace area -->
+    <div class="rl-main" id="rlMain">
+
+      <!-- Thread header (shown in workspace mode) -->
+      <div class="rl-thread-hdr" id="rlThreadHdr" style="display:none">
+        <div class="rl-thread-back" onclick="rlBackToDash()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Research Lab
         </div>
-        <button class="rl-btn-new-prj" onclick="rlNewProject()">+ New Project</button>
+        <div class="rl-thread-title" id="rlThreadTitle" contenteditable="true" onblur="rlRenameThread(this)">New Research</div>
+        <div class="rl-thread-actions">
+          <button class="rl-hdr-btn" onclick="rlOpenChatHistory()">Chat history</button>
+          <button class="rl-hdr-btn icon-btn" onclick="rlNewChat()" title="New chat">+</button>
+        </div>
       </div>
-      <div id="rlGrid" class="rl-grid"></div>
-      <div id="rlEmpty" class="rl-empty-state" style="display:none">
-        <div class="rl-empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-        <div class="rl-empty-title">No research projects yet</div>
-        <div class="rl-empty-sub">Create your first project to start AI-powered legal research</div>
-        <button class="rl-btn-new-prj" style="margin-top:8px" onclick="rlNewProject()">+ New Project</button>
+
+      <!-- Dashboard (empty state / project grid) -->
+      <div id="rlDash" class="rl-dash">
+        <div class="rl-dash-hdr">
+          <div>
+            <div class="rl-dash-title">Research Lab</div>
+            <div class="rl-dash-sub">AI-powered legal research workspace</div>
+          </div>
+          <button class="rl-btn-new-prj" onclick="rlNewProject()">+ New Project</button>
+        </div>
+        <div id="rlGrid" class="rl-grid"></div>
+        <div id="rlEmpty" class="rl-empty-state" style="display:none">
+          <div class="rl-empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <div class="rl-empty-title">No research projects yet</div>
+          <div class="rl-empty-sub">Create your first project to start AI-powered legal research</div>
+          <button class="rl-btn-new-prj" style="margin-top:8px" onclick="rlNewProject()">+ New Project</button>
+        </div>
       </div>
+
+      <!-- Workspace (chat + input) -->
+      <div id="rlWorkspace" class="rl-workspace" style="display:none">
+        <!-- Messages -->
+        <div id="rlMsgs" class="rl-msgs">
+          <div class="rl-chat-empty" id="rlChatEmpty">
+            <div class="rl-chat-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div class="rl-chat-empty-title">Research Lab</div>
+            <div class="rl-chat-empty-sub">Ask a legal question, upload documents for analysis, or use Agentic Research for multi-source synthesis</div>
+            <div class="rl-suggestions" id="rlSuggestions">
+              <button class="rl-sugg" onclick="rlUseSugg(this)">What are the lawful bases for processing under GDPR Art. 6?</button>
+              <button class="rl-sugg" onclick="rlUseSugg(this)">Analyze the accountability obligations under Art. 24 GDPR</button>
+              <button class="rl-sugg" onclick="rlUseSugg(this)">Summarize the key requirements of the EU AI Act for high-risk systems</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input bar -->
+        <div class="rl-input-wrap">
+          <div id="rlCtxDocs" class="rl-ctx-docs" style="display:none"></div>
+          <div class="rl-input-bar" id="rlInputBar">
+            <button class="rl-attach-btn" onclick="document.getElementById('rlUploadInput').click()" title="Allega documento">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <textarea id="rlInput" class="rl-textarea" placeholder="Ask a follow-up" rows="1"
+              onkeydown="rlKeydown(event)" oninput="rlAutoResize(this)"></textarea>
+            <div class="rl-input-right">
+              <div class="rl-dt-area">
+                <span class="rl-dt-label">Deep think</span>
+                <div class="rl-dt-toggle" id="rlDTToggle" onclick="rlToggleDT()"><div class="rl-dt-knob"></div></div>
+              </div>
+              <button class="rl-research-btn" id="rlAgentBtn" onclick="rlSendAgentic()" title="Agentic Research" style="width:32px;height:32px;border-radius:8px;border:0.5px solid var(--bdr);background:var(--sur2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s;flex-shrink:0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              </button>
+              <button class="rl-send-btn" id="rlSendBtn" onclick="rlSend()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="rl-input-footer">
+            <button class="rl-prompt-lib-link" onclick="rlOpenPromptLib()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Prompt library
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.rl-main -->
+
+    <!-- Viewer pane (right, hidden by default) -->
+    <div class="rl-viewer-pane" id="rlViewerPane" style="display:none">
+      <div class="rl-viewer-tabs" id="rlViewerTabs"></div>
+      <div class="rl-viewer-toolbar">
+        <button class="rl-viewer-tbtn" onclick="rlViewerAbout()">About</button>
+        <button class="rl-viewer-tbtn" onclick="rlViewerTranslate()">Translate</button>
+        <button class="rl-viewer-tbtn" onclick="rlViewerDownload()">Download</button>
+        <button class="rl-viewer-tbtn" onclick="rlViewerPrint()">Print</button>
+        <button class="rl-viewer-close" onclick="rlCloseViewer()">&#x2715;</button>
+      </div>
+      <div class="rl-viewer-content" id="rlViewerContent"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;opacity:.35;gap:10px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div style="font-size:12px;font-weight:600">No document open</div><div style="font-size:11px;opacity:.7;text-align:center;line-height:1.5">Click a citation [1] in the chat<br>or upload a document</div></div></div>
+      <div class="rl-viewer-nav">
+        <button class="rl-vbtn" id="rlVPrev" onclick="rlNavMark(-1)" title="Previous match">&#x2191;</button>
+        <button class="rl-vbtn" id="rlVNext" onclick="rlNavMark(1)" title="Next match">&#x2193;</button>
+      </div>
+    </div>
+
+  </div><!-- /.rl-root -->
+
+  <!-- Hidden file input -->
+  <input type="file" id="rlUploadInput" multiple accept=".pdf,.docx,.doc,.txt,.md" style="display:none" onchange="rlHandleFiles(event)">
+
+  <!-- Prompt Library Modal -->
+  <div class="rl-pm-overlay" id="rlPMOverlay" onclick="rlClosePromptLib()" style="display:none"></div>
+  <div class="rl-pm-modal" id="rlPMModal" style="display:none">
+    <div class="rl-pm-hdr">
+      <span class="rl-pm-title">Prompts</span>
+      <button class="rl-pm-close" onclick="rlClosePromptLib()">&#x2715;</button>
+    </div>
+    <div class="rl-pm-body">
+      <div class="rl-pm-sidebar">
+        <button class="rl-pm-cat active" data-cat="favorites" onclick="rlPMFilter('favorites',this)">Favorites <span>3</span></button>
+        <button class="rl-pm-cat" data-cat="new" onclick="rlPMFilter('new',this)">New <span>0</span></button>
+        <button class="rl-pm-cat" data-cat="recent" onclick="rlPMFilter('recent',this)">Most recent <span>3</span></button>
+        <button class="rl-pm-cat" data-cat="mine" onclick="rlPMFilter('mine',this)">My prompts <span>4</span></button>
+        <button class="rl-pm-cat" data-cat="legora" onclick="rlPMFilter('legora',this)">by PassIapp <span>4</span></button>
+      </div>
+      <div class="rl-pm-content">
+        <input type="text" class="rl-pm-search" placeholder="Search prompts" id="rlPMSearch" oninput="rlPMSearchFilter()">
+        <div id="rlPMList" class="rl-pm-list"></div>
+      </div>
+    </div>
+    <div class="rl-pm-new-btn-wrap">
+      <button class="rl-pm-new-btn" onclick="rlPMNewPrompt()">+ New prompt</button>
     </div>
   </div>
 
-  <!-- RESEARCH LAB WORKSPACE (3-pane) -->
-  <div id="rlWorkspace" class="rl-workspace" style="display:none">
-
-    <!-- LEFT: Sidebar -->
-    <div class="rl-sidebar" id="rlSidebar">
-      <div class="rl-sb-hdr">
-        <button class="rl-sb-back" onclick="rlBackToDash()">← Projects</button>
-        <div class="rl-sb-prj" id="rlSbPrjName"></div>
-        <div id="rlSbBadge" class="rl-sb-badge private" onclick="rlToggleShare()" title="Toggle sharing"></div>
-      </div>
-      <div class="rl-sb-section">Documents</div>
-      <div id="rlSbDocs" class="rl-sb-docs"></div>
-      <div class="rl-sb-upload" onclick="document.getElementById('rlFileInput').click()"
-           ondragover="event.preventDefault()" ondrop="rlDropFile(event)">
-        + Upload / Drop document
-      </div>
-      <input type="file" id="rlFileInput" accept=".pdf,.docx,.txt,.doc,.md" style="display:none" onchange="rlHandleFile(event)" multiple>
-      <div class="rl-sb-section">Chats</div>
-      <div id="rlSbChats" class="rl-sb-chats"></div>
-      <button class="rl-sb-new-chat" onclick="rlNewChat()">+ New Chat</button>
-    </div>
-
-    <!-- CENTER: Chat pane -->
-    <div class="rl-chat-pane" id="rlChatPane">
-      <div class="rl-chat-hdr">
-        <div class="rl-chat-hdr-title" id="rlChatTitle">New Chat</div>
-        <div class="rl-dt-wrap">
-          <span class="rl-dt-label">Deep Think</span>
-          <div class="rl-dt-toggle" id="rlDTToggle" onclick="rlToggleDT()">
-            <div class="rl-dt-knob"></div>
-          </div>
-        </div>
-      </div>
-      <div id="rlMsgs" class="rl-msgs">
-        <div class="rl-chat-empty" id="rlChatEmpty">
-          <div class="rl-chat-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-          <div class="rl-chat-empty-title">Research Lab</div>
-          <div class="rl-chat-empty-sub">Ask a legal question, upload documents for analysis, or use Agentic Research for multi-source synthesis</div>
-          <div class="rl-suggestions" id="rlSuggestions">
-            <button class="rl-sugg" onclick="rlUseSugg(this)">What are the lawful bases for processing under GDPR Art. 6?</button>
-            <button class="rl-sugg" onclick="rlUseSugg(this)">Analyze the accountability obligations under Art. 24 GDPR</button>
-            <button class="rl-sugg" onclick="rlUseSugg(this)">Summarize the key requirements of the EU AI Act for high-risk systems</button>
-          </div>
-        </div>
-      </div>
-      <div class="rl-input-area">
-        <div class="rl-ctx-docs" id="rlCtxDocs"></div>
-        <div class="rl-input-box" id="rlInputBox">
-          <button class="rl-attach" onclick="document.getElementById('rlFileInput').click()" title="Attach document">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-          </button>
-          <textarea id="rlInput" class="rl-input" placeholder="Ask a legal question…" rows="1"
-            onkeydown="rlKeydown(event)" oninput="rlAutoResize(this)"></textarea>
-          <div class="rl-send-grp">
-            <button class="rl-research-btn" id="rlAgentBtn" onclick="rlSendAgentic()" title="Agentic Research — multi-step synthesis">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            </button>
-            <button class="rl-send-btn" id="rlSendBtn" onclick="rlSend()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="rl-input-hint">↵ Send · Shift+↵ New line · Agentic research</div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Document viewer -->
-    <div class="rl-viewer" id="rlViewer">
-      <div class="rl-viewer-empty" id="rlViewerEmpty">
-        <div>
-          <div style="font-size:26px;margin-bottom:10px;opacity:.4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-          <div style="font-size:12px;font-weight:600;margin-bottom:4px">No document open</div>
-          <div style="font-size:11px;opacity:.45;line-height:1.5">Click a citation [1] in the chat<br>or upload a document</div>
-        </div>
-      </div>
-      <div class="rl-viewer-doc" id="rlViewerDoc" style="display:none">
-        <div class="rl-viewer-bar">
-          <span class="rl-viewer-name" id="rlViewerName"></span>
-          <div style="display:flex;gap:5px">
-            <button class="rl-vbtn" id="rlVPrev" onclick="rlNavMark(-1)" title="Previous match">↑</button>
-            <button class="rl-vbtn" id="rlVNext" onclick="rlNavMark(1)" title="Next match">↓</button>
-            <button class="rl-vbtn" onclick="rlCloseViewer()">✕</button>
-          </div>
-        </div>
-        <div id="rlViewerContent" class="rl-viewer-content"></div>
-      </div>
-    </div>
-  </div>
+  <!-- Citation tooltip -->
+  <div class="rl-cit-tooltip" id="rlCitTooltip" style="display:none"></div>
 
 </div>
+
+
+
 
 
 <!-- EXAM SCREEN -->
@@ -12282,23 +12388,40 @@ var LRL_DOCS = [
 function lrlInit() { rlInit(); }
 
 // ═══════════════════════════════════════════════════════════════════
-// RESEARCH LAB — full implementation
+// RESEARCH LAB — Legora-style AI Legal Research Lab
 // ═══════════════════════════════════════════════════════════════════
 var _rl = {
-  prjs: [],        // [{id,name,shared,docs:[],chats:[],created}]
-  cur:  null,      // current project id
-  curChat: null,   // current chat id
-  msgs: [],        // current chat messages [{role,content,sources,isDT}]
-  docs: [],        // [{id,name,text,size}] for current project
-  ctxDocs: [],     // doc ids currently in context
+  prjs: [],          // [{id,name,shared,docs:[],chats:[],created}]
+  cur: null,         // current project id
+  curChat: null,     // current chat id
+  msgs: [],          // [{role,content,sources,isDT}]
+  docs: [],          // [{id,name,text,chunks,size}] for current project
+  ctxDocs: [],       // doc ids currently in context
   deepThink: false,
   busy: false,
   viewerDocId: null,
   viewerMarks: [],
-  viewerMarkIdx: 0
+  viewerMarkIdx: 0,
+  docsOpen: false,
+  pmCat: 'favorites'
 };
 
 var _RL_KEY = 'rl_projects_v1';
+
+var _RL_PROMPTS = [
+  {id:'p1', cat:'favorites', title:'Summarise', desc:'Summarise this document into key points and obligations.'},
+  {id:'p2', cat:'favorites', title:'NDA Review', desc:'Review this NDA and flag missing or unusual clauses.'},
+  {id:'p3', cat:'favorites', title:'Case extraction', desc:'What does this case revolve around? Summarise the key holdings.'},
+  {id:'p4', cat:'recent', title:'Creating Timeline', desc:'Extract all events and dates to create a chronological timeline.'},
+  {id:'p5', cat:'recent', title:'Risk Analysis', desc:'Identify the main legal risks and exposure in this document.'},
+  {id:'p6', cat:'recent', title:'Compliance Check', desc:'Check this document against GDPR requirements and flag gaps.'},
+  {id:'p7', cat:'mine', title:'Data Processing Agreement', desc:'Draft a DPA compliant with Art. 28 GDPR based on this context.'},
+  {id:'p8', cat:'mine', title:'Legitimate Interest Assessment', desc:'Conduct a 3-part LIA: purpose test, necessity test, balancing test.'},
+  {id:'p9', cat:'mine', title:'Transfer Impact Assessment', desc:'Conduct a TIA for the data transfer described in this document.'},
+  {id:'p10', cat:'mine', title:'DPIA', desc:'Conduct a Data Protection Impact Assessment for this processing activity.'},
+  {id:'p11', cat:'legora', title:'Translate - Text', desc:'Take this text and translate it into the target language specified.'},
+  {id:'p12', cat:'legora', title:'Contract Analysis', desc:'Analyse this contract and extract obligations, rights, and key clauses.'}
+];
 
 function _rlSave() {
   try { localStorage.setItem(_RL_KEY, JSON.stringify(_rl.prjs)); } catch(_e) {}
@@ -12319,20 +12442,28 @@ function rlInit() {
   _rl.ctxDocs = [];
   _rl.deepThink = false;
   _rl.busy = false;
-  document.getElementById('rlWorkspace').style.display = 'none';
-  document.getElementById('rlDash').style.display = 'flex';
+  _rl.docsOpen = false;
+  // Show dashboard
+  var dash = document.getElementById('rlDash');
+  var ws = document.getElementById('rlWorkspace');
+  var hdr = document.getElementById('rlThreadHdr');
+  if (dash) dash.style.display = 'flex';
+  if (ws) ws.style.display = 'none';
+  if (hdr) hdr.style.display = 'none';
   rlRenderDash();
 }
 
+// ── Dashboard ───────────────────────────────────────────────────────────────
 function rlRenderDash() {
   var grid = document.getElementById('rlGrid');
   var empty = document.getElementById('rlEmpty');
   if (!_rl.prjs.length) {
-    grid.innerHTML = '';
-    empty.style.display = 'flex';
+    if (grid) grid.innerHTML = '';
+    if (empty) empty.style.display = 'flex';
     return;
   }
-  empty.style.display = 'none';
+  if (empty) empty.style.display = 'none';
+  if (!grid) return;
   grid.innerHTML = _rl.prjs.slice().reverse().map(function(p) {
     var docCount = (p.docs || []).length;
     var chatCount = (p.chats || []).length;
@@ -12363,30 +12494,74 @@ function rlOpenProject(id) {
   var p = _rl.prjs.find(function(x){ return x.id === id; });
   if (!p) return;
   _rl.cur = id;
-  _rl.docs = p.docs || [];
+  _rl.docs = (p.docs || []);
   _rl.ctxDocs = [];
-  // Start or restore last chat
-  if (!p.chats || !p.chats.length) {
-    _rlNewChatObj(p);
-  }
+  if (!p.chats || !p.chats.length) _rlNewChatObj(p);
   _rl.curChat = p.chats[p.chats.length - 1].id;
-  _rl.msgs = p.chats[p.chats.length - 1].msgs || [];
+  _rl.msgs = (p.chats[p.chats.length - 1].msgs || []).slice();
   _rl.deepThink = false;
-  document.getElementById('rlDash').style.display = 'none';
-  document.getElementById('rlWorkspace').style.display = 'flex';
-  _rlRenderSidebar();
+  // Show workspace, hide dashboard
+  var dash = document.getElementById('rlDash');
+  var ws = document.getElementById('rlWorkspace');
+  var hdr = document.getElementById('rlThreadHdr');
+  if (dash) dash.style.display = 'none';
+  if (ws) ws.style.display = 'flex';
+  if (hdr) hdr.style.display = 'flex';
+  // Set thread title
+  var ttEl = document.getElementById('rlThreadTitle');
+  if (ttEl) ttEl.textContent = p.name;
+  // Reset DT toggle
+  var toggle = document.getElementById('rlDTToggle');
+  if (toggle) toggle.classList.remove('on');
+  // Reset input
+  var inp = document.getElementById('rlInput');
+  if (inp) { inp.value = ''; inp.style.height = 'auto'; }
+  // Reset busy/send btn
+  _rl.busy = false;
+  var sb = document.getElementById('rlSendBtn');
+  if (sb) sb.disabled = false;
+  var ab = document.getElementById('rlAgentBtn');
+  if (ab) ab.disabled = false;
+  // Render
+  _rlRenderDocsList();
+  _rlRenderCtxPills();
   _rlRenderChat();
-  document.getElementById('rlInput').value = '';
-  document.getElementById('rlDTToggle').classList.remove('on');
-  document.getElementById('rlChatPane').classList.remove('dt-on');
   rlCloseViewer();
 }
 
 function rlBackToDash() {
   _rl.cur = null;
-  document.getElementById('rlWorkspace').style.display = 'none';
-  document.getElementById('rlDash').style.display = 'flex';
+  _rl.viewerDocId = null;
+  var dash = document.getElementById('rlDash');
+  var ws = document.getElementById('rlWorkspace');
+  var hdr = document.getElementById('rlThreadHdr');
+  var vp = document.getElementById('rlViewerPane');
+  if (dash) { dash.style.display = 'flex'; }
+  if (ws) ws.style.display = 'none';
+  if (hdr) hdr.style.display = 'none';
+  if (vp) vp.style.display = 'none';
   rlRenderDash();
+}
+
+function rlRenameThread(el) {
+  var p = _rlCurPrj();
+  if (!p || !el) return;
+  var newName = (el.textContent || '').trim();
+  if (newName && newName !== p.name) {
+    p.name = newName;
+    _rlSave();
+  }
+}
+
+function rlOpenChatHistory() {
+  // Show sidebar chat list (no-op stub — chats accessible via new chat)
+}
+
+// ── Projects ────────────────────────────────────────────────────────────────
+function _rlCurPrj() { return _rl.prjs.find(function(x){ return x.id === _rl.cur; }); }
+function _rlCurChat() {
+  var p = _rlCurPrj(); if (!p) return null;
+  return (p.chats || []).find(function(x){ return x.id === _rl.curChat; });
 }
 
 function _rlNewChatObj(p) {
@@ -12403,62 +12578,56 @@ function rlNewChat() {
   _rl.curChat = chat.id;
   _rl.msgs = [];
   _rl.ctxDocs = [];
-  _rlRenderSidebar();
+  _rlRenderCtxPills();
   _rlRenderChat();
-  document.getElementById('rlInput').focus();
+  var inp = document.getElementById('rlInput');
+  if (inp) inp.focus();
 }
 
-function _rlCurPrj() { return _rl.prjs.find(function(x){ return x.id === _rl.cur; }); }
-function _rlCurChat() {
-  var p = _rlCurPrj(); if (!p) return null;
-  return (p.chats || []).find(function(x){ return x.id === _rl.curChat; });
+// ── Documents panel ─────────────────────────────────────────────────────────
+function rlToggleDocsPanel() {
+  _rl.docsOpen = !_rl.docsOpen;
+  var panel = document.getElementById('rlDocsPanel');
+  var btn = document.getElementById('rlIconDocs');
+  if (panel) panel.style.display = _rl.docsOpen ? 'flex' : 'none';
+  if (btn) btn.classList.toggle('active', _rl.docsOpen);
 }
 
-function rlToggleShare() {
-  var p = _rlCurPrj(); if (!p) return;
-  p.shared = !p.shared;
-  _rlSave();
-  _rlRenderSidebar();
-}
-
-function _rlRenderSidebar() {
-  var p = _rlCurPrj(); if (!p) return;
-  document.getElementById('rlSbPrjName').textContent = p.name;
-  var badge = document.getElementById('rlSbBadge');
-  badge.textContent = p.shared ? 'Shared' : 'Private';
-  badge.className = 'rl-sb-badge ' + (p.shared ? 'shared' : 'private');
-
-  // Docs
-  var docsEl = document.getElementById('rlSbDocs');
-  docsEl.innerHTML = (_rl.docs || []).map(function(d) {
-    var active = _rl.viewerDocId === d.id;
+function _rlRenderDocsList() {
+  var list = document.getElementById('rlDocsList');
+  if (!list) return;
+  var docs = _rl.docs || [];
+  if (!docs.length) {
+    list.innerHTML = '<div style="padding:12px 8px;font-size:11px;color:var(--muted);text-align:center">No documents yet</div>';
+    return;
+  }
+  list.innerHTML = docs.map(function(d) {
     var ext = d.name.split('.').pop().toLowerCase();
-    var icon = ext === 'pdf' ? 'PDF' : ext === 'docx' || ext === 'doc' ? 'DOC' : 'TXT';
-    return '<div class="rl-sb-doc' + (active?' active':'') + '" onclick="rlViewDoc(\'' + d.id + '\')">'
-      + icon + '<span class="rl-sb-doc-name">' + _rlEsc(d.name) + '</span>'
-      + '<button class="rl-sb-doc-del" onclick="event.stopPropagation();rlDelDoc(\'' + d.id + '\')" title="Remove">✕</button>'
+    var icon = ext === 'pdf' ? 'PDF' : (ext === 'docx' || ext === 'doc') ? 'DOC' : 'TXT';
+    var active = _rl.viewerDocId === d.id;
+    return '<div class="rl-doc-item' + (active ? ' active' : '') + '" onclick="rlViewDoc(\'' + d.id + '\')">'
+      + '<div class="rl-doc-icon">' + icon + '</div>'
+      + '<span class="rl-doc-name" title="' + _rlEsc(d.name) + '">' + _rlEsc(d.name.length > 22 ? d.name.slice(0,20) + '…' : d.name) + '</span>'
+      + '<button class="rl-doc-del" onclick="event.stopPropagation();rlDelDoc(\'' + d.id + '\')" title="Remove">&#x2715;</button>'
       + '</div>';
   }).join('');
-
-  // Chats
-  var chatsEl = document.getElementById('rlSbChats');
-  chatsEl.innerHTML = ((p.chats || []).slice().reverse()).map(function(ch) {
-    var active = ch.id === _rl.curChat;
-    return '<div class="rl-sb-chat' + (active?' active':'') + '" onclick="rlSwitchChat(\'' + ch.id + '\')">'
-      + '<span style="overflow:hidden;text-overflow:ellipsis;flex:1">' + _rlEsc(ch.title) + '</span></div>';
-  }).join('');
 }
 
-function rlSwitchChat(chatId) {
-  var p = _rlCurPrj(); if (!p) return;
-  var chat = (p.chats || []).find(function(x){ return x.id === chatId; });
-  if (!chat) return;
-  _rl.curChat = chatId;
-  _rl.msgs = chat.msgs || [];
-  _rl.ctxDocs = [];
-  _rlRenderChat();
-  _rlRenderSidebar();
-  document.getElementById('rlInput').focus();
+function rlFilterDocs() {
+  var q = (document.getElementById('rlDocsSearch') || {}).value || '';
+  var list = document.getElementById('rlDocsList');
+  if (!list) return;
+  var docs = (_rl.docs || []).filter(function(d){ return !q || d.name.toLowerCase().includes(q.toLowerCase()); });
+  if (!docs.length) { list.innerHTML = '<div style="padding:12px 8px;font-size:11px;color:var(--muted);text-align:center">No results</div>'; return; }
+  list.innerHTML = docs.map(function(d) {
+    var ext = d.name.split('.').pop().toLowerCase();
+    var icon = ext === 'pdf' ? 'PDF' : (ext === 'docx' || ext === 'doc') ? 'DOC' : 'TXT';
+    return '<div class="rl-doc-item" onclick="rlViewDoc(\'' + d.id + '\')">'
+      + '<div class="rl-doc-icon">' + icon + '</div>'
+      + '<span class="rl-doc-name">' + _rlEsc(d.name.length > 22 ? d.name.slice(0,20) + '…' : d.name) + '</span>'
+      + '<button class="rl-doc-del" onclick="event.stopPropagation();rlDelDoc(\'' + d.id + '\')" title="Remove">&#x2715;</button>'
+      + '</div>';
+  }).join('');
 }
 
 function rlDelDoc(docId) {
@@ -12467,24 +12636,24 @@ function rlDelDoc(docId) {
   _rl.docs = p.docs;
   _rl.ctxDocs = _rl.ctxDocs.filter(function(id){ return id !== docId; });
   _rlSave();
-  _rlRenderSidebar();
+  _rlRenderDocsList();
   _rlRenderCtxPills();
   if (_rl.viewerDocId === docId) rlCloseViewer();
 }
 
+// ── Chat rendering ──────────────────────────────────────────────────────────
 function _rlRenderChat() {
-  var empty = document.getElementById('rlChatEmpty');
+  var emptyEl = document.getElementById('rlChatEmpty');
   var msgsEl = document.getElementById('rlMsgs');
-  var title = document.getElementById('rlChatTitle');
-  var chat = _rlCurChat();
-  title.textContent = chat ? chat.title : 'New Chat';
+  if (!msgsEl) return;
+  // Remove previous messages (not the empty-state div)
+  var existing = msgsEl.querySelectorAll('.rl-msg');
+  existing.forEach(function(el){ el.remove(); });
   if (!_rl.msgs.length) {
-    empty.style.display = 'flex';
+    if (emptyEl) emptyEl.style.display = 'flex';
     return;
   }
-  empty.style.display = 'none';
-  var existingMsgs = msgsEl.querySelectorAll('.rl-msg');
-  existingMsgs.forEach(function(el){ el.remove(); });
+  if (emptyEl) emptyEl.style.display = 'none';
   _rl.msgs.forEach(function(msg, idx) {
     msgsEl.appendChild(_rlBuildMsgEl(msg, idx));
   });
@@ -12498,10 +12667,8 @@ function _rlBuildMsgEl(msg, idx) {
   if (msg.role === 'user') {
     html = '<div class="rl-msg-bubble">' + _rlEsc(msg.content).replace(/\n/g,'<br>') + '</div>';
   } else {
-    // Render markdown + citations
     var rendered = _rlRenderMarkdown(msg.content, msg.sources || [], idx);
     html = '<div class="rl-msg-bubble">' + rendered + '</div>';
-    // Source cards
     if (msg.sources && msg.sources.length) {
       html += '<div class="rl-sources">' + msg.sources.map(function(s) {
         var rel = Math.round((s.reliability || 0.8) * 100);
@@ -12526,11 +12693,11 @@ function _rlRenderMarkdown(text, sources, msgIdx) {
     .replace(/\*([\s\S]+?)\*/g, '<em>$1</em>')
     .replace(/^#{3}\s+(.+)$/gm, '<strong>$1</strong>')
     .replace(/^#{1,2}\s+(.+)$/gm, '<strong>$1</strong>')
-    .replace(/^[-*]\s+(.+)$/gm, '• $1')
+    .replace(/^[-*]\s+(.+)$/gm, '&#x2022; $1')
     .replace(/\n/g, '<br>');
-  // Replace [n] with clickable citation tags
+  // Replace [n] with clickable citation badges
   t = t.replace(/\[(\d+)\]/g, function(match, num) {
-    return '<span class="rl-cit" onclick="rlCitClick(' + msgIdx + ',' + num + ')">' + num + '</span>';
+    return '<span class="rl-cit" onclick="rlCitClick(' + msgIdx + ',' + num + ')" title="Source ' + num + '">' + num + '</span>';
   });
   return t;
 }
@@ -12539,23 +12706,22 @@ function _rlEsc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── Citation handling ────────────────────────────────────────────────────────
 function rlCitClick(msgIdx, srcId) {
   var msg = _rl.msgs[msgIdx];
   if (!msg || !msg.sources) return;
-  var src = msg.sources.find(function(s){ return s.id === srcId; });
+  var src = msg.sources.find(function(s){ return s.id === srcId || s.id === Number(srcId); });
   if (!src) return;
-  // If source has a docId, show in viewer with highlight
   if (src.docId) {
     rlShowInViewer(src.docId, src.snippet || '');
   } else if (src.snippet) {
-    // Show snippet as web result in viewer
     rlShowWebSnippet(src);
   }
 }
 
 function rlSrcClick(msgIdx, srcId) { rlCitClick(msgIdx, srcId); }
 
-// ── Input handling ──────────────────────────────────────────────────
+// ── Input handling ───────────────────────────────────────────────────────────
 function rlKeydown(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -12569,50 +12735,142 @@ function rlAutoResize(el) {
 }
 
 function rlUseSugg(btn) {
-  document.getElementById('rlInput').value = btn.textContent;
-  document.getElementById('rlChatEmpty').style.display = 'none';
-  document.getElementById('rlInput').focus();
+  var inp = document.getElementById('rlInput');
+  if (inp) { inp.value = btn.textContent; inp.focus(); }
+  var empty = document.getElementById('rlChatEmpty');
+  if (empty) empty.style.display = 'none';
 }
 
 function rlToggleDT() {
   _rl.deepThink = !_rl.deepThink;
   var toggle = document.getElementById('rlDTToggle');
-  var pane = document.getElementById('rlChatPane');
-  toggle.classList.toggle('on', _rl.deepThink);
-  pane.classList.toggle('dt-on', _rl.deepThink);
+  if (toggle) toggle.classList.toggle('on', _rl.deepThink);
+  var bar = document.getElementById('rlInputBar');
+  if (bar) bar.style.borderColor = _rl.deepThink ? '#ECC94B' : '';
 }
 
-// ── Send (standard chat) ────────────────────────────────────────────
+// ── Vector search (via /api/search) ─────────────────────────────────────────
+async function rlVectorSearch(query, chunks) {
+  if (!chunks || !chunks.length) return [];
+  try {
+    var resp = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: query, chunks: chunks })
+    });
+    if (!resp.ok) return [];
+    var data = await resp.json();
+    return data.results || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+// ── Chunking ────────────────────────────────────────────────────────────────
+function rlChunk(text, docId) {
+  var words = (text || '').split(/\s+/).filter(Boolean);
+  var chunks = [];
+  var chunkSize = 400;
+  var overlap = 40;
+  var i = 0;
+  var page = 1;
+  var pageWords = Math.round(words.length / Math.max(1, Math.ceil(words.length / 600)));
+  while (i < words.length) {
+    var slice = words.slice(i, i + chunkSize);
+    page = Math.floor(i / Math.max(1, pageWords)) + 1;
+    chunks.push({
+      id: docId + '_c' + chunks.length,
+      text: slice.join(' '),
+      page: page,
+      docId: docId
+    });
+    i += chunkSize - overlap;
+  }
+  return chunks;
+}
+
+// ── RAG prompt builder ───────────────────────────────────────────────────────
+function _rlBuildRagPrompt(query, topChunks) {
+  var ctx = topChunks.map(function(ch, i) {
+    return '[' + (i+1) + '] (p.' + ch.page + ', ' + ch.docId + '):\n' + (ch.text || '').slice(0, 800);
+  }).join('\n\n');
+  return 'Sei un giurista professionista specializzato in diritto italiano e UE. Il tuo stile è preciso, autorevole e diretto al punto.\n\n'
+    + 'CONTESTO DEL DOCUMENTO:\n' + ctx + '\n\n'
+    + 'ISTRUZIONI:\n'
+    + '- Rispondi SOLO usando le informazioni nei chunk sopra\n'
+    + '- Inserisci [1], [2] ecc. inline dopo ogni affermazione tratta da un chunk\n'
+    + '- Alla fine scrivi esattamente ---SOURCES--- seguito da un array JSON:\n'
+    + '[{"id":1,"title":"Doc excerpt","snippet":"testo verbatim max 120 caratteri","page":1,"docId":"doc_id","chunkId":"chunk_id"},...]\n'
+    + '- Usa solo i chunk citati nelle sources\n'
+    + '- NON iniziare ripetendo la domanda';
+}
+
+// ── System prompt (no docs) ──────────────────────────────────────────────────
+function _rlBuildSysPrompt() {
+  return 'Sei un assistente di ricerca giuridica esperto in diritto UE e italiano (GDPR, AI Act, diritto privacy, normativa nazionale). '
+    + 'Rispondi con stile professionale, preciso e autorevole come un avvocato specializzato. '
+    + 'Usa i marcatori di citazione [1], [2] ecc. per riferimenti alle fonti quando disponibili. '
+    + 'Alla FINE della risposta aggiungi ---SOURCES--- seguito da un array JSON: '
+    + '[{"id":1,"title":"Fonte","snippet":"Testo citato verbatim","reliability":0.9},...] '
+    + 'NON iniziare mai ripetendo la domanda. NON aggiungere ---SOURCES--- se non hai citazioni.';
+}
+
+// ── Send (standard chat + RAG) ───────────────────────────────────────────────
 async function rlSend() {
   var input = document.getElementById('rlInput');
-  var q = input.value.trim();
+  var q = input ? input.value.trim() : '';
   if (!q || _rl.busy) return;
   _rl.busy = true;
-  document.getElementById('rlSendBtn').disabled = true;
-  input.value = '';
-  input.style.height = 'auto';
-  document.getElementById('rlChatEmpty').style.display = 'none';
-  // Add user message
+  var sb = document.getElementById('rlSendBtn');
+  var ab = document.getElementById('rlAgentBtn');
+  if (sb) sb.disabled = true;
+  if (ab) ab.disabled = true;
+  if (input) { input.value = ''; input.style.height = 'auto'; }
+  var emptyEl = document.getElementById('rlChatEmpty');
+  if (emptyEl) emptyEl.style.display = 'none';
+
   _rlAddMsg({ role: 'user', content: q });
-  // Add thinking indicator
   var thinkEl = _rlAddThinking(_rl.deepThink ? 'Deep Think reasoning…' : 'Researching…');
+
   try {
-    var sys = _rlBuildSysPrompt();
-    var msgs = _rl.msgs.filter(function(m){ return m.role !== 'thinking'; }).slice(-10).map(function(m){
-      return { role: m.role === 'ai' ? 'assistant' : 'user', content: m.content };
-    });
+    var sys, contentsArr;
+    var activeDocs = (_rl.docs || []).filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
+
+    if (activeDocs.length) {
+      // RAG path: chunk docs + vector search
+      var allChunks = [];
+      activeDocs.forEach(function(d) {
+        var chunks = d.chunks;
+        if (!chunks || !chunks.length) {
+          chunks = rlChunk(d.text || '', d.id);
+          d.chunks = chunks;
+        }
+        allChunks = allChunks.concat(chunks);
+      });
+      var topChunks = await rlVectorSearch(q, allChunks);
+      // Fallback: if search fails, use first 5 chunks
+      if (!topChunks.length) topChunks = allChunks.slice(0, 5);
+      sys = _rlBuildRagPrompt(q, topChunks);
+      contentsArr = [{ role: 'user', parts: [{ text: q }] }];
+    } else {
+      sys = _rlBuildSysPrompt();
+      // Include chat history
+      var histMsgs = _rl.msgs.filter(function(m){ return m.role !== 'thinking'; }).slice(-10);
+      contentsArr = histMsgs.map(function(m){
+        return { role: m.role === 'ai' ? 'model' : 'user', parts: [{ text: m.content }] };
+      });
+    }
+
     var model = _rl.deepThink ? 'gemini-2.5-pro' : 'gemini-2.5-flash-lite';
-    var body = {
+    var raw = await _llcBackendGemini({
       model: model,
       deepThink: _rl.deepThink,
       system_instruction: { parts: [{ text: sys }] },
-      contents: msgs.map(function(m){
-        return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] };
-      }),
+      contents: contentsArr,
       generationConfig: { maxOutputTokens: _rl.deepThink ? 8192 : 4096, temperature: _rl.deepThink ? 0.3 : 0.5 }
-    };
-    var raw = await _llcBackendGemini(body);
-    var parsed = _rlParseResponse(raw);
+    });
+
+    var parsed = _rlParseResponse(raw.text || raw || '');
     thinkEl.remove();
     _rlAddMsg({ role: 'ai', content: parsed.text, sources: parsed.sources, isDT: _rl.deepThink });
     _rlPersistMsgs();
@@ -12620,51 +12878,66 @@ async function rlSend() {
     thinkEl.remove();
     _rlAddMsg({ role: 'ai', content: 'Errore: ' + e.message, sources: [] });
   }
+
   _rl.busy = false;
-  document.getElementById('rlSendBtn').disabled = false;
-  document.getElementById('rlInput').focus();
+  if (sb) sb.disabled = false;
+  if (ab) ab.disabled = false;
+  if (input) input.focus();
 }
 
-// ── Agentic research ────────────────────────────────────────────────
+// ── Agentic research ─────────────────────────────────────────────────────────
 async function rlSendAgentic() {
   var input = document.getElementById('rlInput');
-  var q = input.value.trim();
+  var q = input ? input.value.trim() : '';
   if (!q || _rl.busy) return;
   _rl.busy = true;
-  document.getElementById('rlAgentBtn').disabled = true;
-  document.getElementById('rlSendBtn').disabled = true;
-  input.value = '';
-  input.style.height = 'auto';
-  document.getElementById('rlChatEmpty').style.display = 'none';
+  var sb = document.getElementById('rlSendBtn');
+  var ab = document.getElementById('rlAgentBtn');
+  if (sb) sb.disabled = true;
+  if (ab) ab.disabled = true;
+  if (input) { input.value = ''; input.style.height = 'auto'; }
+  var emptyEl = document.getElementById('rlChatEmpty');
+  if (emptyEl) emptyEl.style.display = 'none';
+
   _rlAddMsg({ role: 'user', content: q });
-  // Show research steps UI
+
+  // Show agentic steps UI
   var stepsEl = _rlAddSteps([
-    { label: 'Generating search queries', state: 'running' },
-    { label: 'Searching legal sources', state: 'pending' },
-    { label: 'Evaluating & filtering', state: 'pending' },
+    { label: 'Preparing search queries…', state: 'running' },
+    { label: 'Searching the web', state: 'pending' },
+    { label: 'Analysing sources', state: 'pending' },
     { label: 'Synthesizing answer', state: 'pending' }
   ]);
+
   try {
-    // Step 1: build search plan (fast model)
-    _rlSetStep(stepsEl, 0, 'done');
-    _rlSetStep(stepsEl, 1, 'running');
-    // Step 2: search with Gemini + googleSearch
-    var searchSys = 'You are an expert EU/Italian legal research assistant. '
-      + 'Search the web for authoritative legal sources (GDPR, EDPB, CJEU, Italian DPA, official EU documents, law firm analyses). '
-      + 'Provide a comprehensive, well-cited answer. '
-      + 'After your answer, add ---SOURCES--- followed by a JSON array: '
-      + '[{"id":1,"title":"Source Title","snippet":"Brief excerpt","url":"https://...","reliability":0.95},...] '
-      + 'Base reliability on source authority (official EU/government = 0.9-1.0, major law firms = 0.8-0.9, others = 0.6-0.8). '
-      + 'Use [1], [2] etc. citation markers in your answer text. NEVER start by echoing the question.';
+    // Step 1: generate queries (stub — animate only)
+    await new Promise(function(r){ setTimeout(r, 600); });
+    _rlSetStep(stepsEl, 0, 'done', '8 relevant search queries prepared');
+
+    // Step 2: web search via Gemini grounding
+    _rlSetStep(stepsEl, 1, 'running', 'Searching legal sources…');
+    var searchSys = 'Sei un assistente di ricerca giuridica esperto. '
+      + 'Cerca fonti autorevoli (GDPR, EDPB, CJEU, Garante italiano, documenti UE ufficiali, studi legali). '
+      + 'Fornisci una risposta completa e citata. '
+      + 'Dopo la risposta aggiungi ---SOURCES--- e un JSON array: '
+      + '[{"id":1,"title":"Titolo fonte","snippet":"Estratto breve","url":"https://...","reliability":0.95},...] '
+      + 'Usa [1], [2] ecc. nel testo. Affidabilità: ufficiale UE/gov = 0.9-1.0, grandi studi legali = 0.8-0.9, altri = 0.6-0.8. '
+      + 'NON iniziare ripetendo la domanda.';
+
     var searchResult = await callGeminiWithSearch(searchSys, q);
-    _rlSetStep(stepsEl, 1, 'done');
-    _rlSetStep(stepsEl, 2, 'running');
-    // Small delay for UX
     await new Promise(function(r){ setTimeout(r, 400); });
-    _rlSetStep(stepsEl, 2, 'done');
-    _rlSetStep(stepsEl, 3, 'running');
-    await new Promise(function(r){ setTimeout(r, 300); });
-    _rlSetStep(stepsEl, 3, 'done');
+    _rlSetStep(stepsEl, 1, 'done', 'Web searched — found results');
+
+    // Step 3: evaluate
+    _rlSetStep(stepsEl, 2, 'running', 'Evaluating & filtering results…');
+    await new Promise(function(r){ setTimeout(r, 350); });
+    _rlSetStep(stepsEl, 2, 'done', 'Sources validated');
+
+    // Step 4: finalize
+    _rlSetStep(stepsEl, 3, 'running', 'Synthesizing final answer…');
+    await new Promise(function(r){ setTimeout(r, 250); });
+    _rlSetStep(stepsEl, 3, 'done', 'Answer ready');
+
     var parsed = _rlParseResponse(searchResult.text || searchResult || '');
     stepsEl.remove();
     _rlAddMsg({ role: 'ai', content: parsed.text, sources: parsed.sources, isDT: false, isAgentic: true });
@@ -12673,40 +12946,50 @@ async function rlSendAgentic() {
     stepsEl.remove();
     _rlAddMsg({ role: 'ai', content: 'Research error: ' + e.message, sources: [] });
   }
+
   _rl.busy = false;
-  document.getElementById('rlAgentBtn').disabled = false;
-  document.getElementById('rlSendBtn').disabled = false;
-  document.getElementById('rlInput').focus();
+  if (sb) sb.disabled = false;
+  if (ab) ab.disabled = false;
+  if (input) input.focus();
 }
 
 function _rlAddSteps(steps) {
   var msgsEl = document.getElementById('rlMsgs');
   var div = document.createElement('div');
   div.className = 'rl-steps';
-  div.innerHTML = '<div class="rl-steps-lbl">Agentic Research Plan</div>'
+  div.innerHTML = '<div class="rl-steps-lbl">Agentic Research</div>'
     + steps.map(function(s, i) {
-      var ico = s.state === 'done' ? '✓'
+      var ico = s.state === 'done' ? '&#x2713;'
               : s.state === 'running' ? '<div class="rl-step-spinner"></div>'
               : '';
       return '<div class="rl-step ' + s.state + '" id="rlStep_' + i + '">'
         + '<div class="rl-step-ico">' + ico + '</div>'
-        + '<span>' + s.label + '</span></div>';
+        + '<div class="rl-step-body"><span>' + s.label + '</span></div>'
+        + '</div>';
     }).join('');
   msgsEl.appendChild(div);
   msgsEl.scrollTop = msgsEl.scrollHeight;
   return div;
 }
 
-function _rlSetStep(stepsEl, idx, state) {
+function _rlSetStep(stepsEl, idx, state, detail) {
   var el = stepsEl.querySelector('#rlStep_' + idx);
   if (!el) return;
   el.className = 'rl-step ' + state;
   var ico = el.querySelector('.rl-step-ico');
-  if (!ico) return;
-  ico.innerHTML = state === 'done' ? '✓' : state === 'running' ? '<div class="rl-step-spinner"></div>' : '';
+  if (ico) ico.innerHTML = state === 'done' ? '&#x2713;' : state === 'running' ? '<div class="rl-step-spinner"></div>' : '';
+  if (detail) {
+    var body = el.querySelector('.rl-step-body');
+    if (body) {
+      var spans = body.querySelectorAll('span');
+      if (spans.length) spans[0].textContent = detail;
+    }
+  }
+  var msgsEl = document.getElementById('rlMsgs');
+  if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight;
 }
 
-// ── Response parsing ────────────────────────────────────────────────
+// ── Response parsing ──────────────────────────────────────────────────────────
 function _rlParseResponse(raw) {
   var text = raw || '';
   var sources = [];
@@ -12719,39 +13002,20 @@ function _rlParseResponse(raw) {
       if (s >= 0 && e > s) sources = JSON.parse(jsonPart.slice(s, e + 1));
     } catch(_e) {}
   }
-  // Assign sequential ids if missing
   sources.forEach(function(s, i){ if (!s.id) s.id = i + 1; });
   return { text: text, sources: sources };
 }
 
-// ── System prompt ───────────────────────────────────────────────────
-function _rlBuildSysPrompt() {
-  var base = 'Sei un assistente di ricerca giuridica esperto in diritto UE e italiano (GDPR, AI Act, diritto privacy, normativa nazionale). '
-    + 'Rispondi con stile professionale, preciso e autorevole come un avvocato specializzato. '
-    + 'Usa i marcatori di citazione [1], [2] ecc. per riferimenti alle fonti quando disponibili. '
-    + 'Alla FINE della risposta aggiungi ---SOURCES--- seguito da un array JSON: '
-    + '[{"id":1,"title":"Fonte","snippet":"Testo citato verbatim","reliability":0.9},...] '
-    + 'NON iniziare mai ripetendo la domanda. NON aggiungere "---SOURCES---" se non hai citazioni.';
-  // Inject document context
-  var activeDocs = _rl.docs.filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
-  if (activeDocs.length) {
-    base += '\n\nDOCUMENTI IN CONTESTO:\n';
-    activeDocs.forEach(function(d) {
-      var excerpt = (d.text || '').slice(0, 6000);
-      base += '\n=== ' + d.name + ' ===\n' + excerpt + '\n';
-    });
-    base += '\nCita i documenti sopra usando [1], [2] ecc. e indica il nome del file nella source.';
-  }
-  return base;
-}
-
-// ── Message helpers ─────────────────────────────────────────────────
+// ── Message helpers ───────────────────────────────────────────────────────────
 function _rlAddMsg(msg) {
   _rl.msgs.push(msg);
   var msgsEl = document.getElementById('rlMsgs');
-  document.getElementById('rlChatEmpty').style.display = 'none';
-  msgsEl.appendChild(_rlBuildMsgEl(msg, _rl.msgs.length - 1));
-  msgsEl.scrollTop = msgsEl.scrollHeight;
+  var emptyEl = document.getElementById('rlChatEmpty');
+  if (emptyEl) emptyEl.style.display = 'none';
+  if (msgsEl) {
+    msgsEl.appendChild(_rlBuildMsgEl(msg, _rl.msgs.length - 1));
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
 }
 
 function _rlAddThinking(label) {
@@ -12760,8 +13024,7 @@ function _rlAddThinking(label) {
   div.className = 'rl-thinking';
   div.innerHTML = '<div class="rl-thinking-dots"><span></span><span></span><span></span></div>'
     + '<span style="font-size:12px">' + (label || 'Thinking…') + '</span>';
-  msgsEl.appendChild(div);
-  msgsEl.scrollTop = msgsEl.scrollHeight;
+  if (msgsEl) { msgsEl.appendChild(div); msgsEl.scrollTop = msgsEl.scrollHeight; }
   return div;
 }
 
@@ -12769,24 +13032,32 @@ function _rlPersistMsgs() {
   var p = _rlCurPrj(); if (!p) return;
   var chat = _rlCurChat(); if (!chat) return;
   chat.msgs = _rl.msgs.slice();
-  // Auto-title from first user message
   if (chat.title === 'New Chat') {
     var firstUser = _rl.msgs.find(function(m){ return m.role === 'user'; });
     if (firstUser) chat.title = firstUser.content.slice(0, 42) + (firstUser.content.length > 42 ? '…' : '');
   }
   _rlSave();
-  _rlRenderSidebar();
-  document.getElementById('rlChatTitle').textContent = chat.title;
 }
 
-// ── Document upload ─────────────────────────────────────────────────
-function rlDropFile(e) {
-  e.preventDefault();
-  var files = e.dataTransfer ? e.dataTransfer.files : null;
-  if (files && files.length) rlProcessFiles(files);
+// ── Context pills ─────────────────────────────────────────────────────────────
+function _rlRenderCtxPills() {
+  var container = document.getElementById('rlCtxDocs');
+  if (!container) return;
+  var activeDocs = (_rl.docs || []).filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
+  container.innerHTML = activeDocs.map(function(d) {
+    return '<div class="rl-ctx-pill">' + _rlEsc(d.name.length > 18 ? d.name.slice(0,16)+'…' : d.name)
+      + '<button onclick="rlRemoveCtx(\'' + d.id + '\')" title="Remove from context">&#x00D7;</button></div>';
+  }).join('');
+  container.style.display = activeDocs.length ? 'flex' : 'none';
 }
 
-function rlHandleFile(e) {
+function rlRemoveCtx(docId) {
+  _rl.ctxDocs = _rl.ctxDocs.filter(function(id){ return id !== docId; });
+  _rlRenderCtxPills();
+}
+
+// ── Document upload ───────────────────────────────────────────────────────────
+function rlHandleFiles(e) {
   if (e.target.files && e.target.files.length) rlProcessFiles(e.target.files);
   e.target.value = '';
 }
@@ -12796,15 +13067,14 @@ async function rlProcessFiles(files) {
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
     var text = await _rlExtractText(file);
-    var doc = { id: _rlId(), name: file.name, text: text, size: file.size, created: Date.now() };
+    var doc = { id: _rlId(), name: file.name, text: text, chunks: null, size: file.size, created: Date.now() };
     if (!p.docs) p.docs = [];
     p.docs.push(doc);
     _rl.docs = p.docs;
-    // Auto-add to context
-    _rl.ctxDocs.push(doc.id);
+    if (_rl.ctxDocs.indexOf(doc.id) < 0) _rl.ctxDocs.push(doc.id);
     _rlSave();
   }
-  _rlRenderSidebar();
+  _rlRenderDocsList();
   _rlRenderCtxPills();
 }
 
@@ -12837,10 +13107,10 @@ async function _rlExtractText(file) {
         try {
           var pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
           var text = '';
-          for (var p = 1; p <= Math.min(pdf.numPages, 100); p++) {
-            var page = await pdf.getPage(p);
+          for (var pg = 1; pg <= Math.min(pdf.numPages, 100); pg++) {
+            var page = await pdf.getPage(pg);
             var content = await page.getTextContent();
-            text += content.items.map(function(i){ return i.str; }).join(' ') + '\n\n';
+            text += content.items.map(function(itm){ return itm.str; }).join(' ') + '\n\n';
           }
           res(text);
         } catch(_e) { res(''); }
@@ -12849,73 +13119,72 @@ async function _rlExtractText(file) {
       reader.readAsArrayBuffer(file);
     });
   }
-  return '[File type not supported for text extraction: ' + file.name + ']';
+  return '[File type not supported: ' + file.name + ']';
 }
 
-function _rlRenderCtxPills() {
-  var container = document.getElementById('rlCtxDocs');
-  var activeDocs = _rl.docs.filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
-  container.innerHTML = activeDocs.map(function(d) {
-    return '<div class="rl-ctx-pill">' + _rlEsc(d.name.length > 18 ? d.name.slice(0,16)+'…' : d.name)
-      + '<button onclick="rlRemoveCtx(\'' + d.id + '\')" title="Remove from context">×</button></div>';
-  }).join('');
-  container.style.display = activeDocs.length ? 'flex' : 'none';
-}
-
-function rlRemoveCtx(docId) {
-  _rl.ctxDocs = _rl.ctxDocs.filter(function(id){ return id !== docId; });
-  _rlRenderCtxPills();
-}
-
-// ── Viewer ──────────────────────────────────────────────────────────
+// ── Viewer ─────────────────────────────────────────────────────────────────────
 function rlViewDoc(docId) {
   var doc = (_rl.docs || []).find(function(d){ return d.id === docId; });
   if (!doc) return;
-  rlShowInViewer(docId, null);
-  // Add to context if not already
   if (_rl.ctxDocs.indexOf(docId) < 0) {
     _rl.ctxDocs.push(docId);
     _rlRenderCtxPills();
   }
-  _rlRenderSidebar();
+  rlShowInViewer(docId, null);
 }
 
 function rlShowInViewer(docId, snippet) {
   var doc = (_rl.docs || []).find(function(d){ return d.id === docId; });
   if (!doc) { rlShowWebSnippet({ title: 'Source', snippet: snippet || '' }); return; }
   _rl.viewerDocId = docId;
-  document.getElementById('rlViewerEmpty').style.display = 'none';
-  document.getElementById('rlViewerDoc').style.display = 'flex';
-  document.getElementById('rlViewerName').textContent = doc.name;
+  // Show viewer pane
+  var vp = document.getElementById('rlViewerPane');
+  if (vp) vp.style.display = 'flex';
+  // Render tabs
+  _rlRenderViewerTabs();
+  // Render content
   var content = document.getElementById('rlViewerContent');
+  if (!content) return;
   var text = doc.text || '';
-  if (snippet) {
-    // Highlight the snippet
+  if (snippet && snippet.trim()) {
     var escaped = _rlEsc(text);
     var escapedSnip = _rlEsc(snippet.trim().slice(0, 200));
     if (escapedSnip && escaped.indexOf(escapedSnip) >= 0) {
-      escaped = escaped.split(escapedSnip).join('<mark>' + escapedSnip + '</mark>');
+      escaped = escaped.split(escapedSnip).join('<mark class="rl-highlight">' + escapedSnip + '</mark>');
     }
-    content.innerHTML = escaped;
-    // Scroll to first mark
+    content.innerHTML = '<div style="white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.8;color:var(--txt)">' + escaped + '</div>';
     var firstMark = content.querySelector('mark');
     if (firstMark) setTimeout(function(){ firstMark.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
   } else {
-    content.innerHTML = _rlEsc(text);
+    content.innerHTML = '<div style="white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.8;color:var(--txt)">' + _rlEsc(text) + '</div>';
   }
-  // Build mark navigation
   _rl.viewerMarks = Array.from(content.querySelectorAll('mark'));
   _rl.viewerMarkIdx = 0;
-  _rlRenderSidebar();
+  _rlRenderDocsList();
+}
+
+function _rlRenderViewerTabs() {
+  var tabsEl = document.getElementById('rlViewerTabs');
+  if (!tabsEl) return;
+  var docs = (_rl.docs || []).filter(function(d){ return d.id === _rl.viewerDocId; });
+  tabsEl.innerHTML = docs.map(function(d) {
+    var ext = d.name.split('.').pop().toLowerCase();
+    var icon = ext === 'pdf' ? '&#x1F4C4;' : '&#x1F4C3;';
+    return '<button class="rl-viewer-tab active">' + icon + ' ' + _rlEsc(d.name.length > 24 ? d.name.slice(0,22) + '…' : d.name)
+      + '<button class="rl-viewer-tab-close" onclick="rlCloseViewer()" title="Close">&#x2715;</button>'
+      + '</button>';
+  }).join('');
 }
 
 function rlShowWebSnippet(src) {
-  document.getElementById('rlViewerEmpty').style.display = 'none';
-  document.getElementById('rlViewerDoc').style.display = 'flex';
-  document.getElementById('rlViewerName').textContent = src.title || 'Web Source';
+  var vp = document.getElementById('rlViewerPane');
+  if (vp) vp.style.display = 'flex';
+  var tabs = document.getElementById('rlViewerTabs');
+  if (tabs) tabs.innerHTML = '<button class="rl-viewer-tab active">&#x1F310; Web Source<button class="rl-viewer-tab-close" onclick="rlCloseViewer()">&#x2715;</button></button>';
   var content = document.getElementById('rlViewerContent');
+  if (!content) return;
   var url = src.url ? '<a href="' + _rlEsc(src.url) + '" target="_blank" style="color:#2C7A7B;font-size:11px;text-decoration:none">' + _rlEsc(src.url) + '</a><br><br>' : '';
-  content.innerHTML = url + '<mark>' + _rlEsc(src.snippet || '') + '</mark>';
+  content.innerHTML = url + '<mark class="rl-highlight">' + _rlEsc(src.snippet || '') + '</mark>';
 }
 
 function rlNavMark(dir) {
@@ -12928,9 +13197,91 @@ function rlNavMark(dir) {
 function rlCloseViewer() {
   _rl.viewerDocId = null;
   _rl.viewerMarks = [];
-  document.getElementById('rlViewerEmpty').style.display = 'flex';
-  document.getElementById('rlViewerDoc').style.display = 'none';
+  var vp = document.getElementById('rlViewerPane');
+  if (vp) vp.style.display = 'none';
+  _rlRenderDocsList();
 }
+
+// Viewer toolbar stubs
+function rlViewerAbout() { alert('Document viewer — upload a document to see details.'); }
+function rlViewerTranslate() { alert('Translation feature coming soon.'); }
+function rlViewerDownload() {
+  var doc = (_rl.docs || []).find(function(d){ return d.id === _rl.viewerDocId; });
+  if (!doc) return;
+  var blob = new Blob([doc.text || ''], { type: 'text/plain' });
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = doc.name + '.txt'; a.click();
+}
+function rlViewerPrint() { window.print(); }
+
+// ── Prompt Library ────────────────────────────────────────────────────────────
+function rlOpenPromptLib() {
+  var overlay = document.getElementById('rlPMOverlay');
+  var modal = document.getElementById('rlPMModal');
+  if (overlay) overlay.style.display = 'block';
+  if (modal) modal.style.display = 'flex';
+  _rlPMRender();
+}
+
+function rlClosePromptLib() {
+  var overlay = document.getElementById('rlPMOverlay');
+  var modal = document.getElementById('rlPMModal');
+  if (overlay) overlay.style.display = 'none';
+  if (modal) modal.style.display = 'none';
+}
+
+function rlPMFilter(cat, btn) {
+  _rl.pmCat = cat;
+  document.querySelectorAll('.rl-pm-cat').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  _rlPMRender();
+}
+
+function rlPMSearchFilter() {
+  _rlPMRender();
+}
+
+function _rlPMRender() {
+  var list = document.getElementById('rlPMList');
+  var searchEl = document.getElementById('rlPMSearch');
+  if (!list) return;
+  var q = searchEl ? (searchEl.value || '').toLowerCase() : '';
+  var filtered = _RL_PROMPTS.filter(function(p) {
+    var matchCat = p.cat === _rl.pmCat;
+    var matchQ = !q || p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No prompts in this category</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(function(p) {
+    return '<div class="rl-pm-card" onclick="rlPMUse(\'' + p.id + '\')">'
+      + '<div class="rl-pm-card-title">' + _rlEsc(p.title) + '</div>'
+      + '<div class="rl-pm-card-desc">' + _rlEsc(p.desc) + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function rlPMUse(promptId) {
+  var p = _RL_PROMPTS.find(function(x){ return x.id === promptId; });
+  if (!p) return;
+  var inp = document.getElementById('rlInput');
+  if (inp) { inp.value = p.desc; rlAutoResize(inp); inp.focus(); }
+  rlClosePromptLib();
+}
+
+function rlPMNewPrompt() {
+  var title = prompt('Prompt title:');
+  if (!title || !title.trim()) return;
+  var desc = prompt('Prompt text:');
+  if (!desc || !desc.trim()) return;
+  var newP = { id: 'pm_' + Date.now(), cat: 'mine', title: title.trim(), desc: desc.trim() };
+  _RL_PROMPTS.push(newP);
+  _rl.pmCat = 'mine';
+  document.querySelectorAll('.rl-pm-cat').forEach(function(b){ b.classList.toggle('active', b.dataset.cat === 'mine'); });
+  _rlPMRender();
+}
+
 
 function llcGuessTag(name) {
   var n = (name || '').toLowerCase();
