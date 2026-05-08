@@ -10202,7 +10202,6 @@ async function showDashboard(){
 
   // ── Update mode screen greeting (caller decides which screen to show) ──
   var modeGreet = document.getElementById('modeGreet');
-  var _dn = displayName ? displayName.charAt(0).toUpperCase() + displayName.slice(1) : displayName;
   if (modeGreet) modeGreet.textContent = t('mode_greet') + ', ' + _dn + '.';
   // NOTE: showScreen() is intentionally NOT called here — each caller sets the screen
 }
