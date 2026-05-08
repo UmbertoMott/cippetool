@@ -8692,14 +8692,6 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- Citation tooltip -->
   <div class="rl-cit-tooltip" id="rlCitTooltip" style="display:none"></div>
 
-  <!-- Custom modal (replaces browser prompt/confirm) -->
-  <div class="rl-modal-overlay" id="rlModalOverlay" onclick="rlModalClickOutside(event)">
-    <div class="rl-modal" id="rlModal">
-      <div class="rl-modal-title" id="rlModalTitle"></div>
-      <div id="rlModalBody"></div>
-      <div class="rl-modal-actions" id="rlModalActions"></div>
-    </div>
-  </div>
 
 </div>
 
@@ -34857,5 +34849,14 @@ window.trCopyLink = function() {
 
 })();
 </script>
+
+<!-- Modal overlay: direct child of body to avoid stacking context issues -->
+<div class="rl-modal-overlay" id="rlModalOverlay" onclick="rlModalClickOutside(event)">
+  <div class="rl-modal" id="rlModal">
+    <div class="rl-modal-title" id="rlModalTitle"></div>
+    <div id="rlModalBody"></div>
+    <div class="rl-modal-actions" id="rlModalActions"></div>
+  </div>
+</div>
 </body>
 </html>
