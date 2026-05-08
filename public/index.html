@@ -8586,6 +8586,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
                 Giurisprudenza
               </button>
+              <button class="rl-act-btn" id="rlModeDott" onclick="rlToggleMode('dott')" title="Attiva ricerca dottrinale">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                Dottrina
+              </button>
               <button class="rl-act-btn" id="rlModeWeb" onclick="rlToggleMode('web')" title="Ricerca su internet">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                 Web
@@ -12914,6 +12918,31 @@ function rlChunk(text, docId) {
   return chunks;
 }
 
+// ── Output section builder (shared between RAG and no-doc prompts) ───────────
+function _rlBuildOutputSections() {
+  var m = _rl.modes || {};
+  var s = '';
+  var n = 1;
+  s += '**' + (n++) + '. Inquadramento Normativo**\n'
+    + 'Norme applicabili al quesito/documento. Se non presenti nei chunk, attingi da normativa vigente '
+    + '(Normattiva, EUR-Lex, Gazzetta Ufficiale).\n\n';
+  s += '**' + (n++) + '. Analisi del Documento**\n'
+    + 'Sintesi analitica dei punti chiave emersi dai chunk forniti.\n\n';
+  if (m.giur) {
+    s += '**' + (n++) + '. Giurisprudenza Rilevante** ← SEZIONE ATTIVA\n'
+      + 'Tabella: | Autorità/Anno | Massima/principio di diritto | Rilevanza |\n'
+      + 'Cita SOLO: Corte Costituzionale, Corte di Giustizia UE, Cassazione SS.UU., Cassazione sezioni semplici, '
+      + 'Consiglio di Stato. NON citare giurisprudenza di merito (Tribunali, Corti d\'Appello).\n\n';
+  }
+  if (m.dott) {
+    s += '**' + (n++) + '. Analisi della Dottrina** ← SEZIONE ATTIVA\n'
+      + 'Manuali, commentari, articoli scientifici pertinenti. Cita autore, opera, anno.\n\n';
+  }
+  s += '**' + (n++) + '. Conclusione Operativa**\n'
+    + 'Risposta diretta: rischio giuridico e linea d\'azione.\n\n';
+  return '## STRUTTURA OUTPUT\n' + s;
+}
+
 // ── RAG prompt builder ───────────────────────────────────────────────────────
 function _rlBuildRagPrompt(query, topChunks) {
   var ctx = topChunks.map(function(ch, i) {
@@ -12937,66 +12966,63 @@ function _rlBuildRagPrompt(query, topChunks) {
     + '- NO INVENTIO: non inventare sentenze, articoli o dati numerici non presenti nei chunk.\n'
     + '- Se l\'informazione richiesta NON è nei chunk E non è di dominio pubblico verificabile, scrivi: '
     + '"L\'informazione non è reperibile nelle fonti fornite o verificate."\n\n'
-    + '## STRUTTURA OUTPUT\n'
-    + 'Organizza la risposta con le sezioni pertinenti:\n'
-    + '**Inquadramento Normativo** (norme applicabili al contenuto dei documenti)\n'
-    + '**Analisi del Documento** (sintesi analitica dei punti chiave emersi dai chunk)\n'
-    + '**Giurisprudenza di Riferimento** (se pertinente: tabella | Autorità/Anno | Massima | Rilevanza |)\n'
-    + '**Conclusione Operativa** (risposta diretta alla domanda con indicazione del rischio giuridico)\n\n'
-    + '## CITAZIONI\n'
-    + 'Cita con [1],[2],[3] STRETTAMENTE SEQUENZIALE. Usa testo verbatim dai chunk per ogni [n].\n'
+    + _rlBuildOutputSections()
+    + '## REGOLE CITAZIONI [CRITICO]\n'
+    + 'Ogni [n] identifica UN UNICO pezzo di testo — usalo UNA SOLA VOLTA nel testo. '
+    + 'Non ripetere lo stesso numero per rinviare allo stesso chunk.\n'
+    + 'Primo riferimento=[1], secondo=[2], etc. Ogni numero cita un chunk DIVERSO.\n'
     + 'ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
     + '[{"id":1,"title":"Titolo documento","snippet":"testo verbatim max 150 car","page":1,"docId":"ID_REALE_DEL_CHUNK"},...]\n'
-    + 'Il campo "docId" DEVE contenere il valore docId= del chunk (copia esatto, non usare "doc_id" letterale).\n'
+    + 'Il campo "docId" DEVE essere il valore docId= del chunk (copia esatto — non "doc_id" letterale).\n'
     + 'NON iniziare ripetendo la domanda.'
   );
 }
 
 // ── System prompt (no docs) ──────────────────────────────────────────────────
 function _rlBuildSysPrompt() {
-  var modeCtx = _rlGetModeContext();
+  var m = _rl.modes || {};
   var deepCtx = _rl.deepThink
-    ? 'DEEP THINK ATTIVO — esegui internamente (non scrivere nell\'output) il seguente ragionamento a catena prima di rispondere:\n'
-      + '(1) Quaestio Iuris: identifica la questione giuridica precisa.\n'
-      + '(2) Norma: individua le norme applicabili in gerarchia (Cost. → UE → legge ordinaria → regolamenti).\n'
-      + '(3) Giurisprudenza: verifica se esiste orientamento consolidato o contrasto di sezioni.\n'
-      + '(4) Applicazione: applica le norme ai fatti esposti.\n'
-      + '(5) Conclusio: formula la risposta.\n'
-      + 'Il ragionamento è NASCOSTO — nell\'output scrivi SOLO la risposta finale strutturata.\n\n'
+    ? 'DEEP THINK ATTIVO — esegui internamente (non scrivere nell\'output) il ragionamento:\n'
+      + '(1) Quaestio Iuris → (2) Norma (Cost.→UE→legge→regolamento) → (3) Giurisprudenza consolidata → '
+      + '(4) Applicazione ai fatti → (5) Conclusio.\nScrivi SOLO la risposta finale strutturata.\n\n'
     : '';
+  // Build conditional output sections
+  var sections = '';
+  sections += '**1. Inquadramento Normativo**\n'
+    + 'Articoli di legge applicabili (aggiornati). Se non presenti nei documenti caricati, attingi '
+    + 'dalla normativa vigente (Normattiva, EUR-Lex, Gazzetta Ufficiale).\n\n';
+  if (m.giur) {
+    sections += '**2. Giurisprudenza Rilevante** ← SEZIONE ATTIVA\n'
+      + 'Tabella: | Autorità/Anno | Massima o principio di diritto | Rilevanza |\n'
+      + 'Cita SOLO: Corte Costituzionale, Corte di Giustizia UE, Cassazione SS.UU., Cassazione sezioni semplici, '
+      + 'Consiglio di Stato. NON citare giurisprudenza di merito (Tribunali, Corti d\'Appello).\n'
+      + 'CROSS-CHECK: verifica che l\'orientamento non sia stato superato da pronunce successive.\n\n';
+  }
+  if (m.dott) {
+    sections += (m.giur ? '**3.' : '**2.') + ' Analisi della Dottrina** ← SEZIONE ATTIVA\n'
+      + 'Sintesi dei commenti dottrinali più autorevoli (manuali, commentari, articoli scientifici). '
+      + 'Cita autore, opera, anno. Solo dottrina verificabile — no parafrasi di opere inesistenti.\n\n';
+  }
+  var concNum = (m.giur && m.dott) ? '4' : (m.giur || m.dott) ? '3' : '2';
+  sections += '**' + concNum + '. Conclusione Operativa**\n'
+    + 'Risposta diretta alla questione: rischio giuridico e linea d\'azione consigliata.\n\n';
   return (
     'Sei un Senior Legal Analyst & Research Specialist, giurista di alto profilo specializzato in diritto civile, '
-    + 'amministrativo, penale ed europeo. Il tuo metodo di lavoro rispecchia quello di un avvocato cassazionista o di un magistrato: '
-    + 'rigore formale, gerarchia delle fonti, zero speculazione.\n\n'
-    + (deepCtx)
-    + (modeCtx ? modeCtx + '\n\n' : '')
+    + 'amministrativo, penale ed europeo. Metodo: rigore formale, gerarchia delle fonti, zero speculazione.\n\n'
+    + deepCtx
     + '## VINCOLI ANTI-ALLUCINAZIONE (Zero Tolerance)\n'
-    + '- NO INVENTIO: Se non ricordi con certezza il numero esatto di una sentenza o il testo preciso di un articolo, '
-    + 'dichiara esplicitamente "Non ho questo dato verificabile con certezza" — non parafrasare leggi inesistenti.\n'
-    + '- CROSS-CHECK: Prima di citare un orientamento come "consolidato", verifica internamente '
-    + 'che non esista una sentenza successiva che lo abbia superato (es. revirement di Cassazione SS.UU.).\n'
-    + '- CITAZIONE ESATTA: Riporta sempre Autorità, numero sentenza/articolo, data/anno, e massima/principio di diritto.\n\n'
-    + '## GERARCHIA DELLE FONTI (ordine obbligatorio di ricerca)\n'
-    + '1. Fonti primarie: Costituzione, normativa UE (TFUE, Regolamenti, Direttive), leggi ordinarie, decreti legislativi '
-    + '(fonti: Normattiva, EUR-Lex, Gazzetta Ufficiale)\n'
-    + '2. Giurisprudenza: Corte Costituzionale, Corte di Giustizia UE, Corte di Cassazione (SS.UU. > sezioni semplici), '
-    + 'Consiglio di Stato, TAR (fonti: Italgiure, Dejure, sito Corte Costituzionale)\n'
-    + '3. Dottrina: manuali e commentari di riferimento (Altalex, Questione Giustizia, Il Foro Italiano)\n\n'
-    + '## STRUTTURA OUTPUT OBBLIGATORIA\n'
-    + 'Organizza SEMPRE la risposta con queste sezioni (ometti solo se non pertinente):\n\n'
-    + '**1. Inquadramento Normativo**\n'
-    + 'Articoli di legge aggiornati con indicazione di eventuali modifiche recenti.\n\n'
-    + '**2. Giurisprudenza Rilevante**\n'
-    + 'Tabella markdown: | Autorità/Anno | Massima o decisione | Rilevanza per il caso |\n\n'
-    + '**3. Analisi della Dottrina**\n'
-    + 'Sintesi dei commenti dottrinali sulle questioni controverse (solo se esistenti e verificabili).\n\n'
-    + '**4. Conclusione Operativa**\n'
-    + 'Risposta diretta alla questione con indicazione del rischio giuridico e linea d\'azione consigliata.\n\n'
-    + '## CITAZIONI NEL TESTO\n'
-    + 'Usa [1], [2], [3] in ordine STRETTAMENTE SEQUENZIALE. Il primo riferimento nella risposta è [1], '
-    + 'il secondo [2], etc. Non saltare numeri. Non ripetere. '
-    + 'ALLA FINE scrivi esattamente ---SOURCES--- seguito da JSON array:\n'
-    + '[{"id":1,"title":"Autorità — Estremi — Anno","snippet":"massima o testo verbatim max 150 car","reliability":0.9},...]\n'
+    + '- NO INVENTIO: se non ricordi con certezza numero sentenza o testo articolo, '
+    + 'scrivi "Dato non verificabile con certezza". Non parafrasare norme inesistenti.\n'
+    + '- CITAZIONE ESATTA: Autorità + numero + data/anno + massima/principio di diritto.\n\n'
+    + '## STRUTTURA OUTPUT\n' + sections
+    + '## REGOLE CITAZIONI [CRITICO]\n'
+    + 'Ogni numero [n] identifica UN UNICO pezzo di contenuto — usalo UNA SOLA VOLTA nel testo.\n'
+    + 'Esempio CORRETTO: "L\'art. 1 [1] stabilisce X. L\'art. 2 [2] prevede Y. La Cass. [3] ha sancito Z."\n'
+    + 'Esempio SBAGLIATO: "L\'art. 1 [1] stabilisce X ... come già visto [1] ..." ← VIETATO ripetere [1].\n'
+    + 'Se devi rimandare a una fonte già citata, integra il concetto nel testo senza aggiungere un nuovo [n].\n'
+    + 'Sequenza: primo riferimento=[1], secondo=[2], etc. Non saltare numeri.\n'
+    + 'ALLA FINE scrivi ---SOURCES--- con JSON:\n'
+    + '[{"id":1,"title":"Autorità — Estremi — Anno","snippet":"testo verbatim max 150 car","reliability":0.9},...]\n'
     + 'NON aggiungere ---SOURCES--- se non ci sono citazioni. NON iniziare ripetendo la domanda.'
   );
 }
