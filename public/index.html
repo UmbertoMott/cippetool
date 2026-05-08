@@ -4375,7 +4375,18 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 .rl-doc-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--txt);transition:background .13s}
 .rl-doc-item:hover{background:var(--sur2)}
 .rl-doc-item.active{background:var(--sur2);font-weight:600}
-.rl-doc-icon{font-size:10px;font-weight:800;color:var(--muted);flex-shrink:0;width:26px;height:18px;display:flex;align-items:center;justify-content:center;background:var(--sur2);border-radius:3px}
+.rl-doc-icon{font-size:9px;font-weight:800;flex-shrink:0;width:28px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:4px;letter-spacing:.3px}
+.rl-doc-icon.pdf{background:rgba(229,62,62,.12);color:#c53030}
+.rl-doc-icon.doc{background:rgba(49,130,206,.12);color:#2b6cb0}
+.rl-doc-icon.txt{background:rgba(113,128,150,.12);color:#4a5568}
+/* File context pills above input */
+.rl-ctx-pill{display:flex;align-items:center;gap:6px;background:var(--sur);border:0.5px solid var(--bdr);border-radius:8px;padding:5px 10px 5px 8px;font-size:11.5px;font-weight:500;color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.rl-ctx-pill-icon{font-size:8px;font-weight:800;padding:2px 5px;border-radius:3px;letter-spacing:.3px;flex-shrink:0}
+.rl-ctx-pill-icon.pdf{background:rgba(229,62,62,.12);color:#c53030}
+.rl-ctx-pill-icon.doc{background:rgba(49,130,206,.12);color:#2b6cb0}
+.rl-ctx-pill-icon.txt{background:rgba(113,128,150,.12);color:#4a5568}
+.rl-ctx-pill button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0;line-height:1;margin-left:2px;opacity:.6;transition:opacity .13s}
+.rl-ctx-pill button:hover{opacity:1}
 .rl-doc-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
 .rl-doc-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 2px;opacity:0;transition:opacity .13s;line-height:1}
 .rl-doc-item:hover .rl-doc-del{opacity:1}
@@ -4487,16 +4498,15 @@ body.theme-light .rl-cit{background:rgba(0,0,0,.07);color:rgba(0,0,0,.45)}
 /* Input area */
 .rl-input-wrap{flex-shrink:0;padding:8px 20px 14px;background:var(--bg)}
 .rl-ctx-docs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;min-height:0}
-.rl-ctx-pill{display:flex;align-items:center;gap:5px;background:var(--sur2);border:0.5px solid var(--bdr);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--txt)}
-.rl-ctx-pill button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0;line-height:1}
-.rl-input-bar{display:flex;align-items:flex-end;gap:8px;background:var(--sur);border:1px solid rgba(0,0,0,.09);border-radius:16px;padding:10px 10px 10px 16px;transition:border-color .2s,box-shadow .2s;box-sizing:border-box;box-shadow:0 2px 14px rgba(0,0,0,.05)}
+.rl-input-bar{display:flex;align-items:center;gap:8px;background:var(--sur);border:1px solid rgba(0,0,0,.09);border-radius:16px;padding:10px 10px 10px 16px;transition:box-shadow .2s;box-sizing:border-box;box-shadow:0 2px 14px rgba(0,0,0,.05)}
 body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.1);box-shadow:0 2px 16px rgba(0,0,0,.06)}
-.rl-input-bar:focus-within{border-color:rgba(44,122,123,.45);box-shadow:0 2px 22px rgba(44,122,123,.09)}
-.rl-attach-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;display:flex;align-items:center;flex-shrink:0;transition:color .15s,background .15s;margin-bottom:3px}
+.rl-input-bar:focus-within{box-shadow:0 4px 24px rgba(0,0,0,.1)}
+body.theme-light .rl-input-bar:focus-within{box-shadow:0 4px 24px rgba(0,0,0,.1)}
+.rl-attach-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;display:flex;align-items:center;flex-shrink:0;transition:color .15s,background .15s}
 .rl-attach-btn:hover{color:var(--txt);background:var(--sur2)}
-.rl-textarea{flex:1;background:none;border:none;outline:none;font:13.5px/1.6 'Inter',sans-serif;color:var(--txt);resize:none;max-height:140px;padding:3px 0}
-.rl-textarea::placeholder{color:var(--muted);font-size:13px}
-.rl-input-right{display:flex;align-items:center;gap:6px;flex-shrink:0;padding-bottom:3px}
+.rl-textarea{flex:1;background:none;border:none;outline:none;font:13.5px/1.55 'Inter',sans-serif;color:var(--txt);resize:none;max-height:140px;padding:0;line-height:1.55;vertical-align:middle}
+.rl-textarea::placeholder{color:var(--muted);font-size:13.5px}
+.rl-input-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
 /* Deep think pill */
 .rl-dt-pill{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:var(--sur2);border:0.5px solid var(--bdr);cursor:pointer;transition:all .18s;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif}
 .rl-dt-pill:hover{border-color:rgba(236,201,75,.45);color:var(--txt)}
@@ -4542,9 +4552,7 @@ body.theme-light .rl-mode-lever.on{background:rgba(44,122,123,.08);color:#1a6b6c
 .rl-viewer-tab{display:flex;align-items:center;gap:6px;padding:0 12px;height:36px;font-size:12px;color:var(--muted);cursor:pointer;border-right:0.5px solid var(--bdr);white-space:nowrap;background:transparent;border-top:none;border-bottom:none;border-left:none;transition:background .13s;font-family:'Inter',sans-serif}
 .rl-viewer-tab.active{background:var(--bg);color:var(--txt);font-weight:600}
 .rl-viewer-tab-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0;line-height:1;margin-left:2px}
-.rl-viewer-toolbar{display:flex;align-items:center;gap:4px;padding:0 12px;border-bottom:0.5px solid var(--bdr);height:36px;flex-shrink:0}
-.rl-viewer-tbtn{background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:5px;font-family:'Inter',sans-serif;transition:color .13s}
-.rl-viewer-tbtn:hover{color:var(--txt)}
+.rl-viewer-toolbar{display:flex;align-items:center;justify-content:flex-end;padding:0 10px;border-bottom:0.5px solid var(--bdr);height:32px;flex-shrink:0}
 .rl-viewer-close{margin-left:auto;background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1;transition:color .13s}
 .rl-viewer-close:hover{color:var(--txt)}
 .rl-viewer-content{flex:1;overflow-y:auto;padding:20px;font-size:13px;line-height:1.8;color:var(--txt);white-space:pre-wrap;font-family:'Inter',sans-serif;word-break:break-word}
@@ -8622,10 +8630,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="rl-viewer-pane" id="rlViewerPane" style="display:none">
       <div class="rl-viewer-tabs" id="rlViewerTabs"></div>
       <div class="rl-viewer-toolbar">
-        <button class="rl-viewer-tbtn" onclick="rlViewerAbout()">About</button>
-        <button class="rl-viewer-tbtn" onclick="rlViewerTranslate()">Translate</button>
-        <button class="rl-viewer-tbtn" onclick="rlViewerDownload()">Download</button>
-        <button class="rl-viewer-tbtn" onclick="rlViewerPrint()">Print</button>
         <button class="rl-viewer-close" onclick="rlCloseViewer()">&#x2715;</button>
       </div>
       <div class="rl-viewer-content" id="rlViewerContent"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;opacity:.35;gap:10px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div style="font-size:12px;font-weight:600">No document open</div><div style="font-size:11px;opacity:.7;text-align:center;line-height:1.5">Click a citation [1] in the chat<br>or upload a document</div></div></div>
@@ -12721,11 +12725,10 @@ function _rlRenderDocsList() {
     return;
   }
   list.innerHTML = docs.map(function(d) {
-    var ext = d.name.split('.').pop().toLowerCase();
-    var icon = ext === 'pdf' ? 'PDF' : (ext === 'docx' || ext === 'doc') ? 'DOC' : 'TXT';
+    var ft = _rlFileType(d.name);
     var active = _rl.viewerDocId === d.id;
     return '<div class="rl-doc-item' + (active ? ' active' : '') + '" onclick="rlViewDoc(\'' + d.id + '\')">'
-      + '<div class="rl-doc-icon">' + icon + '</div>'
+      + '<div class="rl-doc-icon ' + ft.cls + '">' + ft.label + '</div>'
       + '<span class="rl-doc-name" title="' + _rlEsc(d.name) + '">' + _rlEsc(d.name.length > 22 ? d.name.slice(0,20) + '…' : d.name) + '</span>'
       + '<button class="rl-doc-del" onclick="event.stopPropagation();rlDelDoc(\'' + d.id + '\')" title="Remove">&#x2715;</button>'
       + '</div>';
@@ -12739,10 +12742,9 @@ function rlFilterDocs() {
   var docs = (_rl.docs || []).filter(function(d){ return !q || d.name.toLowerCase().includes(q.toLowerCase()); });
   if (!docs.length) { list.innerHTML = '<div style="padding:12px 8px;font-size:11px;color:var(--muted);text-align:center">No results</div>'; return; }
   list.innerHTML = docs.map(function(d) {
-    var ext = d.name.split('.').pop().toLowerCase();
-    var icon = ext === 'pdf' ? 'PDF' : (ext === 'docx' || ext === 'doc') ? 'DOC' : 'TXT';
+    var ft = _rlFileType(d.name);
     return '<div class="rl-doc-item" onclick="rlViewDoc(\'' + d.id + '\')">'
-      + '<div class="rl-doc-icon">' + icon + '</div>'
+      + '<div class="rl-doc-icon ' + ft.cls + '">' + ft.label + '</div>'
       + '<span class="rl-doc-name">' + _rlEsc(d.name.length > 22 ? d.name.slice(0,20) + '…' : d.name) + '</span>'
       + '<button class="rl-doc-del" onclick="event.stopPropagation();rlDelDoc(\'' + d.id + '\')" title="Remove">&#x2715;</button>'
       + '</div>';
@@ -12807,6 +12809,13 @@ function _rlRenderMarkdown(text, sources, msgIdx) {
     return '<span class="rl-cit" onclick="rlCitClick(' + msgIdx + ',' + num + ')" title="Source ' + num + '">' + num + '</span>';
   });
   return t;
+}
+
+function _rlFileType(name) {
+  var ext = (name || '').split('.').pop().toLowerCase();
+  if (ext === 'pdf') return { label: 'PDF', cls: 'pdf' };
+  if (ext === 'docx' || ext === 'doc') return { label: 'DOC', cls: 'doc' };
+  return { label: 'TXT', cls: 'txt' };
 }
 
 function _rlEsc(s) {
@@ -13185,7 +13194,10 @@ function _rlRenderCtxPills() {
   if (!container) return;
   var activeDocs = (_rl.docs || []).filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
   container.innerHTML = activeDocs.map(function(d) {
-    return '<div class="rl-ctx-pill">' + _rlEsc(d.name.length > 18 ? d.name.slice(0,16)+'…' : d.name)
+    var ft = _rlFileType(d.name);
+    return '<div class="rl-ctx-pill">'
+      + '<span class="rl-ctx-pill-icon ' + ft.cls + '">' + ft.label + '</span>'
+      + _rlEsc(d.name.length > 20 ? d.name.slice(0,18)+'…' : d.name)
       + '<button onclick="rlRemoveCtx(\'' + d.id + '\')" title="Remove from context">&#x00D7;</button></div>';
   }).join('');
   container.style.display = activeDocs.length ? 'flex' : 'none';
