@@ -4336,7 +4336,7 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 #screenLRL.active{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50}
 
 /* Root layout */
-.rl-root{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
+.rl-root{display:flex;height:calc(100vh - 52px);overflow:hidden;background:var(--bg)}
 
 /* Icon sidebar */
 .rl-icons{width:44px;flex-shrink:0;background:#0f0f0e;border-right:0.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px}
@@ -4398,7 +4398,7 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 .rl-empty-sub{font-size:13px;color:var(--muted)}
 
 /* Workspace */
-.rl-workspace{display:flex;flex:1;overflow:hidden}
+.rl-workspace{display:flex;flex:1;overflow:hidden;flex-direction:column}
 
 /* Messages area */
 .rl-msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
@@ -9873,7 +9873,7 @@ function showScreen(id, _skipHistory) {
   var el = document.getElementById(id);
   if (el) el.classList.add('active');
   // Some screens need full viewport width — break out of .wrap max-width:900px
-  var _fullscreenScreens = ['screenLanding', 'screenTabularEditor'];
+  var _fullscreenScreens = ['screenLanding', 'screenTabularEditor', 'screenLRL'];
   var wrapEl = document.querySelector('.wrap');
   if (wrapEl) wrapEl.classList.toggle('fullscreen-mode', _fullscreenScreens.indexOf(id) >= 0);
 }
