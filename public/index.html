@@ -4514,8 +4514,8 @@ body.theme-light .rl-cit{background:rgba(0,0,0,.07);color:rgba(0,0,0,.45)}
 .rl-ctx-docs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;min-height:0}
 .rl-input-bar{display:flex;flex-direction:column;gap:0;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:14px 14px 10px 18px;transition:box-shadow .2s,border-color .2s;box-sizing:border-box;box-shadow:0 2px 14px rgba(0,0,0,.05)}
 body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.11);box-shadow:0 2px 16px rgba(0,0,0,.06)}
-.rl-input-bar:focus-within{border-color:rgba(44,122,123,.35);box-shadow:0 4px 24px rgba(44,122,123,.08)}
-body.theme-light .rl-input-bar:focus-within{border-color:rgba(44,122,123,.4);box-shadow:0 4px 24px rgba(44,122,123,.1)}
+.rl-input-bar:focus-within{box-shadow:0 4px 28px rgba(0,0,0,.1)}
+body.theme-light .rl-input-bar:focus-within{box-shadow:0 4px 28px rgba(0,0,0,.09)}
 .rl-textarea{width:100%;background:none;border:none;outline:none;font:14px/1.6 'Inter',sans-serif;color:var(--txt);resize:none;max-height:160px;min-height:24px;padding:0;line-height:1.6}
 .rl-textarea::placeholder{color:var(--muted);font-size:14px}
 /* Bottom action row inside card */
@@ -13406,11 +13406,32 @@ function _rlFindSnippet(text, snippet) {
   return null;
 }
 
+// Extend a found match to the nearest sentence boundaries (. ! ? or ,)
+function _rlExtendToSentence(text, found) {
+  var idx = text.indexOf(found);
+  if (idx < 0) return found;
+  // Walk backward to previous sentence-ending punctuation
+  var start = idx;
+  for (var si = idx - 1; si >= Math.max(0, idx - 300); si--) {
+    var c = text[si];
+    if (c === '.' || c === '!' || c === '?' || c === '\n') { start = si + 1; break; }
+    if (si === Math.max(0, idx - 300)) start = si;
+  }
+  // Walk forward to next sentence-ending punctuation
+  var end = idx + found.length;
+  for (var ei = end; ei < Math.min(text.length, end + 400); ei++) {
+    var c2 = text[ei];
+    if (c2 === '.' || c2 === '!' || c2 === '?' || c2 === ',') { end = ei + 1; break; }
+  }
+  return text.slice(start, end).trim();
+}
+
 function _rlBuildTextViewer(text, snippet) {
   var escaped = _rlEsc(text);
   if (snippet && snippet.trim()) {
     var found = _rlFindSnippet(text, snippet);
     if (found) {
+      found = _rlExtendToSentence(text, found);
       var ef = _rlEsc(found);
       escaped = escaped.split(ef).join('<mark class="rl-highlight">' + ef + '</mark>');
     }
@@ -13425,7 +13446,20 @@ function _rlMarkSnippetInHtml(html, snippet) {
     var parser = new DOMParser();
     var tmpDoc = parser.parseFromString('<body>' + html + '</body>', 'text/html');
     var root = tmpDoc.body;
-    var candidates = [snippet.slice(0, 120), snippet.slice(0, 60), snippet.slice(0, 30)];
+    // Build extended snippet: find in plain text first, extend to sentence, then use as search candidate
+    var plainText = root.textContent || '';
+    var baseFound = null;
+    var tryLengths = [120, 60, 30];
+    for (var tl = 0; tl < tryLengths.length; tl++) {
+      var tc = snippet.slice(0, tryLengths[tl]);
+      if (tc && plainText.indexOf(tc) >= 0) { baseFound = tc; break; }
+    }
+    if (baseFound) {
+      // Extend to sentence boundary in plain text
+      var extSnippet = _rlExtendToSentence(plainText, baseFound);
+      snippet = extSnippet || baseFound;
+    }
+    var candidates = [snippet.slice(0, 200), snippet.slice(0, 100), snippet.slice(0, 40)];
     var marked = false;
     function walk(node) {
       if (marked) return;
