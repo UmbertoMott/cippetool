@@ -1486,7 +1486,7 @@ body.theme-light #wbCollapseToolsBtn { background: rgba(0,0,0,.05) !important; b
 }
 #screenWorkbench .wb-neon-btn:hover { transform: translateY(-1px); opacity: 0.88; }
 #screenWorkbench .wb-tool.wb-locked { opacity: 0.4; pointer-events: none; }
-#screenWorkbench .wb-tool.wb-locked .wb-neon-btn::before { content: '🔒 '; }
+#screenWorkbench .wb-tool.wb-locked .wb-neon-btn::before { content: ''; }
 
 /* tool output */
 #screenWorkbench .wb-out {
@@ -2169,7 +2169,7 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 .ai-bubble .nb-summary{margin-top:12px;padding:10px 12px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;font-size:12.5px;line-height:1.6;color:var(--txt)}
 .ai-bubble .nb-summary strong{color:var(--acc)}
 .ai-bubble .nb-rule{margin-top:10px;padding:8px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:12px;color:#86efac}
-.ai-bubble .nb-rule::before{content:'💡 ';font-style:normal}
+.ai-bubble .nb-rule::before{content:'';font-style:normal}
 .ai-bubble .nb-correct{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:12.5px;color:#86efac}
 .ai-bubble .nb-wrong{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:8px 12px;margin:6px 0;font-size:12.5px;color:#fca5a5}
 .ai-chart-title{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
@@ -2477,7 +2477,7 @@ body.agent-open.esb-open #eapHamburgerOuter { right:388px; }
 .eap-close{margin-left:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:16px;cursor:pointer;padding:6px 9px;border-radius:8px;line-height:1;transition:all 0.15s}
 .eap-close:hover{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);color:#f87171}
 .eap-context{padding:8px 16px;background:linear-gradient(90deg,rgba(124,58,237,0.08),rgba(59,130,246,0.05));border-bottom:1px solid rgba(124,58,237,0.12);font-size:10.5px;color:rgba(167,139,250,0.55);flex-shrink:0;letter-spacing:0.3px;display:flex;align-items:center;gap:6px}
-.eap-context::before{content:'⚡';font-size:10px}
+.eap-context::before{content:'';font-size:10px}
 .eap-messages{flex:1;overflow-y:auto;padding:20px 16px 6px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
 .eap-messages::-webkit-scrollbar{width:3px}
 .eap-messages::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.18);border-radius:2px}
@@ -2795,7 +2795,7 @@ body.agent-open.esb-open #eapHamburgerOuter { right:388px; }
 .lt-divider{width:30px;height:1px;background:#2e2e3e;margin:4px 0;flex-shrink:0}
 .lt-count{font-size:9px;color:#888899;text-align:center;padding:6px 4px 2px;line-height:1.5;border-top:1px solid #2e2e3e;width:100%}
 .lt-count strong{color:#ef4444;display:block;font-size:14px;font-family:'Inter',sans-serif}
-.lt-dot.flagged::after{content:'🚩';position:absolute;top:-4px;right:-4px;font-size:8px;line-height:1}
+.lt-dot.flagged::after{content:'▶';position:absolute;top:-4px;right:-4px;font-size:8px;line-height:1}
 .lt-dot{position:relative}
 /* Red flag button in question card */
 .flag-btn{display:inline-flex;flex-direction:column;align-items:center;gap:1px;background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:8px;transition:background 0.15s;color:#888899;font-size:10px;font-weight:700;font-family:'Inter',sans-serif;line-height:1}
@@ -6798,7 +6798,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
 <div class="settings-panel" id="settingsPanel">
   <div class="settings-header">
-    <h2>⚙️ Impostazioni</h2>
+    <h2>Impostazioni</h2>
     <button class="settings-close" onclick="closeSettings()">✕</button>
   </div>
   <div class="settings-body">
@@ -6840,7 +6840,7 @@ document.addEventListener('DOMContentLoaded', function() {
             3. Inserisci il codice a 6 cifre per confermare
           </p>
           <div class="mfa-qr-placeholder" id="mfaQR">
-            📱 QR Code<br><br>
+            QR Code<br><br>
             <small>Scansiona con<br>l'app authenticator</small>
           </div>
           <div class="mfa-secret" id="mfaSecret">CARICAMENTO…</div>
@@ -6871,7 +6871,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="settings-row" style="border-bottom:none">
         <div>
-          <div class="settings-row-label">🔄 Azzera stato quiz</div>
+          <div class="settings-row-label">Azzera stato quiz</div>
           <div class="settings-row-sub">Resetta quiz in corso e completati — lo storico rimane</div>
         </div>
         <button class="btn-settings-action" onclick="resetQuizProgress()" style="background:rgba(251,191,36,0.13);border-color:rgba(251,191,36,0.4);color:#fcd34d">Azzera</button>
@@ -6883,7 +6883,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="settings-section-title">Risorse</div>
       <div class="settings-row" style="border-bottom:none;cursor:pointer" onclick="openBancaDomande()">
         <div>
-          <div class="settings-row-label" style="color:var(--acc)">📚 Banca Domande completa</div>
+          <div class="settings-row-label" style="color:var(--acc)">Banca Domande completa</div>
           <div class="settings-row-sub">Sfoglia tutte le 756+ domande con risposte e riferimenti</div>
         </div>
         <span style="color:var(--acc);font-size:20px;margin-left:8px">›</span>
@@ -6897,11 +6897,11 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="bd-overlay" id="bdOverlay">
   <div class="bd-panel">
     <div class="bd-header">
-      <div class="bd-title">📚 Banca <span>Domande</span></div>
+      <div class="bd-title">Banca <span>Domande</span></div>
       <button class="bd-close" onclick="closeBancaDomande()" title="Chiudi">✕</button>
     </div>
     <div class="bd-controls">
-      <input class="bd-search" id="bdSearch" type="text" placeholder="🔍  Cerca domanda, articolo, concetto…" oninput="filterBancaDomande()">
+      <input class="bd-search" id="bdSearch" type="text" placeholder="Cerca domanda, articolo, concetto…" oninput="filterBancaDomande()">
       <select class="bd-filter" id="bdDomainFilter" onchange="filterBancaDomande()">
         <option value="">Tutti i domini</option>
         <option value="1">Domain I — Intro EU Data Protection</option>
@@ -6969,12 +6969,12 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div class="ld-visual-body">
       <div class="ld-visual-sidebar">
-        <div class="ld-visual-q active">📖 GDPR · Art. 6</div>
-        <div class="ld-visual-q">🔒 Data Transfers</div>
-        <div class="ld-visual-q">🤖 EU AI Act</div>
-        <div class="ld-visual-q">👤 Rights of DS</div>
-        <div class="ld-visual-q">📋 DPO Obligations</div>
-        <div class="ld-visual-q">🏛️ Supervisory Auth.</div>
+        <div class="ld-visual-q active">GDPR · Art. 6</div>
+        <div class="ld-visual-q">Data Transfers</div>
+        <div class="ld-visual-q">EU AI Act</div>
+        <div class="ld-visual-q">Rights of DS</div>
+        <div class="ld-visual-q">DPO Obligations</div>
+        <div class="ld-visual-q">Supervisory Auth.</div>
       </div>
       <div class="ld-visual-main">
         <div class="ld-visual-question">Under GDPR Art. 6(1)(f), the legitimate interest basis requires a three-part test. Which element is NOT part of this assessment?</div>
@@ -6984,7 +6984,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="ld-visual-opt wrong">C. Balancing test — interests of data subject ✗</div>
           <div class="ld-visual-opt">D. Necessity test — processing must be necessary</div>
         </div>
-        <div class="ld-visual-ai-chip">🎓 Spiega con AI &nbsp;·&nbsp; Art. 6(1)(f) GDPR</div>
+        <div class="ld-visual-ai-chip">Spiega con AI &nbsp;·&nbsp; Art. 6(1)(f) GDPR</div>
       </div>
     </div>
   </div>
@@ -7037,37 +7037,37 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div class="ld-feat-grid">
       <div class="ld-feat-card">
-        <div class="ld-feat-icon">📚</div>
+        <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
         <h3 class="ld-feat-h3">Quiz Engine Adattivo</h3>
         <p class="ld-feat-p">800+ quesiti aggiornati al curriculum IAPP 2024. Il sistema seleziona le domande in base alle tue lacune per massimizzare l'efficienza di studio.</p>
         <span class="ld-feat-tag">GDPR · EU AI Act · IAPP</span>
       </div>
       <div class="ld-feat-card">
-        <div class="ld-feat-icon">🤖</div>
+        <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <h3 class="ld-feat-h3">AI Tutor Specializzato</h3>
         <p class="ld-feat-p">Chiedi spiegazioni su qualsiasi norma — GDPR, EU AI Act, trasferimenti internazionali — e ricevi risposte da un docente universitario di diritto europeo.</p>
         <span class="ld-feat-tag">Gemini · Knowledge Base</span>
       </div>
       <div class="ld-feat-card">
-        <div class="ld-feat-icon">📊</div>
+        <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
         <h3 class="ld-feat-h3">Analytics in Tempo Reale</h3>
         <p class="ld-feat-p">Dashboard con score per categoria, andamento storico e stima IAPP. Identifica esattamente dove concentrare lo studio prima dell'esame.</p>
         <span class="ld-feat-tag">Score · Trend · Stima</span>
       </div>
       <div class="ld-feat-card">
-        <div class="ld-feat-icon">🗺️</div>
+        <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></div>
         <h3 class="ld-feat-h3">Mappa Concettuale</h3>
         <p class="ld-feat-p">Visualizza le connessioni tra articoli GDPR, linee guida EDPB, EU AI Act e giurisprudenza. Comprendi il sistema normativo nel suo complesso.</p>
         <span class="ld-feat-tag">Interattiva · Navigabile</span>
       </div>
       <div class="ld-feat-card">
-        <div class="ld-feat-icon">🔴</div>
+        <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
         <h3 class="ld-feat-h3">Red Flag & Revisione</h3>
         <p class="ld-feat-p">Segna le domande difficili per rivederle. Il pannello di revisione storico mostra ogni sessione con analisi AI integrata domanda per domanda.</p>
         <span class="ld-feat-tag">Flag · Storico · Review</span>
       </div>
       <div class="ld-feat-card">
-        <div class="ld-feat-icon">⏱️</div>
+        <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
         <h3 class="ld-feat-h3">Simulazione Esame Reale</h3>
         <p class="ld-feat-p">150 minuti, 90 domande, condizioni identiche all'esame IAPP. Timer con reset di emergenza, modalità pausa e focus mode per simulare la pressione reale.</p>
         <span class="ld-feat-tag">150 min · 90 Q · IAPP</span>
@@ -7119,7 +7119,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Visual: AI chat preview -->
     <div class="ld-workflow-visual">
       <div class="ld-wv-header">
-        <div class="ld-wv-icon">🤖</div>
+        <div class="ld-wv-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div>
           <div class="ld-wv-title">CIPP/E AI Agent</div>
           <div class="ld-wv-sub">GDPR · EU AI Act · IAPP</div>
@@ -7168,7 +7168,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <button class="ld-plan-cta secondary" onclick="showScreen('screenLogin')">Inizia gratis</button>
       </div>
       <div class="ld-plan featured">
-        <div class="ld-plan-badge">⭐ Più scelto</div>
+        <div class="ld-plan-badge">Più scelto</div>
         <div class="ld-plan-name">Pro</div>
         <div class="ld-plan-price"><sup>€</sup>29</div>
         <div class="ld-plan-price-sub">al mese · cancella quando vuoi</div>
@@ -7282,7 +7282,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="screen" id="screenLogin">
   <div class="login-wrap">
     <div class="login-box">
-      <span class="login-logo">📋</span>
+      
       <div class="login-title">CIPP/<span>E</span> Training</div>
       <div class="login-sub" id="loginSub">Accedi per salvare i tuoi progressi</div>
       <div style="font-size:11px;color:rgba(167,139,250,.4);margin-bottom:-10px"><a onclick="showScreen('screenLanding')" style="cursor:pointer;color:rgba(167,139,250,.5)">← Home</a></div>
@@ -7290,7 +7290,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <!-- MFA verification (shown after login if MFA enabled) -->
       <div id="mfaPrompt" style="display:none">
         <div class="mfa-prompt">
-          <h3>🔐 Verifica in due fattori</h3>
+          <h3>Verifica in due fattori</h3>
           <p>Inserisci il codice a 6 cifre dalla tua app di autenticazione (es. Microsoft Authenticator)</p>
           <div class="mfa-code-input" id="mfaInputs">
             <input type="text" maxlength="1" inputmode="numeric" oninput="mfaDigit(this,0)">
@@ -7339,7 +7339,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="pass-wrap">
               <input type="password" id="inputPass" placeholder="La tua password" autocomplete="current-password"
                 onkeydown="if(event.key==='Enter') doLogin()" data-i18n-ph="login_pass_ph">
-              <button type="button" class="eye-btn" onclick="toggleEye('inputPass',this)" title="Mostra/nascondi">👁</button>
+              <button type="button" class="eye-btn" onclick="toggleEye('inputPass',this)" title="Mostra/nascondi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
           </div>
           <div class="login-err" id="loginErr"></div>
@@ -7361,7 +7361,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <label>Password</label>
             <div class="pass-wrap">
               <input type="password" id="inputRegPass" placeholder="Scegli una password" autocomplete="new-password">
-              <button type="button" class="eye-btn" onclick="toggleEye('inputRegPass',this)" title="Mostra/nascondi">👁</button>
+              <button type="button" class="eye-btn" onclick="toggleEye('inputRegPass',this)" title="Mostra/nascondi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
           </div>
           <div class="login-err" id="regErr"></div>
@@ -7931,7 +7931,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="tr-modal-btn" onclick="trMemberAdd()">Aggiungi</button>
     </div>
     <div id="trMemberChips" style="margin-bottom:16px;min-height:24px;"></div>
-    <button class="tr-copy-link" onclick="trCopyLink()">🔗 Copia link di condivisione</button>
+    <button class="tr-copy-link" onclick="trCopyLink()">Copia link di condivisione</button>
     <div style="margin-top:16px;text-align:right;">
       <button class="tr-modal-btn ghost" onclick="trMembersClose()">Chiudi</button>
     </div>
@@ -7952,11 +7952,11 @@ document.addEventListener('DOMContentLoaded', function() {
       <option value="bulleted_list">•  Bulleted list</option>
       <option value="number">#  Number</option>
       <option value="percentage">%  Percentage</option>
-      <option value="monetary">💳  Monetary Amount</option>
+      <option value="monetary">Monetary Amount</option>
       <option value="currency">$  Currency</option>
       <option value="yes_no">◎  Yes / No</option>
-      <option value="date">📅  Date</option>
-      <option value="tags">🏷  Tags</option>
+      <option value="date">Date</option>
+      <option value="tags">Tags</option>
     </select>
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -7966,7 +7966,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <textarea class="tr-modal-input" id="trColPromptInput" placeholder="es. estrai i concetti principali per ogni paragrafo"></textarea>
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;">
-      <button class="tr-modal-btn danger" id="trColDeleteBtn" onclick="trColDeleteFromModal()" style="display:none;">🗑 Delete</button>
+      <button class="tr-modal-btn danger" id="trColDeleteBtn" onclick="trColDeleteFromModal()" style="display:none;">Delete</button>
       <div style="display:flex;gap:8px;margin-left:auto;">
         <button class="tr-modal-btn ghost" onclick="trColClose()">Annulla</button>
         <button class="tr-modal-btn" onclick="trColSave()">Save</button>
@@ -8151,7 +8151,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Placeholder pre-upload -->
     <div class="wb-doc-placeholder" id="wbDocPlaceholder">
-      <div class="wb-doc-placeholder-icon">📄</div>
+      <div class="wb-doc-placeholder-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
       <div>Il documento apparirà qui dopo il caricamento</div>
     </div>
 
@@ -8172,7 +8172,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <span class="wp-dot"></span>
       <span class="wp-count" id="wbPinCount">0/3 blocchi in memoria</span>
       <span class="wp-items" id="wbPinItems"></span>
-      <button class="wp-discrimen" id="wbPillDiscrimen" onclick="wbMultiBlockAction('discrimen')">⚖ Trova il Discrimen</button>
+      <button class="wp-discrimen" id="wbPillDiscrimen" onclick="wbMultiBlockAction('discrimen')">Trova il Discrimen</button>
       <span class="wp-reset" onclick="wbClearBlockSelection()" title="Cancella selezione">✕</span>
     </div>
   </div>
@@ -8288,22 +8288,22 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <!-- Tutti i toggle sulla stessa riga -->
           <div style="display:flex;align-items:center;gap:7px;margin-left:auto;padding-right:2px;flex-wrap:nowrap">
-            <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.65);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap">📄 Integrale</button>
+            <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.65);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap">Integrale</button>
             <span style="width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0"></span>
-            <span id="wbGiurisLabel" title="Giurisprudenza Cassazione" style="font-size:10px;color:rgba(251,191,36,.45);transition:color .2s;cursor:default;flex-shrink:0;display:flex;align-items:center;gap:2px">⚖️<span style="font-size:8.5px;font-weight:600;letter-spacing:0.02em;white-space:nowrap">Giurisp.</span></span>
+            <span id="wbGiurisLabel" title="Giurisprudenza Cassazione" style="font-size:10px;color:rgba(251,191,36,.45);transition:color .2s;cursor:default;flex-shrink:0;display:flex;align-items:center;gap:2px"><span style="font-size:8.5px;font-weight:600;letter-spacing:0.02em;white-space:nowrap">Giurisp.</span></span>
             <label title="Cerca sentenze Cassazione Sezioni Unite" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbGiurisToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnGiurisToggle(this)">
               <span id="wbGiurisTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
               <span id="wbGiurisKnob" style="position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
             </label>
-            <span id="wbDottrinaLabel" title="Dottrina giuridica accademica" style="font-size:10px;color:rgba(94,234,212,.45);transition:color .2s;cursor:default;flex-shrink:0;display:flex;align-items:center;gap:2px">📚<span style="font-size:8.5px;font-weight:600;letter-spacing:0.02em;white-space:nowrap">Dottrina</span></span>
+            <span id="wbDottrinaLabel" title="Dottrina giuridica accademica" style="font-size:10px;color:rgba(94,234,212,.45);transition:color .2s;cursor:default;flex-shrink:0;display:flex;align-items:center;gap:2px"><span style="font-size:8.5px;font-weight:600;letter-spacing:0.02em;white-space:nowrap">Dottrina</span></span>
             <label title="Cerca dottrina giuridica accademica" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbDottrinaToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnDottrinaToggle(this)">
               <span id="wbDottrinaTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;transition:background .25s"></span>
               <span id="wbDottrinaKnob" style="position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;background:#888;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.5)"></span>
             </label>
             <span style="width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0"></span>
-            <span id="wbWebSearchLabel" style="font-size:10px;color:rgba(255,255,255,.35);transition:color .2s">🔍 Web</span>
+            <span id="wbWebSearchLabel" style="font-size:10px;color:rgba(255,255,255,.35);transition:color .2s">Web</span>
             <label title="Attiva ricerca web in tempo reale" style="position:relative;display:inline-block;width:34px;height:18px;cursor:pointer;flex-shrink:0">
               <input type="checkbox" id="wbWebSearchToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="wbOnWebSearchToggle(this)">
               <span id="wbWebSearchTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:20px;transition:background .25s"></span>
@@ -8318,7 +8318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <!-- Area messaggi -->
         <div style="display:flex;align-items:center;justify-content:flex-end;padding:0 14px 4px">
-          <button class="wb-clear-btn" onclick="wbClearChat()" title="Svuota chat" id="wbChatClearBtn" style="display:none">🗑️</button>
+          <button class="wb-clear-btn" onclick="wbClearChat()" title="Svuota chat" id="wbChatClearBtn" style="display:none">✕</button>
         </div>
         <div id="wbChatMessages" style="display:flex;flex-direction:column;gap:10px;padding:0 14px 12px;max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(129,140,248,.3) transparent"></div>
         <!-- Placeholder vuoto -->
@@ -8341,11 +8341,11 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- MOBILE BOTTOM TAB BAR — only visible ≤768px -->
   <div id="wbMobileTabBar">
     <button class="wb-mob-tab active" onclick="wbMobileShowPanel('doc')" data-panel="doc">
-      <span class="wb-mob-tab-icon">📄</span>
+      <span class="wb-mob-tab-icon"></span>
       <span class="wb-mob-tab-label">Documento</span>
     </button>
     <button class="wb-mob-tab" onclick="wbMobileShowPanel('tools')" data-panel="tools">
-      <span class="wb-mob-tab-icon">⚡</span>
+      <span class="wb-mob-tab-icon"></span>
       <span class="wb-mob-tab-label">Analisi AI</span>
     </button>
   </div>
@@ -8364,7 +8364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </button>
   </div>
   <div class="dash-greeting" id="dashGreet">Welcome back!</div>
-  <div class="dash-sub">982 domande · 9 quiz da 90 quesiti · ogni quiz è unico e non ripete domande 🔄</div>
+  <div class="dash-sub">982 domande · 9 quiz da 90 quesiti · ogni quiz è unico e non ripete domande</div>
 
   <div class="stats-grid" id="statsGrid"></div>
 
@@ -8375,7 +8375,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="color:var(--muted);font-size:14px;padding:12px 0">No exams yet. Start your first one!</div>
   </div>
   <!-- BANCA DATI QUIZ ─────────────────────────────────────── -->
-  <div class="section-title" style="margin-top:32px">📚 Banca Dati Quiz</div>
+  <div class="section-title" style="margin-top:32px">Banca Dati Quiz</div>
   <div id="quizBankSection"></div>
 
 </div>
@@ -8389,7 +8389,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="rl-dash-nav">
       <button class="rl-nav-back" onclick="showScreen('screenMode')">← Sezioni</button>
       <div style="font-size:12px;font-weight:700;color:var(--txt)">Research Lab</div>
-      <button class="rl-nav-back" onclick="toggleTheme()" title="Tema">☀</button>
+      <button class="rl-nav-back" onclick="toggleTheme()" title="Tema"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
     </div>
     <div class="rl-dash-body">
       <div class="rl-dash-hdr">
@@ -8401,7 +8401,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div id="rlGrid" class="rl-grid"></div>
       <div id="rlEmpty" class="rl-empty-state" style="display:none">
-        <div class="rl-empty-icon">⚖️</div>
+        <div class="rl-empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
         <div class="rl-empty-title">No research projects yet</div>
         <div class="rl-empty-sub">Create your first project to start AI-powered legal research</div>
         <button class="rl-btn-new-prj" style="margin-top:8px" onclick="rlNewProject()">+ New Project</button>
@@ -8444,7 +8444,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div id="rlMsgs" class="rl-msgs">
         <div class="rl-chat-empty" id="rlChatEmpty">
-          <div class="rl-chat-empty-icon">⚖️</div>
+          <div class="rl-chat-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
           <div class="rl-chat-empty-title">Research Lab</div>
           <div class="rl-chat-empty-sub">Ask a legal question, upload documents for analysis, or use Agentic Research for multi-source synthesis</div>
           <div class="rl-suggestions" id="rlSuggestions">
@@ -8471,7 +8471,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </button>
           </div>
         </div>
-        <div class="rl-input-hint">↵ Send · Shift+↵ New line · 🔍 Agentic multi-source research</div>
+        <div class="rl-input-hint">↵ Send · Shift+↵ New line · Agentic research</div>
       </div>
     </div>
 
@@ -8479,7 +8479,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="rl-viewer" id="rlViewer">
       <div class="rl-viewer-empty" id="rlViewerEmpty">
         <div>
-          <div style="font-size:26px;margin-bottom:10px;opacity:.4">📄</div>
+          <div style="font-size:26px;margin-bottom:10px;opacity:.4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
           <div style="font-size:12px;font-weight:600;margin-bottom:4px">No document open</div>
           <div style="font-size:11px;opacity:.45;line-height:1.5">Click a citation [1] in the chat<br>or upload a document</div>
         </div>
@@ -8507,14 +8507,14 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="prog-info">
       <span id="progText">Question 1 of 90</span>
       <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
-        <button class="pause-btn" id="btnPause" onclick="togglePause()">⏸ Pausa</button>
+        <button class="pause-btn" id="btnPause" onclick="togglePause()">Pausa</button>
         <div class="zoom-controls">
           <button class="zoom-btn" onclick="changeZoom(-1)" title="Diminuisci testo">−</button>
           <span class="zoom-label" id="zoomLabel">100%</span>
           <button class="zoom-btn" onclick="changeZoom(1)" title="Ingrandisci testo">+</button>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
-          <div class="timer" id="timerEl">⏱ 2:30:00</div>
+          <div class="timer" id="timerEl">2:30:00</div>
           <button class="timer-reset-btn" id="timerResetBtn" onclick="resetTimer()" title="Riavvia timer (una sola volta)">↺</button>
         </div>
       </div>
@@ -8528,7 +8528,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="lb-divider"></div>
     <div class="lb-item"><div class="lb-dot" style="background:var(--muted)"></div><span style="color:var(--muted);font-size:12px">Done</span><span class="lb-val" id="lbDone" style="color:var(--muted)">0/90</span></div>
     <div class="lb-divider"></div>
-    <div class="lb-item"><span style="color:var(--muted);font-size:12px">🎓 IAPP est.</span><span class="lb-iapp" id="lbIapp">—</span></div>
+    <div class="lb-item"><span style="color:var(--muted);font-size:12px">IAPP est.</span><span class="lb-iapp" id="lbIapp">—</span></div>
     <div class="lb-divider"></div>
     <div class="lb-badge no" id="lbBadge">Start answering…</div>
   </div>
@@ -8536,7 +8536,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="btn-row">
     <button class="btn btn-sec" id="btnPrev" onclick="prevQ()">← Prev</button>
     <button class="flag-btn" id="flagBtn" onclick="toggleFlag()" title="Segna domanda">
-      <span class="flag-icon">🚩</span>
+      <span class="flag-icon">⚑</span>
       <span style="font-size:9px">flag</span>
     </button>
     <button class="btn btn-pri" id="btnNext" onclick="nextQ()">Next →</button>
@@ -8559,7 +8559,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="sc-title" id="scTitle"></div>
         <div class="sc-sub" id="scSub"></div>
         <div class="iapp-box">
-          <div class="iapp-title">🎓 IAPP Scaled Score (200–500)</div>
+          <div class="iapp-title">IAPP Scaled Score (200–500)</div>
           <div class="iapp-main" id="iappMain"></div>
           <div class="iapp-sub">Pass threshold: <strong>300 points</strong></div>
           <div class="iapp-thr" id="iappThr"></div>
@@ -8567,7 +8567,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="domain-grid" id="domainGrid"></div>
         <div style="display:flex;gap:11px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-sec" onclick="toggleReview()">📚 Risposte Errate</button>
+          <button class="btn btn-sec" onclick="toggleReview()">Risposte Errate</button>
           <button class="btn btn-pri" onclick="goToDash()">← Dashboard</button>
         </div>
         <div id="wrReview" class="wr-section" style="display:none"></div>
@@ -8575,7 +8575,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div class="ai-panel" id="aiPanel">
       <div class="ai-panel-header">
-        <div class="ai-avatar">🎓</div>
+        <div class="ai-avatar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="ai-header-info" style="flex:1;min-width:0">
           <div class="ai-header-title">Prof. CIPP/E — AI Tutor</div>
           <div class="ai-header-sub">Esperto GDPR · EU AI Act · Privacy Law</div>
@@ -9683,7 +9683,7 @@ async function resetQuizProgress() {
   exam = null;
   await showDashboard();
   showScreen('screenDash');
-  alert('✅ Stato quiz azzerato. Tutti i quiz sono ora disponibili da zero.');
+  alert('Stato quiz azzerato. Tutti i quiz sono ora disponibili da zero.');
 }
 
 // ─── AUTH LOGIC ───────────────────────────────────────────────────────────────
@@ -9884,11 +9884,11 @@ function renderQuizBank(ud) {
 
     let borderColor, badgeText, badgeBg, btnStyle;
     if (isDone) {
-      borderColor = C.borderDone;  badgeText = '✅ Completato'; badgeBg = C.badgeDone;  btnStyle = C.btnDone;
+      borderColor = C.borderDone;  badgeText = 'Completato'; badgeBg = C.badgeDone;  btnStyle = C.btnDone;
     } else if (isActive) {
-      borderColor = C.borderActive; badgeText = '⏱ In corso';  badgeBg = C.badgeActive; btnStyle = C.btnActive;
+      borderColor = C.borderActive; badgeText = 'In corso';  badgeBg = C.badgeActive; btnStyle = C.btnActive;
     } else {
-      borderColor = C.borderTodo;  badgeText = '🎯 Disponibile'; badgeBg = C.badgeTodo; btnStyle = C.btnTodo;
+      borderColor = C.borderTodo;  badgeText = 'Disponibile'; badgeBg = C.badgeTodo; btnStyle = C.btnTodo;
     }
 
     const scList = qi.scenarios.map(s =>
@@ -9906,7 +9906,7 @@ function renderQuizBank(ud) {
     }
 
     const btnOnclick = isActive ? `resumeExam(${qi.num})` : `startQuizN(${qi.num})`;
-    const btnLabel   = isActive ? '▶ Riprendi Quiz N.' + qi.num : isDone ? '🔄 Ripeti Quiz N.' + qi.num : '▶ Inizia Quiz N.' + qi.num;
+    const btnLabel   = isActive ? '▶ Riprendi Quiz N.' + qi.num : isDone ? 'Ripeti Quiz N.' + qi.num : '▶ Inizia Quiz N.' + qi.num;
 
     html += `
     <div style="background:${C.cardBg};border:1px solid ${borderColor};border-radius:12px;padding:14px 16px;transition:all .2s">
@@ -9941,9 +9941,10 @@ async function showDashboard(){
   const displayName = ud.name || currentUser;
 
   document.getElementById('userBadge').style.display='flex';
-  document.getElementById('userNameBadge').textContent=displayName;
+  const _dn = displayName ? displayName.charAt(0).toUpperCase() + displayName.slice(1) : displayName;
+  document.getElementById('userNameBadge').textContent=_dn;
   showHeaderButtons();
-  document.getElementById('dashGreet').textContent=`Welcome back, ${displayName}! 👋`;
+  document.getElementById('dashGreet').textContent=`Welcome back, ${_dn}.`;
 
   const exams = ud.exams || [];
   const completed = exams.filter(e=>e.status==='done');
@@ -10005,7 +10006,7 @@ async function showDashboard(){
           <div class="hist-date">${ex.date}</div>
           <div class="hist-name">Exam #${exams.length-i}${qnLabel} · ${ex.correct}/90 correct</div>
           <div class="hist-score ${ex.pass?'pass':'fail'}">IAPP ${ex.iapp}</div>
-          <div class="hist-badge ${ex.pass?'pass':'fail'}">${ex.pass?'✅ PASS':'❌ FAIL'}</div>
+          <div class="hist-badge ${ex.pass?'pass':'fail'}">${ex.pass?'PASS':'FAIL'}</div>
           <button onclick="openExamReview(${realIdx})"
             style="margin-top:4px;width:100%;background:rgba(124,58,237,0.13);
             border:1px solid rgba(124,58,237,0.35);color:#c4b5fd;font-size:11px;
@@ -10013,7 +10014,7 @@ async function showDashboard(){
             font-family:inherit;letter-spacing:0.4px;transition:all .15s"
             onmouseover="this.style.background='rgba(124,58,237,0.28)'"
             onmouseout="this.style.background='rgba(124,58,237,0.13)'">
-            📋 Rivedi domande & spiega AI</button>
+            Rivedi domande & spiega AI</button>
         </div>`;
       }
     });
@@ -10031,7 +10032,7 @@ async function showDashboard(){
       startBtn.onclick = function(){ resumeExam(); };
     } else {
       const allDone = (ud.completedQuizNums||[]).length >= QUIZ_CATALOG.length;
-      const label = allDone ? `▶ Ricomincia da Quiz N.${nextCatalogNum} (ciclo completato 🔄)` : `▶ Inizia Quiz N.${nextCatalogNum} (90 domande · 150 min)`;
+      const label = allDone ? `▶ Ricomincia da Quiz N.${nextCatalogNum} (ciclo completato)` : `▶ Inizia Quiz N.${nextCatalogNum} (90 domande · 150 min)`;
       startBtn.textContent = label;
       startBtn.onclick = startNewExam;
     }
@@ -10039,7 +10040,7 @@ async function showDashboard(){
 
   // ── Update mode screen greeting (caller decides which screen to show) ──
   var modeGreet = document.getElementById('modeGreet');
-  if (modeGreet) modeGreet.textContent = t('mode_greet') + ', ' + displayName + '! 👋';
+  if (modeGreet) modeGreet.textContent = t('mode_greet') + ', ' + displayName + '.';
   // NOTE: showScreen() is intentionally NOT called here — each caller sets the screen
 }
 
@@ -10222,7 +10223,7 @@ function updateTimer(){
   const rem = EXAM_TIME - exam.elapsed;
   const h=Math.floor(rem/3600), m=Math.floor((rem%3600)/60), s=rem%60;
   const el = document.getElementById('timerEl');
-  el.textContent = `⏱ ${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.textContent = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   el.className = rem<600?'timer danger':rem<1800?'timer warn':'timer';
 }
 
@@ -10273,7 +10274,7 @@ function renderQ(){
       html+=`<div class="scenario-group-header"><span class="scenario-badge">${_scenarioLabel}</span><span class="scenario-instruction">Please use the following scenario to answer the next ${_scenarioCount} questions.</span></div>`;
       html+=`<div class="scenario-group-body">${_scenarioText}</div>`;
     } else {
-      html+=`<div class="scenario-box"><div class="scenario-title">📋 Scenario</div>${_scenarioText}</div>`;
+      html+=`<div class="scenario-box"><div class="scenario-title">Scenario</div>${_scenarioText}</div>`;
     }
     // If part of a named group, show intra-scenario navigation dots
     if(q.scenarioGroup){
@@ -10322,19 +10323,19 @@ function renderQ(){
       correct: cor, opts: _opts, corrLabel: _corrLabel, userLabel: _userLabel
     };
     _spiegaMap[_spiegaKey] = [
-      '📋 DOMANDA CIPP/E:',
+      'DOMANDA CIPP/E:',
       '"' + q.q + '"',
       '',
-      '📝 OPZIONI:',
+      'OPZIONI:',
       _opts,
       '',
       cor
-        ? '✅ Risposta CORRETTA: ' + _userLabel
-        : '❌ Risposta ERRATA: ' + _userLabel + '\n✅ Risposta CORRETTA: ' + _corrLabel,
+        ? 'Risposta CORRETTA: ' + _userLabel
+        : 'Risposta ERRATA: ' + _userLabel + '\nRisposta CORRETTA: ' + _corrLabel,
       '',
-      '📚 Riferimento normativo: ' + _ref,
+      'Riferimento normativo: ' + _ref,
       '',
-      '🎯 COMPITO (rispondi in italiano, tono da docente universitario di diritto europeo della privacy):',
+      'COMPITO (rispondi in italiano, tono da docente universitario di diritto europeo della privacy):',
       '',
       '### 1️⃣ RISPOSTA CORRETTA',
       'Spiega perché la risposta ' + LETTERS[q.a] + ' è corretta. Cita l\'articolo GDPR o la norma specifica, il considerando rilevante se utile, e la ratio legis.',
@@ -10352,8 +10353,8 @@ function renderQ(){
       '- Perché il GDPR / la norma distingue i due casi',
       '- La regola mnemonica o il principio chiave per non confonderli mai più in sede d\'esame',
     ].join('\n');
-    html+=`<div class="rationale show"><div class="rat-title">${cor?'✅ Corretto!':'❌ Sbagliato'} · Ref: ${q.ref||DOMAIN_INFO[dc].name}</div>${cor?'Ottimo!':'Risposta corretta: <strong>'+LETTERS[q.a]+'. '+q.o[q.a]+'</strong>'}</div>`;
-    html+=`<button class="spiega-btn" onclick="eapSpiegaRisposta('${_spiegaKey}', '📚 ${_ref.substring(0,35)} · Q${exam.current+1}')">🎓 Spiega</button> <button class="mappa-btn" id="mBtn_${_spiegaKey}" onclick="generaMappa('${_spiegaKey}',this)">🗺️ Mappa concettuale</button> <button class="report-btn" onclick="generateReport('${_spiegaKey}')">📥 Report PDF</button>`;
+    html+=`<div class="rationale show"><div class="rat-title">${cor?'Corretto':'Sbagliato'} · Ref: ${q.ref||DOMAIN_INFO[dc].name}</div>${cor?'Ottimo!':'Risposta corretta: <strong>'+LETTERS[q.a]+'. '+q.o[q.a]+'</strong>'}</div>`;
+    html+=`<button class="spiega-btn" onclick="eapSpiegaRisposta('${_spiegaKey}', '${_ref.substring(0,35)} · Q${exam.current+1}')">Spiega</button> <button class="mappa-btn" id="mBtn_${_spiegaKey}" onclick="generaMappa('${_spiegaKey}',this)">Mappa concettuale</button> <button class="report-btn" onclick="generateReport('${_spiegaKey}')">Report PDF</button>`;
   }
   html+=`</div>`;
   document.getElementById('qContainer').innerHTML=html;
@@ -10548,7 +10549,7 @@ function updateLive(){
     const proj=Math.round((cor/exam.questions.length)*500);
     document.getElementById('lbIapp').textContent=`~${proj}`;
     const onTrack=proj>=300;
-    badge.textContent=onTrack?'✅ On Track':'❌ Below Pass';
+    badge.textContent=onTrack?'On Track':'Below Pass';
     badge.className=`lb-badge ${onTrack?'ok':'no'}`;
   } else {
     document.getElementById('lbIapp').textContent='—';
@@ -10636,10 +10637,10 @@ async function finishExam(){
   const pb=document.getElementById('pfBadge');
   pb.className=`pf-badge ${pass?'pass':'fail'}`;
   pb.textContent=pass?'✓ PASS':'✗ FAIL';
-  document.getElementById('scTitle').textContent=pass?'Congratulations! 🎉':'Keep studying! 📚';
+  document.getElementById('scTitle').textContent=pass?'Congratulations!':'Keep studying';
   document.getElementById('scSub').textContent=`You answered ${cor} out of ${exam.questions.length} questions correctly (${pct}%)`;
   document.getElementById('iappMain').textContent=`${iapp} / 500`;
-  document.getElementById('iappThr').textContent=pass?`✅ ${iapp} ≥ 300 — PASS`:`❌ ${iapp} < 300 — FAIL`;
+  document.getElementById('iappThr').textContent=pass?`${iapp} ≥ 300 — PASS`:`${iapp} < 300 — FAIL`;
 
   document.getElementById('domainGrid').innerHTML=`
     <div class="dc d1"><div class="dc-ttl">Domain I</div><div class="dc-name">Introduction to EU Data Protection</div><div class="dc-sc" style="color:var(--d1)">${d1c}/${d1t}</div><div class="dc-track"><div class="dc-fill" style="width:${d1t?d1c/d1t*100:0}%"></div></div><div class="dc-pct">${d1t?Math.round(d1c/d1t*100):0}% correct</div></div>
@@ -10848,8 +10849,8 @@ function logout(){
 // ─── EYE ICON ────────────────────────────────────────────────────────────────
 function toggleEye(fieldId, btn){
   const f = document.getElementById(fieldId);
-  if(f.type==='password'){ f.type='text'; btn.textContent='🙈'; }
-  else { f.type='password'; btn.textContent='👁'; }
+  if(f.type==='password'){ f.type='text'; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'; }
+  else { f.type='password'; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'; }
 }
 
 // ─── ZOOM ────────────────────────────────────────────────────────────────────
@@ -10891,7 +10892,7 @@ function togglePause(){
       pauseStart = null;
     }
     overlay.classList.remove('active');
-    if(btn) btn.innerHTML = '⏸ Pausa';
+    if(btn) btn.innerHTML = 'Pausa';
     document.getElementById('timerEl').classList.remove('paused');
     startTimer();
   }
@@ -11141,7 +11142,7 @@ async function streamAiResponse(userMessage, isSystem) {
     var errMsg = err.message || String(err);
     var helpMsg = '<p style="color:var(--err)"><strong>Errore AI:</strong> ' + errMsg + '</p>';
     if (errMsg.indexOf('fetch') !== -1 || errMsg.indexOf('Failed') !== -1 || errMsg.indexOf('NetworkError') !== -1) {
-      helpMsg += '<p style="color:var(--muted);font-size:12px;margin-top:8px">💡 <strong>Soluzione:</strong> Carica il file su <a href="https://app.netlify.com/drop" target="_blank" style="color:var(--acc)">Netlify Drop</a> (gratuito, 30 sec) oppure avvia <code>python3 avvia_server.py</code> e apri localhost:8080</p>';
+      helpMsg += '<p style="color:var(--muted);font-size:12px;margin-top:8px"><strong>Soluzione:</strong> Carica il file su <a href="https://app.netlify.com/drop" target="_blank" style="color:var(--acc)">Netlify Drop</a> (gratuito, 30 sec) oppure avvia <code>python3 avvia_server.py</code> e apri localhost:8080</p>';
     }
     appendAiMessage('assistant', helpMsg, true);
   }
@@ -11216,8 +11217,8 @@ var AGENT_SYSTEM = 'Sei il Professor CIPP/E, docente universitario esperto di di
   'ISTRUZIONI FONDAMENTALI:\n' +
   '1. LEGGI SEMPRE la base di conoscenza sopra prima di rispondere — identifica la sezione rilevante\n' +
   '2. STRUTTURA RISPOSTA:\n' +
-  '   • Inizia sempre con "📌 PUNTO CHIAVE:" in 1-2 frasi (la risposta diretta)\n' +
-  '   • Poi "📖 TESTO DI RIFERIMENTO:" con la sezione/articolo specifico della KB\n' +
+  '   • Inizia sempre con "PUNTO CHIAVE:" in 1-2 frasi (la risposta diretta)\n' +
+  '   • Poi "TESTO DI RIFERIMENTO:" con la sezione/articolo specifico della KB\n' +
   '   • Poi breve spiegazione (max 2-3 paragrafi)\n' +
   '   • Se l\'utente chiede approfondimento, espandi con dettagli aggiuntivi\n' +
   '3. CITA SEMPRE articoli specifici tra parentesi: [Art.6(1)(f) GDPR], [Art.9 AI Act], [Cap.7 Manuale CIPP/E]\n' +
@@ -11306,7 +11307,7 @@ function _esbSaveCurrent() {
     var userMsg = chat.msgs.find(function(m){ return m.role === 'user'; });
     if (userMsg && userMsg.html) {
       var utxt = userMsg.html.replace(/<[^>]+>/g,'').trim();
-      var skipWords = ['Spiega questa risposta','Spiega la domanda','\u{1F393}','Deep Research','🎓','🔭'];
+      var skipWords = ['Spiega questa risposta','Spiega la domanda','Deep Research'];
       var shouldSkip = skipWords.some(function(p){ return utxt.indexOf(p) >= 0; });
       if (!shouldSkip && utxt.length > 3) chat.name = utxt.substring(0,38) + (utxt.length > 38 ? '\u2026' : '');
     }
@@ -11715,7 +11716,7 @@ function eapWelcome() {
   var msg = '<p><strong>Ciao! Sono il tuo tutor CIPP/E.</strong></p>' +
     '<p>Prima di rispondere leggo sempre il <strong>Manuale CIPP/E</strong> (IAPP, 3a ed.) e l\'<strong>EU AI Act 2024/1689</strong>.</p>' +
     '<p>Ogni risposta parte dal <strong>punto chiave</strong>, poi cito il testo di riferimento. Se vuoi più dettagli, basta chiedere!</p>' +
-    '<p>Puoi anche allegare un documento PDF o immagine con il tasto <strong>📎</strong>.</p>';
+    '<p>Puoi anche allegare un documento PDF o immagine con il pulsante allegati.</p>';
   eapAppend('assistant', msg, true);
 }
 
@@ -11786,12 +11787,12 @@ async function eapQuerySpiega(fullPrompt) {
   document.getElementById('eapSendBtn').disabled = true;
 
   // Show a clean label to the user instead of the raw prompt
-  eapAppend('user', '🎓 Spiega questa risposta', false);
+  eapAppend('user', 'Spiega questa risposta', false);
 
   // Send the full structured prompt to AI (not displayed raw)
   var msgs = eapHistory.slice(-8);
   msgs.push({ role: 'user', content: fullPrompt });
-  eapHistory.push({ role: 'user', content: '🎓 Spiega questa risposta' });
+  eapHistory.push({ role: 'user', content: 'Spiega questa risposta' });
 
   var typingId = 'eap-t-' + Date.now();
   var tDiv = document.createElement('div');
@@ -11826,7 +11827,7 @@ async function eapQuerySpiega(fullPrompt) {
     var errMsg = err.message || String(err);
     var helpMsg = '<p style="color:#ef4444"><strong>Errore AI:</strong> ' + errMsg + '</p>';
     if (errMsg.indexOf('fetch') !== -1 || errMsg.indexOf('Failed') !== -1 || errMsg.indexOf('NetworkError') !== -1 || errMsg.indexOf('CORS') !== -1) {
-      helpMsg += '<p style="font-size:12px;color:#888899;margin-top:8px">💡 Apri il file da un server invece che da file://:<br>' +
+      helpMsg += '<p style="font-size:12px;color:#888899;margin-top:8px">Apri il file da un server invece che da file://:<br>' +
         '1. Trascina il file su <a href="https://app.netlify.com/drop" target="_blank" style="color:#a78bfa">app.netlify.com/drop</a> (gratuito)<br>' +
         '2. Oppure esegui <code style="background:#2e2e3e;padding:1px 5px;border-radius:3px">python3 avvia_server.py</code></p>';
     }
@@ -11869,7 +11870,7 @@ async function eapDoWebSearch(userText, questionContext) {
   tDiv.id = typingId;
   tDiv.className = 'eap-msg assistant';
   tDiv.innerHTML = '<div class="eap-bubble"><div class="eap-deep-result">' +
-    '<div class="dr-header">🌐 Web Research in corso…</div>' +
+    '<div class="dr-header">Web Research in corso…</div>' +
     '<div class="eap-typing" style="margin-top:6px">' +
     '<div class="eap-think-orb">✦</div><div class="eap-think-body"><div class="eap-think-lbl">Ricerca web in corso…</div><div class="eap-think-bars"><div class="eap-think-bar"></div><div class="eap-think-bar"></div><div class="eap-think-bar"></div></div></div></div></div></div>';
   document.getElementById('eapMessages').appendChild(tDiv);
@@ -11882,24 +11883,24 @@ async function eapDoWebSearch(userText, questionContext) {
 
     var rendered = eapRender(result.text || '(Nessun risultato)');
 
-    var fallbackNote = result._isFallback ? '<div style="font-size:10px;color:#f97316;margin-bottom:6px">⚠️ Ricerca web non disponibile — risposta da knowledge base</div>' : '';
+    var fallbackNote = result._isFallback ? '<div style="font-size:10px;color:#f97316;margin-bottom:6px">Ricerca web non disponibile — risposta da knowledge base</div>' : '';
     var fullHtml = '<div class="eap-deep-result">' +
-      '<div class="dr-header">🌐 Web Research · Gemini 2.5 Flash Lite + Google Search</div>' + fallbackNote +
+      '<div class="dr-header">Web Research · Gemini 2.5 Flash Lite + Google Search</div>' + fallbackNote +
       rendered + '</div>';
 
     eapAppend('assistant', fullHtml, true);
 
     var _topicHint = _esbExtractTopic(result.text || '');
-    _esbAutoSession('🌐 ' + (_topicHint || 'Web Research'));
-    _esbRenameIfGeneric('🌐 ' + (_topicHint || 'Web Research'));
-    _esbAddMemory('🌐 ' + (result.text||'').replace(/<[^>]+>/g,'').trim().substring(0,90));
+    _esbAutoSession(' + (_topicHint || 'Web Research'));
+    _esbRenameIfGeneric(' + (_topicHint || 'Web Research'));
+    _esbAddMemory(' + (result.text||'').replace(/<[^>]+>/g,'').trim().substring(0,90));
     _esbSaveCurrent();
 
     // Attach norm tooltips
     var lastMsg = document.querySelector('#eapMessages .eap-msg.assistant:last-child');
     if (lastMsg) _normAttach(lastMsg);
 
-    eapHistory.push({ role: 'assistant', content: '🌐 [Web Research] ' + (result.text||'') });
+    eapHistory.push({ role: 'assistant', content: '[Web Research] ' + (result.text||'') });
     if (eapHistory.length > 24) eapHistory = eapHistory.slice(-24);
 
   } catch(err) {
@@ -11907,7 +11908,7 @@ async function eapDoWebSearch(userText, questionContext) {
     if (el2) el2.remove();
     var errMsg = err.message || String(err);
     var fallback = '<div class="eap-deep-result">' +
-      '<div class="dr-header">🌐 Web Research — Errore</div>' +
+      '<div class="dr-header">Web Research — Errore</div>' +
       '<p style="color:#ef4444;font-size:12px">' + errMsg + '</p>' +
       (errMsg.indexOf('404') > -1 || errMsg.indexOf('model') > -1
         ? '<p style="color:#888899;font-size:11px">Il modello di ricerca non è disponibile. Prova a ricaricare la pagina o usa la chat normale.</p>'
@@ -11940,8 +11941,8 @@ async function eapQuery(userText) {
 
   // Deep Research mode — intercept and route to web search
   if (_eapWebActive && !eapAttachedFile) {
-    eapAppend('user', '🌐 ' + (userText || 'Web Research'), false);
-    eapHistory.push({ role: 'user', content: '🌐 ' + userText });
+    eapAppend('user', ' + (userText || 'Web Research'), false);
+    eapHistory.push({ role: 'user', content: userText });
     // Build rich question context for deep research
     var drCtx = '';
     if (typeof exam !== 'undefined' && exam && exam.questions && exam.questions[exam.current]) {
@@ -11961,7 +11962,7 @@ async function eapQuery(userText) {
 
   // Build display text
   var displayText = userText || '';
-  if (eapAttachedFile) displayText = (displayText ? displayText + '\n' : '') + '📎 ' + eapAttachedFile.name;
+  if (eapAttachedFile) displayText = (displayText ? displayText + '\n' : '') + '[allegato] ' + eapAttachedFile.name;
   eapAppend('user', displayText || '(allegato)', false);
 
   // Build context message — inject FULL current question + options + answer status
@@ -12065,7 +12066,7 @@ async function eapQuery(userText) {
     var errMsg = err.message || String(err);
     var helpMsg = '<p style="color:#ef4444"><strong>Errore AI:</strong> ' + errMsg + '</p>';
     if (errMsg.indexOf('fetch') !== -1 || errMsg.indexOf('Failed') !== -1 || errMsg.indexOf('NetworkError') !== -1 || errMsg.indexOf('CORS') !== -1) {
-      helpMsg += '<p style="font-size:12px;color:#888899;margin-top:8px">💡 Apri il file da un server invece che da file://:<br>' +
+      helpMsg += '<p style="font-size:12px;color:#888899;margin-top:8px">Apri il file da un server invece che da file://:<br>' +
         '1. Trascina il file su <a href="https://app.netlify.com/drop" target="_blank" style="color:#a78bfa">app.netlify.com/drop</a> (gratuito)<br>' +
         '2. Oppure esegui <code style="background:#2e2e3e;padding:1px 5px;border-radius:3px">python3 avvia_server.py</code></p>';
     }
@@ -12337,8 +12338,8 @@ function rlRenderDash() {
     var chatCount = (p.chats || []).length;
     var date = new Date(p.created).toLocaleDateString('it-IT', {day:'2-digit',month:'short',year:'numeric'});
     var badge = p.shared
-      ? '<span class="rl-card-badge shared">👥 Shared</span>'
-      : '<span class="rl-card-badge private">🔒 Private</span>';
+      ? '<span class="rl-card-badge shared">Shared</span>'
+      : '<span class="rl-card-badge private">Private</span>';
     return '<div class="rl-card" onclick="rlOpenProject(\'' + p.id + '\')">'
       + '<div class="rl-card-name">' + _rlEsc(p.name) + '</div>'
       + '<div class="rl-card-date">' + date + '</div>'
@@ -12424,7 +12425,7 @@ function _rlRenderSidebar() {
   var p = _rlCurPrj(); if (!p) return;
   document.getElementById('rlSbPrjName').textContent = p.name;
   var badge = document.getElementById('rlSbBadge');
-  badge.textContent = p.shared ? '👥 Shared' : '🔒 Private';
+  badge.textContent = p.shared ? 'Shared' : 'Private';
   badge.className = 'rl-sb-badge ' + (p.shared ? 'shared' : 'private');
 
   // Docs
@@ -12432,7 +12433,7 @@ function _rlRenderSidebar() {
   docsEl.innerHTML = (_rl.docs || []).map(function(d) {
     var active = _rl.viewerDocId === d.id;
     var ext = d.name.split('.').pop().toLowerCase();
-    var icon = ext === 'pdf' ? '📕' : ext === 'docx' || ext === 'doc' ? '📘' : '📄';
+    var icon = ext === 'pdf' ? 'PDF' : ext === 'docx' || ext === 'doc' ? 'DOC' : 'TXT';
     return '<div class="rl-sb-doc' + (active?' active':'') + '" onclick="rlViewDoc(\'' + d.id + '\')">'
       + icon + '<span class="rl-sb-doc-name">' + _rlEsc(d.name) + '</span>'
       + '<button class="rl-sb-doc-del" onclick="event.stopPropagation();rlDelDoc(\'' + d.id + '\')" title="Remove">✕</button>'
@@ -12444,7 +12445,7 @@ function _rlRenderSidebar() {
   chatsEl.innerHTML = ((p.chats || []).slice().reverse()).map(function(ch) {
     var active = ch.id === _rl.curChat;
     return '<div class="rl-sb-chat' + (active?' active':'') + '" onclick="rlSwitchChat(\'' + ch.id + '\')">'
-      + '💬 <span style="overflow:hidden;text-overflow:ellipsis;flex:1">' + _rlEsc(ch.title) + '</span></div>';
+      + '<span style="overflow:hidden;text-overflow:ellipsis;flex:1">' + _rlEsc(ch.title) + '</span></div>';
   }).join('');
 }
 
@@ -12617,7 +12618,7 @@ async function rlSend() {
     _rlPersistMsgs();
   } catch(e) {
     thinkEl.remove();
-    _rlAddMsg({ role: 'ai', content: '⚠️ Errore: ' + e.message, sources: [] });
+    _rlAddMsg({ role: 'ai', content: 'Errore: ' + e.message, sources: [] });
   }
   _rl.busy = false;
   document.getElementById('rlSendBtn').disabled = false;
@@ -12670,7 +12671,7 @@ async function rlSendAgentic() {
     _rlPersistMsgs();
   } catch(e) {
     stepsEl.remove();
-    _rlAddMsg({ role: 'ai', content: '⚠️ Research error: ' + e.message, sources: [] });
+    _rlAddMsg({ role: 'ai', content: 'Research error: ' + e.message, sources: [] });
   }
   _rl.busy = false;
   document.getElementById('rlAgentBtn').disabled = false;
@@ -12682,7 +12683,7 @@ function _rlAddSteps(steps) {
   var msgsEl = document.getElementById('rlMsgs');
   var div = document.createElement('div');
   div.className = 'rl-steps';
-  div.innerHTML = '<div class="rl-steps-lbl">🔍 Agentic Research Plan</div>'
+  div.innerHTML = '<div class="rl-steps-lbl">Agentic Research Plan</div>'
     + steps.map(function(s, i) {
       var ico = s.state === 'done' ? '✓'
               : s.state === 'running' ? '<div class="rl-step-spinner"></div>'
@@ -12855,7 +12856,7 @@ function _rlRenderCtxPills() {
   var container = document.getElementById('rlCtxDocs');
   var activeDocs = _rl.docs.filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
   container.innerHTML = activeDocs.map(function(d) {
-    return '<div class="rl-ctx-pill">📄 ' + _rlEsc(d.name.length > 18 ? d.name.slice(0,16)+'…' : d.name)
+    return '<div class="rl-ctx-pill">' + _rlEsc(d.name.length > 18 ? d.name.slice(0,16)+'…' : d.name)
       + '<button onclick="rlRemoveCtx(\'' + d.id + '\')" title="Remove from context">×</button></div>';
   }).join('');
   container.style.display = activeDocs.length ? 'flex' : 'none';
@@ -13004,7 +13005,7 @@ window._llcLibFileSelected = async function(input) {
     var progress = document.getElementById('llcLibUpProgress');
     var lbl = document.getElementById('llcLibUpLbl');
     if (progress) progress.style.display = 'block';
-    if (lbl) { lbl.textContent = '⚠️ File già caricato: ' + file.name; lbl.style.color = '#f59e0b'; }
+    if (lbl) { lbl.textContent = 'File già caricato: ' + file.name; lbl.style.color = '#f59e0b'; }
     setTimeout(function(){ if (progress) progress.style.display = 'none'; }, 3000);
     return;
   }
@@ -13032,7 +13033,7 @@ window._llcLibFileSelected = async function(input) {
         if (e.lengthComputable) {
           var pct = Math.round(5 + e.loaded/e.total*88);
           bar.style.width = pct + '%';
-          if (pct >= 93) { lbl.textContent = '⏳ Server in avvio… attendere'; }
+          if (pct >= 93) { lbl.textContent = 'Server in avvio… attendere'; }
         }
       };
       xhr.onload = function() {
@@ -13050,7 +13051,7 @@ window._llcLibFileSelected = async function(input) {
       xhr.send(fd);
     });
     bar.style.width = '100%';
-    lbl.textContent = '✅ Caricato!';
+    lbl.textContent = 'Caricato.';
     // Cache the file in memory so viewing works even if server restarts
     _LLC_FILE_CACHE[result.blob_name] = {
       objectUrl: URL.createObjectURL(file),
@@ -13088,7 +13089,7 @@ window._llcLibFileSelected = async function(input) {
   } catch(e) {
     bar.style.width = '0%';
     lbl.style.color = '#f87171';
-    lbl.textContent = '⚠️ ' + e.message;
+    lbl.textContent = e.message;
     setTimeout(function() { progress.style.display = 'none'; lbl.style.color = ''; if (btn) btn.disabled = false; }, 3500);
   }
 };
@@ -13121,7 +13122,7 @@ async function llcUploadDocs(input) {
 
     statusEl.style.display = 'block';
     statusEl.style.color   = '#a78bfa';
-    statusEl.textContent   = '⏳ ' + file.name + ' — richiesta URL firmato…';
+    statusEl.textContent   = '' + file.name + ' — richiesta URL firmato…';
 
     if (_llcGcsConnected) {
       // ── SIGNED URL FLOW ──────────────────────────────────────────────────
@@ -13143,7 +13144,7 @@ async function llcUploadDocs(input) {
         var urlData = await urlRes.json();
 
         // 2. PUT file directly to GCS using the signed URL
-        statusEl.textContent = '⏳ ' + file.name + ' — caricamento su GCS…';
+        statusEl.textContent = '' + file.name + ' — caricamento su GCS…';
         var putRes = await fetch(urlData.signed_url, {
           method:  'PUT',
           headers: { 'Content-Type': file.type },
@@ -13186,7 +13187,7 @@ async function llcUploadDocs(input) {
         source:   'local'
       });
       statusEl.style.color = '#fbbf24';
-      statusEl.textContent = '⚠ ' + file.name + ' — sessione locale (GCS non disponibile)';
+      statusEl.textContent = '' + file.name + ' — sessione locale (GCS non disponibile)';
       badge.textContent = '● Locale (' + LLC.docs.filter(function(d){ return d.source==='local'; }).length + ' caricati)';
     }
 
@@ -13335,7 +13336,7 @@ function llcToggleDeepWork() {
   LLC.deepWork = !LLC.deepWork;
   document.getElementById('llcRoot').classList.toggle('deep-work', LLC.deepWork);
   document.getElementById('llcDeepWorkBtn').classList.toggle('active', LLC.deepWork);
-  document.getElementById('llcDeepWorkBtn').textContent = LLC.deepWork ? '🎯 Exit Deep Work' : '🎯 Deep Work';
+  document.getElementById('llcDeepWorkBtn').textContent = LLC.deepWork ? 'Exit Deep Work' : 'Deep Work';
 
   var chatBar = document.getElementById('llcViewerChatBar');
 
@@ -13362,7 +13363,7 @@ function llcToggleDeepWork() {
 function llcToggleHighlights() {
   LLC.highlights = !LLC.highlights;
   var btn = document.getElementById('llcHlToggleBtn');
-  btn.textContent = LLC.highlights ? '✨ Highlights OFF' : '✨ Highlights ON';
+  btn.textContent = LLC.highlights ? 'Highlights OFF' : 'Highlights ON';
   btn.classList.toggle('active', LLC.highlights);
   // Toggle visibility of highlights in viewer
   var viewer = document.getElementById('llcViewer');
@@ -13430,10 +13431,10 @@ function _llcDocMenuToggle(docId, uploadId, btn) {
   var isSelected = !!_llcSelectedDocs[docId];
   // Use buttons with data attributes — NO inline string data in onclick
   var btnSel = document.createElement('button');
-  btnSel.textContent = isSelected ? '☑ Deseleziona' : '☐ Seleziona';
+  btnSel.textContent = isSelected ? 'Deseleziona' : 'Seleziona';
   btnSel.onclick = function(e) { e.stopPropagation(); _llcDocToggleSel(docId, uploadId); };
   var btnDel = document.createElement('button');
-  btnDel.textContent = '🗑 Elimina';
+  btnDel.textContent = 'Elimina';
   btnDel.onclick = function(e) { e.stopPropagation(); _llcDocDelete(docId, uploadId); };
   dd.appendChild(btnSel);
   dd.appendChild(btnDel);
@@ -13657,7 +13658,7 @@ async function llcOpenDoc(docId) {
             docBody.innerHTML =
               '<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">' +
               '<div style="padding:14px 20px;background:rgba(124,58,237,.08);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;flex-shrink:0">' +
-                '<span style="font-size:22px">📄</span>' +
+                '<span style="font-size:22px"></span>' +
                 '<div>' +
                   '<div style="font-size:13px;font-weight:600;color:var(--txt)">' + llcEsc(doc.title||doc.name) + '</div>' +
                   '<div style="font-size:11px;color:rgba(167,139,250,.6);margin-top:2px"><a href="' + localUrl + '" download="' + llcEsc(doc.name||'file') + '" style="color:#a78bfa">⬇ Scarica originale</a></div>' +
@@ -13681,7 +13682,7 @@ async function llcOpenDoc(docId) {
             var data = resp.ok ? await resp.json() : null;
             var text = data && data.text ? data.text : '';
             LLC.activeDocText = text;
-            var typeIcon = {'word':'📄','word_legacy':'📄','excel':'📊','excel_legacy':'📊','text':'📝'}[data && data.type] || '📄';
+            var typeIcon = {'word':'DOC','word_legacy':'DOC','excel':'XLS','excel_legacy':'XLS','text':'TXT'}[data && data.type] || '📄';
             var lines = text.split('\n');
             var rendered = lines.map(function(l) {
               var esc = l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -13768,8 +13769,8 @@ function llcBuildStaticDocHTML(doc) {
   return '<h1>' + llcEsc(doc.title) + '</h1>' +
     '<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">' +
       (doc.tag ? '<span class="llc-doc-tag ' + doc.tag + '" style="font-size:11px;padding:3px 8px">' + doc.tag.toUpperCase() + '</span>' : '') +
-      (doc.pages ? '<span style="font-size:11px;color:var(--muted)">📄 ' + doc.pages + ' pages</span>' : '') +
-      (doc.lang ? '<span style="font-size:11px;color:var(--muted)">🌐 ' + doc.lang + '</span>' : '') +
+      (doc.pages ? '<span style="font-size:11px;color:var(--muted)">' + doc.pages + ' pages</span>' : '') +
+      (doc.lang ? '<span style="font-size:11px;color:var(--muted)">' + doc.lang + '</span>' : '') +
     '</div>' +
     (doc.abstract ? '<p style="font-size:13px;line-height:1.7;color:var(--txt);margin-bottom:20px">' + llcEsc(doc.abstract) + '</p>' : '') +
     '<div style="padding:16px;background:rgba(124,58,237,.07);border-radius:10px;border:1px solid rgba(124,58,237,.15);font-size:12px;color:var(--muted)">' +
@@ -13788,8 +13789,8 @@ async function llcAnalyzeStaticDoc(doc) {
     '<h2 style="margin:0 0 10px;font-size:16px;font-weight:700;color:var(--fg)">' + llcEsc(title) + '</h2>' +
     '<div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">' +
       (doc.tag ? '<span class="llc-doc-tag ' + doc.tag + '" style="font-size:11px;padding:3px 8px">' + doc.tag.toUpperCase() + '</span>' : '') +
-      (doc.pages ? '<span style="font-size:11px;color:var(--muted)">📄 ' + doc.pages + ' p.</span>' : '') +
-      (doc.lang  ? '<span style="font-size:11px;color:var(--muted)">🌐 ' + doc.lang + '</span>' : '') +
+      (doc.pages ? '<span style="font-size:11px;color:var(--muted)">' + doc.pages + ' p.</span>' : '') +
+      (doc.lang  ? '<span style="font-size:11px;color:var(--muted)">' + doc.lang + '</span>' : '') +
       (doc.pdfUrl ? '<a href="' + llcEsc(doc.pdfUrl) + '" target="_blank" rel="noopener" style="font-size:11px;color:var(--acc);text-decoration:none;padding:2px 8px;border:1px solid rgba(124,58,237,.3);border-radius:5px">↗ Fonte ufficiale</a>' : '') +
     '</div>' +
     (doc.abstract ? '<p style="font-size:12px;line-height:1.6;color:var(--muted);margin-bottom:18px;font-style:italic">' + llcEsc(doc.abstract) + '</p>' : '') +
@@ -13864,7 +13865,7 @@ function llcStructureContent(rawText, title) {
 // ── Post-doc-load: trigger Cornell + graph + heatmap ─────────────────────────
 function llcPostDocLoad(doc) {
   LLC.highlights = true;
-  document.getElementById('llcHlToggleBtn').textContent = '✨ Highlights ON';
+  document.getElementById('llcHlToggleBtn').textContent = 'Highlights ON';
   document.getElementById('llcHlToggleBtn').classList.add('active');
 
   // Cornell notes auto-generate (lightweight, no heavy AI cost)
@@ -13904,7 +13905,7 @@ function llcPostDocLoad(doc) {
   LLC._graphPrewarmDone = false;
   LLC._graphPrewarmPromise = null;
   var graphStatus = document.getElementById('llcGraphStatus');
-  if (graphStatus) graphStatus.textContent = 'Clicca 🗺️ per generare la mappa.';
+  if (graphStatus) graphStatus.textContent = 'Clicca Mappa per generare la mappa.';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -16092,7 +16093,7 @@ async function llcDocAiSend() {
 
   } catch(e) {
     if (typingEl) typingEl.remove();
-    _llcDocAiAppendMsg('ai', '⚠️ Errore: ' + llcEsc(e.message));
+    _llcDocAiAppendMsg('ai', 'Errore: ' + llcEsc(e.message));
   }
 
   input.disabled = false;
@@ -21663,7 +21664,7 @@ function ermRender() {
   }
 
   if (filtered.length === 0) {
-    var msg = {wrong:'🎉 Nessuna risposta errata!', skip:'✅ Hai risposto a tutte!',
+    var msg = {wrong:'Nessuna risposta errata.', skip:'Hai risposto a tutte.',
                correct:'Nessuna risposta corretta.', all:'Nessuna domanda.'};
     listEl.innerHTML = '<div style="color:rgba(167,139,250,0.4);text-align:center;padding:50px 20px;font-size:13px">' +
       (msg[_ermFilter] || '') + '</div>';
@@ -22687,7 +22688,7 @@ function _wbInjectClearBtns() {
     btn.id = 'wbClearTool' + n + 'Btn';
     btn.className = 'wb-clear-btn';
     btn.title = 'Svuota risultato';
-    btn.textContent = '🗑️';
+    btn.textContent = '✕';
     btn.style.display = 'none';
     btn.onclick = function(){ wbClearTool(n); };
     head.appendChild(btn);
@@ -24101,7 +24102,7 @@ function wbOnFileSelect(input) {
     }).catch(function(err) {
       _wbSetProgress(0, '⚠️ ' + err.message);
       document.getElementById('wbProgressBar').style.background = '#ff6d8d';
-      document.getElementById('wbFileMeta').textContent = '⚠️ Errore: ' + err.message;
+      document.getElementById('wbFileMeta').textContent = 'Errore: ' + err.message;
     });
   };
   reader.onerror = function() {
@@ -26384,7 +26385,7 @@ function wbUpdateMultiBar(anchorEl) {
         '<button class="wmb-btn wmb-btn-std" onclick="wbMultiBlockAction(\'collega\')">Collega</button>' +
         '<button class="wmb-btn wmb-btn-std" onclick="wbMultiBlockAction(\'tools\')">⚙ Tools</button>' +
       '</div>' +
-      '<button class="wmb-btn wmb-btn-disc" style="width:100%;justify-content:center;display:flex" onclick="wbMultiBlockAction(\'discrimen\')">⚖ Trova il Discrimen</button>' +
+      '<button class="wmb-btn wmb-btn-disc" style="width:100%;justify-content:center;display:flex" onclick="wbMultiBlockAction(\'discrimen\')">Trova il Discrimen</button>' +
       '<button class="wmb-btn wmb-btn-close" style="width:100%;justify-content:center;display:flex" onclick="wbClearBlockSelection()">✕ Deseleziona tutto</button>';
     document.body.appendChild(bar);
   }
@@ -27793,7 +27794,7 @@ function wbSelectSection(idx) {
     <button id="eapHamburger" onclick="esbToggle()" title="Storico chat">
       <span></span><span></span><span></span>
     </button>
-    <div class="eap-avatar">🎓</div>
+    <div class="eap-avatar"></div>
     <div style="flex:1">
       <div class="eap-title">Prof. CIPP/E</div>
       <div class="eap-sub">AI · GDPR · EU AI Act · IAPP</div>
@@ -27814,7 +27815,7 @@ function wbSelectSection(idx) {
   </div>
   <div class="eap-input-area">
     <div id="eapFilePreview" style="display:none" class="eap-file-preview">
-      <span>📄</span><span class="fp-name" id="eapFileName"></span>
+      <span></span><span class="fp-name" id="eapFileName"></span>
       <button class="eap-file-remove" onclick="eapRemoveFile()" title="Rimuovi allegato">✕</button>
     </div>
     <div id="eapWebBadge" style="display:none" class="eap-deep-badge">
@@ -27938,7 +27939,7 @@ function wbSelectSection(idx) {
       <div style="padding:13px 16px;border-bottom:1px solid rgba(124,58,237,0.15);flex-shrink:0">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="width:28px;height:28px;background:linear-gradient(135deg,#7c3aed,#4f46e5);
-            border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">🎓</div>
+            border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px"></div>
           <div>
             <div style="font-size:12px;font-weight:700;color:#e2e0ff">Prof. CIPP/E — Spiegazione AI</div>
             <div style="font-size:10px;color:rgba(167,139,250,0.5)">Clicca una domanda o premi Spiega AI</div>
@@ -33228,7 +33229,7 @@ Non aggiungere testo prima o dopo il JSON. Non usare markdown o backtick.`;
 
   } catch(err) {
     _trDocMenuHideLoading();
-    if (statusEl) statusEl.textContent = '⚠ ' + (err.message || err);
+    if (statusEl) statusEl.textContent = '' + (err.message || err);
   }
 };
 
