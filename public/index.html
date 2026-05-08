@@ -4509,44 +4509,38 @@ body.theme-light .rl-cit{background:rgba(0,0,0,.07);color:rgba(0,0,0,.45)}
 .rl-step-favs{display:flex;align-items:center;gap:4px;margin-top:4px}
 .rl-step-fav{width:16px;height:16px;border-radius:3px;background:var(--sur2);display:inline-flex;align-items:center;justify-content:center;font-size:9px}
 
-/* Input area */
-.rl-input-wrap{flex-shrink:0;padding:8px 20px 14px;background:var(--bg)}
+/* Input area — card style */
+.rl-input-wrap{flex-shrink:0;padding:10px 20px 16px;background:var(--bg)}
 .rl-ctx-docs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;min-height:0}
-.rl-input-bar{display:flex;align-items:center;gap:8px;background:var(--sur);border:1px solid rgba(0,0,0,.09);border-radius:16px;padding:10px 10px 10px 16px;transition:box-shadow .2s;box-sizing:border-box;box-shadow:0 2px 14px rgba(0,0,0,.05)}
-body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.1);box-shadow:0 2px 16px rgba(0,0,0,.06)}
-.rl-input-bar:focus-within{box-shadow:0 4px 24px rgba(0,0,0,.1)}
-body.theme-light .rl-input-bar:focus-within{box-shadow:0 4px 24px rgba(0,0,0,.1)}
-.rl-attach-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;display:flex;align-items:center;flex-shrink:0;transition:color .15s,background .15s}
-.rl-attach-btn:hover{color:var(--txt);background:var(--sur2)}
-.rl-textarea{flex:1;background:none;border:none;outline:none;font:13.5px/1.55 'Inter',sans-serif;color:var(--txt);resize:none;max-height:140px;padding:0;line-height:1.55;vertical-align:middle}
-.rl-textarea::placeholder{color:var(--muted);font-size:13.5px}
-.rl-input-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
-/* Deep think pill */
-.rl-dt-pill{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:var(--sur2);border:0.5px solid var(--bdr);cursor:pointer;transition:all .18s;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif}
-.rl-dt-pill:hover{border-color:rgba(236,201,75,.45);color:var(--txt)}
-.rl-dt-pill.on{background:rgba(236,201,75,.13);border-color:rgba(236,201,75,.55);color:#a07c00}
-body.theme-light .rl-dt-pill.on{color:#7a5c00}
-/* Research button */
-.rl-research-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:var(--sur2);border:0.5px solid var(--bdr);color:var(--muted);cursor:pointer;font-size:11px;font-weight:600;transition:all .15s;white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif}
-.rl-research-btn:hover{border-color:rgba(44,122,123,.45);color:var(--txt)}
-/* Prompt library icon btn inside bar */
-.rl-prompt-lib-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .15s,background .15s;margin-bottom:3px}
-.rl-prompt-lib-btn:hover{color:var(--txt);background:var(--sur2)}
+.rl-input-bar{display:flex;flex-direction:column;gap:0;background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:14px 14px 10px 18px;transition:box-shadow .2s,border-color .2s;box-sizing:border-box;box-shadow:0 2px 14px rgba(0,0,0,.05)}
+body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.11);box-shadow:0 2px 16px rgba(0,0,0,.06)}
+.rl-input-bar:focus-within{border-color:rgba(44,122,123,.35);box-shadow:0 4px 24px rgba(44,122,123,.08)}
+body.theme-light .rl-input-bar:focus-within{border-color:rgba(44,122,123,.4);box-shadow:0 4px 24px rgba(44,122,123,.1)}
+.rl-textarea{width:100%;background:none;border:none;outline:none;font:14px/1.6 'Inter',sans-serif;color:var(--txt);resize:none;max-height:160px;min-height:24px;padding:0;line-height:1.6}
+.rl-textarea::placeholder{color:var(--muted);font-size:14px}
+/* Bottom action row inside card */
+.rl-input-actions{display:flex;align-items:center;gap:4px;margin-top:10px;flex-wrap:nowrap}
+.rl-act-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:none;border:0.5px solid var(--bdr);color:var(--muted);cursor:pointer;font:500 11.5px 'Inter',sans-serif;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.rl-act-btn:hover{border-color:rgba(44,122,123,.45);color:var(--txt);background:var(--sur2)}
+.rl-act-btn.on{background:rgba(44,122,123,.1);border-color:rgba(44,122,123,.5);color:#2C7A7B;font-weight:600}
+body.theme-light .rl-act-btn.on{background:rgba(44,122,123,.07);color:#1a6b6c}
+.rl-act-btn-deep.on{background:rgba(236,201,75,.13);border-color:rgba(236,201,75,.55);color:#a07c00}
+body.theme-light .rl-act-btn-deep.on{color:#7a5c00}
+.rl-act-sep{width:1px;height:16px;background:var(--bdr);flex-shrink:0;margin:0 4px}
+.rl-act-spacer{flex:1}
+.rl-model-badge{display:inline-flex;align-items:center;gap:4px;font:500 11px 'Inter',sans-serif;color:var(--muted);padding:4px 8px;border-radius:8px;flex-shrink:0;white-space:nowrap}
 /* Send button */
-.rl-send-btn{width:34px;height:34px;border-radius:11px;border:none;background:var(--acc);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s,transform .12s;flex-shrink:0;box-shadow:0 2px 8px rgba(44,122,123,.3)}
-.rl-send-btn:hover{opacity:.87;transform:scale(1.05)}
-.rl-send-btn:disabled{opacity:.28;cursor:not-allowed;transform:none;box-shadow:none}
-/* Legacy rl-dt-toggle kept for JS compat */
-.rl-dt-toggle{display:none}
-.rl-dt-knob{display:none}
+.rl-send-btn{width:34px;height:34px;border-radius:11px;border:none;background:#0f0f0e;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s,transform .12s;flex-shrink:0}
+body.theme-light .rl-send-btn{background:#111}
+.rl-send-btn:hover{opacity:.82;transform:scale(1.05)}
+.rl-send-btn:disabled{opacity:.25;cursor:not-allowed;transform:none}
+/* Legacy compat */
+.rl-attach-btn{display:none}.rl-input-right{display:none}.rl-dt-pill{display:none}.rl-dt-toggle{display:none}.rl-dt-knob{display:none}.rl-research-btn{display:none}.rl-prompt-lib-btn{display:none}
 
-/* Search mode levers */
-.rl-mode-row{display:flex;align-items:center;gap:6px;padding:7px 2px 0;flex-wrap:wrap}
-.rl-mode-lever{display:flex;align-items:center;gap:6px;padding:5px 12px 5px 8px;border-radius:20px;background:none;border:0.5px solid var(--bdr);color:var(--muted);cursor:pointer;font:500 11px 'Inter',sans-serif;transition:all .16s;white-space:nowrap;flex-shrink:0}
-.rl-mode-lever:hover{border-color:rgba(44,122,123,.35);color:var(--txt)}
-.rl-mode-lever.on{background:rgba(44,122,123,.1);border-color:rgba(44,122,123,.55);color:#2C7A7B;font-weight:600}
-body.theme-light .rl-mode-lever.on{background:rgba(44,122,123,.08);color:#1a6b6c}
-.rl-mode-dot{width:7px;height:7px;border-radius:50%;background:var(--bdr);transition:background .16s;flex-shrink:0}
+/* Search mode levers — now inside action row, reuse .rl-act-btn */
+.rl-mode-row{display:none} /* hidden — modes moved into action row */
+.rl-mode-lever{display:none}
+.rl-mode-dot{display:none}
 .rl-mode-lever.on .rl-mode-dot{background:#2C7A7B}
 
 /* Chat empty state */
@@ -8572,45 +8566,43 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
 
-        <!-- Input bar -->
+        <!-- Input card -->
         <div class="rl-input-wrap">
           <div id="rlCtxDocs" class="rl-ctx-docs" style="display:none"></div>
           <div class="rl-input-bar" id="rlInputBar">
-            <button class="rl-attach-btn" onclick="document.getElementById('rlUploadInput').click()" title="Allega documento">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-            </button>
-            <textarea id="rlInput" class="rl-textarea" placeholder="Fai una domanda legale…" rows="1"
+            <textarea id="rlInput" class="rl-textarea" placeholder="Fai una domanda legale…" rows="2"
               onkeydown="rlKeydown(event)" oninput="rlAutoResize(this)"></textarea>
-            <div class="rl-input-right">
-              <button class="rl-prompt-lib-btn" onclick="rlOpenPromptLib()" title="Prompt library">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <!-- Action row: left = context shortcuts, right = model + send -->
+            <div class="rl-input-actions">
+              <button class="rl-act-btn" onclick="document.getElementById('rlUploadInput').click()" title="Allega documento">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                + Documenti
               </button>
-              <div class="rl-dt-pill" id="rlDTToggle" onclick="rlToggleDT()">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
-                <span>Deep</span>
-              </div>
+              <button class="rl-act-btn" onclick="rlOpenProjectMenu()" title="Progetti">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                Progetti
+              </button>
+              <button class="rl-act-btn" id="rlModeGiur" onclick="rlToggleMode('giur')" title="Attiva ricerca giurisprudenziale">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+                Giurisprudenza
+              </button>
+              <button class="rl-act-btn" id="rlModeWeb" onclick="rlToggleMode('web')" title="Ricerca su internet">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                Web
+              </button>
+              <button class="rl-act-btn rl-act-btn-deep" id="rlDTToggle" onclick="rlToggleDT()" title="Ragionamento approfondito">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+                Deep
+              </button>
+              <div class="rl-act-spacer"></div>
+              <span class="rl-model-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Gemini 2.5 Flash
+              </span>
               <button class="rl-send-btn" id="rlSendBtn" onclick="rlSend()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </button>
             </div>
-          </div>
-          <!-- Search mode levers -->
-          <div class="rl-mode-row">
-            <button class="rl-mode-lever" id="rlModeGiur" onclick="rlToggleMode('giur')">
-              <span class="rl-mode-dot"></span>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
-              Giurisprudenza
-            </button>
-            <button class="rl-mode-lever" id="rlModeDott" onclick="rlToggleMode('dott')">
-              <span class="rl-mode-dot"></span>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-              Dottrina
-            </button>
-            <button class="rl-mode-lever" id="rlModeWeb" onclick="rlToggleMode('web')">
-              <span class="rl-mode-dot"></span>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-              Ricerca su internet
-            </button>
           </div>
         </div>
       </div>
@@ -12640,6 +12632,7 @@ function rlOpenChatHistory() {
   // no-op stub
 }
 
+function rlOpenProjectMenu() { rlToggleSessions(); }
 function rlToggleSessions() {
   var drawer = document.getElementById('rlSessionsDrawer');
   if (!drawer) return;
