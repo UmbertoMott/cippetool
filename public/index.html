@@ -12564,7 +12564,8 @@ function rlOpenProject(id) {
   if (!p) return;
   _rl.cur = id;
   _rl.docs = (p.docs || []);
-  _rl.ctxDocs = [];
+  // Auto-activate all docs already in the project
+  _rl.ctxDocs = (p.docs || []).map(function(d){ return d.id; });
   if (!p.chats || !p.chats.length) _rlNewChatObj(p);
   _rl.curChat = p.chats[p.chats.length - 1].id;
   _rl.msgs = (p.chats[p.chats.length - 1].msgs || []).slice();
@@ -12937,7 +12938,7 @@ function _rlBuildSysPrompt() {
     ? 'MODALITÀ DEEP THINK ATTIVA. Prima di rispondere, esegui internamente (non scrivere nel testo) il seguente ragionamento: (1) Quaestio Iuris: identifica la questione giuridica precisa. (2) Norma: individua le norme applicabili in gerarchia (Normativa > Giurisprudenza > Dottrina). (3) Applicazione: applica le norme ai fatti. (4) Conclusio: formula la risposta basata esclusivamente sulle prove. Il ragionamento è NASCOSTO — nell\'output scrivi solo la conclusione finale strutturata. '
     : '';
   return 'Sei un Senior Legal Counsel AI, giurista specializzato in diritto civile, amministrativo ed europeo. '
-    + 'REGOLE ASSOLUTE: (1) È VIETATO inventare informazioni. Se l\'informazione non è disponibile, scrivi esattamente: "L\'informazione non è reperibile nelle fonti fornite o verificate". (2) Usa linguaggio giuridico formale e tecnico (ratio legis, onere della prova, giurisprudenza consolidata, inammissibilità, etc.). (3) Zero filler conversazionale — ogni frase deve avere valore giuridico o fattuale. (4) Quando citi un punto specifico, usa snippets verbatim dalla fonte. (5) Se l\'utente chiede approfondimenti su una risposta precedente, mantieni il contesto esatto del punto specifico senza generalizzare. '
+    + 'REGOLE: (1) Rispondi usando la tua conoscenza giuridica consolidata. Se non sono stati forniti documenti specifici, basa la risposta su normativa, giurisprudenza e dottrina di tuo dominio. (2) NON inventare sentenze, articoli di legge o dati numerici specifici che non conosci con certezza — in quel caso indicalo esplicitamente. (3) Se l\'utente chiede di documenti specifici non caricati, avvisalo che deve prima caricare i file. (4) Usa linguaggio giuridico formale e tecnico (ratio legis, onere della prova, giurisprudenza consolidata, inammissibilità, etc.). (5) Zero filler conversazionale — ogni frase deve avere valore giuridico o fattuale. (6) Se l\'utente chiede approfondimenti su una risposta precedente, mantieni il contesto esatto senza generalizzare. '
     + (modeCtx ? modeCtx + ' ' : '')
     + (deepCtx ? deepCtx : '')
     + 'CITAZIONI: usa [1], [2], [3] in ordine STRETTAMENTE SEQUENZIALE basato su dove l\'informazione appare nella risposta. Non saltare numeri. Non ripetere numeri già usati. Il primo riferimento è sempre [1], il secondo [2], e così via. '
