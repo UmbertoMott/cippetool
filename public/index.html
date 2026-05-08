@@ -2929,6 +2929,8 @@ body.agent-open.esb-open #eapHamburgerOuter { right:388px; }
 
 /* Dark mode: forza nero */
 #screenLanding { background: #000; }
+/* Hide main app header on landing page — it has its own nav */
+body:has(#screenLanding.active) .hdr { display: none !important; }
 /* ── Landing LIGHT MODE ─────────────────────────────────────────── */
 body.theme-light #screenLanding { background: #f5f3ef; }
 body.theme-light #screenLanding,
@@ -2982,7 +2984,7 @@ body.theme-light .ld-footer-link:hover { color: rgba(28,22,18,0.75) !important; 
 
 /* ── NAV ─────────────────────────────────────────────── */
 .ld-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1100;
   display: flex; align-items: center; padding: 0 80px;
   height: 60px;
   background: rgba(0,0,0,0.85);
@@ -9925,6 +9927,11 @@ function showScreen(id, _skipHistory) {
   var _fullscreenScreens = ['screenLanding', 'screenTabularEditor', 'screenLRL'];
   var wrapEl = document.querySelector('.wrap');
   if (wrapEl) wrapEl.classList.toggle('fullscreen-mode', _fullscreenScreens.indexOf(id) >= 0);
+  // Landing page has its own nav — hide main app header to avoid z-index interference
+  var hdrEl = document.querySelector('.hdr');
+  if (hdrEl) hdrEl.style.display = (id === 'screenLanding') ? 'none' : '';
+  // Reset body overflow (may have been set to 'hidden' by research lab mode)
+  if (id === 'screenLanding' || id === 'screenMode') document.body.style.overflow = '';
 }
 
 function goBack() {
