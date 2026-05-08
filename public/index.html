@@ -12925,30 +12925,40 @@ function rlChunk(text, docId) {
 // ── RAG prompt builder ───────────────────────────────────────────────────────
 function _rlBuildRagPrompt(query, topChunks) {
   var ctx = topChunks.map(function(ch, i) {
-    return '[' + (i+1) + '] (p.' + ch.page + ', ' + ch.docId + '):\n' + (ch.text || '').slice(0, 800);
+    return '[CHUNK ' + (i+1) + '] docId=' + ch.docId + ' pagina=' + ch.page + ':\n' + (ch.text || '').slice(0, 800);
   }).join('\n\n');
   var modeCtx = _rlGetModeContext();
-  return 'Sei un giurista professionista specializzato in diritto italiano e UE. Il tuo stile è preciso, autorevole e diretto al punto.\n\n'
+  var deepCtx = _rl.deepThink
+    ? 'DEEP THINK: prima di rispondere esegui internamente (non scritto nell\'output) — Quaestio Iuris → norma applicabile → applicazione ai fatti → conclusio. Scrivi solo la conclusione finale.\n\n'
+    : '';
+  return 'Sei un Senior Legal Counsel AI, giurista specializzato in diritto civile, amministrativo ed europeo. Linguaggio formale e tecnico. Zero invenzioni.\n\n'
+    + (deepCtx)
     + (modeCtx ? modeCtx + '\n\n' : '')
-    + 'CONTESTO DEL DOCUMENTO:\n' + ctx + '\n\n'
-    + 'ISTRUZIONI:\n'
-    + '- Rispondi SOLO usando le informazioni nei chunk sopra\n'
-    + '- Inserisci [1], [2] ecc. inline dopo ogni affermazione tratta da un chunk\n'
-    + '- Alla fine scrivi esattamente ---SOURCES--- seguito da un array JSON:\n'
-    + '[{"id":1,"title":"Doc excerpt","snippet":"testo verbatim max 120 caratteri","page":1,"docId":"doc_id","chunkId":"chunk_id"},...]\n'
-    + '- Usa solo i chunk citati nelle sources\n'
+    + 'DOCUMENTI FORNITI:\n' + ctx + '\n\n'
+    + 'REGOLE RISPOSTA:\n'
+    + '- Rispondi SOLO usando i chunk sopra. Se non c\'è risposta, scrivi: "L\'informazione non è reperibile nelle fonti fornite o verificate"\n'
+    + '- Cita con [1], [2], [3] in ordine STRETTAMENTE SEQUENZIALE (primo riferimento=[1], secondo=[2], etc.). Non saltare numeri. Non ripetere numeri.\n'
+    + '- Usa snippets verbatim dal chunk per ogni citazione\n'
+    + '- ALLA FINE scrivi esattamente ---SOURCES--- poi JSON:\n'
+    + '[{"id":1,"title":"Titolo documento","snippet":"testo verbatim max 120 car","page":1,"docId":"ID_REALE_DEL_CHUNK"},...]\n'
+    + '- Il campo "docId" deve contenere il valore docId= del chunk citato (copia esatto)\n'
     + '- NON iniziare ripetendo la domanda';
 }
 
 // ── System prompt (no docs) ──────────────────────────────────────────────────
 function _rlBuildSysPrompt() {
   var modeCtx = _rlGetModeContext();
-  return 'Sei un assistente di ricerca giuridica esperto in diritto UE e italiano (GDPR, AI Act, diritto privacy, normativa nazionale). '
-    + 'Rispondi con stile professionale, preciso e autorevole come un avvocato specializzato. '
+  var deepCtx = _rl.deepThink
+    ? 'MODALITÀ DEEP THINK ATTIVA. Prima di rispondere, esegui internamente (non scrivere nel testo) il seguente ragionamento: (1) Quaestio Iuris: identifica la questione giuridica precisa. (2) Norma: individua le norme applicabili in gerarchia (Normativa > Giurisprudenza > Dottrina). (3) Applicazione: applica le norme ai fatti. (4) Conclusio: formula la risposta basata esclusivamente sulle prove. Il ragionamento è NASCOSTO — nell\'output scrivi solo la conclusione finale strutturata. '
+    : '';
+  return 'Sei un Senior Legal Counsel AI, giurista specializzato in diritto civile, amministrativo ed europeo. '
+    + 'REGOLE ASSOLUTE: (1) È VIETATO inventare informazioni. Se l\'informazione non è disponibile, scrivi esattamente: "L\'informazione non è reperibile nelle fonti fornite o verificate". (2) Usa linguaggio giuridico formale e tecnico (ratio legis, onere della prova, giurisprudenza consolidata, inammissibilità, etc.). (3) Zero filler conversazionale — ogni frase deve avere valore giuridico o fattuale. (4) Quando citi un punto specifico, usa snippets verbatim dalla fonte. (5) Se l\'utente chiede approfondimenti su una risposta precedente, mantieni il contesto esatto del punto specifico senza generalizzare. '
     + (modeCtx ? modeCtx + ' ' : '')
-    + 'Usa i marcatori di citazione [1], [2] ecc. per riferimenti alle fonti quando disponibili. '
-    + 'Alla FINE della risposta aggiungi ---SOURCES--- seguito da un array JSON: '
-    + '[{"id":1,"title":"Fonte","snippet":"Testo citato verbatim","reliability":0.9},...] '
+    + (deepCtx ? deepCtx : '')
+    + 'CITAZIONI: usa [1], [2], [3] in ordine STRETTAMENTE SEQUENZIALE basato su dove l\'informazione appare nella risposta. Non saltare numeri. Non ripetere numeri già usati. Il primo riferimento è sempre [1], il secondo [2], e così via. '
+    + 'GERARCHIA FONTI: Normativa > Giurisprudenza > Dottrina. '
+    + 'ALLA FINE della risposta aggiungi ---SOURCES--- e un array JSON con id corrispondente al numero usato nel testo: '
+    + '[{"id":1,"title":"Nome fonte","snippet":"testo verbatim citato","reliability":0.9},...] '
     + 'NON iniziare mai ripetendo la domanda. NON aggiungere ---SOURCES--- se non hai citazioni.';
 }
 
@@ -13010,12 +13020,15 @@ async function rlSend() {
 
     var parsed = _rlParseResponse(raw.text || raw || '');
     // Enrich sources with docId: match snippet against RAG chunks so viewer can open
+    // Also fixes AI returning placeholder "doc_id" instead of a real doc ID
     if (_ragChunks.length) {
+      var realDocIds = (_rl.docs || []).map(function(d){ return d.id; });
       parsed.sources.forEach(function(s) {
-        if (!s.docId && s.snippet) {
-          var snip = s.snippet.slice(0, 50);
-          var match = _ragChunks.find(function(ch){ return ch.text && ch.text.indexOf(snip) >= 0; });
-          if (!match) match = _ragChunks[s.id - 1] || _ragChunks[0];
+        var hasRealDocId = s.docId && realDocIds.indexOf(s.docId) >= 0;
+        if (!hasRealDocId) {
+          var snip = (s.snippet || '').slice(0, 60);
+          var match = snip ? _ragChunks.find(function(ch){ return ch.text && ch.text.indexOf(snip) >= 0; }) : null;
+          if (!match) match = _ragChunks[Math.max(0, (s.id || 1) - 1)] || _ragChunks[0];
           if (match) { s.docId = match.docId; s.chunkId = match.id; s.page = s.page || match.page; }
         }
       });
@@ -13151,7 +13164,7 @@ function _rlParseResponse(raw) {
       if (s >= 0 && e > s) sources = JSON.parse(jsonPart.slice(s, e + 1));
     } catch(_e) {}
   }
-  sources.forEach(function(s, i){ s.id = i + 1; });
+  sources.forEach(function(s, i){ if (!s.id && s.id !== 0) s.id = i + 1; });
   return { text: text, sources: sources };
 }
 
