@@ -13043,6 +13043,34 @@ function _rlCitationRules(isRag) {
   );
 }
 
+// Fix source titles (replace raw docId with actual filename) and extend
+// snippets to complete sentence boundaries using the stored document text.
+function _rlFixSources(sources) {
+  if (!sources || !sources.length) return;
+  sources.forEach(function(s) {
+    // Fix title: if it looks like a raw docId or starts with "docId=", replace with filename
+    var titleLooksLikeId = !s.title
+      || /^docId=/i.test(s.title)
+      || /^rl_\d+_/.test(s.title)
+      || s.title === s.docId;
+    if (titleLooksLikeId && s.docId) {
+      var doc = (_rl.docs || []).find(function(d){ return d.id === s.docId; });
+      if (doc) s.title = doc.name;
+    }
+    // Extend snippet to sentence boundary using actual document text
+    if (s.docId && s.snippet && s.snippet.length > 10) {
+      var doc = (_rl.docs || []).find(function(d){ return d.id === s.docId; });
+      if (doc && doc.text) {
+        var found = _rlFindSnippet(doc.text, s.snippet);
+        if (found) {
+          var extended = _rlExtendToSentence(doc.text, found);
+          if (extended && extended.length > found.length) s.snippet = extended;
+        }
+      }
+    }
+  });
+}
+
 // ── Output section builder (shared between RAG and no-doc prompts) ───────────
 function _rlBuildOutputSections() {
   var m = _rl.modes || {};
@@ -13208,6 +13236,8 @@ async function rlSend() {
         }
       });
     }
+    // Fix source titles and extend snippets to sentence boundaries
+    _rlFixSources(parsed.sources);
     thinkEl.remove();
     _rlAddMsg({ role: 'ai', content: parsed.text, sources: parsed.sources, isDT: _rl.deepThink });
     _rlPersistMsgs();
@@ -13276,6 +13306,7 @@ async function rlSendAgentic() {
     _rlSetStep(stepsEl, 3, 'done', 'Answer ready');
 
     var parsed = _rlParseResponse(searchResult.text || searchResult || '');
+    _rlFixSources(parsed.sources);
     stepsEl.remove();
     _rlAddMsg({ role: 'ai', content: parsed.text, sources: parsed.sources, isDT: false, isAgentic: true });
     _rlPersistMsgs();
