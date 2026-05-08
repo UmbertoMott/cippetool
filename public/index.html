@@ -4570,6 +4570,17 @@ body.theme-light .rl-mode-lever.on{background:rgba(44,122,123,.08);color:#1a6b6c
 .rl-viewer-close{margin-left:auto;background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px;line-height:1;transition:color .13s}
 .rl-viewer-close:hover{color:var(--txt)}
 .rl-viewer-content{flex:1;overflow-y:auto;padding:20px;font-size:13px;line-height:1.8;color:var(--txt);white-space:pre-wrap;font-family:'Inter',sans-serif;word-break:break-word}
+.rl-docx-viewer{white-space:normal;max-width:680px;margin:0 auto;background:#fff;color:#1a1a1a;padding:40px 52px;box-shadow:0 2px 24px rgba(0,0,0,.1);font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.65;border-radius:2px}
+.rl-docx-viewer h1,.rl-docx-viewer h2,.rl-docx-viewer h3{font-family:'Times New Roman',Times,serif;margin:1.2em 0 .4em;color:#111}
+.rl-docx-viewer h1{font-size:18pt;font-weight:700}.rl-docx-viewer h2{font-size:15pt;font-weight:700}.rl-docx-viewer h3{font-size:13pt;font-weight:700}
+.rl-docx-viewer p{margin:.5em 0}.rl-docx-viewer table{border-collapse:collapse;width:100%;margin:1em 0;font-size:11pt}
+.rl-docx-viewer td,.rl-docx-viewer th{border:1px solid #ccc;padding:4px 8px;vertical-align:top}
+.rl-docx-viewer th{background:#f0f0f0;font-weight:700}
+.rl-docx-viewer ul,.rl-docx-viewer ol{margin:.5em 0 .5em 1.4em;padding:0}
+.rl-docx-viewer strong,.rl-docx-viewer b{font-weight:700}.rl-docx-viewer em,.rl-docx-viewer i{font-style:italic}
+[data-theme=dark] .rl-docx-viewer{background:#1e1e1e;color:#e8e8e8;box-shadow:0 2px 24px rgba(0,0,0,.4)}
+[data-theme=dark] .rl-docx-viewer th{background:#2a2a2a}
+[data-theme=dark] .rl-docx-viewer td,[data-theme=dark] .rl-docx-viewer th{border-color:#404040}
 .rl-viewer-content mark,.rl-highlight{background:rgba(236,201,75,.4);border-radius:2px;padding:1px 2px}
 .rl-viewer-nav{display:flex;align-items:center;gap:6px;padding:6px 12px;border-top:0.5px solid var(--bdr);flex-shrink:0}
 .rl-vbtn{background:none;border:0.5px solid var(--bdr);border-radius:5px;width:24px;height:24px;cursor:pointer;color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .13s}
@@ -12463,6 +12474,8 @@ var _rl = {
 };
 
 var _RL_KEY = 'rl_projects_v1';
+var _RL_HTML_CACHE = {}; // docId → mammoth HTML (DOCX, session-only, not persisted)
+var _RL_BLOB_CACHE = {}; // docId → ArrayBuffer (PDF, session-only, not persisted)
 
 var _RL_PROMPTS = [
   {id:'p1', cat:'favorites', title:'Summarise', desc:'Summarise this document into key points and obligations.'},
@@ -13217,8 +13230,33 @@ async function rlProcessFiles(files) {
   var p = _rlCurPrj(); if (!p) return;
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
+    var ext = file.name.split('.').pop().toLowerCase();
     var text = await _rlExtractText(file);
     var doc = { id: _rlId(), name: file.name, text: text, chunks: null, size: file.size, created: Date.now() };
+    // Cache DOCX HTML for visual viewer (session-only, not saved to localStorage)
+    if ((ext === 'docx' || ext === 'doc') && typeof mammoth !== 'undefined') {
+      await new Promise(function(res) {
+        var docId = doc.id;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          mammoth.convertToHtml({ arrayBuffer: e.target.result })
+            .then(function(r){ _RL_HTML_CACHE[docId] = r.value || ''; res(); })
+            .catch(function(){ res(); });
+        };
+        reader.onerror = function(){ res(); };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+    // Cache PDF ArrayBuffer for canvas rendering (session-only)
+    if (ext === 'pdf' && typeof pdfjsLib !== 'undefined') {
+      await new Promise(function(res) {
+        var docId = doc.id;
+        var reader = new FileReader();
+        reader.onload = function(e) { _RL_BLOB_CACHE[docId] = e.target.result; res(); };
+        reader.onerror = function(){ res(); };
+        reader.readAsArrayBuffer(file);
+      });
+    }
     if (!p.docs) p.docs = [];
     p.docs.push(doc);
     _rl.docs = p.docs;
@@ -13284,34 +13322,146 @@ function rlViewDoc(docId) {
   rlShowInViewer(docId, null);
 }
 
-function rlShowInViewer(docId, snippet) {
+async function rlShowInViewer(docId, snippet) {
   var doc = (_rl.docs || []).find(function(d){ return d.id === docId; });
   if (!doc) { rlShowWebSnippet({ title: 'Source', snippet: snippet || '' }); return; }
   _rl.viewerDocId = docId;
-  // Show viewer pane
   var vp = document.getElementById('rlViewerPane');
   if (vp) vp.style.display = 'flex';
-  // Render tabs
   _rlRenderViewerTabs();
-  // Render content
   var content = document.getElementById('rlViewerContent');
   if (!content) return;
-  var text = doc.text || '';
-  if (snippet && snippet.trim()) {
-    var escaped = _rlEsc(text);
-    var escapedSnip = _rlEsc(snippet.trim().slice(0, 200));
-    if (escapedSnip && escaped.indexOf(escapedSnip) >= 0) {
-      escaped = escaped.split(escapedSnip).join('<mark class="rl-highlight">' + escapedSnip + '</mark>');
+  var ext = doc.name.split('.').pop().toLowerCase();
+
+  // ── PDF: canvas rendering ───────────────────────────────────────────────────
+  if (ext === 'pdf' && _RL_BLOB_CACHE[docId]) {
+    content.style.whiteSpace = 'normal';
+    content.innerHTML = '<div id="rl-pdf-pages" style="padding:8px 0;background:var(--bg2,#f4f4f4)"></div>';
+    var pdfContainer = content.querySelector('#rl-pdf-pages');
+    try {
+      var pdfDoc = await pdfjsLib.getDocument({ data: _RL_BLOB_CACHE[docId].slice(0) }).promise;
+      var contentW = content.clientWidth || 560;
+      for (var pg = 1; pg <= pdfDoc.numPages; pg++) {
+        var page = await pdfDoc.getPage(pg);
+        var vpNorm = page.getViewport({ scale: 1 });
+        var scale = Math.min(1.6, (contentW - 32) / vpNorm.width);
+        var viewport = page.getViewport({ scale: scale });
+        var canvas = document.createElement('canvas');
+        canvas.width = viewport.width; canvas.height = viewport.height;
+        canvas.style.cssText = 'display:block;margin:0 auto 12px;box-shadow:0 2px 12px rgba(0,0,0,.15);background:#fff;max-width:100%';
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+        pdfContainer.appendChild(canvas);
+      }
+    } catch(_e) {
+      content.style.whiteSpace = '';
+      content.innerHTML = _rlBuildTextViewer(doc.text || '', snippet);
     }
-    content.innerHTML = '<div style="white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.8;color:var(--txt)">' + escaped + '</div>';
-    var firstMark = content.querySelector('mark');
-    if (firstMark) setTimeout(function(){ firstMark.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
-  } else {
-    content.innerHTML = '<div style="white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.8;color:var(--txt)">' + _rlEsc(text) + '</div>';
+    _rl.viewerMarks = []; _rl.viewerMarkIdx = 0;
+    _rlRenderDocsList();
+    return;
   }
+
+  // ── DOCX: HTML rendering ────────────────────────────────────────────────────
+  if (_RL_HTML_CACHE[docId]) {
+    content.style.whiteSpace = 'normal';
+    var html = _RL_HTML_CACHE[docId];
+    if (snippet && snippet.trim()) {
+      html = _rlMarkSnippetInHtml(html, snippet.trim().replace(/\s+/g, ' '));
+    }
+    content.innerHTML = '<div class="rl-docx-viewer">' + html + '</div>';
+    var firstMark = content.querySelector('mark');
+    if (firstMark) setTimeout(function(){ firstMark.scrollIntoView({ behavior:'smooth', block:'center' }); }, 50);
+    _rl.viewerMarks = Array.from(content.querySelectorAll('mark'));
+    _rl.viewerMarkIdx = 0;
+    _rlRenderDocsList();
+    return;
+  }
+
+  // ── Fallback: styled text ───────────────────────────────────────────────────
+  content.style.whiteSpace = '';
+  content.innerHTML = _rlBuildTextViewer(doc.text || '', snippet);
+  var firstMark = content.querySelector('mark');
+  if (firstMark) setTimeout(function(){ firstMark.scrollIntoView({ behavior:'smooth', block:'center' }); }, 50);
   _rl.viewerMarks = Array.from(content.querySelectorAll('mark'));
   _rl.viewerMarkIdx = 0;
   _rlRenderDocsList();
+}
+
+// Fuzzy snippet search: tries progressively shorter strings until a match is found
+function _rlFindSnippet(text, snippet) {
+  if (!snippet) return null;
+  var s = snippet.trim();
+  // Tier 1: first 200 chars exact
+  var t1 = s.slice(0, 200);
+  if (text.indexOf(t1) >= 0) return t1;
+  // Tier 2: first 80 chars exact
+  var t2 = s.slice(0, 80);
+  if (text.indexOf(t2) >= 0) return t2;
+  // Tier 3: first 40 chars exact
+  var t3 = s.slice(0, 40);
+  if (t3 && text.indexOf(t3) >= 0) return t3;
+  // Tier 4: normalized whitespace on 80-char version
+  var norm = function(x){ return x.replace(/\s+/g,' ').trim(); };
+  var normSnip = norm(t2);
+  var normText = norm(text);
+  var idx = normText.indexOf(normSnip);
+  if (idx >= 0) {
+    var prefix = normSnip.slice(0, 30);
+    var origIdx = text.indexOf(prefix);
+    if (origIdx >= 0) return text.slice(origIdx, origIdx + normSnip.length + 5).slice(0, normSnip.length);
+  }
+  return null;
+}
+
+function _rlBuildTextViewer(text, snippet) {
+  var escaped = _rlEsc(text);
+  if (snippet && snippet.trim()) {
+    var found = _rlFindSnippet(text, snippet);
+    if (found) {
+      var ef = _rlEsc(found);
+      escaped = escaped.split(ef).join('<mark class="rl-highlight">' + ef + '</mark>');
+    }
+  }
+  return '<div style="white-space:pre-wrap;font-family:Inter,sans-serif;font-size:13px;line-height:1.8;color:var(--txt);padding:8px">' + escaped + '</div>';
+}
+
+// Walk DOM text nodes and wrap the first occurrence of snippet with <mark>
+function _rlMarkSnippetInHtml(html, snippet) {
+  if (!snippet) return html;
+  try {
+    var parser = new DOMParser();
+    var tmpDoc = parser.parseFromString('<body>' + html + '</body>', 'text/html');
+    var root = tmpDoc.body;
+    var candidates = [snippet.slice(0, 120), snippet.slice(0, 60), snippet.slice(0, 30)];
+    var marked = false;
+    function walk(node) {
+      if (marked) return;
+      if (node.nodeType === 3) {
+        var val = node.nodeValue;
+        for (var ci = 0; ci < candidates.length; ci++) {
+          var c = candidates[ci]; if (!c) continue;
+          var idx = val.indexOf(c);
+          if (idx >= 0) {
+            var mark = tmpDoc.createElement('mark');
+            mark.className = 'rl-highlight';
+            mark.textContent = val.slice(idx, idx + c.length);
+            var parent = node.parentNode;
+            if (idx > 0) parent.insertBefore(tmpDoc.createTextNode(val.slice(0, idx)), node);
+            parent.insertBefore(mark, node);
+            if (idx + c.length < val.length) parent.insertBefore(tmpDoc.createTextNode(val.slice(idx + c.length)), node);
+            parent.removeChild(node);
+            marked = true;
+            return;
+          }
+        }
+      } else {
+        var kids = Array.from(node.childNodes);
+        for (var ki = 0; ki < kids.length; ki++) { walk(kids[ki]); if (marked) return; }
+      }
+    }
+    walk(root);
+    return root.innerHTML;
+  } catch(_e) { return html; }
 }
 
 function _rlRenderViewerTabs() {
