@@ -4336,7 +4336,7 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 #screenLRL.active{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50}
 
 /* Root layout */
-.rl-root{display:flex;height:calc(100vh - 52px);overflow:hidden;background:var(--bg);position:relative}
+.rl-root{display:flex;height:100vh;overflow:hidden;background:var(--bg);position:relative}
 
 /* Icon sidebar — hamburger strip */
 .rl-icons{width:44px;flex-shrink:0;background:#0f0f0e;border-right:0.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:4px;z-index:31;flex-shrink:0}
@@ -8526,7 +8526,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div id="rlDash" class="rl-dash">
         <div class="rl-dash-hdr">
           <div>
-            <button class="rl-dash-back-btn" onclick="showScreen('screenDash')">
+            <button class="rl-dash-back-btn" onclick="showScreen('screenWorkbench')">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
               Sezioni
             </button>
@@ -12912,7 +12912,7 @@ async function rlSend() {
   var thinkEl = _rlAddThinking(_rl.deepThink ? 'Deep Think reasoning…' : 'Researching…');
 
   try {
-    var sys, contentsArr;
+    var sys, contentsArr, _ragChunks = [];
     var activeDocs = (_rl.docs || []).filter(function(d){ return _rl.ctxDocs.indexOf(d.id) >= 0; });
 
     if (activeDocs.length) {
@@ -12929,6 +12929,7 @@ async function rlSend() {
       var topChunks = await rlVectorSearch(q, allChunks);
       // Fallback: if search fails, use first 5 chunks
       if (!topChunks.length) topChunks = allChunks.slice(0, 5);
+      _ragChunks = topChunks;
       sys = _rlBuildRagPrompt(q, topChunks);
       contentsArr = [{ role: 'user', parts: [{ text: q }] }];
     } else {
@@ -12950,6 +12951,17 @@ async function rlSend() {
     });
 
     var parsed = _rlParseResponse(raw.text || raw || '');
+    // Enrich sources with docId: match snippet against RAG chunks so viewer can open
+    if (_ragChunks.length) {
+      parsed.sources.forEach(function(s) {
+        if (!s.docId && s.snippet) {
+          var snip = s.snippet.slice(0, 50);
+          var match = _ragChunks.find(function(ch){ return ch.text && ch.text.indexOf(snip) >= 0; });
+          if (!match) match = _ragChunks[s.id - 1] || _ragChunks[0];
+          if (match) { s.docId = match.docId; s.chunkId = match.id; s.page = s.page || match.page; }
+        }
+      });
+    }
     thinkEl.remove();
     _rlAddMsg({ role: 'ai', content: parsed.text, sources: parsed.sources, isDT: _rl.deepThink });
     _rlPersistMsgs();
@@ -13081,7 +13093,7 @@ function _rlParseResponse(raw) {
       if (s >= 0 && e > s) sources = JSON.parse(jsonPart.slice(s, e + 1));
     } catch(_e) {}
   }
-  sources.forEach(function(s, i){ if (!s.id) s.id = i + 1; });
+  sources.forEach(function(s, i){ s.id = i + 1; });
   return { text: text, sources: sources };
 }
 
