@@ -4336,13 +4336,32 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 #screenLRL.active{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:50}
 
 /* Root layout */
-.rl-root{display:flex;height:calc(100vh - 52px);overflow:hidden;background:var(--bg)}
+.rl-root{display:flex;height:calc(100vh - 52px);overflow:hidden;background:var(--bg);position:relative}
 
-/* Icon sidebar */
-.rl-icons{width:44px;flex-shrink:0;background:#0f0f0e;border-right:0.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px}
+/* Icon sidebar — hamburger strip */
+.rl-icons{width:44px;flex-shrink:0;background:#0f0f0e;border-right:0.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:4px;z-index:31;flex-shrink:0}
 .rl-icon-btn{width:32px;height:32px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0}
 .rl-icon-btn:hover{background:rgba(255,255,255,.1);color:#fff}
 .rl-icon-btn.active{background:rgba(255,255,255,.12);color:#fff}
+
+/* Sessions drawer */
+.rl-sessions-drawer{position:absolute;left:44px;top:0;bottom:0;width:240px;background:var(--sur);border-right:0.5px solid var(--bdr);z-index:30;transform:translateX(-100%);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:4px 0 20px rgba(0,0,0,.1)}
+.rl-sessions-drawer.open{transform:translateX(0)}
+.rl-sd-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;border-bottom:0.5px solid var(--bdr);flex-shrink:0}
+.rl-sd-hdr-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.rl-sd-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px;line-height:1;transition:color .13s;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:4px}
+.rl-sd-close:hover{color:var(--txt);background:var(--sur2)}
+.rl-sd-list{flex:1;overflow-y:auto;padding:6px 6px}
+.rl-sd-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .13s;border:0.5px solid transparent}
+.rl-sd-item:hover{background:var(--sur2)}
+.rl-sd-item.active{background:var(--sur2);border-color:var(--bdr)}
+.rl-sd-item-ico{width:26px;height:26px;border-radius:7px;background:rgba(44,122,123,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:800;color:#2C7A7B;font-family:'Inter',sans-serif}
+.rl-sd-item-body{flex:1;overflow:hidden}
+.rl-sd-item-name{font-size:12px;font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rl-sd-item-date{font-size:10px;color:var(--muted);margin-top:1px}
+.rl-sd-footer{padding:8px;border-top:0.5px solid var(--bdr);flex-shrink:0}
+.rl-sd-new-btn{width:100%;background:none;border:0.5px dashed var(--bdr);border-radius:8px;padding:8px;font:600 11px 'Inter',sans-serif;color:var(--muted);cursor:pointer;transition:all .15s}
+.rl-sd-new-btn:hover{border-color:var(--acc);color:var(--txt)}
 
 /* Docs panel */
 .rl-docs-panel{width:260px;flex-shrink:0;background:var(--sur);border-right:0.5px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
@@ -4380,6 +4399,8 @@ body.theme-light #rptArchiveBtn{background:#1a1a1a;color:#fff;}
 .rl-dash-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
 .rl-dash-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--txt)}
 .rl-dash-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.rl-dash-back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;font:600 11.5px 'Inter',sans-serif;color:var(--muted);cursor:pointer;padding:0;transition:color .13s}
+.rl-dash-back-btn:hover{color:var(--txt)}
 .rl-btn-new-prj{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:9px 18px;font:600 13px 'Inter',sans-serif;cursor:pointer;transition:opacity .15s;flex-shrink:0}
 .rl-btn-new-prj:hover{opacity:.82}
 .rl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
@@ -4460,30 +4481,36 @@ body.theme-light .rl-cit{background:rgba(0,0,0,.07);color:rgba(0,0,0,.45)}
 .rl-step-fav{width:16px;height:16px;border-radius:3px;background:var(--sur2);display:inline-flex;align-items:center;justify-content:center;font-size:9px}
 
 /* Input area */
-.rl-input-wrap{flex-shrink:0;border-top:0.5px solid var(--bdr);padding:12px 24px;background:var(--bg)}
+.rl-input-wrap{flex-shrink:0;padding:8px 20px 14px;background:var(--bg)}
 .rl-ctx-docs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;min-height:0}
 .rl-ctx-pill{display:flex;align-items:center;gap:5px;background:var(--sur2);border:0.5px solid var(--bdr);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--txt)}
 .rl-ctx-pill button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0;line-height:1}
-.rl-input-bar{display:flex;align-items:flex-end;gap:8px;background:var(--bg);border:0.5px solid rgba(0,0,0,.12);border-radius:12px;padding:12px 16px;transition:border-color .15s;box-sizing:border-box}
-body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.12)}
-.rl-input-bar:focus-within{border-color:var(--acc)}
-.rl-attach-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;flex-shrink:0;transition:color .13s}
-.rl-attach-btn:hover{color:var(--txt)}
-.rl-textarea{flex:1;background:none;border:none;outline:none;font:14px 'Inter',sans-serif;color:var(--txt);resize:none;max-height:120px;line-height:1.5}
-.rl-textarea::placeholder{color:var(--muted)}
-.rl-input-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.rl-dt-area{display:flex;align-items:center;gap:6px}
-.rl-dt-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
-.rl-dt-toggle{width:34px;height:19px;border-radius:10px;background:var(--sur2);border:0.5px solid var(--bdr);cursor:pointer;position:relative;transition:background .2s,border-color .2s;flex-shrink:0}
-.rl-dt-toggle.on{background:#ECC94B;border-color:#d4ad30}
-.rl-dt-knob{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.rl-dt-toggle.on .rl-dt-knob{transform:translateX(15px)}
-.rl-send-btn{width:32px;height:32px;border-radius:8px;border:none;background:var(--acc);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .13s;flex-shrink:0}
-.rl-send-btn:hover{opacity:.84}
-.rl-send-btn:disabled{opacity:.35;cursor:not-allowed}
-.rl-input-footer{display:flex;justify-content:flex-end;margin-top:6px}
-.rl-prompt-lib-link{background:none;border:none;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;padding:0;transition:color .13s}
-.rl-prompt-lib-link:hover{color:var(--txt)}
+.rl-input-bar{display:flex;align-items:flex-end;gap:8px;background:var(--sur);border:1px solid rgba(0,0,0,.09);border-radius:16px;padding:10px 10px 10px 16px;transition:border-color .2s,box-shadow .2s;box-sizing:border-box;box-shadow:0 2px 14px rgba(0,0,0,.05)}
+body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.1);box-shadow:0 2px 16px rgba(0,0,0,.06)}
+.rl-input-bar:focus-within{border-color:rgba(44,122,123,.45);box-shadow:0 2px 22px rgba(44,122,123,.09)}
+.rl-attach-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;display:flex;align-items:center;flex-shrink:0;transition:color .15s,background .15s;margin-bottom:3px}
+.rl-attach-btn:hover{color:var(--txt);background:var(--sur2)}
+.rl-textarea{flex:1;background:none;border:none;outline:none;font:13.5px/1.6 'Inter',sans-serif;color:var(--txt);resize:none;max-height:140px;padding:3px 0}
+.rl-textarea::placeholder{color:var(--muted);font-size:13px}
+.rl-input-right{display:flex;align-items:center;gap:6px;flex-shrink:0;padding-bottom:3px}
+/* Deep think pill */
+.rl-dt-pill{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:var(--sur2);border:0.5px solid var(--bdr);cursor:pointer;transition:all .18s;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif}
+.rl-dt-pill:hover{border-color:rgba(236,201,75,.45);color:var(--txt)}
+.rl-dt-pill.on{background:rgba(236,201,75,.13);border-color:rgba(236,201,75,.55);color:#a07c00}
+body.theme-light .rl-dt-pill.on{color:#7a5c00}
+/* Research button */
+.rl-research-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;background:var(--sur2);border:0.5px solid var(--bdr);color:var(--muted);cursor:pointer;font-size:11px;font-weight:600;transition:all .15s;white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif}
+.rl-research-btn:hover{border-color:rgba(44,122,123,.45);color:var(--txt)}
+/* Prompt library icon btn inside bar */
+.rl-prompt-lib-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .15s,background .15s;margin-bottom:3px}
+.rl-prompt-lib-btn:hover{color:var(--txt);background:var(--sur2)}
+/* Send button */
+.rl-send-btn{width:34px;height:34px;border-radius:11px;border:none;background:var(--acc);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s,transform .12s;flex-shrink:0;box-shadow:0 2px 8px rgba(44,122,123,.3)}
+.rl-send-btn:hover{opacity:.87;transform:scale(1.05)}
+.rl-send-btn:disabled{opacity:.28;cursor:not-allowed;transform:none;box-shadow:none}
+/* Legacy rl-dt-toggle kept for JS compat */
+.rl-dt-toggle{display:none}
+.rl-dt-knob{display:none}
 
 /* Chat empty state */
 .rl-chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;text-align:center;padding:20px}
@@ -4491,8 +4518,10 @@ body.theme-light .rl-input-bar{border-color:rgba(0,0,0,.12)}
 .rl-chat-empty-title{font-size:15px;font-weight:700;color:var(--txt)}
 .rl-chat-empty-sub{font-size:12px;color:var(--muted);max-width:300px;line-height:1.5}
 .rl-suggestions{display:flex;flex-direction:column;gap:7px;margin-top:18px;width:100%;max-width:380px}
-.rl-sugg{background:var(--sur);border:0.5px solid var(--bdr);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--txt);cursor:pointer;text-align:left;transition:border-color .13s;font-family:'Inter',sans-serif}
-.rl-sugg:hover{border-color:rgba(44,122,123,.4)}
+.rl-sugg{background:var(--sur);border:0.5px solid var(--bdr);border-radius:10px;padding:11px 14px 11px 18px;font-size:12.5px;color:var(--txt);cursor:pointer;text-align:left;transition:all .16s;font-family:'Inter',sans-serif;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.rl-sugg::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#2C7A7B;border-radius:2px 0 0 2px;opacity:0;transition:opacity .16s}
+.rl-sugg:hover{border-color:rgba(44,122,123,.3);box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.rl-sugg:hover::before{opacity:1}
 
 /* Viewer pane */
 .rl-viewer-pane{width:46%;min-width:400px;flex-shrink:0;background:var(--sur);border-left:0.5px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
@@ -8448,14 +8477,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <div class="rl-root">
 
-    <!-- Icon sidebar -->
+    <!-- Icon sidebar — hamburger only -->
     <div class="rl-icons">
-      <button class="rl-icon-btn" onclick="rlBackToDash()" title="Sezioni" style="margin-bottom:4px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <button class="rl-icon-btn" id="rlHamburgerBtn" onclick="rlToggleSessions()" title="Sessions">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/>
+        </svg>
       </button>
-      <button class="rl-icon-btn" id="rlIconDocs" onclick="rlToggleDocsPanel()" title="Documents">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      </button>
+    </div>
+
+    <!-- Sessions drawer (slide-in) -->
+    <div class="rl-sessions-drawer" id="rlSessionsDrawer">
+      <div class="rl-sd-hdr">
+        <span class="rl-sd-hdr-title">Sessions</span>
+        <button class="rl-sd-close" onclick="rlToggleSessions()">&#x2715;</button>
+      </div>
+      <div id="rlSDList" class="rl-sd-list"></div>
+      <div class="rl-sd-footer">
+        <button class="rl-sd-new-btn" onclick="rlToggleSessions();rlNewProject()">+ New Project</button>
+      </div>
     </div>
 
     <!-- Documents panel (collapsible) -->
@@ -8479,8 +8519,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="rl-thread-title" id="rlThreadTitle" contenteditable="true" onblur="rlRenameThread(this)">New Research</div>
         <div class="rl-thread-actions">
-          <button class="rl-hdr-btn" onclick="rlOpenChatHistory()">Chat history</button>
-          <button class="rl-hdr-btn icon-btn" onclick="rlNewChat()" title="New chat">+</button>
         </div>
       </div>
 
@@ -8488,7 +8526,11 @@ document.addEventListener('DOMContentLoaded', function() {
       <div id="rlDash" class="rl-dash">
         <div class="rl-dash-hdr">
           <div>
-            <div class="rl-dash-title">Research Lab</div>
+            <button class="rl-dash-back-btn" onclick="showScreen('screenDash')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Sezioni
+            </button>
+            <div class="rl-dash-title" style="margin-top:8px">Research Lab</div>
             <div class="rl-dash-sub">AI-powered legal research workspace</div>
           </div>
           <button class="rl-btn-new-prj" onclick="rlNewProject()">+ New Project</button>
@@ -8525,26 +8567,24 @@ document.addEventListener('DOMContentLoaded', function() {
             <button class="rl-attach-btn" onclick="document.getElementById('rlUploadInput').click()" title="Allega documento">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
             </button>
-            <textarea id="rlInput" class="rl-textarea" placeholder="Ask a follow-up" rows="1"
+            <textarea id="rlInput" class="rl-textarea" placeholder="Fai una domanda legale…" rows="1"
               onkeydown="rlKeydown(event)" oninput="rlAutoResize(this)"></textarea>
             <div class="rl-input-right">
-              <div class="rl-dt-area">
-                <span class="rl-dt-label">Deep think</span>
-                <div class="rl-dt-toggle" id="rlDTToggle" onclick="rlToggleDT()"><div class="rl-dt-knob"></div></div>
+              <button class="rl-prompt-lib-btn" onclick="rlOpenPromptLib()" title="Prompt library">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </button>
+              <div class="rl-dt-pill" id="rlDTToggle" onclick="rlToggleDT()">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+                <span>Deep</span>
               </div>
-              <button class="rl-research-btn" id="rlAgentBtn" onclick="rlSendAgentic()" title="Agentic Research" style="width:32px;height:32px;border-radius:8px;border:0.5px solid var(--bdr);background:var(--sur2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .13s;flex-shrink:0">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <button class="rl-research-btn" id="rlAgentBtn" onclick="rlSendAgentic()" title="Agentic Research">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>Research</span>
               </button>
               <button class="rl-send-btn" id="rlSendBtn" onclick="rlSend()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
               </button>
             </div>
-          </div>
-          <div class="rl-input-footer">
-            <button class="rl-prompt-lib-link" onclick="rlOpenPromptLib()">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              Prompt library
-            </button>
           </div>
         </div>
       </div>
@@ -12554,7 +12594,46 @@ function rlRenameThread(el) {
 }
 
 function rlOpenChatHistory() {
-  // Show sidebar chat list (no-op stub — chats accessible via new chat)
+  // no-op stub
+}
+
+function rlToggleSessions() {
+  var drawer = document.getElementById('rlSessionsDrawer');
+  if (!drawer) return;
+  var isOpen = drawer.classList.contains('open');
+  if (isOpen) {
+    drawer.classList.remove('open');
+  } else {
+    rlRenderSessionsDrawer();
+    drawer.classList.add('open');
+  }
+  var btn = document.getElementById('rlHamburgerBtn');
+  if (btn) btn.classList.toggle('active', !isOpen);
+}
+
+function rlRenderSessionsDrawer() {
+  var list = document.getElementById('rlSDList');
+  if (!list) return;
+  var html = '';
+  if (!_rl.prjs || _rl.prjs.length === 0) {
+    html = '<div style="padding:24px 14px;text-align:center;font-size:12px;color:var(--muted);line-height:1.5">Nessuna sessione.<br>Crea un nuovo progetto.</div>';
+  } else {
+    var sorted = _rl.prjs.slice().sort(function(a,b){ return (b.created||0)-(a.created||0); });
+    sorted.forEach(function(p) {
+      var active = p.id === _rl.cur ? ' active' : '';
+      var initials = (p.name || 'R').replace(/[^A-Za-z0-9]/g,'').substring(0,2).toUpperCase() || 'RL';
+      var d = p.created ? new Date(p.created) : null;
+      var date = d ? d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'}) : '';
+      html += '<div class="rl-sd-item'+active+'" onclick="rlOpenProject(\''+p.id+'\');rlToggleSessions()">'
+        + '<div class="rl-sd-item-ico">'+initials+'</div>'
+        + '<div class="rl-sd-item-body">'
+        + '<div class="rl-sd-item-name">'+_rlEsc(p.name||'Untitled')+'</div>'
+        + '<div class="rl-sd-item-date">'+date+'</div>'
+        + '</div>'
+        + '</div>';
+    });
+  }
+  list.innerHTML = html;
 }
 
 // ── Projects ────────────────────────────────────────────────────────────────
