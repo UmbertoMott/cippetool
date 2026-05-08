@@ -4512,6 +4512,15 @@ body.theme-light .rl-dt-pill.on{color:#7a5c00}
 .rl-dt-toggle{display:none}
 .rl-dt-knob{display:none}
 
+/* Search mode levers */
+.rl-mode-row{display:flex;align-items:center;gap:6px;padding:7px 2px 0;flex-wrap:wrap}
+.rl-mode-lever{display:flex;align-items:center;gap:6px;padding:5px 12px 5px 8px;border-radius:20px;background:none;border:0.5px solid var(--bdr);color:var(--muted);cursor:pointer;font:500 11px 'Inter',sans-serif;transition:all .16s;white-space:nowrap;flex-shrink:0}
+.rl-mode-lever:hover{border-color:rgba(44,122,123,.35);color:var(--txt)}
+.rl-mode-lever.on{background:rgba(44,122,123,.1);border-color:rgba(44,122,123,.55);color:#2C7A7B;font-weight:600}
+body.theme-light .rl-mode-lever.on{background:rgba(44,122,123,.08);color:#1a6b6c}
+.rl-mode-dot{width:7px;height:7px;border-radius:50%;background:var(--bdr);transition:background .16s;flex-shrink:0}
+.rl-mode-lever.on .rl-mode-dot{background:#2C7A7B}
+
 /* Chat empty state */
 .rl-chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;text-align:center;padding:20px}
 .rl-chat-empty-icon{font-size:32px;margin-bottom:4px}
@@ -8577,14 +8586,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
                 <span>Deep</span>
               </div>
-              <button class="rl-research-btn" id="rlAgentBtn" onclick="rlSendAgentic()" title="Agentic Research">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <span>Research</span>
-              </button>
               <button class="rl-send-btn" id="rlSendBtn" onclick="rlSend()">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13M22 2 15 22 11 13 2 9l20-7z"/></svg>
               </button>
             </div>
+          </div>
+          <!-- Search mode levers -->
+          <div class="rl-mode-row">
+            <button class="rl-mode-lever" id="rlModeGiur" onclick="rlToggleMode('giur')">
+              <span class="rl-mode-dot"></span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+              Giurisprudenza
+            </button>
+            <button class="rl-mode-lever" id="rlModeDott" onclick="rlToggleMode('dott')">
+              <span class="rl-mode-dot"></span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              Dottrina
+            </button>
+            <button class="rl-mode-lever" id="rlModeWeb" onclick="rlToggleMode('web')">
+              <span class="rl-mode-dot"></span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+              Ricerca su internet
+            </button>
           </div>
         </div>
       </div>
@@ -12483,6 +12506,7 @@ function rlInit() {
   _rl.deepThink = false;
   _rl.busy = false;
   _rl.docsOpen = false;
+  _rl.modes = { giur: false, dott: false, web: false };
   // Show dashboard
   var dash = document.getElementById('rlDash');
   var ws = document.getElementById('rlWorkspace');
@@ -12748,18 +12772,6 @@ function _rlBuildMsgEl(msg, idx) {
   } else {
     var rendered = _rlRenderMarkdown(msg.content, msg.sources || [], idx);
     html = '<div class="rl-msg-bubble">' + rendered + '</div>';
-    if (msg.sources && msg.sources.length) {
-      html += '<div class="rl-sources">' + msg.sources.map(function(s) {
-        var rel = Math.round((s.reliability || 0.8) * 100);
-        return '<div class="rl-src" onclick="rlSrcClick(' + idx + ',' + s.id + ')">'
-          + '<div class="rl-src-num">Source [' + s.id + ']</div>'
-          + '<div class="rl-src-title">' + _rlEsc(s.title || '') + '</div>'
-          + '<div class="rl-src-snip">' + _rlEsc(s.snippet || '') + '</div>'
-          + '<div class="rl-src-rel"><div class="rl-src-rel-bar"><div class="rl-src-rel-fill" style="width:' + rel + '%"></div></div>'
-          + '<span class="rl-src-rel-pct">' + rel + '%</span></div>'
-          + '</div>';
-      }).join('') + '</div>';
-    }
   }
   div.innerHTML = html;
   return div;
@@ -12828,6 +12840,23 @@ function rlToggleDT() {
   if (bar) bar.style.borderColor = _rl.deepThink ? '#ECC94B' : '';
 }
 
+function rlToggleMode(mode) {
+  if (!_rl.modes) _rl.modes = { giur: false, dott: false, web: false };
+  _rl.modes[mode] = !_rl.modes[mode];
+  var map = { giur: 'rlModeGiur', dott: 'rlModeDott', web: 'rlModeWeb' };
+  var el = document.getElementById(map[mode]);
+  if (el) el.classList.toggle('on', _rl.modes[mode]);
+}
+
+function _rlGetModeContext() {
+  var m = _rl.modes || {};
+  var parts = [];
+  if (m.giur) parts.push('Privilegia fonti giurisprudenziali (sentenze, ordinanze, massime). Cita Cass., TAR, Consiglio di Stato ove pertinente.');
+  if (m.dott) parts.push('Privilegia la dottrina giuridica italiana (manuali, commentari, articoli scientifici). Cita autori e opere.');
+  if (m.web)  parts.push('Integra anche fonti da internet (siti istituzionali, banche dati giuridiche online, Gazzetta Ufficiale, EUR-Lex).');
+  return parts.join(' ');
+}
+
 // ── Vector search (via /api/search) ─────────────────────────────────────────
 async function rlVectorSearch(query, chunks) {
   if (!chunks || !chunks.length) return [];
@@ -12873,7 +12902,9 @@ function _rlBuildRagPrompt(query, topChunks) {
   var ctx = topChunks.map(function(ch, i) {
     return '[' + (i+1) + '] (p.' + ch.page + ', ' + ch.docId + '):\n' + (ch.text || '').slice(0, 800);
   }).join('\n\n');
+  var modeCtx = _rlGetModeContext();
   return 'Sei un giurista professionista specializzato in diritto italiano e UE. Il tuo stile è preciso, autorevole e diretto al punto.\n\n'
+    + (modeCtx ? modeCtx + '\n\n' : '')
     + 'CONTESTO DEL DOCUMENTO:\n' + ctx + '\n\n'
     + 'ISTRUZIONI:\n'
     + '- Rispondi SOLO usando le informazioni nei chunk sopra\n'
@@ -12886,8 +12917,10 @@ function _rlBuildRagPrompt(query, topChunks) {
 
 // ── System prompt (no docs) ──────────────────────────────────────────────────
 function _rlBuildSysPrompt() {
+  var modeCtx = _rlGetModeContext();
   return 'Sei un assistente di ricerca giuridica esperto in diritto UE e italiano (GDPR, AI Act, diritto privacy, normativa nazionale). '
     + 'Rispondi con stile professionale, preciso e autorevole come un avvocato specializzato. '
+    + (modeCtx ? modeCtx + ' ' : '')
     + 'Usa i marcatori di citazione [1], [2] ecc. per riferimenti alle fonti quando disponibili. '
     + 'Alla FINE della risposta aggiungi ---SOURCES--- seguito da un array JSON: '
     + '[{"id":1,"title":"Fonte","snippet":"Testo citato verbatim","reliability":0.9},...] '
