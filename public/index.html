@@ -12751,13 +12751,15 @@ function rlModalConfirmInput() {
   var inp = document.getElementById('rlModalInputField');
   var val = inp ? inp.value.trim() : '';
   if (!val) { if (inp) inp.focus(); return; }
+  var cb = _rlModalCb;
   rlModalClose();
-  if (_rlModalCb) _rlModalCb(val);
+  if (cb) cb(val);
 }
 
 function rlModalConfirmAction() {
+  var cb = _rlModalCb;
   rlModalClose();
-  if (_rlModalCb) _rlModalCb();
+  if (cb) cb();
 }
 
 function rlModalClose() {
