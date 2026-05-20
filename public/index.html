@@ -30379,7 +30379,6 @@ window.ocrFilterHistory = function(q) {
 
 window.ocrRemovePage = function(id) {
   _ocrPages = _ocrPages.filter(function(p) { return p.id !== id; });
-  _ocrPages.forEach(function(p, i) { p.page_number = i + 1; });
   if (_ocrActivePageId === id) _ocrActivePageId = _ocrPages[0] ? _ocrPages[0].id : null;
   if (!_ocrPages.length) _ocrSetStatus('empty');
   _ocrRenderPhotos(); _ocrRenderEditor();
@@ -30573,9 +30572,16 @@ function _ocrAutoReorderByPrintedNumber() {
     return a.num - b.num;
   });
   _ocrPages = detected.map(function(d){ return d.page; });
-  _ocrPages.forEach(function(p, i){ p.page_number = i + 1; });
-  var newOrder = _ocrPages.map(function(p){ return p.id; }).join(',');
-  if (newOrder === originalOrder) return 0;
+  var maxDetected = detected.reduce(function(m,d){ return d.num !== null ? Math.max(m, d.num) : m; }, 0);
+  var undetIdx = 0;
+  detected.forEach(function(d) {
+    if (d.num !== null) {
+      d.page.page_number = d.num;
+    } else {
+      undetIdx++;
+      d.page.page_number = maxDetected + undetIdx;
+    }
+  });
   _ocrActivePageId = _ocrPages[0].id;
   _ocrRenderPhotos();
   _ocrRenderEditor();
@@ -30669,7 +30675,6 @@ function _ocrRenderPhotos() {
   if (empty) empty.style.display = 'none';
   if (grid)  grid.style.display = 'flex';
   wrap.innerHTML = '';
-  _ocrPages.forEach(function(p, i) { p.page_number = i + 1; });
   _ocrPages.forEach(function(p, idx) {
     var el = document.createElement('div');
     el.className = 'ocr-thumb';
@@ -30767,7 +30772,6 @@ function _ocrRenderPhotos() {
           var tmp = _ocrPages[si];
           _ocrPages[si] = _ocrPages[ti];
           _ocrPages[ti] = tmp;
-          _ocrPages.forEach(function(p2, j) { p2.page_number = j + 1; });
           // Keep editor focused on the dragged page (now at position ti)
           if (_ocrPages[ti]) _ocrActivePageId = _ocrPages[ti].id;
           _ocrRenderPhotos(); _ocrRenderEditor();
