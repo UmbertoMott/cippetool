@@ -30630,10 +30630,10 @@ function _ocrGetFooterNumFromImage(page) {
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data) {
         if (!data) { resolve(null); return; }
-        var txt = ((data.candidates || [])[0]?.content?.parts || [])
-          .map(function(x){ return x.text || ''; }).join('').trim();
+        // /api/gemini proxy returns { text } already extracted
+        var txt = (data.text || '').trim();
         var n = parseInt(txt, 10);
-        var result = (!isNaN(n) && n >= 1 && n <= 999) ? n : null;
+        var result = (!isNaN(n) && n >= 1 && n <= 9999) ? n : null;
         console.log('[OCR-SORT] footer strip "' + page.fileName + '" → "' + txt + '" → ' + result);
         resolve(result);
       })
