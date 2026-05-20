@@ -30585,7 +30585,44 @@ function _ocrAutoReorderByPrintedNumber() {
   return validCount;
 }
 
-// AI-powered sort: one Gemini batch call to read all footer page numbers → sort → sequential labels
+// Read footer page number directly from the original IMAGE (not OCR text)
+// Image has physical layout — footer is always at bottom. Text (Markdown) can reorder elements.
+function _ocrGetFooterNumFromImage(page) {
+  return new Promise(function(resolve) {
+    // PDF or no file → fall back to text regex
+    if (!page._file || !page._file.type.startsWith('image/')) {
+      resolve(_ocrDetectPrintedPageNumber(page.text));
+      return;
+    }
+    _ocrResizeAndEncode(page._file, 900, 0.85, function(b64, mime) {
+      fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gemini-2.0-flash-lite-001',
+          contents: [{ role: 'user', parts: [
+            { inlineData: { mimeType: mime, data: b64 } },
+            { text: 'Look ONLY at the very bottom of this document page image (the footer area). What is the page number printed there as a standalone number? Reply with ONLY the integer. If no isolated page number is visible at the bottom, reply: null' }
+          ]}],
+          generationConfig: { temperature: 0, maxOutputTokens: 8 }
+        })
+      })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data) {
+        if (!data) { resolve(null); return; }
+        var txt = ((data.candidates || [])[0]?.content?.parts || [])
+          .map(function(x){ return x.text || ''; }).join('').trim();
+        var n = parseInt(txt, 10);
+        var result = (!isNaN(n) && n >= 1 && n <= 999) ? n : null;
+        console.log('[OCR-SORT] img detection "' + page.fileName + '" → raw:"' + txt + '" → num:' + result);
+        resolve(result);
+      })
+      .catch(function(e){ console.warn('[OCR-SORT] img err:', e.message); resolve(null); });
+    });
+  });
+}
+
+// After all OCR done: parallel Vision calls per page → sort → sequential labels
 async function _ocrDetectAndSort() {
   var t = document.getElementById('ocrToast');
   function _toast(html, ms) {
@@ -30595,57 +30632,39 @@ async function _ocrDetectAndSort() {
     if (ms) t._tid = setTimeout(function(){ t.classList.remove('show'); }, ms);
   }
 
-  var pages = _ocrPages.filter(function(p){ return p.status === 'done' && p.text && p.text.trim(); });
+  var pages = _ocrPages.filter(function(p){ return p.status === 'done'; });
   if (pages.length < 2) { _toast('✓ Sessione salvata', 4000); return; }
 
   _toast('<span style="display:inline-flex;align-items:center;gap:6px;"><span class="ocr-spinner"></span> AI sta riordinando le pagine…</span>', 0);
 
   try {
-    // Only last 150 chars per page — just the bottom few lines, avoids citations/years
-    var snippets = pages.map(function(p, i) {
-      var tail = p.text.replace(/\*+|_+|#+/g, ' ').slice(-150).trim();
-      // Keep only the last 4 non-empty lines
-      var lines = tail.split('\n').map(function(l){ return l.trim(); }).filter(Boolean).slice(-4).join('\n');
-      return 'P' + (i + 1) + ':\n' + lines;
-    }).join('\n---\n');
+    // Run all image detections in parallel — wait for ALL before sorting
+    var detections = await Promise.all(pages.map(function(p){ return _ocrGetFooterNumFromImage(p); }));
+    console.log('[OCR-SORT] all detections:', detections);
 
-    var sys = 'You analyze the last few lines of OCR text from each scanned document page. ' +
-      'The page number is a SINGLE integer printed ALONE on the very last line of the page (footer). ' +
-      'It is NOT a number inside a sentence, citation, year, or case reference. ' +
-      'Reply ONLY with a valid JSON array of integers in order: [3,4,5,null,7]. ' +
-      'Use null if the last line is not a standalone integer. Max page number: 999. No extra text.';
+    var validCount = detections.filter(function(n){ return n !== null; }).length;
+    console.log('[OCR-SORT] valid:', validCount, '/', pages.length);
 
-    var raw = await callGemini(sys, [{ role: 'user', parts: [{ text: snippets }] }], 256);
-    var match = raw.match(/\[[\s\S]*?\]/);
-    if (!match) throw new Error('No JSON array');
-    var nums = JSON.parse(match[0]);
-    if (!Array.isArray(nums)) throw new Error('Not array');
+    if (validCount < Math.ceil(pages.length / 2)) {
+      throw new Error('Not enough detections: ' + validCount + '/' + pages.length);
+    }
 
-    var validCount = 0;
-    pages.forEach(function(p, i) {
-      var n = typeof nums[i] === 'number' ? Math.round(nums[i]) : null;
-      p._aiPageNum = (n && n >= 1 && n <= 999) ? n : null;
-      if (p._aiPageNum) validCount++;
+    var paired = pages.map(function(p, i){ return { page: p, num: detections[i] }; });
+    paired.sort(function(a, b) {
+      var na = a.num != null ? a.num : 999999;
+      var nb = b.num != null ? b.num : 999999;
+      return na - nb;
     });
 
-    if (validCount >= Math.ceil(pages.length / 2)) {
-      pages.sort(function(a, b) {
-        var na = a._aiPageNum != null ? a._aiPageNum : 999999;
-        var nb = b._aiPageNum != null ? b._aiPageNum : 999999;
-        return na - nb;
-      });
-      var rest = _ocrPages.filter(function(p){ return p.status !== 'done' || !p.text || !p.text.trim(); });
-      _ocrPages = pages.concat(rest);
-      _ocrPages.forEach(function(p, i){ p.page_number = i + 1; });
-      _ocrActivePageId = _ocrPages[0].id;
-      _ocrRenderPhotos(); _ocrRenderEditor();
-      _toast('↕ Pagine riordinate da AI (' + validCount + '/' + pages.length + ') &nbsp;<span onclick="ocrMobilePanel(\'C\')" style="text-decoration:underline;cursor:pointer;font-weight:700;">Storico →</span>', 6000);
-      return;
-    }
-    throw new Error('Not enough detections: ' + validCount + '/' + pages.length);
+    var rest = _ocrPages.filter(function(p){ return p.status !== 'done'; });
+    _ocrPages = paired.map(function(x){ return x.page; }).concat(rest);
+    _ocrPages.forEach(function(p, i){ p.page_number = i + 1; });
+    _ocrActivePageId = _ocrPages[0].id;
+    _ocrRenderPhotos(); _ocrRenderEditor();
+    _toast('↕ Pagine riordinate da AI (' + validCount + '/' + pages.length + ') &nbsp;<span onclick="ocrMobilePanel(\'C\')" style="text-decoration:underline;cursor:pointer;font-weight:700;">Storico →</span>', 6000);
 
   } catch(e) {
-    console.warn('[OCR] AI sort fallback → regex:', e.message);
+    console.warn('[OCR-SORT] fallback → regex:', e.message);
     var regexResult = _ocrAutoReorderByPrintedNumber();
     _toast(regexResult
       ? '↕ Pagine riordinate (' + regexResult + '/' + pages.length + ') &nbsp;<span onclick="ocrMobilePanel(\'C\')" style="text-decoration:underline;cursor:pointer;font-weight:700;">Storico →</span>'
