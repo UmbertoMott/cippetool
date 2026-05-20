@@ -30585,21 +30585,90 @@ function _ocrAutoReorderByPrintedNumber() {
   return validCount;
 }
 
+// AI-powered sort: one Gemini batch call to read all footer page numbers → sort → sequential labels
+async function _ocrDetectAndSort() {
+  var t = document.getElementById('ocrToast');
+  function _toast(html, ms) {
+    if (!t) return;
+    t.innerHTML = html; t.classList.add('show');
+    clearTimeout(t._tid);
+    if (ms) t._tid = setTimeout(function(){ t.classList.remove('show'); }, ms);
+  }
+
+  var pages = _ocrPages.filter(function(p){ return p.status === 'done' && p.text && p.text.trim(); });
+  if (pages.length < 2) { _toast('✓ Sessione salvata', 4000); return; }
+
+  _toast('<span style="display:inline-flex;align-items:center;gap:6px;"><span class="ocr-spinner"></span> AI sta riordinando le pagine…</span>', 0);
+
+  try {
+    var snippets = pages.map(function(p, i) {
+      return 'PAGINA_' + (i + 1) + ':\n' + p.text.slice(-300);
+    }).join('\n\n---\n\n');
+
+    var sys = 'Sei un assistente per documenti scansionati. ' +
+      'Ti mostro la fine del testo OCR di ogni pagina. ' +
+      'Il numero di pagina è il numeretto stampato in fondo ad ogni pagina (footer). ' +
+      'Rispondi SOLO con un array JSON valido, es: [36,37,null,39]. ' +
+      'Mantieni l\'ordine delle pagine come ti sono state date. Nessun testo aggiuntivo.';
+
+    var raw = await callGemini(sys, [{ role: 'user', parts: [{ text: snippets }] }], 512);
+    var match = raw.match(/\[[\s\S]*?\]/);
+    if (!match) throw new Error('No JSON array');
+    var nums = JSON.parse(match[0]);
+    if (!Array.isArray(nums)) throw new Error('Not array');
+
+    var validCount = 0;
+    pages.forEach(function(p, i) {
+      var n = typeof nums[i] === 'number' ? Math.round(nums[i]) : null;
+      p._aiPageNum = (n && n >= 1 && n <= 9999) ? n : null;
+      if (p._aiPageNum) validCount++;
+    });
+
+    if (validCount >= Math.ceil(pages.length / 2)) {
+      pages.sort(function(a, b) {
+        var na = a._aiPageNum != null ? a._aiPageNum : 999999;
+        var nb = b._aiPageNum != null ? b._aiPageNum : 999999;
+        return na - nb;
+      });
+      var rest = _ocrPages.filter(function(p){ return p.status !== 'done' || !p.text || !p.text.trim(); });
+      _ocrPages = pages.concat(rest);
+      _ocrPages.forEach(function(p, i){ p.page_number = i + 1; });
+      _ocrActivePageId = _ocrPages[0].id;
+      _ocrRenderPhotos(); _ocrRenderEditor();
+      _toast('↕ Pagine riordinate da AI (' + validCount + '/' + pages.length + ') &nbsp;<span onclick="ocrMobilePanel(\'C\')" style="text-decoration:underline;cursor:pointer;font-weight:700;">Storico →</span>', 6000);
+      return;
+    }
+    throw new Error('Not enough detections: ' + validCount + '/' + pages.length);
+
+  } catch(e) {
+    console.warn('[OCR] AI sort fallback → regex:', e.message);
+    var regexResult = _ocrAutoReorderByPrintedNumber();
+    _toast(regexResult
+      ? '↕ Pagine riordinate (' + regexResult + '/' + pages.length + ') &nbsp;<span onclick="ocrMobilePanel(\'C\')" style="text-decoration:underline;cursor:pointer;font-weight:700;">Storico →</span>'
+      : '✓ Sessione salvata &nbsp;<span onclick="ocrMobilePanel(\'C\')" style="text-decoration:underline;cursor:pointer;font-weight:700;">Storico →</span>',
+      5000);
+  }
+}
+
 function _ocrCheckAllDone() {
   var allDone = _ocrPages.length > 0 && _ocrPages.every(function(p){ return p.status === 'done'; });
   if (allDone) {
     clearInterval(_ocrTickId); _ocrTickId = null;
     _ocrSetStatus('completed');
     _ocrUpdateExportButtons(true);
-    var reordered = _ocrAutoReorderByPrintedNumber();
-    if (!_ocrPages.find(function(p) { return p.id === _ocrActivePageId; })) {
+    if (!_ocrPages.find(function(p){ return p.id === _ocrActivePageId; })) {
       _ocrActivePageId = _ocrPages[0] ? _ocrPages[0].id : null;
     }
-    var titleEl = document.getElementById('ocrSessionTitle');
-    _ocrCurrentHistoryId = _ocrSaveToHistory(titleEl ? titleEl.value : 'Sessione OCR', _ocrPages.length);
-    _ocrRenderHistory(_ocrLoadHistory());
     _ocrMobileShowPanel('B');
-    _ocrShowHistoryToast(reordered);
+    _ocrDetectAndSort().then(function() {
+      var titleEl = document.getElementById('ocrSessionTitle');
+      _ocrCurrentHistoryId = _ocrSaveToHistory(titleEl ? titleEl.value : 'Sessione OCR', _ocrPages.length);
+      _ocrRenderHistory(_ocrLoadHistory());
+    }).catch(function() {
+      var titleEl = document.getElementById('ocrSessionTitle');
+      _ocrCurrentHistoryId = _ocrSaveToHistory(titleEl ? titleEl.value : 'Sessione OCR', _ocrPages.length);
+      _ocrRenderHistory(_ocrLoadHistory());
+    });
   }
 }
 
