@@ -30000,6 +30000,8 @@ window.ocrHandleFiles = function(files) {
   _ocrRenderPhotos();
   var ci = document.getElementById('ocrCameraInput'); if (ci) ci.value = '';
   var fi = document.getElementById('ocrFileInput');   if (fi) fi.value = '';
+  // Kick off lightweight page-number detection immediately for each image
+  newPages.forEach(function(page) { _ocrDetectPageNumFromImage(page); });
   // Open review for zone exclusion before OCR
   _ocrRvOpen(newPages);
 };
@@ -30557,31 +30559,60 @@ function _ocrDetectPrintedPageNumber(text) {
   return null;
 }
 
+// Progressive sort called as image detections arrive (before OCR)
+function _ocrApplySort() {
+  if (_ocrPages.length < 2) return;
+  var withNum = _ocrPages.filter(function(p){ return p._detectedNum != null; });
+  if (withNum.length === 0) return;
+  var withoutNum = _ocrPages.filter(function(p){ return p._detectedNum == null; });
+  withNum.sort(function(a, b){ return a._detectedNum - b._detectedNum; });
+  _ocrPages = withNum.concat(withoutNum);
+  _ocrPages.forEach(function(p, i){ p.page_number = i + 1; });
+  _ocrActivePageId = _ocrPages[0].id;
+  _ocrRenderPhotos();
+}
+
+// Lightweight Gemini Vision call — asks only for the footer page number
+function _ocrDetectPageNumFromImage(page) {
+  if (!page._file || !page._file.type.startsWith('image/')) return;
+  _ocrResizeAndEncode(page._file, 600, 0.72, function(b64, mime) {
+    fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemini-2.0-flash-lite-001',
+        contents: [{ role: 'user', parts: [
+          { inlineData: { mimeType: mime, data: b64 } },
+          { text: 'Guarda il numero di pagina stampato IN FONDO a questa immagine (footer). Rispondi SOLO con il numero intero. Se non è visibile, rispondi: null' }
+        ]}],
+        generationConfig: { temperature: 0, maxOutputTokens: 8 }
+      })
+    }).then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data) return;
+      var txt = ((data.candidates || [])[0]?.content?.parts || []).map(function(p){ return p.text || ''; }).join('').trim();
+      var n = parseInt(txt, 10);
+      if (!isNaN(n) && n >= 1 && n <= 9999) { page._detectedNum = n; _ocrApplySort(); }
+    }).catch(function(){});
+  });
+}
+
 function _ocrAutoReorderByPrintedNumber() {
   if (_ocrPages.length < 2) return 0;
-  var detected = _ocrPages.map(function(p) {
-    return { page: p, num: _ocrDetectPrintedPageNumber(p.text) };
+  var items = _ocrPages.map(function(p) {
+    var num = p._detectedNum != null ? p._detectedNum : _ocrDetectPrintedPageNumber(p.text);
+    return { page: p, num: num };
   });
-  var validCount = detected.filter(function(d){ return d.num !== null; }).length;
+  var validCount = items.filter(function(x){ return x.num != null; }).length;
   if (validCount < Math.ceil(_ocrPages.length / 2)) return 0;
-  var originalOrder = _ocrPages.map(function(p){ return p.id; }).join(',');
-  detected.sort(function(a, b) {
-    if (a.num === null && b.num === null) return 0;
-    if (a.num === null) return 1;
-    if (b.num === null) return -1;
+  items.sort(function(a, b) {
+    if (a.num == null && b.num == null) return 0;
+    if (a.num == null) return 1;
+    if (b.num == null) return -1;
     return a.num - b.num;
   });
-  _ocrPages = detected.map(function(d){ return d.page; });
-  var maxDetected = detected.reduce(function(m,d){ return d.num !== null ? Math.max(m, d.num) : m; }, 0);
-  var undetIdx = 0;
-  detected.forEach(function(d) {
-    if (d.num !== null) {
-      d.page.page_number = d.num;
-    } else {
-      undetIdx++;
-      d.page.page_number = maxDetected + undetIdx;
-    }
-  });
+  _ocrPages = items.map(function(x){ return x.page; });
+  _ocrPages.forEach(function(p, i){ p.page_number = i + 1; });
   _ocrActivePageId = _ocrPages[0].id;
   _ocrRenderPhotos();
   _ocrRenderEditor();
