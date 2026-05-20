@@ -30551,15 +30551,15 @@ function _ocrDetectPrintedPageNumber(text) {
     var line = lines[i];
     // Short line (≤8 chars): standalone number possibly wrapped in dashes/dots/spaces
     if (line.length <= 8) {
-      var m = line.match(/^[-—–\s.]*(\d{1,4})[-—–\s.]*$/);
-      if (m) { var n = parseInt(m[1], 10); if (n >= 1 && n <= 9999) return n; }
+      var m = line.match(/^[-—–\s.]*(\d{1,3})[-—–\s.]*$/);
+      if (m) { var n = parseInt(m[1], 10); if (n >= 1 && n <= 999) return n; }
     }
     // "Pagina 5" / "Page 5" / "pag. 5"
-    var m2 = line.match(/^(?:pagina|page|pag\.?|p\.)\s*(\d{1,4})\.?$/i);
-    if (m2) { var n2 = parseInt(m2[1], 10); if (n2 >= 1 && n2 <= 9999) return n2; }
+    var m2 = line.match(/^(?:pagina|page|pag\.?|p\.)\s*(\d{1,3})\.?$/i);
+    if (m2) { var n2 = parseInt(m2[1], 10); if (n2 >= 1 && n2 <= 999) return n2; }
     // "5/20" or "5 di 20"
-    var m3 = line.match(/^(\d{1,4})\s*(?:\/|of|di)\s*\d{1,4}\.?$/i);
-    if (m3) { var n3 = parseInt(m3[1], 10); if (n3 >= 1 && n3 <= 9999) return n3; }
+    var m3 = line.match(/^(\d{1,3})\s*(?:\/|of|di)\s*\d{1,3}\.?$/i);
+    if (m3) { var n3 = parseInt(m3[1], 10); if (n3 >= 1 && n3 <= 999) return n3; }
   }
   return null;
 }
@@ -30601,17 +30601,21 @@ async function _ocrDetectAndSort() {
   _toast('<span style="display:inline-flex;align-items:center;gap:6px;"><span class="ocr-spinner"></span> AI sta riordinando le pagine…</span>', 0);
 
   try {
+    // Only last 150 chars per page — just the bottom few lines, avoids citations/years
     var snippets = pages.map(function(p, i) {
-      return 'PAGINA_' + (i + 1) + ':\n' + p.text.slice(-300);
-    }).join('\n\n---\n\n');
+      var tail = p.text.replace(/\*+|_+|#+/g, ' ').slice(-150).trim();
+      // Keep only the last 4 non-empty lines
+      var lines = tail.split('\n').map(function(l){ return l.trim(); }).filter(Boolean).slice(-4).join('\n');
+      return 'P' + (i + 1) + ':\n' + lines;
+    }).join('\n---\n');
 
-    var sys = 'Sei un assistente per documenti scansionati. ' +
-      'Ti mostro la fine del testo OCR di ogni pagina. ' +
-      'Il numero di pagina è il numeretto stampato in fondo ad ogni pagina (footer). ' +
-      'Rispondi SOLO con un array JSON valido, es: [36,37,null,39]. ' +
-      'Mantieni l\'ordine delle pagine come ti sono state date. Nessun testo aggiuntivo.';
+    var sys = 'You analyze the last few lines of OCR text from each scanned document page. ' +
+      'The page number is a SINGLE integer printed ALONE on the very last line of the page (footer). ' +
+      'It is NOT a number inside a sentence, citation, year, or case reference. ' +
+      'Reply ONLY with a valid JSON array of integers in order: [3,4,5,null,7]. ' +
+      'Use null if the last line is not a standalone integer. Max page number: 999. No extra text.';
 
-    var raw = await callGemini(sys, [{ role: 'user', parts: [{ text: snippets }] }], 512);
+    var raw = await callGemini(sys, [{ role: 'user', parts: [{ text: snippets }] }], 256);
     var match = raw.match(/\[[\s\S]*?\]/);
     if (!match) throw new Error('No JSON array');
     var nums = JSON.parse(match[0]);
@@ -30620,7 +30624,7 @@ async function _ocrDetectAndSort() {
     var validCount = 0;
     pages.forEach(function(p, i) {
       var n = typeof nums[i] === 'number' ? Math.round(nums[i]) : null;
-      p._aiPageNum = (n && n >= 1 && n <= 9999) ? n : null;
+      p._aiPageNum = (n && n >= 1 && n <= 999) ? n : null;
       if (p._aiPageNum) validCount++;
     });
 
