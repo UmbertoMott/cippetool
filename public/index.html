@@ -30585,16 +30585,36 @@ function _ocrAutoReorderByPrintedNumber() {
   return validCount;
 }
 
-// Read footer page number directly from the original IMAGE (not OCR text)
-// Image has physical layout — footer is always at bottom. Text (Markdown) can reorder elements.
+// Crop bottom 15% of image — contains ONLY the footer strip (page number area)
+function _ocrCropFooterStrip(file, cb) {
+  var url = URL.createObjectURL(file);
+  var img = new Image();
+  img.onload = function() {
+    URL.revokeObjectURL(url);
+    var w = img.naturalWidth, h = img.naturalHeight;
+    var stripH = Math.max(80, Math.round(h * 0.15));
+    var cv = document.createElement('canvas');
+    cv.width = w; cv.height = stripH;
+    cv.getContext('2d').drawImage(img, 0, h - stripH, w, stripH, 0, 0, w, stripH);
+    cv.toBlob(function(blob) {
+      var reader = new FileReader();
+      reader.onload = function(e) { cb(e.target.result.split(',')[1], 'image/jpeg'); };
+      reader.readAsDataURL(blob);
+    }, 'image/jpeg', 0.92);
+  };
+  img.onerror = function() { URL.revokeObjectURL(url); cb(null, null); };
+  img.src = url;
+}
+
+// Read footer page number from the CROPPED BOTTOM STRIP — no body text visible
 function _ocrGetFooterNumFromImage(page) {
   return new Promise(function(resolve) {
-    // PDF or no file → fall back to text regex
     if (!page._file || !page._file.type.startsWith('image/')) {
       resolve(_ocrDetectPrintedPageNumber(page.text));
       return;
     }
-    _ocrResizeAndEncode(page._file, 900, 0.85, function(b64, mime) {
+    _ocrCropFooterStrip(page._file, function(b64, mime) {
+      if (!b64) { resolve(_ocrDetectPrintedPageNumber(page.text)); return; }
       fetch('/api/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -30602,7 +30622,7 @@ function _ocrGetFooterNumFromImage(page) {
           model: 'gemini-2.0-flash-lite-001',
           contents: [{ role: 'user', parts: [
             { inlineData: { mimeType: mime, data: b64 } },
-            { text: 'Look ONLY at the very bottom of this document page image (the footer area). What is the page number printed there as a standalone number? Reply with ONLY the integer. If no isolated page number is visible at the bottom, reply: null' }
+            { text: 'This is the bottom footer strip of a document page. What is the page number? Reply with ONLY the integer. If no number: null' }
           ]}],
           generationConfig: { temperature: 0, maxOutputTokens: 8 }
         })
@@ -30614,10 +30634,13 @@ function _ocrGetFooterNumFromImage(page) {
           .map(function(x){ return x.text || ''; }).join('').trim();
         var n = parseInt(txt, 10);
         var result = (!isNaN(n) && n >= 1 && n <= 999) ? n : null;
-        console.log('[OCR-SORT] img detection "' + page.fileName + '" → raw:"' + txt + '" → num:' + result);
+        console.log('[OCR-SORT] footer strip "' + page.fileName + '" → "' + txt + '" → ' + result);
         resolve(result);
       })
-      .catch(function(e){ console.warn('[OCR-SORT] img err:', e.message); resolve(null); });
+      .catch(function(e) {
+        console.warn('[OCR-SORT] err:', e.message);
+        resolve(_ocrDetectPrintedPageNumber(page.text));
+      });
     });
   });
 }
