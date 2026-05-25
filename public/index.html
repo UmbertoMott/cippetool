@@ -2877,6 +2877,7 @@ body.agent-open.esb-open #eapHamburgerOuter { right:388px; }
 .lang-btn.active{background:var(--acc);color:white;box-shadow:0 1px 6px rgba(167,139,250,0.4)}
 .lang-btn:hover:not(.active){color:var(--txt)}
 body.theme-light .lang-btn:not(.active){color:#0f0f0e}
+#screenLanding .lang-btn:not(.active){color:rgba(255,255,255,0.75)}
 #hlToolbar{display:none;position:fixed;z-index:600;background:#1a1a22;border:1px solid #2e2e3e;border-radius:10px;padding:5px 8px;gap:6px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,0.5)}
 #hlToolbar.show{display:flex}
 .hl-btn{width:26px;height:26px;border-radius:6px;border:2px solid transparent;cursor:pointer;transition:transform 0.1s,border-color 0.1s;flex-shrink:0}
@@ -7100,9 +7101,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <a class="ld-nav-link" href="#reviews" data-i18n="ld_nav_reviews">Recensioni</a>
   </div>
   <div class="ld-nav-cta">
-    <div style="display:flex;gap:2px;align-items:center">
-      <button class="lang-btn" data-lang="it" onclick="setLang('it')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;cursor:pointer;">IT</button>
-      <button class="lang-btn" data-lang="en" onclick="setLang('en')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;cursor:pointer;">EN</button>
+    <div class="lang-toggle" id="ldLangToggle">
+      <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
     </div>
     <button id="themeToggleBtnLanding" onclick="toggleTheme()" title="Cambia tema" style="
       background:none;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.8);
