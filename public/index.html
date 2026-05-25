@@ -6962,7 +6962,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
 <div class="settings-panel" id="settingsPanel">
   <div class="settings-header">
-    <h2>Impostazioni</h2>
+    <h2 data-i18n="settings_title">Impostazioni</h2>
     <button class="settings-close" onclick="closeSettings()">✕</button>
   </div>
   <div class="settings-body">
@@ -7093,10 +7093,10 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="ld-logo-text">PassIapp</span>
   </div>
   <div class="ld-nav-links">
-    <a class="ld-nav-link" href="#features">Funzionalità</a>
-    <a class="ld-nav-link" href="#workflow">Come funziona</a>
-    <a class="ld-nav-link" href="#pricing">Piani</a>
-    <a class="ld-nav-link" href="#reviews">Recensioni</a>
+    <a class="ld-nav-link" href="#features" data-i18n="ld_nav_features">Funzionalità</a>
+    <a class="ld-nav-link" href="#workflow" data-i18n="ld_nav_workflow">Come funziona</a>
+    <a class="ld-nav-link" href="#pricing" data-i18n="ld_nav_pricing">Piani</a>
+    <a class="ld-nav-link" href="#reviews" data-i18n="ld_nav_reviews">Recensioni</a>
   </div>
   <div class="ld-nav-cta">
     <div style="display:flex;gap:2px;align-items:center">
@@ -7118,13 +7118,13 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="ld-hero-glow"></div>
   <div class="ld-hero-badge">
     <div class="ld-hero-badge-dot"></div>
-    800+ quesiti · AI 24/7 · Certificazione IAPP
+    <span data-i18n="ld_hero_badge">800+ quesiti · AI 24/7 · Certificazione IAPP</span>
   </div>
-  <h1 class="ld-hero-h1">Privacy law,<br><em>senza limiti.</em></h1>
-  <p class="ld-hero-sub">La piattaforma di studio più avanzata per la certificazione CIPP/E — con quiz intelligenti, AI tutor e analytics in tempo reale.</p>
+  <h1 class="ld-hero-h1" data-i18n-html="ld_hero_h1">Privacy law,<br><em>senza limiti.</em></h1>
+  <p class="ld-hero-sub" data-i18n="ld_hero_sub">La piattaforma di studio più avanzata per la certificazione CIPP/E — con quiz intelligenti, AI tutor e analytics in tempo reale.</p>
   <div class="ld-hero-actions">
-    <button class="ld-btn-primary" onclick="showScreen('screenLogin')">Inizia la preparazione →</button>
-    <button class="ld-btn-outline" onclick="showScreen('screenLogin')">Vedi una demo</button>
+    <button class="ld-btn-primary" onclick="showScreen('screenLogin')" data-i18n="ld_hero_cta">Inizia la preparazione →</button>
+    <button class="ld-btn-outline" onclick="showScreen('screenLogin')" data-i18n="ld_hero_demo">Vedi una demo</button>
   </div>
   <!-- App preview -->
   <div class="ld-hero-visual">
@@ -7159,7 +7159,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- SOCIAL PROOF -->
 <section class="ld-proof">
-  <span class="ld-proof-label">Già scelto da privacy professionals in tutta Europa</span>
+  <span class="ld-proof-label" data-i18n="ld_proof_label">Già scelto da privacy professionals in tutta Europa</span>
   <div class="ld-proof-logos">
     <span class="ld-proof-logo">DPO Network</span>
     <div class="ld-proof-divider"></div>
@@ -7174,22 +7174,22 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="ld-proof-stats">
     <div class="ld-stat">
       <span class="ld-stat-n">800+</span>
-      <span class="ld-stat-l">Quesiti CIPP/E</span>
+      <span class="ld-stat-l" data-i18n="ld_stat_questions">Quesiti CIPP/E</span>
     </div>
     <div class="ld-stat-sep"></div>
     <div class="ld-stat">
       <span class="ld-stat-n">94%</span>
-      <span class="ld-stat-l">Tasso di superamento</span>
+      <span class="ld-stat-l" data-i18n="ld_stat_pass">Tasso di superamento</span>
     </div>
     <div class="ld-stat-sep"></div>
     <div class="ld-stat">
       <span class="ld-stat-n">40+</span>
-      <span class="ld-stat-l">Normative coperte</span>
+      <span class="ld-stat-l" data-i18n="ld_stat_norms">Normative coperte</span>
     </div>
     <div class="ld-stat-sep"></div>
     <div class="ld-stat">
       <span class="ld-stat-n">24/7</span>
-      <span class="ld-stat-l">AI Tutor attivo</span>
+      <span class="ld-stat-l" data-i18n="ld_stat_ai">AI Tutor attivo</span>
     </div>
   </div>
 </section>
@@ -7198,45 +7198,45 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="ld-features" id="features">
   <div class="ld-features-inner">
     <div class="ld-section-header">
-      <span class="ld-section-eyebrow">Funzionalità</span>
-      <h2 class="ld-section-h2">Tutto ciò che serve per<br>ottenere la certificazione.</h2>
-      <p class="ld-section-sub">Dall'apprendimento adattivo all'AI tutor specializzato in diritto europeo della privacy.</p>
+      <span class="ld-section-eyebrow" data-i18n="ld_feat_eyebrow">Funzionalità</span>
+      <h2 class="ld-section-h2" data-i18n-html="ld_feat_h2">Tutto ciò che serve per<br>ottenere la certificazione.</h2>
+      <p class="ld-section-sub" data-i18n="ld_feat_sub">Dall'apprendimento adattivo all'AI tutor specializzato in diritto europeo della privacy.</p>
     </div>
     <div class="ld-feat-grid">
       <div class="ld-feat-card">
         <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
-        <h3 class="ld-feat-h3">Quiz Engine Adattivo</h3>
-        <p class="ld-feat-p">800+ quesiti aggiornati al curriculum IAPP 2024. Il sistema seleziona le domande in base alle tue lacune per massimizzare l'efficienza di studio.</p>
+        <h3 class="ld-feat-h3" data-i18n="ld_feat1_h3">Quiz Engine Adattivo</h3>
+        <p class="ld-feat-p" data-i18n="ld_feat1_p">800+ quesiti aggiornati al curriculum IAPP 2024. Il sistema seleziona le domande in base alle tue lacune per massimizzare l'efficienza di studio.</p>
         <span class="ld-feat-tag">GDPR · EU AI Act · IAPP</span>
       </div>
       <div class="ld-feat-card">
         <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-        <h3 class="ld-feat-h3">AI Tutor Specializzato</h3>
-        <p class="ld-feat-p">Chiedi spiegazioni su qualsiasi norma — GDPR, EU AI Act, trasferimenti internazionali — e ricevi risposte da un docente universitario di diritto europeo.</p>
+        <h3 class="ld-feat-h3" data-i18n="ld_feat2_h3">AI Tutor Specializzato</h3>
+        <p class="ld-feat-p" data-i18n="ld_feat2_p">Chiedi spiegazioni su qualsiasi norma — GDPR, EU AI Act, trasferimenti internazionali — e ricevi risposte da un docente universitario di diritto europeo.</p>
         <span class="ld-feat-tag">Gemini · Knowledge Base</span>
       </div>
       <div class="ld-feat-card">
         <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-        <h3 class="ld-feat-h3">Analytics in Tempo Reale</h3>
-        <p class="ld-feat-p">Dashboard con score per categoria, andamento storico e stima IAPP. Identifica esattamente dove concentrare lo studio prima dell'esame.</p>
+        <h3 class="ld-feat-h3" data-i18n="ld_feat3_h3">Analytics in Tempo Reale</h3>
+        <p class="ld-feat-p" data-i18n="ld_feat3_p">Dashboard con score per categoria, andamento storico e stima IAPP. Identifica esattamente dove concentrare lo studio prima dell'esame.</p>
         <span class="ld-feat-tag">Score · Trend · Stima</span>
       </div>
       <div class="ld-feat-card">
         <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></div>
-        <h3 class="ld-feat-h3">Mappa Concettuale</h3>
-        <p class="ld-feat-p">Visualizza le connessioni tra articoli GDPR, linee guida EDPB, EU AI Act e giurisprudenza. Comprendi il sistema normativo nel suo complesso.</p>
+        <h3 class="ld-feat-h3" data-i18n="ld_feat4_h3">Mappa Concettuale</h3>
+        <p class="ld-feat-p" data-i18n="ld_feat4_p">Visualizza le connessioni tra articoli GDPR, linee guida EDPB, EU AI Act e giurisprudenza. Comprendi il sistema normativo nel suo complesso.</p>
         <span class="ld-feat-tag">Interattiva · Navigabile</span>
       </div>
       <div class="ld-feat-card">
         <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
-        <h3 class="ld-feat-h3">Red Flag & Revisione</h3>
-        <p class="ld-feat-p">Segna le domande difficili per rivederle. Il pannello di revisione storico mostra ogni sessione con analisi AI integrata domanda per domanda.</p>
+        <h3 class="ld-feat-h3" data-i18n="ld_feat5_h3">Red Flag & Revisione</h3>
+        <p class="ld-feat-p" data-i18n="ld_feat5_p">Segna le domande difficili per rivederle. Il pannello di revisione storico mostra ogni sessione con analisi AI integrata domanda per domanda.</p>
         <span class="ld-feat-tag">Flag · Storico · Review</span>
       </div>
       <div class="ld-feat-card">
         <div class="ld-feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <h3 class="ld-feat-h3">Simulazione Esame Reale</h3>
-        <p class="ld-feat-p">150 minuti, 90 domande, condizioni identiche all'esame IAPP. Timer con reset di emergenza, modalità pausa e focus mode per simulare la pressione reale.</p>
+        <h3 class="ld-feat-h3" data-i18n="ld_feat6_h3">Simulazione Esame Reale</h3>
+        <p class="ld-feat-p" data-i18n="ld_feat6_p">150 minuti, 90 domande, condizioni identiche all'esame IAPP. Timer con reset di emergenza, modalità pausa e focus mode per simulare la pressione reale.</p>
         <span class="ld-feat-tag">150 min · 90 Q · IAPP</span>
       </div>
     </div>
@@ -7248,37 +7248,37 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="ld-workflow-inner">
     <div>
       <div class="ld-section-header" style="margin-bottom:36px">
-        <span class="ld-section-eyebrow">Come funziona</span>
-        <h2 class="ld-section-h2">Studia, pratica, certifìcati.</h2>
-        <p class="ld-section-sub">Un processo progettato per portarti dalla prima domanda alla certificazione CIPP/E nel tempo più breve possibile.</p>
+        <span class="ld-section-eyebrow" data-i18n="ld_how_eyebrow">Come funziona</span>
+        <h2 class="ld-section-h2" data-i18n="ld_how_h2">Studia, pratica, certifìcati.</h2>
+        <p class="ld-section-sub" data-i18n="ld_how_sub">Un processo progettato per portarti dalla prima domanda alla certificazione CIPP/E nel tempo più breve possibile.</p>
       </div>
       <div class="ld-workflow-steps">
         <div class="ld-step">
           <div class="ld-step-num">1</div>
           <div>
-            <p class="ld-step-title">Inizia con un quiz diagnostico</p>
-            <p class="ld-step-desc">90 domande selezionate per mappare le tue conoscenze su GDPR, EU AI Act, trasferimenti e diritti degli interessati.</p>
+            <p class="ld-step-title" data-i18n="ld_step1_title">Inizia con un quiz diagnostico</p>
+            <p class="ld-step-desc" data-i18n="ld_step1_desc">90 domande selezionate per mappare le tue conoscenze su GDPR, EU AI Act, trasferimenti e diritti degli interessati.</p>
           </div>
         </div>
         <div class="ld-step">
           <div class="ld-step-num">2</div>
           <div>
-            <p class="ld-step-title">Approfondisci con l'AI Tutor</p>
-            <p class="ld-step-desc">Ogni risposta sbagliata diventa un'opportunità. Chiedi spiegazioni all'AI che cita articoli, giurisprudenza e linee guida EDPB.</p>
+            <p class="ld-step-title" data-i18n="ld_step2_title">Approfondisci con l'AI Tutor</p>
+            <p class="ld-step-desc" data-i18n="ld_step2_desc">Ogni risposta sbagliata diventa un'opportunità. Chiedi spiegazioni all'AI che cita articoli, giurisprudenza e linee guida EDPB.</p>
           </div>
         </div>
         <div class="ld-step">
           <div class="ld-step-num">3</div>
           <div>
-            <p class="ld-step-title">Monitora i progressi</p>
-            <p class="ld-step-desc">La dashboard aggiorna il tuo score stimato IAPP dopo ogni sessione. Vedi esattamente quanto manca al traguardo.</p>
+            <p class="ld-step-title" data-i18n="ld_step3_title">Monitora i progressi</p>
+            <p class="ld-step-desc" data-i18n="ld_step3_desc">La dashboard aggiorna il tuo score stimato IAPP dopo ogni sessione. Vedi esattamente quanto manca al traguardo.</p>
           </div>
         </div>
         <div class="ld-step">
           <div class="ld-step-num">4</div>
           <div>
-            <p class="ld-step-title">Simula l'esame reale</p>
-            <p class="ld-step-desc">150 minuti, 90 domande, pressione autentica. Poi rivedi ogni risposta con spiegazione AI per l'ultima revisione prima del grande giorno.</p>
+            <p class="ld-step-title" data-i18n="ld_step4_title">Simula l'esame reale</p>
+            <p class="ld-step-desc" data-i18n="ld_step4_desc">150 minuti, 90 domande, pressione autentica. Poi rivedi ogni risposta con spiegazione AI per l'ultima revisione prima del grande giorno.</p>
           </div>
         </div>
       </div>
@@ -7314,15 +7314,15 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="ld-pricing" id="pricing">
   <div class="ld-pricing-inner">
     <div class="ld-section-header" style="text-align:center;align-items:center">
-      <span class="ld-section-eyebrow">Piani</span>
-      <h2 class="ld-section-h2" style="max-width:100%;text-align:center">Semplice, trasparente, efficace.</h2>
-      <p class="ld-section-sub" style="max-width:440px;text-align:center;margin:0 auto">Inizia gratis. Passa a Pro quando sei pronto per accelerare la preparazione.</p>
+      <span class="ld-section-eyebrow" data-i18n="ld_price_eyebrow">Piani</span>
+      <h2 class="ld-section-h2" style="max-width:100%;text-align:center" data-i18n="ld_price_h2">Semplice, trasparente, efficace.</h2>
+      <p class="ld-section-sub" style="max-width:440px;text-align:center;margin:0 auto" data-i18n="ld_price_sub">Inizia gratis. Passa a Pro quando sei pronto per accelerare la preparazione.</p>
     </div>
     <div class="ld-plans">
       <div class="ld-plan">
         <div class="ld-plan-name">Starter</div>
         <div class="ld-plan-price"><sup>€</sup>0</div>
-        <div class="ld-plan-price-sub">Gratis per sempre</div>
+        <div class="ld-plan-price-sub" data-i18n="ld_plan_free_forever">Gratis per sempre</div>
         <div class="ld-plan-divider"></div>
         <div class="ld-plan-features">
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon">✓</span>50 quesiti al giorno</div>
@@ -7332,13 +7332,13 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon dim">—</span>Simulazione esame</div>
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon dim">—</span>Analytics avanzate</div>
         </div>
-        <button class="ld-plan-cta secondary" onclick="showScreen('screenLogin')">Inizia gratis</button>
+        <button class="ld-plan-cta secondary" onclick="showScreen('screenLogin')" data-i18n="ld_plan_start_free">Inizia gratis</button>
       </div>
       <div class="ld-plan featured">
-        <div class="ld-plan-badge">Più scelto</div>
+        <div class="ld-plan-badge" data-i18n="ld_plan_most">Più scelto</div>
         <div class="ld-plan-name">Pro</div>
         <div class="ld-plan-price"><sup>€</sup>29</div>
-        <div class="ld-plan-price-sub">al mese · cancella quando vuoi</div>
+        <div class="ld-plan-price-sub" data-i18n="ld_plan_mo">al mese · cancella quando vuoi</div>
         <div class="ld-plan-divider"></div>
         <div class="ld-plan-features">
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon">✓</span>800+ quesiti illimitati</div>
@@ -7348,12 +7348,12 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon">✓</span>Mappa concettuale AI</div>
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon">✓</span>Tooltip normativi hover</div>
         </div>
-        <button class="ld-plan-cta primary" onclick="showScreen('screenLogin')">Inizia Pro →</button>
+        <button class="ld-plan-cta primary" onclick="showScreen('screenLogin')" data-i18n="ld_plan_start_pro">Inizia Pro →</button>
       </div>
       <div class="ld-plan">
         <div class="ld-plan-name">Team</div>
         <div class="ld-plan-price"><sup>€</sup>79</div>
-        <div class="ld-plan-price-sub">al mese · fino a 5 utenti</div>
+        <div class="ld-plan-price-sub" data-i18n="ld_plan_team_mo">al mese · fino a 5 utenti</div>
         <div class="ld-plan-divider"></div>
         <div class="ld-plan-features">
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon">✓</span>Tutto di Pro</div>
@@ -7363,7 +7363,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon">✓</span>SLA prioritario</div>
           <div class="ld-plan-feat"><span class="ld-plan-feat-icon">✓</span>Custom question sets</div>
         </div>
-        <button class="ld-plan-cta secondary" onclick="showScreen('screenLogin')">Contattaci</button>
+        <button class="ld-plan-cta secondary" onclick="showScreen('screenLogin')" data-i18n="ld_plan_contact">Contattaci</button>
       </div>
     </div>
   </div>
@@ -7373,40 +7373,40 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="ld-testi" id="reviews">
   <div class="ld-testi-inner">
     <div class="ld-section-header">
-      <span class="ld-section-eyebrow">Recensioni</span>
-      <h2 class="ld-section-h2">Chi l'ha già superato.</h2>
+      <span class="ld-section-eyebrow" data-i18n="ld_testi_eyebrow">Recensioni</span>
+      <h2 class="ld-section-h2" data-i18n="ld_testi_h2">Chi l'ha già superato.</h2>
     </div>
     <div class="ld-testi-grid">
       <div class="ld-testi-card">
         <div class="ld-testi-stars">★★★★★</div>
-        <p class="ld-testi-quote">"L'AI tutor è incredibile. Mi spiegava ogni articolo GDPR con riferimenti precisi alla giurisprudenza. Ho superato il CIPP/E al primo tentativo."</p>
+        <p class="ld-testi-quote" data-i18n="ld_testi1_quote">"L'AI tutor è incredibile. Mi spiegava ogni articolo GDPR con riferimenti precisi alla giurisprudenza. Ho superato il CIPP/E al primo tentativo."</p>
         <div class="ld-testi-author">
           <div class="ld-testi-avatar">SM</div>
           <div>
-            <div class="ld-testi-name">Sara M.</div>
-            <div class="ld-testi-role">DPO · Financial Services</div>
+            <div class="ld-testi-name" data-i18n="ld_testi1_name">Sara M.</div>
+            <div class="ld-testi-role" data-i18n="ld_testi1_role">DPO · Financial Services</div>
           </div>
         </div>
       </div>
       <div class="ld-testi-card">
         <div class="ld-testi-stars">★★★★★</div>
-        <p class="ld-testi-quote">"I tooltip sugli articoli normativi durante le spiegazioni AI sono geniali. Hover sull'Art. 35 GDPR e vedi subito il testo completo. Non ho trovato niente di simile."</p>
+        <p class="ld-testi-quote" data-i18n="ld_testi2_quote">"I tooltip sugli articoli normativi durante le spiegazioni AI sono geniali. Hover sull'Art. 35 GDPR e vedi subito il testo completo. Non ho trovato niente di simile."</p>
         <div class="ld-testi-author">
           <div class="ld-testi-avatar">LC</div>
           <div>
-            <div class="ld-testi-name">Luca C.</div>
-            <div class="ld-testi-role">Privacy Counsel · Pharma</div>
+            <div class="ld-testi-name" data-i18n="ld_testi2_name">Luca C.</div>
+            <div class="ld-testi-role" data-i18n="ld_testi2_role">Privacy Counsel · Pharma</div>
           </div>
         </div>
       </div>
       <div class="ld-testi-card">
         <div class="ld-testi-stars">★★★★★</div>
-        <p class="ld-testi-quote">"La simulazione esame con 150 minuti mi ha dato la confidence giusta. Sapevo esattamente cosa aspettarmi. In due settimane ero pronta per l'esame."</p>
+        <p class="ld-testi-quote" data-i18n="ld_testi3_quote">"La simulazione esame con 150 minuti mi ha dato la confidence giusta. Sapevo esattamente cosa aspettarmi. In due settimane ero pronta per l'esame."</p>
         <div class="ld-testi-author">
           <div class="ld-testi-avatar">AV</div>
           <div>
-            <div class="ld-testi-name">Anna V.</div>
-            <div class="ld-testi-role">Legal Analyst · Tech</div>
+            <div class="ld-testi-name" data-i18n="ld_testi3_name">Anna V.</div>
+            <div class="ld-testi-role" data-i18n="ld_testi3_role">Legal Analyst · Tech</div>
           </div>
         </div>
       </div>
@@ -7418,11 +7418,11 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="ld-cta-section">
   <div class="ld-cta-inner">
     <div class="ld-cta-glow"></div>
-    <h2 class="ld-cta-h2">Inizia la tua preparazione<br>CIPP/E oggi.</h2>
-    <p class="ld-cta-sub">800+ quesiti, AI tutor specializzato in diritto europeo della privacy, simulazione esame reale. Gratis per iniziare.</p>
+    <h2 class="ld-cta-h2" data-i18n-html="ld_cta_h2">Inizia la tua preparazione<br>CIPP/E oggi.</h2>
+    <p class="ld-cta-sub" data-i18n="ld_cta_sub">800+ quesiti, AI tutor specializzato in diritto europeo della privacy, simulazione esame reale. Gratis per iniziare.</p>
     <div class="ld-cta-actions">
-      <button class="ld-btn-primary" onclick="showScreen('screenLogin')">Inizia gratis →</button>
-      <button class="ld-btn-outline" onclick="showScreen('screenLogin')">Accedi al tuo account</button>
+      <button class="ld-btn-primary" onclick="showScreen('screenLogin')" data-i18n="ld_cta_start">Inizia gratis →</button>
+      <button class="ld-btn-outline" onclick="showScreen('screenLogin')" data-i18n="ld_cta_login">Accedi al tuo account</button>
     </div>
   </div>
 </section>
@@ -7434,10 +7434,10 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="ld-footer-copy">© 2024 CIPP/E Prep · UmbertoMottola · Powered by IAPP Curriculum</span>
   </div>
   <div class="ld-footer-links">
-    <a class="ld-footer-link" href="#features">Features</a>
-    <a class="ld-footer-link" href="#pricing">Piani</a>
-    <a class="ld-footer-link" href="#reviews">Recensioni</a>
-    <a class="ld-footer-link" onclick="showScreen('screenLogin')" style="cursor:pointer">Accedi</a>
+    <a class="ld-footer-link" href="#features" data-i18n="ld_nav_features">Features</a>
+    <a class="ld-footer-link" href="#pricing" data-i18n="ld_footer_plans">Piani</a>
+    <a class="ld-footer-link" href="#reviews" data-i18n="ld_footer_reviews">Recensioni</a>
+    <a class="ld-footer-link" onclick="showScreen('screenLogin')" style="cursor:pointer" data-i18n="ld_footer_login">Accedi</a>
   </div>
 </footer>
 
@@ -7451,7 +7451,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="login-box">
       
       <div class="login-title">Pass<span>Iapp</span></div>
-      <div class="login-sub" id="loginSub">Accedi per salvare i tuoi progressi</div>
+      <div class="login-sub" id="loginSub" data-i18n="login_sub">Accedi per salvare i tuoi progressi</div>
       <div style="font-size:11px;color:rgba(167,139,250,.4);margin-bottom:-10px"><a onclick="showScreen('screenLanding')" style="cursor:pointer;color:rgba(167,139,250,.5)">← Home</a></div>
 
       <!-- MFA verification (shown after login if MFA enabled) -->
@@ -7468,8 +7468,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <input type="text" maxlength="1" inputmode="numeric" oninput="mfaDigit(this,5)">
           </div>
           <div class="login-err" id="mfaErr"></div>
-          <button class="btn-login" onclick="verifyMfa()">Verifica →</button>
-          <div class="login-switch" style="margin-top:12px"><a onclick="cancelMfa()">← Torna al login</a></div>
+          <button class="btn-login" onclick="verifyMfa()" data-i18n="mfa_verify">Verifica →</button>
+          <div class="login-switch" style="margin-top:12px"><a onclick="cancelMfa()" data-i18n="mfa_back">← Torna al login</a></div>
         </div>
       </div>
 
@@ -7492,7 +7492,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         </div>
 
-        <div class="login-divider">oppure</div>
+        <div class="login-divider" data-i18n="login_or">oppure</div>
 
         <!-- Email/Password Form -->
         <div id="loginForm">
@@ -7547,7 +7547,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="sm-wrap">
     <div class="sm-header">
       <div class="sm-greet" id="modeGreet">Bentornato!</div>
-      <div class="sm-sub">Seleziona uno strumento per iniziare</div>
+      <div class="sm-sub" data-i18n="mode_sub">Seleziona uno strumento per iniziare</div>
     </div>
 
     <div class="sm-grid" id="modeGrid">
@@ -7558,8 +7558,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </div>
         <div class="sm-card-body">
-          <div class="sm-card-title">Quiz &amp; Training</div>
-          <div class="sm-card-desc">Simulazioni d'esame e ripasso guidato</div>
+          <div class="sm-card-title" data-i18n="quiz_title">Quiz &amp; Training</div>
+          <div class="sm-card-desc" data-i18n="quiz_desc_full">Simulazioni d'esame e ripasso guidato</div>
         </div>
       </button>
 
@@ -7569,8 +7569,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
         <div class="sm-card-body">
-          <div class="sm-card-title">Legal Research Lab</div>
-          <div class="sm-card-desc">Analisi multifonti, normativa e dottrina</div>
+          <div class="sm-card-title" data-i18n="lrl_title">Legal Research Lab</div>
+          <div class="sm-card-desc" data-i18n="lrl_desc_full">Analisi multifonti, normativa e dottrina</div>
         </div>
       </button>
 
@@ -7580,8 +7580,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
         </div>
         <div class="sm-card-body">
-          <div class="sm-card-title">AI Document Workbench</div>
-          <div class="sm-card-desc">Lettura attiva e analisi AI di documenti</div>
+          <div class="sm-card-title" data-i18n="wb_title">AI Document Workbench</div>
+          <div class="sm-card-desc" data-i18n="wb_desc_full">Lettura attiva e analisi AI di documenti</div>
         </div>
       </button>
 
@@ -7613,8 +7613,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
         </div>
         <div class="sm-card-body">
-          <div class="sm-card-title">Tabular Review</div>
-          <div class="sm-card-desc">Analisi multi-documento con colonne AI</div>
+          <div class="sm-card-title" data-i18n="tab_title">Tabular Review</div>
+          <div class="sm-card-desc" data-i18n="tab_desc">Analisi multi-documento con colonne AI</div>
         </div>
       </button>
 
@@ -7751,13 +7751,13 @@ document.addEventListener('DOMContentLoaded', function() {
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg>
             </div>
             <div>
-              <div style="font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:15px;font-weight:600;color:#0F172A;margin-bottom:4px;">Inizia una nuova sessione</div>
-              <div style="font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12.5px;color:#64748B;line-height:1.5;max-width:240px;">Scatta o carica le foto di un documento multi-pagina. L'OCR processa ogni foto e unisce il testo.</div>
+              <div style="font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:15px;font-weight:600;color:#0F172A;margin-bottom:4px;" data-i18n="ocr_start_title">Inizia una nuova sessione</div>
+              <div style="font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12.5px;color:#64748B;line-height:1.5;max-width:240px;" data-i18n="ocr_start_body">Scatta o carica le foto di un documento multi-pagina. L'OCR processa ogni foto e unisce il testo.</div>
             </div>
             <div style="display:flex;gap:8px;">
               <button onclick="document.getElementById('ocrFileInput').click()" class="ocr-btn ocr-btn-accent">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
-                Inserisci documento
+                <span data-i18n="ocr_insert">Inserisci documento</span>
               </button>
             </div>
           </div>
@@ -7796,23 +7796,23 @@ document.addEventListener('DOMContentLoaded', function() {
           <!-- mode toggle -->
           <div style="display:flex;border-radius:10px;background:rgba(17,24,39,.05);padding:3px;gap:2px;">
             <button id="ocrTabPages" onclick="ocrSetMode('pages')" style="padding:5px 10px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12px;font-weight:600;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);color:#0F172A;transition:all 120ms;display:flex;align-items:center;gap:5px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Pagine
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span data-i18n="ocr_btn_pages">Pagine</span>
             </button>
             <button id="ocrTabDoc" onclick="ocrSetMode('merged')" style="padding:5px 10px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12px;font-weight:600;background:transparent;color:#64748B;transition:all 120ms;display:flex;align-items:center;gap:5px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>Documento
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span data-i18n="ocr_btn_doc">Documento</span>
             </button>
           </div>
           <button onclick="ocrCopyText()" class="ocr-btn-sm">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copia
+            <span data-i18n="ocr_btn_copy">Copia</span>
           </button>
           <button onclick="ocrCleanText()" class="ocr-btn-sm">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l5 5M9 10l10-6 1 1-6 10M4 20l6-6M2 22l2-2"/></svg>
-            Pulisci
+            <span data-i18n="ocr_btn_clean">Pulisci</span>
           </button>
           <button onclick="ocrTogglePreview()" id="ocrPreviewBtn" class="ocr-btn-sm">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Preview
+            <span data-i18n="ocr_btn_preview">Preview</span>
           </button>
         </div>
         <!-- Page tabs strip -->
@@ -7825,8 +7825,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div style="width:52px;height:52px;border-radius:14px;background:rgba(17,24,39,.04);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 20h6M12 5v15"/></svg>
                 </div>
-                <div style="font-size:14px;font-weight:600;color:#0F172A;margin-bottom:4px;">Nessun testo ancora</div>
-                <div style="font-size:12.5px;max-width:240px;line-height:1.5;">Aggiungi foto nel pannello a sinistra. Il testo estratto apparirà qui, pagina per pagina.</div>
+                <div style="font-size:14px;font-weight:600;color:#0F172A;margin-bottom:4px;" data-i18n="ocr_no_text">Nessun testo ancora</div>
+                <div style="font-size:12.5px;max-width:240px;line-height:1.5;" data-i18n="ocr_no_text_sub">Aggiungi foto nel pannello a sinistra. Il testo estratto apparirà qui, pagina per pagina.</div>
               </div>
             </div>
             <textarea id="ocrTextarea" oninput="ocrOnTextChange()" placeholder="Il testo OCR estratto apparirà qui..." style="display:none;width:100%;height:100%;min-height:320px;border:none;outline:none;resize:none;padding:20px 26px;font-family:'JetBrains Mono','SF Mono',Menlo,monospace;font-size:13.5px;line-height:1.65;color:#0F172A;background:transparent;box-sizing:border-box;"></textarea>
@@ -7854,7 +7854,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ocr-panel" id="ocrPanelC">
         <!-- Export section -->
         <div style="padding:18px 20px 12px;flex-shrink:0;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;"><span class="ocr-label">Esporta</span></div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;"><span class="ocr-label" data-i18n="ocr_esporta">Esporta</span></div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <button onclick="ocrDoExport('docx')" id="ocrExportDocx"
               style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:rgba(17,24,39,.03);border:1px solid rgba(17,24,39,.08);cursor:pointer;opacity:.55;text-align:left;width:100%;transition:all 150ms;box-sizing:border-box;"
@@ -7885,24 +7885,24 @@ document.addEventListener('DOMContentLoaded', function() {
           <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(17,24,39,.06);display:flex;flex-direction:column;gap:8px;">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12.5px;color:#0F172A;user-select:none;">
               <div onclick="this.classList.toggle('ocr-chk-on')" class="ocr-chk ocr-chk-on"></div>
-              Separatori pagina
+              <span data-i18n="ocr_sep">Separatori pagina</span>
             </label>
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12.5px;color:#0F172A;user-select:none;">
               <div onclick="this.classList.toggle('ocr-chk-on')" class="ocr-chk ocr-chk-on"></div>
-              Intestazione data + titolo
+              <span data-i18n="ocr_header_chk">Intestazione documento</span>
             </label>
           </div>
         </div>
         <!-- History section -->
         <div style="flex:1;min-height:0;border-top:1px solid rgba(17,24,39,.06);display:flex;flex-direction:column;overflow:hidden;">
           <div style="padding:16px 20px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0;">
-            <span class="ocr-label">Storico</span>
+            <span class="ocr-label" data-i18n="ocr_history_lbl">Storico</span>
             <span id="ocrHistoryCount" style="font-size:10.5px;color:#64748B;font-family:'Inter',-apple-system,system-ui,sans-serif;margin-left:auto;"></span>
           </div>
           <div style="padding:0 16px 10px;flex-shrink:0;">
             <div style="display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;background:rgba(17,24,39,.04);border:1px solid rgba(17,24,39,.06);">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-              <input id="ocrHistorySearch" placeholder="Cerca sessioni…" oninput="ocrFilterHistory(this.value)" style="flex:1;border:none;outline:none;background:transparent;font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12px;color:#0F172A;"/>
+              <input id="ocrHistorySearch" placeholder="Cerca sessioni…" data-i18n-ph="ocr_search_hist" oninput="ocrFilterHistory(this.value)" style="flex:1;border:none;outline:none;background:transparent;font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:12px;color:#0F172A;"/>
             </div>
           </div>
           <div id="ocrHistoryList" style="flex:1;overflow:auto;padding:0 10px 12px;"></div>
@@ -23350,7 +23350,134 @@ var _i18n = {
     reg_switch_link: 'Accedi',
     mode_greet: 'Bentornato',
     ai_lang_suffix: '',
-    wbp_no_doc: 'Sessione senza documento'
+    wbp_no_doc: 'Sessione senza documento',
+    // Dashboard
+    mode_sub: 'Seleziona uno strumento per iniziare',
+    quiz_title: 'Quiz & Training',
+    quiz_desc_full: 'Simulazioni d\'esame e ripasso guidato',
+    lrl_title: 'Legal Research Lab',
+    lrl_desc_full: 'Analisi multifonti, normativa e dottrina',
+    wb_title: 'AI Document Workbench',
+    wb_desc_full: 'Lettura attiva e analisi AI di documenti',
+    tab_title: 'Tabular Review',
+    tab_desc: 'Analisi multi-documento con colonne AI',
+    settings_title: 'Impostazioni',
+    // Landing nav
+    ld_nav_features: 'Funzionalità',
+    ld_nav_workflow: 'Come funziona',
+    ld_nav_pricing: 'Piani',
+    ld_nav_reviews: 'Recensioni',
+    ld_login: 'Accedi',
+    ld_start_free: 'Inizia gratis →',
+    // Landing hero
+    ld_hero_badge: '800+ quesiti · AI 24/7 · Certificazione IAPP',
+    ld_hero_h1: 'Privacy law,<br><em>senza limiti.</em>',
+    ld_hero_sub: 'La piattaforma di studio più avanzata per la certificazione CIPP/E — con quiz intelligenti, AI tutor e analytics in tempo reale.',
+    ld_hero_cta: 'Inizia la preparazione →',
+    ld_hero_demo: 'Vedi una demo',
+    // Social proof
+    ld_proof_label: 'Già scelto da privacy professionals in tutta Europa',
+    ld_stat_questions: 'Quesiti CIPP/E',
+    ld_stat_pass: 'Tasso di superamento',
+    ld_stat_norms: 'Normative coperte',
+    ld_stat_ai: 'AI Tutor attivo',
+    // Features
+    ld_feat_eyebrow: 'Funzionalità',
+    ld_feat_h2: 'Tutto ciò che serve per<br>ottenere la certificazione.',
+    ld_feat_sub: 'Dall\'apprendimento adattivo all\'AI tutor specializzato in diritto europeo della privacy.',
+    ld_feat1_h3: 'Quiz Engine Adattivo',
+    ld_feat1_p: '800+ quesiti aggiornati al curriculum IAPP 2024. Il sistema seleziona le domande in base alle tue lacune per massimizzare l\'efficienza di studio.',
+    ld_feat2_h3: 'AI Tutor Specializzato',
+    ld_feat2_p: 'Chiedi spiegazioni su qualsiasi norma — GDPR, EU AI Act, trasferimenti internazionali — e ricevi risposte da un docente universitario di diritto europeo.',
+    ld_feat3_h3: 'Analytics in Tempo Reale',
+    ld_feat3_p: 'Dashboard con score per categoria, andamento storico e stima IAPP. Identifica esattamente dove concentrare lo studio prima dell\'esame.',
+    ld_feat4_h3: 'Mappa Concettuale',
+    ld_feat4_p: 'Visualizza le connessioni tra articoli GDPR, linee guida EDPB, EU AI Act e giurisprudenza. Comprendi il sistema normativo nel suo complesso.',
+    ld_feat5_h3: 'Red Flag & Revisione',
+    ld_feat5_p: 'Segna le domande difficili per rivederle. Il pannello di revisione storico mostra ogni sessione con analisi AI integrata domanda per domanda.',
+    ld_feat6_h3: 'Simulazione Esame Reale',
+    ld_feat6_p: '150 minuti, 90 domande, condizioni identiche all\'esame IAPP. Timer con reset di emergenza, modalità pausa e focus mode per simulare la pressione reale.',
+    // Workflow
+    ld_how_eyebrow: 'Come funziona',
+    ld_how_h2: 'Studia, pratica, certifìcati.',
+    ld_how_sub: 'Un processo progettato per portarti dalla prima domanda alla certificazione CIPP/E nel tempo più breve possibile.',
+    ld_step1_title: 'Inizia con un quiz diagnostico',
+    ld_step1_desc: '90 domande selezionate per mappare le tue conoscenze su GDPR, EU AI Act, trasferimenti e diritti degli interessati.',
+    ld_step2_title: 'Approfondisci con l\'AI Tutor',
+    ld_step2_desc: 'Ogni risposta sbagliata diventa un\'opportunità. Chiedi spiegazioni all\'AI che cita articoli, giurisprudenza e linee guida EDPB.',
+    ld_step3_title: 'Monitora i progressi',
+    ld_step3_desc: 'La dashboard aggiorna il tuo score stimato IAPP dopo ogni sessione. Vedi esattamente quanto manca al traguardo.',
+    ld_step4_title: 'Simula l\'esame reale',
+    ld_step4_desc: '150 minuti, 90 domande, pressione autentica. Poi rivedi ogni risposta con spiegazione AI per l\'ultima revisione prima del grande giorno.',
+    // Pricing
+    ld_price_eyebrow: 'Piani',
+    ld_price_h2: 'Semplice, trasparente, efficace.',
+    ld_price_sub: 'Inizia gratis. Passa a Pro quando sei pronto per accelerare la preparazione.',
+    ld_plan_free_forever: 'Gratis per sempre',
+    ld_plan_mo: 'al mese · cancella quando vuoi',
+    ld_plan_team_mo: 'al mese · fino a 5 utenti',
+    ld_plan_most: 'Più scelto',
+    ld_plan_start_free: 'Inizia gratis',
+    ld_plan_start_pro: 'Inizia Pro →',
+    ld_plan_contact: 'Contattaci',
+    // Testimonials
+    ld_testi_eyebrow: 'Recensioni',
+    ld_testi_h2: 'Chi l\'ha già superato.',
+    ld_testi1_quote: '"L\'AI tutor è incredibile. Mi spiegava ogni articolo GDPR con riferimenti precisi alla giurisprudenza. Ho superato il CIPP/E al primo tentativo."',
+    ld_testi1_name: 'Sara M.',
+    ld_testi1_role: 'DPO · Financial Services',
+    ld_testi2_quote: '"I tooltip sugli articoli normativi durante le spiegazioni AI sono geniali. Hover sull\'Art. 35 GDPR e vedi subito il testo completo. Non ho trovato niente di simile."',
+    ld_testi2_name: 'Luca C.',
+    ld_testi2_role: 'Privacy Counsel · Pharma',
+    ld_testi3_quote: '"La simulazione esame con 150 minuti mi ha dato la confidence giusta. Sapevo esattamente cosa aspettarmi. In due settimane ero pronta per l\'esame."',
+    ld_testi3_name: 'Anna V.',
+    ld_testi3_role: 'Legal Analyst · Tech',
+    // Final CTA
+    ld_cta_h2: 'Inizia la tua preparazione<br>CIPP/E oggi.',
+    ld_cta_sub: '800+ quesiti, AI tutor specializzato in diritto europeo della privacy, simulazione esame reale. Gratis per iniziare.',
+    ld_cta_start: 'Inizia gratis →',
+    ld_cta_login: 'Accedi al tuo account',
+    // Footer
+    ld_footer_plans: 'Piani',
+    ld_footer_reviews: 'Recensioni',
+    ld_footer_login: 'Accedi',
+    // Login
+    login_sub: 'Accedi per salvare i tuoi progressi',
+    login_google: 'Continua con Google',
+    login_or: 'oppure',
+    login_username_lbl: 'Username',
+    login_pass_lbl: 'Password',
+    mfa_title: 'Verifica in due fattori',
+    mfa_desc: 'Inserisci il codice a 6 cifre dalla tua app di autenticazione (es. Microsoft Authenticator)',
+    mfa_verify: 'Verifica →',
+    mfa_back: '← Torna al login',
+    // Register
+    reg_username_lbl: 'Username',
+    reg_name_lbl: 'Nome (opzionale)',
+    reg_pass_lbl: 'Password',
+    // OCR
+    ocr_page_prefix: 'Pagina ',
+    ocr_btn_pages: 'Pagine',
+    ocr_btn_doc: 'Documento',
+    ocr_btn_copy: 'Copia',
+    ocr_btn_clean: 'Pulisci',
+    ocr_btn_preview: 'Preview',
+    ocr_export_word: 'Scarica Word, editabile',
+    ocr_export_pdf: 'Scarica PDF pronto stampa',
+    ocr_sep: 'Separatori pagina',
+    ocr_header_chk: 'Intestazione documento',
+    ocr_history_lbl: 'Storico',
+    ocr_search_hist: 'Cerca sessioni…',
+    ocr_no_text: 'Nessun testo ancora',
+    ocr_no_text_sub: 'Aggiungi foto nel pannello a sinistra. Il testo estratto apparirà qui, pagina per pagina.',
+    ocr_insert: 'Inserisci documento',
+    ocr_start_title: 'Inizia una nuova sessione',
+    ocr_start_body: 'Scatta o carica le foto di un documento multi-pagina.<br>L\'OCR processa ogni foto e unisce il testo.',
+    ocr_new_session: 'Nuova sessione OCR',
+    ocr_header_sub: 'Documenti multi-foto',
+    ocr_saved: '✓ Sessione salvata',
+    ocr_reordering: 'AI sta riordinando le pagine…',
+    ocr_esporta: 'Esporta',
   },
   en: {
     logout: 'Logout',
@@ -23387,7 +23514,134 @@ var _i18n = {
     reg_switch_link: 'Sign in',
     mode_greet: 'Welcome back',
     ai_lang_suffix: '\n\nRespond entirely in English.',
-    wbp_no_doc: 'Session without document'
+    wbp_no_doc: 'Session without document',
+    // Dashboard
+    mode_sub: 'Select a tool to get started',
+    quiz_title: 'Quiz & Training',
+    quiz_desc_full: 'Exam simulations and guided review',
+    lrl_title: 'Legal Research Lab',
+    lrl_desc_full: 'Multi-source research, regulatory and doctrinal analysis',
+    wb_title: 'AI Document Workbench',
+    wb_desc_full: 'Active reading and AI document analysis',
+    tab_title: 'Tabular Review',
+    tab_desc: 'Multi-document analysis with AI columns',
+    settings_title: 'Settings',
+    // Landing nav
+    ld_nav_features: 'Features',
+    ld_nav_workflow: 'How it works',
+    ld_nav_pricing: 'Pricing',
+    ld_nav_reviews: 'Reviews',
+    ld_login: 'Sign in',
+    ld_start_free: 'Start free →',
+    // Landing hero
+    ld_hero_badge: '800+ questions · AI 24/7 · IAPP Certification',
+    ld_hero_h1: 'Privacy law,<br><em>without limits.</em>',
+    ld_hero_sub: 'The most advanced study platform for CIPP/E certification — with smart quizzes, AI tutor and real-time analytics.',
+    ld_hero_cta: 'Start preparing →',
+    ld_hero_demo: 'See a demo',
+    // Social proof
+    ld_proof_label: 'Already chosen by privacy professionals across Europe',
+    ld_stat_questions: 'CIPP/E questions',
+    ld_stat_pass: 'Pass rate',
+    ld_stat_norms: 'Regulations covered',
+    ld_stat_ai: 'AI Tutor active',
+    // Features
+    ld_feat_eyebrow: 'Features',
+    ld_feat_h2: 'Everything you need<br>to get certified.',
+    ld_feat_sub: 'From adaptive learning to an AI tutor specialised in European privacy law.',
+    ld_feat1_h3: 'Adaptive Quiz Engine',
+    ld_feat1_p: '800+ questions updated to the IAPP 2024 curriculum. The system selects questions based on your gaps to maximise study efficiency.',
+    ld_feat2_h3: 'Specialised AI Tutor',
+    ld_feat2_p: 'Ask for explanations on any regulation — GDPR, EU AI Act, international transfers — and receive answers from a university-level European privacy law lecturer.',
+    ld_feat3_h3: 'Real-Time Analytics',
+    ld_feat3_p: 'Dashboard with category scores, historical trends and IAPP score estimate. Identify exactly where to focus your study before the exam.',
+    ld_feat4_h3: 'Concept Map',
+    ld_feat4_p: 'Visualise the connections between GDPR articles, EDPB guidelines, EU AI Act and case law. Understand the regulatory system as a whole.',
+    ld_feat5_h3: 'Red Flag & Review',
+    ld_feat5_p: 'Flag difficult questions to review later. The historical review panel shows each session with integrated AI analysis question by question.',
+    ld_feat6_h3: 'Real Exam Simulation',
+    ld_feat6_p: '150 minutes, 90 questions, identical conditions to the IAPP exam. Emergency-reset timer, pause mode and focus mode to simulate real pressure.',
+    // Workflow
+    ld_how_eyebrow: 'How it works',
+    ld_how_h2: 'Study, practise, certify.',
+    ld_how_sub: 'A process designed to take you from the first question to CIPP/E certification in the shortest possible time.',
+    ld_step1_title: 'Start with a diagnostic quiz',
+    ld_step1_desc: '90 questions selected to map your knowledge of GDPR, EU AI Act, transfers and data subject rights.',
+    ld_step2_title: 'Go deeper with the AI Tutor',
+    ld_step2_desc: 'Every wrong answer becomes an opportunity. Ask the AI for explanations that cite articles, case law and EDPB guidelines.',
+    ld_step3_title: 'Track your progress',
+    ld_step3_desc: 'The dashboard updates your estimated IAPP score after each session. See exactly how far you are from the goal.',
+    ld_step4_title: 'Simulate the real exam',
+    ld_step4_desc: '150 minutes, 90 questions, authentic pressure. Then review every answer with AI explanation for the final revision before the big day.',
+    // Pricing
+    ld_price_eyebrow: 'Pricing',
+    ld_price_h2: 'Simple, transparent, effective.',
+    ld_price_sub: 'Start free. Upgrade to Pro when you\'re ready to accelerate your preparation.',
+    ld_plan_free_forever: 'Free forever',
+    ld_plan_mo: 'per month · cancel anytime',
+    ld_plan_team_mo: 'per month · up to 5 users',
+    ld_plan_most: 'Most popular',
+    ld_plan_start_free: 'Start free',
+    ld_plan_start_pro: 'Start Pro →',
+    ld_plan_contact: 'Contact us',
+    // Testimonials
+    ld_testi_eyebrow: 'Reviews',
+    ld_testi_h2: 'Those who\'ve already passed.',
+    ld_testi1_quote: '"The AI tutor is incredible. It explained every GDPR article with precise references to case law. I passed CIPP/E on my first attempt."',
+    ld_testi1_name: 'Sara M.',
+    ld_testi1_role: 'DPO · Financial Services',
+    ld_testi2_quote: '"The regulatory article tooltips during AI explanations are brilliant. Hover over Art. 35 GDPR and you instantly see the full text. I haven\'t found anything like it."',
+    ld_testi2_name: 'Luca C.',
+    ld_testi2_role: 'Privacy Counsel · Pharma',
+    ld_testi3_quote: '"The 150-minute exam simulation gave me just the right confidence. I knew exactly what to expect. In two weeks I was ready for the exam."',
+    ld_testi3_name: 'Anna V.',
+    ld_testi3_role: 'Legal Analyst · Tech',
+    // Final CTA
+    ld_cta_h2: 'Start your CIPP/E<br>preparation today.',
+    ld_cta_sub: '800+ questions, AI tutor specialised in European privacy law, real exam simulation. Free to start.',
+    ld_cta_start: 'Start free →',
+    ld_cta_login: 'Sign in to your account',
+    // Footer
+    ld_footer_plans: 'Pricing',
+    ld_footer_reviews: 'Reviews',
+    ld_footer_login: 'Sign in',
+    // Login
+    login_sub: 'Sign in to save your progress',
+    login_google: 'Continue with Google',
+    login_or: 'or',
+    login_username_lbl: 'Username',
+    login_pass_lbl: 'Password',
+    mfa_title: 'Two-factor verification',
+    mfa_desc: 'Enter the 6-digit code from your authenticator app (e.g. Microsoft Authenticator)',
+    mfa_verify: 'Verify →',
+    mfa_back: '← Back to login',
+    // Register
+    reg_username_lbl: 'Username',
+    reg_name_lbl: 'Name (optional)',
+    reg_pass_lbl: 'Password',
+    // OCR
+    ocr_page_prefix: 'Page ',
+    ocr_btn_pages: 'Pages',
+    ocr_btn_doc: 'Document',
+    ocr_btn_copy: 'Copy',
+    ocr_btn_clean: 'Clean',
+    ocr_btn_preview: 'Preview',
+    ocr_export_word: 'Download Word, editable',
+    ocr_export_pdf: 'Download print-ready PDF',
+    ocr_sep: 'Page separators',
+    ocr_header_chk: 'Document header',
+    ocr_history_lbl: 'History',
+    ocr_search_hist: 'Search sessions…',
+    ocr_no_text: 'No text yet',
+    ocr_no_text_sub: 'Add photos in the left panel. Extracted text will appear here, page by page.',
+    ocr_insert: 'Insert document',
+    ocr_start_title: 'Start a new session',
+    ocr_start_body: 'Take or upload photos of a multi-page document.<br>OCR processes each photo and joins the text.',
+    ocr_new_session: 'New OCR session',
+    ocr_header_sub: 'Multi-photo documents',
+    ocr_saved: '✓ Session saved',
+    ocr_reordering: 'AI is reordering pages…',
+    ocr_esporta: 'Export',
   }
 };
 
@@ -30400,7 +30654,7 @@ window.ocrOpenLightbox = function(pageId) {
   lb.innerHTML = '<div onclick="event.stopPropagation()" style="display:flex;gap:16px;max-width:100%;max-height:100%;font-family:Geist,-apple-system,system-ui,sans-serif;flex-wrap:wrap;justify-content:center;">' +
     '<div style="width:360px;height:480px;border-radius:16px;overflow:hidden;' + thumbBg + ';box-shadow:0 30px 80px rgba(0,0,0,.4);position:relative;flex-shrink:0;">' +
       svgStripes +
-      '<div style="position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);font-size:11px;font-weight:700;color:#111;">Pagina ' + p.page_number + '</div>' +
+      '<div style="position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);font-size:11px;font-weight:700;color:#111;">' + t('ocr_page_prefix') + p.page_number + '</div>' +
     '</div>' +
     '<div style="width:340px;max-height:480px;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);box-shadow:0 30px 80px rgba(0,0,0,.3);display:flex;flex-direction:column;flex-shrink:0;">' +
       '<div style="padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">' +
@@ -30655,9 +30909,9 @@ async function _ocrDetectAndSort() {
   }
 
   var pages = _ocrPages.filter(function(p){ return p.status === 'done'; });
-  if (pages.length < 2) { _toast('✓ Sessione salvata', 4000); return; }
+  if (pages.length < 2) { _toast(t('ocr_saved'), 4000); return; }
 
-  _toast('<span style="display:inline-flex;align-items:center;gap:6px;"><span class="ocr-spinner"></span> AI sta riordinando le pagine…</span>', 0);
+  _toast('<span style="display:inline-flex;align-items:center;gap:6px;"><span class="ocr-spinner"></span> ' + t('ocr_reordering') + '</span>', 0);
 
   try {
     // Run all image detections in parallel — wait for ALL before sorting
@@ -30929,7 +31183,7 @@ function _ocrRenderEditor() {
       dp.forEach(function(p) {
         var btn = document.createElement('button'), isA = ap && p.id === ap.id;
         btn.style.cssText = 'padding:7px 12px 9px;border:none;cursor:pointer;background:transparent;font-family:Geist,-apple-system,system-ui,sans-serif;font-size:12.5px;font-weight:600;white-space:nowrap;margin-bottom:-1px;color:' + (isA ? '#4F46E5' : '#64748B') + ';border-bottom:' + (isA ? '2px solid #4F46E5' : '2px solid transparent') + ';';
-        btn.textContent = 'Pagina ' + p.page_number;
+        btn.textContent = t('ocr_page_prefix') + p.page_number;
         (function(pid) { btn.addEventListener('click', function() { _ocrActivePageId = pid; _ocrRenderEditor(); }); })(p.id);
         pt.appendChild(btn);
       });
@@ -30937,7 +31191,7 @@ function _ocrRenderEditor() {
   }
   if (ta) {
     if (_ocrMode === 'pages') { var ap2 = dp.find(function(p) { return p.id === _ocrActivePageId; }) || dp[0]; ta.value = ap2 ? ap2.text : ''; }
-    else ta.value = dp.map(function(p) { return '--- Pagina ' + p.page_number + ' ---\n' + p.text; }).join('\n\n');
+    else ta.value = dp.map(function(p) { return '--- ' + t('ocr_page_prefix') + p.page_number + ' ---\n' + p.text; }).join('\n\n');
   }
   if (mm) { mm.style.display = dp.length >= 2 ? 'flex' : 'none'; if (dp.length >= 2) _ocrRenderMinimap(); }
   /* refresh preview if open */
