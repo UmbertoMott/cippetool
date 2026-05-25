@@ -8319,7 +8319,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="wb-tools" id="wbToolsPanel">
     <div class="wb-tools-topbar">
       <span class="wb-tools-label">Step 03 · AI Analysis &amp; Tools</span>
-      <span class="wb-tools-ctx" id="wbCtxLabel">Contesto: <span>nessuno</span></span>
+      <span class="wb-tools-ctx" id="wbCtxLabel"><span data-i18n="wb_ctx_label_prefix">Contesto:</span> <span id="wbCtxVal" data-i18n="wb_ctx_none">nessuno</span></span>
       <button id="wbCollapseToolsBtn" onclick="wbToggleToolsCollapse()" title="Comprimi/espandi tool">⊟</button>
     </div>
     <div class="wb-tools-scroll" id="wbToolsScroll">
@@ -10197,11 +10197,11 @@ async function showDashboard(){
       const qnNum = sess.quizNum || 0;
       html += `<div class="hist-item" onclick="resumeExam(${qnNum})" style="border:2px solid var(--acc);background:rgba(139,92,246,0.07);cursor:pointer;margin-bottom:6px">
         <div style="width:100%">
-          <div style="font-size:11px;color:var(--acc);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">⏱ Esame in corso${qn} — salvato</div>
-          <div class="hist-name" style="font-weight:600">Domanda ${sess.current+1} di 90 · ${ans} risposte date</div>
+          <div style="font-size:11px;color:var(--acc);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">⏱ ${t('quiz_in_progress')}${qn} — ${t('quiz_saved_lbl')}</div>
+          <div class="hist-name" style="font-weight:600">${t('quiz_question_lbl')} ${sess.current+1} ${t('quiz_of_lbl')} 90 · ${ans} ${_lang==='en'?'answers given':'risposte date'}</div>
           <div style="margin-top:8px;display:flex;gap:8px">
-            <button onclick="event.stopPropagation();resumeExam(${qnNum})" style="background:var(--acc);color:white;border:none;border-radius:8px;padding:8px 18px;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;cursor:pointer">▶ Riprendi esame</button>
-            <button onclick="event.stopPropagation();abandonExam(${qnNum})" style="background:transparent;color:var(--err);border:1px solid var(--err);border-radius:8px;padding:8px 14px;font-family:'Inter',sans-serif;font-weight:600;font-size:12px;cursor:pointer">✕ Abbandona</button>
+            <button onclick="event.stopPropagation();resumeExam(${qnNum})" style="background:var(--acc);color:white;border:none;border-radius:8px;padding:8px 18px;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;cursor:pointer">${t('quiz_resume_exam')}</button>
+            <button onclick="event.stopPropagation();abandonExam(${qnNum})" style="background:transparent;color:var(--err);border:1px solid var(--err);border-radius:8px;padding:8px 14px;font-family:'Inter',sans-serif;font-weight:600;font-size:12px;cursor:pointer">${t('quiz_abandon')}</button>
           </div>
         </div>
       </div>`;
@@ -10222,7 +10222,7 @@ async function showDashboard(){
             font-family:inherit;letter-spacing:0.4px;transition:all .15s"
             onmouseover="this.style.background='rgba(124,58,237,0.28)'"
             onmouseout="this.style.background='rgba(124,58,237,0.13)'">
-            Rivedi domande & spiega AI</button>
+            ${t('quiz_review')}</button>
         </div>`;
       }
     });
@@ -10463,7 +10463,7 @@ function renderQ(){
   // Fallback: se il domain non è in DOMAIN_INFO (es. topic string) usa "1"
   const di = DOMAIN_INFO[dc] || DOMAIN_INFO['1'];
 
-  document.getElementById('progText').textContent=`Quiz #${exam.examNum||exam._quizNum||1} · Domanda ${exam.current+1} di ${exam.questions.length}`;
+  document.getElementById('progText').textContent=`Quiz #${exam.examNum||exam._quizNum||1} · ${t('quiz_question_lbl')} ${exam.current+1} ${t('quiz_of_lbl')} ${exam.questions.length}`;
   document.getElementById('progFill').style.width=pct+'%';
 
   let html=`<div class="q-card ${di.cls}">
@@ -23494,6 +23494,13 @@ var _i18n = {
     quiz_bank_title: 'Banca Dati Quiz',
     quiz_resume_btn_lbl: '▶ Riprendi Quiz in corso',
     quiz_no_exams: 'Nessun esame ancora. Inizia il primo!',
+    quiz_in_progress: 'Esame in corso',
+    quiz_saved_lbl: 'salvato',
+    quiz_resume_exam: '▶ Riprendi esame',
+    quiz_abandon: '✕ Abbandona',
+    quiz_review: 'Rivedi domande & spiega AI',
+    quiz_question_lbl: 'Domanda',
+    quiz_of_lbl: 'di',
     // Prof. Lex JS
     prof_idle: 'In attesa…',
     prof_listening: 'In ascolto…',
@@ -23517,6 +23524,7 @@ var _i18n = {
     wb_block_map: 'Mappa blocchi',
     wb_doc_placeholder: 'Il documento apparirà qui dopo il caricamento',
     wb_find_discrimen: 'Trova il Discrimen',
+    wb_ctx_label_prefix: 'Contesto:',
     wb_ctx_none: 'nessuno',
     wb_ctx_select: 'Seleziona una sezione',
     wb_genera: '▶ GENERA',
@@ -23752,6 +23760,13 @@ var _i18n = {
     quiz_bank_title: 'Quiz Question Bank',
     quiz_resume_btn_lbl: '▶ Resume Quiz in progress',
     quiz_no_exams: 'No exams yet. Start your first one!',
+    quiz_in_progress: 'Exam in progress',
+    quiz_saved_lbl: 'saved',
+    quiz_resume_exam: '▶ Resume exam',
+    quiz_abandon: '✕ Abandon',
+    quiz_review: 'Review questions & AI explain',
+    quiz_question_lbl: 'Question',
+    quiz_of_lbl: 'of',
     // Prof. Lex JS
     prof_idle: 'Waiting…',
     prof_listening: 'Listening…',
@@ -23775,6 +23790,7 @@ var _i18n = {
     wb_block_map: 'Block map',
     wb_doc_placeholder: 'The document will appear here after upload',
     wb_find_discrimen: 'Find the Discrimen',
+    wb_ctx_label_prefix: 'Context:',
     wb_ctx_none: 'none',
     wb_ctx_select: 'Select a section',
     wb_genera: '▶ GENERATE',
