@@ -13360,7 +13360,7 @@ async function rlSend() {
     var raw = await _llcBackendGemini({
       model: model,
       deepThink: _rl.deepThink,
-      system_instruction: { parts: [{ text: sys }] },
+      system_instruction: { parts: [{ text: sys + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] },
       contents: contentsArr,
       generationConfig: { maxOutputTokens: _rl.deepThink ? 8192 : 4096, temperature: _rl.deepThink ? 0.2 : 0.1 }
     });
@@ -15863,7 +15863,7 @@ function _llcBuildDocSysPrompt(docType, docTitle, docText) {
 // ── Gemini call with low temperature for precision (DocAI Q&A) ───────────────
 async function llcGeminiPrecision(systemPrompt, userContent, maxTokens) {
   return _llcBackendGemini({
-    system_instruction: { parts: [{ text: systemPrompt }] },
+    system_instruction: { parts: [{ text: systemPrompt + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] },
     contents: [{ role: 'user', parts: [{ text: userContent || '' }] }],
     generationConfig: { temperature: 0.1, maxOutputTokens: maxTokens || 6144 }
   });
@@ -18164,7 +18164,7 @@ function llcCmdKSelect(docId) {
 // ── Gemini API — routed through backend proxy (API key restricted to server) ──
 async function llcGemini(systemPrompt, userContent, maxTokens) {
   return _llcBackendGemini({
-    system_instruction: { parts: [{ text: systemPrompt }] },
+    system_instruction: { parts: [{ text: systemPrompt + (typeof t === 'function' ? t('ai_lang_suffix') : '') }] },
     contents: [{ role: 'user', parts: [{ text: userContent || '' }] }],
     generationConfig: { temperature: 0.3, maxOutputTokens: maxTokens || 8192 }
   });
@@ -29999,8 +29999,10 @@ function _profBuildSystemPrompt() {
     approfondita: 'Rispondi in modo APPROFONDITO e strutturato: definizione, normativa di riferimento, giurisprudenza, implicazioni pratiche. Puoi usare fino a 300 parole.'
   }[_profMode] || 'Rispondi in modo chiaro e completo, max 100 parole.';
 
-  return 'Sei Prof. Lex, un docente universitario di diritto di alto profilo, esperto in ' + auth.label + '.\n'
-    + 'Rispondi ESCLUSIVAMENTE in italiano, con linguaggio autorevole ma accessibile.\n'
+  var langInstr = (_lang === 'en')
+    ? 'You are Prof. Lex, a senior law professor. Reply EXCLUSIVELY in English, with authoritative yet accessible language.\n'
+    : 'Sei Prof. Lex, un docente universitario di diritto di alto profilo, esperto in ' + auth.label + '.\nRispondi ESCLUSIVAMENTE in italiano, con linguaggio autorevole ma accessibile.\n';
+  return langInstr
     + 'Usa fonti normative precise. Le autorità principali per questo dominio sono:\n'
     + auth.sources + '\n'
     + modeInstr
