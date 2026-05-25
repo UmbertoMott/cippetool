@@ -6973,12 +6973,12 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="settings-row">
         <div>
           <div class="settings-row-label" id="setUsername">—</div>
-          <div class="settings-row-sub">Utente corrente</div>
+          <div class="settings-row-sub" data-i18n="set_current_user">Utente corrente</div>
         </div>
       </div>
       <div class="settings-row">
         <div>
-          <div class="settings-row-label">Metodo di accesso</div>
+          <div class="settings-row-label" data-i18n="set_login_method">Metodo di accesso</div>
           <div class="settings-row-sub" id="setLoginMethod">Username/Password</div>
         </div>
       </div>
@@ -6986,13 +6986,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- MFA -->
     <div class="settings-section">
-      <div class="settings-section-title">Sicurezza — Autenticazione a due fattori (MFA)</div>
+      <div class="settings-section-title" data-i18n="set_security">Sicurezza — Autenticazione a due fattori (MFA)</div>
       <div class="settings-row">
         <div>
-          <div class="settings-row-label">Stato MFA</div>
+          <div class="settings-row-label" data-i18n="set_mfa_status">Stato MFA</div>
           <div class="settings-row-sub">App: Microsoft Authenticator, Google Authenticator</div>
         </div>
-        <span class="settings-badge inactive" id="mfaBadge">Inattivo</span>
+        <span class="settings-badge inactive" id="mfaBadge" data-i18n="set_mfa_inactive">Inattivo</span>
       </div>
 
       <!-- MFA setup area (hidden by default) -->
@@ -7018,37 +7018,37 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <div style="display:flex;gap:8px;margin-top:14px" id="mfaActions">
-        <button class="btn-settings-action" id="btnToggleMfa" onclick="toggleMfaSetup()">Configura MFA</button>
-        <button class="btn-settings-action danger" id="btnDisableMfa" style="display:none" onclick="disableMfa()">Disattiva MFA</button>
+        <button class="btn-settings-action" id="btnToggleMfa" onclick="toggleMfaSetup()" data-i18n="set_setup_mfa">Configura MFA</button>
+        <button class="btn-settings-action danger" id="btnDisableMfa" style="display:none" onclick="disableMfa()" data-i18n="set_disable_mfa">Disattiva MFA</button>
       </div>
     </div>
 
     <!-- Privacy -->
     <div class="settings-section">
-      <div class="settings-section-title">Dati</div>
+      <div class="settings-section-title" data-i18n="set_data">Dati</div>
       <div class="settings-row">
         <div>
-          <div class="settings-row-label">Cancella progressi</div>
-          <div class="settings-row-sub">Rimuove tutta la cronologia esami</div>
+          <div class="settings-row-label" data-i18n="set_clear_progress">Cancella progressi</div>
+          <div class="settings-row-sub" data-i18n="set_clear_progress_sub">Rimuove tutta la cronologia esami</div>
         </div>
-        <button class="btn-settings-action danger" onclick="confirmClearData()">Cancella</button>
+        <button class="btn-settings-action danger" onclick="confirmClearData()" data-i18n="set_clear_btn">Cancella</button>
       </div>
       <div class="settings-row" style="border-bottom:none">
         <div>
-          <div class="settings-row-label">Azzera stato quiz</div>
-          <div class="settings-row-sub">Resetta quiz in corso e completati — lo storico rimane</div>
+          <div class="settings-row-label" data-i18n="set_reset_quiz">Azzera stato quiz</div>
+          <div class="settings-row-sub" data-i18n="set_reset_quiz_sub">Resetta quiz in corso e completati — lo storico rimane</div>
         </div>
-        <button class="btn-settings-action" onclick="resetQuizProgress()" style="background:rgba(251,191,36,0.13);border-color:rgba(251,191,36,0.4);color:#fcd34d">Azzera</button>
+        <button class="btn-settings-action" onclick="resetQuizProgress()" style="background:rgba(251,191,36,0.13);border-color:rgba(251,191,36,0.4);color:#fcd34d" data-i18n="set_reset_btn">Azzera</button>
       </div>
     </div>
 
     <!-- Banca Domande entry -->
     <div class="settings-section" style="padding-top:16px;border-top:1px solid var(--bdr)">
-      <div class="settings-section-title">Risorse</div>
+      <div class="settings-section-title" data-i18n="set_resources">Risorse</div>
       <div class="settings-row" style="border-bottom:none;cursor:pointer" onclick="openBancaDomande()">
         <div>
-          <div class="settings-row-label" style="color:var(--acc)">Banca Domande completa</div>
-          <div class="settings-row-sub">Sfoglia tutte le 756+ domande con risposte e riferimenti</div>
+          <div class="settings-row-label" style="color:var(--acc)" data-i18n="set_questions_db">Banca Domande completa</div>
+          <div class="settings-row-sub" data-i18n="set_questions_db_sub">Sfoglia tutte le 756+ domande con risposte e riferimenti</div>
         </div>
         <span style="color:var(--acc);font-size:20px;margin-left:8px">›</span>
       </div>
@@ -7689,8 +7689,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg>
         </div>
         <div>
-          <div style="font-size:14px;font-weight:700;color:#0F172A;letter-spacing:-0.2px;">OCR Documento</div>
-          <div style="font-size:10.5px;color:#64748B;margin-top:-1px;">Documenti multi-foto</div>
+          <div style="font-size:14px;font-weight:700;color:#0F172A;letter-spacing:-0.2px;" data-i18n="ocr_name">OCR Documento</div>
+          <div style="font-size:10.5px;color:#64748B;margin-top:-1px;" data-i18n="ocr_header_sub">Documenti multi-foto</div>
         </div>
       </div>
       <div style="flex:1;"></div>
@@ -7699,11 +7699,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <kbd style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;font-size:10px;font-family:'JetBrains Mono','SF Mono',Menlo,monospace;font-weight:600;background:rgba(17,24,39,.05);border:1px solid rgba(17,24,39,.08);border-radius:4px;color:#64748B;">⌘</kbd>
         <kbd style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;font-size:10px;font-family:'JetBrains Mono','SF Mono',Menlo,monospace;font-weight:600;background:rgba(17,24,39,.05);border:1px solid rgba(17,24,39,.08);border-radius:4px;color:#64748B;">⇧</kbd>
         <kbd style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;font-size:10px;font-family:'JetBrains Mono','SF Mono',Menlo,monospace;font-weight:600;background:rgba(17,24,39,.05);border:1px solid rgba(17,24,39,.08);border-radius:4px;color:#64748B;">N</kbd>
-        <span style="margin-left:3px;">Nuova</span>
+        <span style="margin-left:3px;" data-i18n="ocr_nuova_hint">Nuova</span>
       </div>
       <button onclick="ocrNewSession()" class="ocr-btn ocr-btn-accent">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-        Nuova sessione
+        <span data-i18n="ocr_new_session">Nuova sessione OCR</span>
       </button>
       <button onclick="ocrClose()" class="ocr-btn-icon" title="Chiudi">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -7713,13 +7713,13 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- MOBILE NAV -->
     <div class="ocr-mobile-nav" id="ocrMobileNav">
       <button class="ocr-mobile-nav-btn active" onclick="ocrMobilePanel('A')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="4"/></svg>Sessione
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="4"/></svg><span data-i18n="ocr_session_label">Sessione</span>
       </button>
       <button class="ocr-mobile-nav-btn" onclick="ocrMobilePanel('B')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M4 7V5h16v2M9 20h6M12 5v15"/></svg>Editor
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M4 7V5h16v2M9 20h6M12 5v15"/></svg><span data-i18n="ocr_editor_label">Editor</span>
       </button>
       <button class="ocr-mobile-nav-btn" id="ocrTabC" onclick="ocrMobilePanel('C')" style="position:relative;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Storico
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span data-i18n="ocr_history_lbl">Storico</span>
         <span id="ocrHistoryBadge" style="display:none;position:absolute;top:4px;right:6px;min-width:16px;height:16px;background:#4F46E5;color:#fff;font-size:9px;font-weight:700;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;"></span>
       </button>
     </div>
@@ -7731,7 +7731,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ocr-panel" id="ocrPanelA">
         <div style="padding:18px 20px 14px;border-bottom:1px solid rgba(17,24,39,.06);flex-shrink:0;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <span class="ocr-label">Sessione</span>
+            <span class="ocr-label" data-i18n="ocr_session_label">Sessione</span>
             <span id="ocrStatusBadge" style="font-size:10px;font-weight:700;letter-spacing:.4px;padding:3px 8px;border-radius:999px;text-transform:uppercase;color:#64748B;background:rgba(100,116,139,.12);">Nuova</span>
           </div>
           <input id="ocrSessionTitle" value="Nuova sessione OCR" oninput="ocrUpdateTitle(this.value)" style="width:100%;border:none;outline:none;background:transparent;font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:17px;font-weight:600;color:#0F172A;padding:0;box-sizing:border-box;"/>
@@ -7764,20 +7764,20 @@ document.addEventListener('DOMContentLoaded', function() {
           <!-- Photo grid (shown when pages > 0) -->
           <div id="ocrPhotoGrid" style="display:none;flex-direction:column;gap:12px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
-              <span class="ocr-label">Foto pagine</span>
+              <span class="ocr-label" data-i18n="ocr_photo_pages">Foto pagine</span>
               <span style="font-size:10px;color:#64748B;font-family:'Inter',-apple-system,system-ui,sans-serif;display:flex;align-items:center;gap:4px;">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14M5 15h14"/></svg> Trascina per riordinare
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14M5 15h14"/></svg> <span data-i18n="ocr_drag_reorder">Trascina per riordinare</span>
               </span>
             </div>
             <div id="ocrThumbsWrap" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
             <div style="display:flex;gap:8px;margin-top:4px;">
               <button onclick="ocrOpenCamera()" class="ocr-btn ocr-btn-accent" style="flex:1;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="4"/></svg>
-                Scatta foto
+                <span data-i18n="ocr_shoot_photo">Scatta foto</span>
               </button>
               <button onclick="document.getElementById('ocrFileInput').click()" class="ocr-btn ocr-btn-ghost" style="flex:1;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
-                Carica
+                <span data-i18n="ocr_upload_btn">Carica</span>
               </button>
             </div>
           </div>
@@ -7788,9 +7788,9 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="ocr-panel" id="ocrPanelB">
         <div style="padding:14px 18px;border-bottom:1px solid rgba(17,24,39,.06);display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0;">
           <div style="display:flex;align-items:center;gap:8px;margin-right:auto;">
-            <span class="ocr-label">Editor</span>
+            <span class="ocr-label" data-i18n="ocr_editor_label">Editor</span>
             <span id="ocrSaveIndicator" style="font-size:10.5px;color:#10B981;display:flex;align-items:center;gap:3px;font-weight:600;font-family:'Inter',-apple-system,system-ui,sans-serif;letter-spacing:.2px;">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Salvato
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> <span data-i18n="ocr_saved_lbl">Salvato</span>
             </span>
           </div>
           <!-- mode toggle -->
@@ -7999,16 +7999,16 @@ document.addEventListener('DOMContentLoaded', function() {
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="screen" id="screenTabularReview">
   <div class="tr-picker-root">
-    <button class="tr-picker-back" onclick="showScreen('screenMode')">← Sezioni</button>
+    <button class="tr-picker-back" onclick="showScreen('screenMode')" data-i18n="tr_back">← Sezioni</button>
     <div style="display:flex;align-items:center;justify-content:space-between;margin:20px 0 6px;">
       <div class="tr-picker-heading">Tabular Review</div>
-      <button class="tr-picker-new" onclick="trPickerNew()">＋ Nuova Review</button>
+      <button class="tr-picker-new" onclick="trPickerNew()" data-i18n="tr_new_review">＋ Nuova Review</button>
     </div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Analisi multi-documento con colonne AI personalizzabili</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;" data-i18n="tr_desc">Analisi multi-documento con colonne AI personalizzabili</div>
     <div class="tr-picker-table-head">
-      <span>Nome</span><span>Data</span><span>Documenti</span><span>Colonne</span><span></span>
+      <span data-i18n="tr_col_name">Nome</span><span data-i18n="tr_col_date">Data</span><span data-i18n="tr_col_docs">Documenti</span><span data-i18n="tr_col_cols">Colonne</span><span></span>
     </div>
-    <div id="trPickerList"><div class="tr-picker-empty">Nessuna review ancora.<br><small>Clicca "Nuova Review" per iniziare.</small></div></div>
+    <div id="trPickerList"><div class="tr-picker-empty" data-i18n-html="tr_empty">Nessuna review ancora.<br><small>Clicca "Nuova Review" per iniziare.</small></div></div>
   </div>
 </div>
 
@@ -8037,19 +8037,19 @@ document.addEventListener('DOMContentLoaded', function() {
       </button>
       <button class="tr-ed-btn" onclick="trMembersOpen()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Membri
+        <span data-i18n="tr_members_btn">Membri</span>
       </button>
     </div>
   </div>
   <!-- Table -->
   <div class="tr-table-area">
     <div class="tr-table-wrap">
-      <table class="tr-table" id="trTable"><thead><tr><th>Documento</th></tr></thead><tbody></tbody></table>
+      <table class="tr-table" id="trTable"><thead><tr><th data-i18n="tr_doc_col_hdr">Documento</th></tr></thead><tbody></tbody></table>
     </div>
     <div class="tr-table-foot">
       <label class="tr-add-doc-btn" for="trDocInput" style="cursor:pointer;">
         <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect x="5" y="0" width="2" height="12"/><rect x="0" y="5" width="12" height="2"/></svg>
-        Aggiungi documento
+        <span data-i18n="tr_add_doc">Aggiungi documento</span>
       </label>
       <input type="file" id="trDocInput" style="display:none" multiple accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.csv" onchange="trDocInputChange(event)">
     </div>
@@ -8060,15 +8060,15 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Members modal -->
 <div class="tr-overlay" id="trMembersOverlay" onclick="trMembersClose()">
   <div class="tr-modal" onclick="event.stopPropagation()">
-    <div class="tr-modal-title">Membri &amp; Condivisione</div>
+    <div class="tr-modal-title" data-i18n="tr_members_title">Membri &amp; Condivisione</div>
     <div style="display:flex;gap:8px;margin-bottom:8px;">
       <input type="email" class="tr-modal-input" id="trMemberEmailInput" placeholder="email@esempio.com" onkeydown="if(event.key==='Enter') trMemberAdd()" style="flex:1">
-      <button class="tr-modal-btn" onclick="trMemberAdd()">Aggiungi</button>
+      <button class="tr-modal-btn" onclick="trMemberAdd()" data-i18n="tr_add_member_btn">Aggiungi</button>
     </div>
     <div id="trMemberChips" style="margin-bottom:16px;min-height:24px;"></div>
-    <button class="tr-copy-link" onclick="trCopyLink()">Copia link di condivisione</button>
+    <button class="tr-copy-link" onclick="trCopyLink()" data-i18n="tr_copy_link">Copia link di condivisione</button>
     <div style="margin-top:16px;text-align:right;">
-      <button class="tr-modal-btn ghost" onclick="trMembersClose()">Chiudi</button>
+      <button class="tr-modal-btn ghost" onclick="trMembersClose()" data-i18n="tr_close_btn">Chiudi</button>
     </div>
   </div>
 </div>
@@ -8076,7 +8076,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="tr-overlay" id="trColOverlay" onclick="trColClose()">
   <div class="tr-modal" onclick="event.stopPropagation()">
     <input type="hidden" id="trColEditId">
-    <div class="tr-modal-title" id="trColModalTitle">Nuova colonna AI</div>
+    <div class="tr-modal-title" id="trColModalTitle" data-i18n="tr_new_col_title">Nuova colonna AI</div>
 
     <label class="tr-modal-label" for="trColLabelInput">Label</label>
     <input type="text" class="tr-modal-input" id="trColLabelInput" placeholder="es. concetti chiave">
@@ -8103,7 +8103,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;">
       <button class="tr-modal-btn danger" id="trColDeleteBtn" onclick="trColDeleteFromModal()" style="display:none;">Delete</button>
       <div style="display:flex;gap:8px;margin-left:auto;">
-        <button class="tr-modal-btn ghost" onclick="trColClose()">Annulla</button>
+        <button class="tr-modal-btn ghost" onclick="trColClose()" data-i18n="tr_cancel_btn">Annulla</button>
         <button class="tr-modal-btn" onclick="trColSave()">Save</button>
       </div>
     </div>
@@ -8118,8 +8118,8 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="tr-modal" onclick="event.stopPropagation()" style="max-width:500px;">
     <!-- Form view -->
     <div id="trDocMenuForm">
-      <div class="tr-modal-title">Genera colonne con AI</div>
-      <label class="tr-modal-label" for="trDocMenuAIDesc">Indicazioni aggiuntive <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;">(opzionale)</span></label>
+      <div class="tr-modal-title" data-i18n="tr_gen_cols_title">Genera colonne con AI</div>
+      <label class="tr-modal-label" for="trDocMenuAIDesc"><span data-i18n="tr_add_hints_lbl">Indicazioni aggiuntive</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;">(opzionale)</span></label>
       <textarea class="tr-modal-input" id="trDocMenuAIDesc" style="min-height:80px;" placeholder="es. Focalizzati sulle clausole contrattuali e le responsabilità delle parti. Lascia vuoto per analisi automatica completa."></textarea>
       <div class="tr-modal-hint">L'AI legge i documenti caricati, li analizza come docente di diritto e genera almeno 10 colonne ottimali. Sostituisce le colonne esistenti.</div>
       <div id="trDocMenuConflicts" style="display:none;background:var(--sur2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--bdr);">
@@ -8128,8 +8128,8 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div id="trDocMenuStatus" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
       <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:4px;">
-        <button class="tr-modal-btn ghost" onclick="trDocMenuClose()">Annulla</button>
-        <button class="tr-modal-btn" id="trDocMenuGenBtn" onclick="trDocMenuAIGenerate()">✦ Analizza e genera</button>
+        <button class="tr-modal-btn ghost" onclick="trDocMenuClose()" data-i18n="tr_cancel_btn">Annulla</button>
+        <button class="tr-modal-btn" id="trDocMenuGenBtn" onclick="trDocMenuAIGenerate()" data-i18n="tr_gen_btn">✦ Analizza e genera</button>
       </div>
     </div>
     <!-- Loading view (hidden by default) -->
@@ -8140,7 +8140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="tr-doc-loading-dot" style="animation-delay:.36s"></span>
       </div>
       <div id="trDocMenuLoadingMsg" style="font-size:12.5px;color:var(--muted);line-height:1.6;min-height:40px;transition:opacity .3s;font-family:'Inter',sans-serif;"></div>
-      <div style="margin-top:20px;font-size:10.5px;color:var(--muted);opacity:.45;letter-spacing:.04em;">Analisi in corso — potrebbe richiedere alcuni secondi</div>
+      <div style="margin-top:20px;font-size:10.5px;color:var(--muted);opacity:.45;letter-spacing:.04em;" data-i18n="tr_gen_loading_sub">Analisi in corso — potrebbe richiedere alcuni secondi</div>
     </div>
   </div>
 </div>
@@ -8215,7 +8215,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="wb-upload" id="wbUploadBar">
   <span class="wb-step-tag">Step 01 · Document Ingestion</span>
   <div id="wbNoFile" style="display:flex;align-items:center;gap:12px;flex:1">
-    <span class="wb-upload-placeholder">PDF · DOC · DOCX — clicca per caricare</span>
+    <span class="wb-upload-placeholder" data-i18n="wb_upload_ph">PDF · DOC · DOCX — clicca per caricare</span>
   </div>
   <div id="wbFileInfo" style="display:none;flex:1" class="wb-file-info">
     <div class="wb-file-icon" id="wbFileIconEl"></div>
@@ -8225,8 +8225,8 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
   <input type="file" id="wbFilePicker" accept=".pdf,.doc,.docx" style="display:none">
-  <button class="wb-btn-file" id="wbPickerBtn">Scegli file</button>
-  <button class="wb-btn-change" id="wbChangeBtn" style="display:none" onclick="wbResetUpload()">Cambia file</button>
+  <button class="wb-btn-file" id="wbPickerBtn" data-i18n="wb_choose_file">Scegli file</button>
+  <button class="wb-btn-change" id="wbChangeBtn" style="display:none" onclick="wbResetUpload()" data-i18n="wb_change_file">Cambia file</button>
 </div>
 <div id="wbProgressWrap" style="display:none;padding:6px 20px 6px;background:#0d0d0d;border-bottom:1px solid rgba(255,255,255,.06)">
   <div style="background:rgba(255,255,255,.07);border-radius:999px;height:4px;overflow:hidden;margin-bottom:4px">
@@ -8250,7 +8250,7 @@ document.addEventListener('DOMContentLoaded', function() {
           onmouseover="if(!this.disabled)this.style.background='rgba(255,255,255,.09)'"
           onmouseout="this.style.background='none'">↪</button>
         <span class="wb-doc-label">Step 02 · Document Viewer · Seleziona un blocco</span>
-        <span class="wb-doc-sub" id="wbDocSub" style="margin-left:4px">Carica un documento per iniziare</span>
+        <span class="wb-doc-sub" id="wbDocSub" style="margin-left:4px" data-i18n="wb_doc_sub">Carica un documento per iniziare</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <div id="wbViewerToolbar">
@@ -8277,7 +8277,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Block Map Preview panel -->
     <div id="wbBlockMap">
       <div id="wbBlockMapHead">
-        <span class="bm-title">Mappa blocchi</span>
+        <span class="bm-title" data-i18n="wb_block_map">Mappa blocchi</span>
         <span class="bm-count" id="wbBlockMapCount"></span>
         <button onclick="wbToggleBlockMap()" title="Chiudi">✕</button>
       </div>
@@ -8287,7 +8287,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Placeholder pre-upload -->
     <div class="wb-doc-placeholder" id="wbDocPlaceholder">
       <div class="wb-doc-placeholder-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-      <div>Il documento apparirà qui dopo il caricamento</div>
+      <div data-i18n="wb_doc_placeholder">Il documento apparirà qui dopo il caricamento</div>
     </div>
 
     <!-- Doc viewer con blocchi interattivi (ChatPDF-style) -->
@@ -8307,7 +8307,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <span class="wp-dot"></span>
       <span class="wp-count" id="wbPinCount">0/3 blocchi in memoria</span>
       <span class="wp-items" id="wbPinItems"></span>
-      <button class="wp-discrimen" id="wbPillDiscrimen" onclick="wbMultiBlockAction('discrimen')">Trova il Discrimen</button>
+      <button class="wp-discrimen" id="wbPillDiscrimen" onclick="wbMultiBlockAction('discrimen')" data-i18n="wb_find_discrimen">Trova il Discrimen</button>
       <span class="wp-reset" onclick="wbClearBlockSelection()" title="Cancella selezione">✕</span>
     </div>
   </div>
@@ -8335,7 +8335,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <!-- Context strip -->
       <div class="wb-ctx-strip" id="wbCtxStrip" style="display:none">
         <div class="wb-ctx-dot"></div>
-        <div class="wb-ctx-text" id="wbCtxText">Seleziona una sezione</div>
+        <div class="wb-ctx-text" id="wbCtxText" data-i18n="wb_ctx_select">Seleziona una sezione</div>
       </div>
 
       <!-- TOOL 01: Visual Storytelling -->
@@ -8344,12 +8344,12 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="wb-glow-bar" style="background:linear-gradient(180deg,#c084fc,#7c3aed)"></div>
           <div class="wb-tool-info">
             <div class="wb-tool-n">Tool 01</div>
-            <div class="wb-tool-name">Mappa Concettuale</div>
+            <div class="wb-tool-name" data-i18n="wb_tool_01_name">Mappa Concettuale</div>
           </div>
-          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#c084fc,#9333ea);color:#fff;box-shadow:0 0 16px rgba(168,85,247,0.35)" onclick="wbRunTool(1)">▶ GENERA</button>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#c084fc,#9333ea);color:#fff;box-shadow:0 0 16px rgba(168,85,247,0.35)" onclick="wbRunTool(1)" data-i18n="wb_genera">▶ GENERA</button>
         </div>
-        <div class="wb-tool-desc">Mappa concettuale gerarchica: tema centrale, rami tematici con sotto-concetti, connessioni chiave e sintesi docente.</div>
-        <div id="wbTool01Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-tool-desc" data-i18n="wb_tool_01_desc">Mappa concettuale gerarchica: tema centrale, rami tematici con sotto-concetti, connessioni chiave e sintesi docente.</div>
+        <div id="wbTool01Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace" data-i18n="wb_gen_loading">⏳ Generazione in corso…</div>
         <div class="wb-out" id="wbTool01Result" style="display:none"></div>
       </div>
 
@@ -8361,10 +8361,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="wb-tool-n">Tool 02</div>
             <div class="wb-tool-name">Knowledge Synthesis</div>
           </div>
-          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#67e8f9,#0891b2);color:#000;box-shadow:0 0 16px rgba(34,211,238,0.25)" onclick="wbRunTool(2)">▶ GENERA</button>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#67e8f9,#0891b2);color:#000;box-shadow:0 0 16px rgba(34,211,238,0.25)" onclick="wbRunTool(2)" data-i18n="wb_genera">▶ GENERA</button>
         </div>
-        <div class="wb-tool-desc">Formula logica del concetto · Key Concept con bordo neon · Learning Process in 3 step progressivi.</div>
-        <div id="wbTool02Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-tool-desc" data-i18n="wb_tool_02_desc">Formula logica del concetto · Key Concept con bordo neon · Learning Process in 3 step progressivi.</div>
+        <div id="wbTool02Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace" data-i18n="wb_gen_loading">⏳ Generazione in corso…</div>
         <div class="wb-out" id="wbTool02Result" style="display:none"></div>
       </div>
 
@@ -8376,10 +8376,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="wb-tool-n">Tool 03</div>
             <div class="wb-tool-name">Scholar's Metaphor</div>
           </div>
-          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#fcd34d,#d97706);color:#000;box-shadow:0 0 16px rgba(245,158,11,0.25)" onclick="wbRunTool(3)">▶ GENERA</button>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#fcd34d,#d97706);color:#000;box-shadow:0 0 16px rgba(245,158,11,0.25)" onclick="wbRunTool(3)" data-i18n="wb_genera">▶ GENERA</button>
         </div>
-        <div class="wb-tool-desc">Metafora cognitiva originale che cattura l'essenza del concetto in termini quotidiani e memorabili.</div>
-        <div id="wbTool03Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-tool-desc" data-i18n="wb_tool_03_desc">Metafora cognitiva originale che cattura l'essenza del concetto in termini quotidiani e memorabili.</div>
+        <div id="wbTool03Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace" data-i18n="wb_gen_loading">⏳ Generazione in corso…</div>
         <div class="wb-out" id="wbTool03Result" style="display:none"></div>
       </div>
 
@@ -8391,10 +8391,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="wb-tool-n">Tool 04</div>
             <div class="wb-tool-name">Active Recall</div>
           </div>
-          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#6ee7b7,#059669);color:#000;box-shadow:0 0 16px rgba(16,185,129,0.25)" onclick="wbRunTool(4)">▶ GENERA</button>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#6ee7b7,#059669);color:#000;box-shadow:0 0 16px rgba(16,185,129,0.25)" onclick="wbRunTool(4)" data-i18n="wb_genera">▶ GENERA</button>
         </div>
-        <div class="wb-tool-desc">3 domande a risposta multipla sulla sezione selezionata. Clicca un'opzione per rivelare la risposta corretta.</div>
-        <div id="wbTool04Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-tool-desc" data-i18n="wb_tool_04_desc">3 domande a risposta multipla sulla sezione selezionata. Clicca un'opzione per rivelare la risposta corretta.</div>
+        <div id="wbTool04Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace" data-i18n="wb_gen_loading">⏳ Generazione in corso…</div>
         <div class="wb-out" id="wbTool04Result" style="display:none"></div>
       </div>
 
@@ -8406,10 +8406,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="wb-tool-n">Tool 05</div>
             <div class="wb-tool-name">Visual Memory Map</div>
           </div>
-          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#f9a8d4,#db2777);color:#fff;box-shadow:0 0 16px rgba(219,39,119,0.3)" onclick="wbRunTool(5)">▶ GENERA</button>
+          <button class="wb-neon-btn" style="background:linear-gradient(135deg,#f9a8d4,#db2777);color:#fff;box-shadow:0 0 16px rgba(219,39,119,0.3)" onclick="wbRunTool(5)" data-i18n="wb_genera">▶ GENERA</button>
         </div>
-        <div class="wb-tool-desc">Mappa cognitiva visiva: ogni concetto chiave diventa un nodo colorato con emoji e micro-spiegazione per la memoria visiva.</div>
-        <div id="wbTool05Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace">⏳ Generazione in corso…</div>
+        <div class="wb-tool-desc" data-i18n="wb_tool_05_desc">Mappa cognitiva visiva: ogni concetto chiave diventa un nodo colorato con emoji e micro-spiegazione per la memoria visiva.</div>
+        <div id="wbTool05Loading" style="display:none;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.4);font-family:monospace" data-i18n="wb_gen_loading">⏳ Generazione in corso…</div>
         <div class="wb-out" id="wbTool05Result" style="display:none"></div>
       </div>
 
@@ -8423,7 +8423,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <!-- Tutti i toggle sulla stessa riga -->
           <div style="display:flex;align-items:center;gap:7px;margin-left:auto;padding-right:2px;flex-wrap:nowrap">
-            <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.65);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap">Integrale</button>
+            <button id="wbFullDocBtn" title="Chat sull'intero documento — ignora blocco selezionato" onclick="wbToggleFullDoc()" style="font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 7px;border-radius:5px;border:1px solid rgba(129,140,248,0.25);background:rgba(129,140,248,0.07);color:rgba(255,255,255,0.65);cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap" data-i18n="wb_integral">Integrale</button>
             <span style="width:1px;height:14px;background:rgba(255,255,255,.1);flex-shrink:0"></span>
             <span id="wbGiurisLabel" title="Giurisprudenza Cassazione" style="font-size:10px;color:rgba(251,191,36,.45);transition:color .2s;cursor:default;flex-shrink:0;display:flex;align-items:center;gap:2px"><span style="font-size:8.5px;font-weight:600;letter-spacing:0.02em;white-space:nowrap">Giurisp.</span></span>
             <label title="Cerca sentenze Cassazione Sezioni Unite" style="position:relative;display:inline-block;width:28px;height:15px;cursor:pointer;flex-shrink:0">
@@ -8448,7 +8448,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <!-- Indicatore blocco attivo -->
         <div id="wbChatBlockIndicator" style="display:none;margin:0 14px 8px;padding:7px 12px;background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.25);border-radius:8px;font-size:11px;color:#a5b4fc;line-height:1.5">
-          <span style="opacity:.6;font-size:10px;display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em">Blocco selezionato</span>
+          <span style="opacity:.6;font-size:10px;display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.08em" data-i18n="wb_block_selected">Blocco selezionato</span>
           <span id="wbChatBlockSnippet"></span>
         </div>
         <!-- Area messaggi -->
@@ -8462,8 +8462,8 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <!-- Input -->
         <div id="wbChatInputRow" style="display:flex;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.06)">
-          <input id="wbChatInput" type="text" placeholder="Scrivi una domanda sul documento…" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='rgba(129,140,248,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'" onkeydown="if(event.key==='Enter'&&!_wbChatBusy)wbChatSend()">
-          <button id="wbChatSendBtn" onclick="wbChatSend()" style="background:linear-gradient(135deg,#818cf8,#4f46e5);color:#fff;border:none;border-radius:8px;padding:0 16px;font:600 12px/1 inherit;cursor:pointer;flex-shrink:0;transition:opacity .15s">Invia</button>
+          <input id="wbChatInput" type="text" placeholder="Scrivi una domanda sul documento…" data-i18n-ph="wb_chat_ph" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='rgba(129,140,248,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'" onkeydown="if(event.key==='Enter'&&!_wbChatBusy)wbChatSend()">
+          <button id="wbChatSendBtn" onclick="wbChatSend()" style="background:linear-gradient(135deg,#818cf8,#4f46e5);color:#fff;border:none;border-radius:8px;padding:0 16px;font:600 12px/1 inherit;cursor:pointer;flex-shrink:0;transition:opacity .15s" data-i18n="wb_send">Invia</button>
           <button id="wbChatStopBtn" onclick="wbChatStop()" title="Interrompi generazione" style="display:none;align-items:center;justify-content:center;gap:6px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#f87171;border-radius:8px;padding:0 14px;font:600 12px/1 inherit;cursor:pointer;flex-shrink:0;transition:all .15s;height:36px">
             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect width="10" height="10" rx="2"/></svg> Stop
           </button>
@@ -8477,11 +8477,11 @@ document.addEventListener('DOMContentLoaded', function() {
   <div id="wbMobileTabBar">
     <button class="wb-mob-tab active" onclick="wbMobileShowPanel('doc')" data-panel="doc">
       <span class="wb-mob-tab-icon"></span>
-      <span class="wb-mob-tab-label">Documento</span>
+      <span class="wb-mob-tab-label" data-i18n="wb_mob_doc">Documento</span>
     </button>
     <button class="wb-mob-tab" onclick="wbMobileShowPanel('tools')" data-panel="tools">
       <span class="wb-mob-tab-icon"></span>
-      <span class="wb-mob-tab-label">Analisi AI</span>
+      <span class="wb-mob-tab-label" data-i18n="wb_mob_analysis">Analisi AI</span>
     </button>
   </div>
 </div><!-- end screenWorkbench -->
@@ -8495,11 +8495,11 @@ document.addEventListener('DOMContentLoaded', function() {
       font-family:inherit;font-weight:600;transition:all .15s;
     " onmouseover="this.style.borderColor='var(--acc)';this.style.color='var(--acc)'"
        onmouseout="this.style.borderColor='var(--bdr)';this.style.color='var(--muted)'">
-      ← Torna
+      <span data-i18n="back">← Torna</span>
     </button>
   </div>
   <div class="dash-greeting" id="dashGreet">Welcome back!</div>
-  <div class="dash-sub">982 domande · 9 quiz da 90 quesiti · ogni quiz è unico e non ripete domande</div>
+  <div class="dash-sub" data-i18n="quiz_dash_sub">982 domande · 9 quiz da 90 quesiti · ogni quiz è unico e non ripete domande</div>
 
   <div class="stats-grid" id="statsGrid"></div>
 
@@ -8507,10 +8507,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <div class="section-title">Exam History</div>
   <div class="history-list" id="historyList">
-    <div style="color:var(--muted);font-size:14px;padding:12px 0">No exams yet. Start your first one!</div>
+    <div style="color:var(--muted);font-size:14px;padding:12px 0" data-i18n="quiz_no_exams">Nessun esame ancora. Inizia il primo!</div>
   </div>
   <!-- BANCA DATI QUIZ ─────────────────────────────────────── -->
-  <div class="section-title" style="margin-top:32px">Banca Dati Quiz</div>
+  <div class="section-title" style="margin-top:32px" data-i18n="quiz_bank_title">Banca Dati Quiz</div>
   <div id="quizBankSection"></div>
 
 </div>
@@ -8572,7 +8572,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div>
             <button class="rl-dash-back-btn" onclick="showScreen('screenMode')">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-              Sezioni
+              <span data-i18n="lrl_sections_back">Sezioni</span>
             </button>
             <div class="rl-dash-title" style="margin-top:8px">Research Lab</div>
             <div class="rl-dash-sub">AI-powered legal research workspace</div>
@@ -8608,25 +8608,25 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="rl-input-wrap">
           <div id="rlCtxDocs" class="rl-ctx-docs" style="display:none"></div>
           <div class="rl-input-bar" id="rlInputBar">
-            <textarea id="rlInput" class="rl-textarea" placeholder="Fai una domanda legale…" rows="2"
+            <textarea id="rlInput" class="rl-textarea" placeholder="Fai una domanda legale…" data-i18n-ph="lrl_input_ph" rows="2"
               onkeydown="rlKeydown(event)" oninput="rlAutoResize(this)"></textarea>
             <!-- Action row: left = context shortcuts, right = model + send -->
             <div class="rl-input-actions">
               <button class="rl-act-btn" onclick="document.getElementById('rlUploadInput').click()" title="Allega documento">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-                + Documenti
+                <span data-i18n="lrl_attach_docs">+ Documenti</span>
               </button>
               <button class="rl-act-btn" onclick="rlOpenProjectMenu()" title="Progetti">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-                Progetti
+                <span data-i18n="lrl_projects">Progetti</span>
               </button>
               <button class="rl-act-btn" id="rlModeGiur" onclick="rlToggleMode('giur')" title="Attiva ricerca giurisprudenziale">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
-                Giurisprudenza
+                <span data-i18n="lrl_case_law">Giurisprudenza</span>
               </button>
               <button class="rl-act-btn" id="rlModeDott" onclick="rlToggleMode('dott')" title="Attiva ricerca dottrinale">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                Dottrina
+                <span data-i18n="lrl_doctrine">Dottrina</span>
               </button>
               <button class="rl-act-btn" id="rlModeWeb" onclick="rlToggleMode('web')" title="Ricerca su internet">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
@@ -10152,7 +10152,7 @@ async function showDashboard(){
   const _dn = displayName ? displayName.charAt(0).toUpperCase() + displayName.slice(1) : displayName;
   document.getElementById('userNameBadge').textContent=_dn;
   showHeaderButtons();
-  document.getElementById('dashGreet').textContent=`Welcome back, ${_dn}.`;
+  document.getElementById('dashGreet').textContent=t('mode_greet')+', '+_dn+'.';
 
   const exams = ud.exams || [];
   const completed = exams.filter(e=>e.status==='done');
@@ -10187,7 +10187,7 @@ async function showDashboard(){
 
   const hlEl = document.getElementById('historyList');
   if(exams.length===0 && activeSessions.length===0){
-    hlEl.innerHTML='<div style="color:var(--muted);font-size:14px;padding:12px 0">No exams yet. Start your first one!</div>';
+    hlEl.innerHTML='<div style="color:var(--muted);font-size:14px;padding:12px 0">'+t('quiz_no_exams')+'</div>';
   } else {
     let html='';
     // One card per active session
@@ -10236,11 +10236,13 @@ async function showDashboard(){
   if(startBtn){
     const hasActive = !!(await getActiveSession(currentUser));
     if(hasActive){
-      startBtn.textContent = '▶ Riprendi Quiz in corso';
+      startBtn.textContent = t('quiz_resume_btn_lbl');
       startBtn.onclick = function(){ resumeExam(); };
     } else {
       const allDone = (ud.completedQuizNums||[]).length >= QUIZ_CATALOG.length;
-      const label = allDone ? `▶ Ricomincia da Quiz N.${nextCatalogNum} (ciclo completato)` : `▶ Inizia Quiz N.${nextCatalogNum} (90 domande · 150 min)`;
+      const label = allDone
+        ? (_lang==='en' ? `▶ Restart from Quiz N.${nextCatalogNum} (cycle complete)` : `▶ Ricomincia da Quiz N.${nextCatalogNum} (ciclo completato)`)
+        : (_lang==='en' ? `▶ Start Quiz N.${nextCatalogNum} (90 questions · 150 min)` : `▶ Inizia Quiz N.${nextCatalogNum} (90 domande · 150 min)`);
       startBtn.textContent = label;
       startBtn.onclick = startNewExam;
     }
@@ -23478,6 +23480,100 @@ var _i18n = {
     ocr_saved: '✓ Sessione salvata',
     ocr_reordering: 'AI sta riordinando le pagine…',
     ocr_esporta: 'Esporta',
+    // OCR header extras
+    ocr_nuova_hint: 'Nuova',
+    ocr_session_label: 'Sessione',
+    ocr_photo_pages: 'Foto pagine',
+    ocr_drag_reorder: 'Trascina per riordinare',
+    ocr_shoot_photo: 'Scatta foto',
+    ocr_upload_btn: 'Carica',
+    ocr_editor_label: 'Editor',
+    ocr_saved_lbl: 'Salvato',
+    // Quiz dashboard
+    quiz_dash_sub: '982 domande · 9 quiz da 90 quesiti · ogni quiz è unico e non ripete domande',
+    quiz_bank_title: 'Banca Dati Quiz',
+    quiz_resume_btn_lbl: '▶ Riprendi Quiz in corso',
+    quiz_no_exams: 'Nessun esame ancora. Inizia il primo!',
+    // Prof. Lex JS
+    prof_idle: 'In attesa…',
+    prof_listening: 'In ascolto…',
+    prof_thinking: 'Elaboro…',
+    prof_speaking: 'Sto parlando…',
+    prof_btn_start: 'Avvia conversazione',
+    prof_btn_stop: 'Termina',
+    prof_btn_connecting: 'Connessione…',
+    // LRL
+    lrl_sections_back: 'Sezioni',
+    lrl_input_ph: 'Fai una domanda legale…',
+    lrl_attach_docs: '+ Documenti',
+    lrl_projects: 'Progetti',
+    lrl_case_law: 'Giurisprudenza',
+    lrl_doctrine: 'Dottrina',
+    // Workbench
+    wb_upload_ph: 'PDF · DOC · DOCX — clicca per caricare',
+    wb_choose_file: 'Scegli file',
+    wb_change_file: 'Cambia file',
+    wb_doc_sub: 'Carica un documento per iniziare',
+    wb_block_map: 'Mappa blocchi',
+    wb_doc_placeholder: 'Il documento apparirà qui dopo il caricamento',
+    wb_find_discrimen: 'Trova il Discrimen',
+    wb_ctx_none: 'nessuno',
+    wb_ctx_select: 'Seleziona una sezione',
+    wb_genera: '▶ GENERA',
+    wb_gen_loading: '⏳ Generazione in corso…',
+    wb_integral: 'Integrale',
+    wb_block_selected: 'Blocco selezionato',
+    wb_chat_ph: 'Scrivi una domanda sul documento…',
+    wb_send: 'Invia',
+    wb_mob_doc: 'Documento',
+    wb_mob_analysis: 'Analisi AI',
+    wb_tool_01_name: 'Mappa Concettuale',
+    wb_tool_01_desc: 'Mappa concettuale gerarchica: tema centrale, rami tematici con sotto-concetti, connessioni chiave e sintesi docente.',
+    wb_tool_02_desc: 'Formula logica del concetto · Key Concept con bordo neon · Learning Process in 3 step progressivi.',
+    wb_tool_03_desc: 'Metafora cognitiva originale che cattura l\'essenza del concetto in termini quotidiani e memorabili.',
+    wb_tool_04_desc: '3 domande a risposta multipla sulla sezione selezionata. Clicca un\'opzione per rivelare la risposta corretta.',
+    wb_tool_05_desc: 'Mappa cognitiva visiva: ogni concetto chiave diventa un nodo colorato con emoji e micro-spiegazione per la memoria visiva.',
+    // Tabular Review
+    tr_back: '← Sezioni',
+    tr_new_review: '＋ Nuova Review',
+    tr_desc: 'Analisi multi-documento con colonne AI personalizzabili',
+    tr_col_name: 'Nome',
+    tr_col_date: 'Data',
+    tr_col_docs: 'Documenti',
+    tr_col_cols: 'Colonne',
+    tr_empty: 'Nessuna review ancora.<br><small>Clicca "Nuova Review" per iniziare.</small>',
+    tr_members_btn: 'Membri',
+    tr_doc_col_hdr: 'Documento',
+    tr_add_doc: 'Aggiungi documento',
+    tr_members_title: 'Membri &amp; Condivisione',
+    tr_add_member_btn: 'Aggiungi',
+    tr_copy_link: 'Copia link di condivisione',
+    tr_close_btn: 'Chiudi',
+    tr_new_col_title: 'Nuova colonna AI',
+    tr_cancel_btn: 'Annulla',
+    tr_gen_cols_title: 'Genera colonne con AI',
+    tr_gen_btn: '✦ Analizza e genera',
+    tr_gen_loading_sub: 'Analisi in corso — potrebbe richiedere alcuni secondi',
+    tr_add_hints_lbl: 'Indicazioni aggiuntive',
+    // Settings
+    set_current_user: 'Utente corrente',
+    set_login_method: 'Metodo di accesso',
+    set_security: 'Sicurezza — Autenticazione a due fattori (MFA)',
+    set_mfa_status: 'Stato MFA',
+    set_mfa_inactive: 'Inattivo',
+    set_mfa_active: 'Attivo',
+    set_setup_mfa: 'Configura MFA',
+    set_disable_mfa: 'Disattiva MFA',
+    set_data: 'Dati',
+    set_clear_progress: 'Cancella progressi',
+    set_clear_progress_sub: 'Rimuove tutta la cronologia esami',
+    set_clear_btn: 'Cancella',
+    set_reset_quiz: 'Azzera stato quiz',
+    set_reset_quiz_sub: 'Resetta quiz in corso e completati — lo storico rimane',
+    set_reset_btn: 'Azzera',
+    set_resources: 'Risorse',
+    set_questions_db: 'Banca Domande completa',
+    set_questions_db_sub: 'Sfoglia tutte le 756+ domande con risposte e riferimenti',
   },
   en: {
     logout: 'Logout',
@@ -23642,6 +23738,100 @@ var _i18n = {
     ocr_saved: '✓ Session saved',
     ocr_reordering: 'AI is reordering pages…',
     ocr_esporta: 'Export',
+    // OCR header extras
+    ocr_nuova_hint: 'New',
+    ocr_session_label: 'Session',
+    ocr_photo_pages: 'Page photos',
+    ocr_drag_reorder: 'Drag to reorder',
+    ocr_shoot_photo: 'Take photo',
+    ocr_upload_btn: 'Upload',
+    ocr_editor_label: 'Editor',
+    ocr_saved_lbl: 'Saved',
+    // Quiz dashboard
+    quiz_dash_sub: '982 questions · 9 quizzes of 90 each · every quiz is unique and non-repeating',
+    quiz_bank_title: 'Quiz Question Bank',
+    quiz_resume_btn_lbl: '▶ Resume Quiz in progress',
+    quiz_no_exams: 'No exams yet. Start your first one!',
+    // Prof. Lex JS
+    prof_idle: 'Waiting…',
+    prof_listening: 'Listening…',
+    prof_thinking: 'Thinking…',
+    prof_speaking: 'Speaking…',
+    prof_btn_start: 'Start conversation',
+    prof_btn_stop: 'End',
+    prof_btn_connecting: 'Connecting…',
+    // LRL
+    lrl_sections_back: 'Sections',
+    lrl_input_ph: 'Ask a legal question…',
+    lrl_attach_docs: '+ Documents',
+    lrl_projects: 'Projects',
+    lrl_case_law: 'Case Law',
+    lrl_doctrine: 'Doctrine',
+    // Workbench
+    wb_upload_ph: 'PDF · DOC · DOCX — click to upload',
+    wb_choose_file: 'Choose file',
+    wb_change_file: 'Change file',
+    wb_doc_sub: 'Upload a document to get started',
+    wb_block_map: 'Block map',
+    wb_doc_placeholder: 'The document will appear here after upload',
+    wb_find_discrimen: 'Find the Discrimen',
+    wb_ctx_none: 'none',
+    wb_ctx_select: 'Select a section',
+    wb_genera: '▶ GENERATE',
+    wb_gen_loading: '⏳ Generating…',
+    wb_integral: 'Full doc',
+    wb_block_selected: 'Selected block',
+    wb_chat_ph: 'Ask a question about the document…',
+    wb_send: 'Send',
+    wb_mob_doc: 'Document',
+    wb_mob_analysis: 'AI Analysis',
+    wb_tool_01_name: 'Concept Map',
+    wb_tool_01_desc: 'Hierarchical concept map: central theme, thematic branches with sub-concepts, key connections and expert summary.',
+    wb_tool_02_desc: 'Logical formula of the concept · Key Concept with neon border · Learning Process in 3 progressive steps.',
+    wb_tool_03_desc: 'Original cognitive metaphor that captures the essence of the concept in everyday, memorable terms.',
+    wb_tool_04_desc: '3 multiple-choice questions on the selected section. Click an option to reveal the correct answer.',
+    wb_tool_05_desc: 'Visual cognitive map: each key concept becomes a coloured node with emoji and micro-explanation for visual memory.',
+    // Tabular Review
+    tr_back: '← Sections',
+    tr_new_review: '＋ New Review',
+    tr_desc: 'Multi-document analysis with customisable AI columns',
+    tr_col_name: 'Name',
+    tr_col_date: 'Date',
+    tr_col_docs: 'Documents',
+    tr_col_cols: 'Columns',
+    tr_empty: 'No reviews yet.<br><small>Click "New Review" to get started.</small>',
+    tr_members_btn: 'Members',
+    tr_doc_col_hdr: 'Document',
+    tr_add_doc: 'Add document',
+    tr_members_title: 'Members &amp; Sharing',
+    tr_add_member_btn: 'Add',
+    tr_copy_link: 'Copy sharing link',
+    tr_close_btn: 'Close',
+    tr_new_col_title: 'New AI column',
+    tr_cancel_btn: 'Cancel',
+    tr_gen_cols_title: 'Generate columns with AI',
+    tr_gen_btn: '✦ Analyse and generate',
+    tr_gen_loading_sub: 'Analysis in progress — may take a few seconds',
+    tr_add_hints_lbl: 'Additional instructions',
+    // Settings
+    set_current_user: 'Current user',
+    set_login_method: 'Login method',
+    set_security: 'Security — Two-factor authentication (MFA)',
+    set_mfa_status: 'MFA status',
+    set_mfa_inactive: 'Inactive',
+    set_mfa_active: 'Active',
+    set_setup_mfa: 'Set up MFA',
+    set_disable_mfa: 'Disable MFA',
+    set_data: 'Data',
+    set_clear_progress: 'Clear progress',
+    set_clear_progress_sub: 'Removes all exam history',
+    set_clear_btn: 'Clear',
+    set_reset_quiz: 'Reset quiz state',
+    set_reset_quiz_sub: 'Resets in-progress and completed quizzes — history is kept',
+    set_reset_btn: 'Reset',
+    set_resources: 'Resources',
+    set_questions_db: 'Full Question Bank',
+    set_questions_db_sub: 'Browse all 756+ questions with answers and references',
   }
 };
 
@@ -29416,10 +29606,10 @@ function _profSetState(state) {
   var icon  = document.getElementById('profOrbIcon');
   if (!sc) return;
   sc.classList.remove('prof-state-listening','prof-state-thinking','prof-state-speaking');
-  var labels = { idle:'In attesa…', listening:'In ascolto…', thinking:'Elaboro…', speaking:'Sto parlando…' };
+  var labels = { idle:t('prof_idle'), listening:t('prof_listening'), thinking:t('prof_thinking'), speaking:t('prof_speaking') };
   var icons  = { idle:'🎙️', listening:'👂', thinking:'💭', speaking:'🔊' };
   if (state !== 'idle') sc.classList.add('prof-state-' + state);
-  if (label) label.textContent = labels[state] || 'In attesa…';
+  if (label) label.textContent = labels[state] || t('prof_idle');
   if (icon)  icon.textContent  = icons[state]  || '🎙️';
 }
 
@@ -29436,19 +29626,19 @@ async function _profBeginConversation() {
   var lbl  = document.getElementById('profStartLabel');
   if (btn)  btn.classList.add('active');
   if (icon) icon.textContent = '■';
-  if (lbl)  lbl.textContent  = 'Termina';
+  if (lbl)  lbl.textContent  = t('prof_btn_stop');
   _profSetState('listening');
 
   // Ping backend to wake up Render before opening WebSocket
   var healthUrl = _PROF_WS_URL.replace(/^wss?:\/\//, 'https://').replace(/^ws:\/\//, 'http://').replace('/ws/voice', '/api/health');
   try {
-    if (lbl) lbl.textContent = 'Connessione…';
+    if (lbl) lbl.textContent = t('prof_btn_connecting');
     await fetch(healthUrl, { signal: AbortSignal.timeout(12000) });
   } catch(e) {
     console.warn('[Prof] Health ping failed, proceeding anyway:', e.message);
   }
   if (!_profAutoMode) return; // user stopped while pinging
-  if (lbl) lbl.textContent = 'Termina';
+  if (lbl) lbl.textContent = t('prof_btn_stop');
   _profStartAudio();
 }
 
@@ -29490,7 +29680,7 @@ function _profStopAll() {
   var lbl  = document.getElementById('profStartLabel');
   if (btn)  btn.classList.remove('active');
   if (icon) icon.textContent = '▶';
-  if (lbl)  lbl.textContent  = 'Avvia conversazione';
+  if (lbl)  lbl.textContent  = t('prof_btn_start');
   _profSetState('idle');
 }
 
