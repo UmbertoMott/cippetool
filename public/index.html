@@ -1923,8 +1923,7 @@ body.theme-light .social-tooltip::after{border-top-color:#f5d9be}
 .btn-hamburger{background:none;border:1px solid var(--bdr);border-radius:10px;padding:7px 9px;cursor:pointer;color:var(--txt);display:none;flex-direction:column;gap:4px;align-items:center;justify-content:center;transition:border-color 0.15s}
 .btn-hamburger:hover{border-color:var(--acc)}
 .btn-hamburger span{display:block;width:16px;height:2px;background:currentColor;border-radius:2px}
-.lang-toggle{display:none;gap:2px;align-items:center}
-.lang-toggle.visible{display:flex}
+.lang-toggle{display:flex;gap:2px;align-items:center}
 .lang-btn{background:none;border:1px solid var(--bdr);color:var(--muted);padding:3px 9px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px;line-height:1}
 .lang-btn.active{background:var(--acc);border-color:var(--acc);color:#fff}
 .lang-btn:not(.active):hover{border-color:var(--acc);color:var(--txt)}
@@ -7100,13 +7099,17 @@ document.addEventListener('DOMContentLoaded', function() {
     <a class="ld-nav-link" href="#reviews">Recensioni</a>
   </div>
   <div class="ld-nav-cta">
+    <div style="display:flex;gap:2px;align-items:center">
+      <button class="lang-btn" data-lang="it" onclick="setLang('it')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;cursor:pointer;">IT</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;cursor:pointer;">EN</button>
+    </div>
     <button id="themeToggleBtnLanding" onclick="toggleTheme()" title="Cambia tema" style="
       background:none;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.8);
       width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:15px;
       display:flex;align-items:center;justify-content:center;
       transition:all .2s;flex-shrink:0;">☀️</button>
-    <button class="ld-btn-ghost" onclick="showScreen('screenLogin')">Accedi</button>
-    <button class="ld-btn-nav" onclick="showScreen('screenLogin')">Inizia gratis →</button>
+    <button class="ld-btn-ghost" onclick="showScreen('screenLogin')" data-i18n="ld_login">Accedi</button>
+    <button class="ld-btn-nav" onclick="showScreen('screenLogin')" data-i18n="ld_start_free">Inizia gratis →</button>
   </div>
 </nav>
 
@@ -22613,15 +22616,11 @@ function confirmClearData() {
 function showHeaderButtons() {
   document.getElementById('btnLogout').style.display = 'inline-flex';
   document.getElementById('btnSettings').style.display = 'flex';
-  var lt = document.getElementById('langToggle');
-  if (lt) lt.classList.add('visible');
 }
 
 function hideHeaderButtons() {
   document.getElementById('btnLogout').style.display = 'none';
   document.getElementById('btnSettings').style.display = 'none';
-  var lt = document.getElementById('langToggle');
-  if (lt) lt.classList.remove('visible');
 }
 
 
