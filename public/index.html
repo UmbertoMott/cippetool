@@ -8710,7 +8710,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="prog-info">
       <span id="progText">Question 1 of 90</span>
       <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
-        <button class="pause-btn" id="btnPause" onclick="togglePause()">Pausa</button>
+        <button class="pause-btn" id="btnPause" onclick="togglePause()" data-i18n="quiz_pause_btn">Pausa</button>
         <div class="zoom-controls">
           <button class="zoom-btn" onclick="changeZoom(-1)" title="Diminuisci testo">−</button>
           <span class="zoom-label" id="zoomLabel">100%</span>
@@ -8766,11 +8766,11 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="iapp-main" id="iappMain"></div>
           <div class="iapp-sub">Pass threshold: <strong>300 points</strong></div>
           <div class="iapp-thr" id="iappThr"></div>
-          <div class="iapp-note">Scala lineare: 200 (0/90) → 500 (90/90) · Ogni domanda corretta vale 3.33 pt · Pass = min. 30/90 (33%)</div>
+          <div class="iapp-note" data-i18n="quiz_iapp_note">Scala lineare: 200 (0/90) → 500 (90/90) · Ogni domanda corretta vale 3.33 pt · Pass = min. 30/90 (33%)</div>
         </div>
         <div class="domain-grid" id="domainGrid"></div>
         <div style="display:flex;gap:11px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-sec" onclick="toggleReview()">Risposte Errate</button>
+          <button class="btn btn-sec" onclick="toggleReview()" data-i18n="quiz_wrong_answers_btn">Risposte Errate</button>
           <button class="btn btn-pri" onclick="goToDash()">← Dashboard</button>
         </div>
         <div id="wrReview" class="wr-section" style="display:none"></div>
@@ -8781,14 +8781,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="ai-avatar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="ai-header-info" style="flex:1;min-width:0">
           <div class="ai-header-title">Prof. CIPP/E — AI Tutor</div>
-          <div class="ai-header-sub">Esperto GDPR · EU AI Act · Privacy Law</div>
+          <div class="ai-header-sub" data-i18n="quiz_ai_sub">Esperto GDPR · EU AI Act · Privacy Law</div>
         </div>
         <div class="ai-status"><div class="ai-status-dot"></div>Online</div>
       </div>
-      <div class="ai-context-bar" id="aiContextBar">Analisi del tuo esame in corso…</div>
+      <div class="ai-context-bar" id="aiContextBar" data-i18n="quiz_ai_context_bar">Analisi del tuo esame in corso…</div>
       <div class="ai-messages" id="aiMessages"></div>
       <div class="ai-input-area">
-        <textarea class="ai-input" id="aiInput" placeholder="Chiedi una spiegazione…" rows="1"
+        <textarea class="ai-input" id="aiInput" placeholder="Chiedi una spiegazione…" data-i18n-ph="quiz_ai_input_ph" rows="1"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg()}"
           oninput="this.style.height='40px';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
         <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMsg()">➤</button>
@@ -8820,9 +8820,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="modal-title">Finish exam?</div>
     <div class="modal-body" id="finishModalBody">You still have unanswered questions. Are you sure you want to finish?</div>
     <div class="modal-btns" style="flex-direction:column;gap:8px;align-items:stretch">
-      <button class="btn btn-sec" onclick="closeModal()" style="width:100%">↩ Continua l'esame</button>
-      <button class="btn btn-pri" onclick="finishExam()" style="width:100%">✓ Consegna e termina</button>
-      <button class="btn" onclick="saveAndExitExam()" style="width:100%;background:var(--sur);border:1px solid var(--acc);color:var(--acc);padding:12px;border-radius:10px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer">⏸ Salva ed esci — riprendi dopo</button>
+      <button class="btn btn-sec" onclick="closeModal()" style="width:100%" data-i18n="quiz_continue_exam">↩ Continua l'esame</button>
+      <button class="btn btn-pri" onclick="finishExam()" style="width:100%" data-i18n="quiz_finish_submit">✓ Consegna e termina</button>
+      <button class="btn" onclick="saveAndExitExam()" style="width:100%;background:var(--sur);border:1px solid var(--acc);color:var(--acc);padding:12px;border-radius:10px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer" data-i18n="quiz_save_exit">⏸ Salva ed esci — riprendi dopo</button>
     </div>
   </div>
 </div>
@@ -10114,7 +10114,7 @@ function renderQuizBank(ud) {
     }
 
     const btnOnclick = isActive ? `resumeExam(${qi.num})` : `startQuizN(${qi.num})`;
-    const btnLabel   = isActive ? '▶ Riprendi Quiz N.' + qi.num : isDone ? 'Ripeti Quiz N.' + qi.num : '▶ Inizia Quiz N.' + qi.num;
+    const btnLabel   = isActive ? t('quiz_resume_n') + qi.num : isDone ? t('quiz_repeat_n') + qi.num : t('quiz_start_n') + qi.num;
 
     html += `
     <div style="background:${C.cardBg};border:1px solid ${borderColor};border-radius:12px;padding:14px 16px;transition:all .2s">
@@ -10125,12 +10125,12 @@ function renderQuizBank(ud) {
             <span style="font-size:13px;font-weight:700;color:${C.titleColor}">Quiz CIPP/E N.${qi.num}</span>
             ${scoreTag}
           </div>
-          <div style="font-size:11px;color:${C.metaColor};margin-top:1px">90 domande · ${qi.scenarios.length} scenari · 150 min</div>
+          <div style="font-size:11px;color:${C.metaColor};margin-top:1px">90 ${_lang==='en'?'questions':'domande'} · ${qi.scenarios.length} ${_lang==='en'?'scenarios':'scenari'} · 150 min</div>
         </div>
         <div style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;background:${badgeBg};color:${C.badgeTxtColor};white-space:nowrap">${badgeText}</div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
-        <span style="font-size:10px;color:${C.scenLabel};margin-right:4px">Scenari:</span>
+        <span style="font-size:10px;color:${C.scenLabel};margin-right:4px">${t('quiz_scenarios_lbl')}</span>
         ${scList}
       </div>
       <button onclick="${btnOnclick}" style="margin-top:10px;width:100%;${btnStyle};font-size:11px;font-weight:700;padding:9px 14px;border-radius:9px;cursor:pointer;font-family:inherit;letter-spacing:0.3px;transition:all .15s"
@@ -10871,7 +10871,7 @@ async function finishExam(){
       qNum: i+1, question: q.q, options: q.o,
       correctAnswer: q.a, userAnswer: exam.answers[i],
       correctText: q.o[q.a],
-      userText: exam.answers[i] !== null ? q.o[exam.answers[i]] : 'Non risposto',
+      userText: exam.answers[i] !== null ? q.o[exam.answers[i]] : t('quiz_not_answered'),
       ref: q.ref||'GDPR', domain: q.domain
     };
   }).filter(Boolean);
@@ -10885,19 +10885,19 @@ function toggleReview(){
   var el=document.getElementById('wrReview');
   if(el.style.display==='block'){el.style.display='none';return;}
   var wrong=window._wrongAnswers||[];
-  if(!wrong.length){el.innerHTML='<div style="color:var(--ok);padding:12px 0">Nessun errore!</div>';el.style.display='block';return;}
+  if(!wrong.length){el.innerHTML='<div style="color:var(--ok);padding:12px 0">'+t('quiz_no_errors')+'</div>';el.style.display='block';return;}
   var rows='';
   for(var wi=0;wi<wrong.length;wi++){
     var q=wrong[wi].q, idx=wrong[wi].i, ua=wrong[wi].ua;
     var wiCopy=wi;
     rows += '<div class="wr-item" style="cursor:pointer" onclick="askAiAboutWrong(' + wi + ')">';
     rows += '<div class="wr-q">' + (idx+1) + '. ' + q.q + '</div>';
-    rows += '<div class="wr-your">Tua risposta: ' + (ua!==null ? LETTERS[ua]+'. '+q.o[ua] : 'Non risposto') + '</div>';
-    rows += '<div class="wr-cor">Corretta: ' + LETTERS[q.a] + '. ' + q.o[q.a] + '</div>';
-    rows += '<div style="font-size:11px;color:var(--acc);margin-top:6px">Clicca per spiegazione AI</div>';
+    rows += '<div class="wr-your">'+t('quiz_your_answer')+' ' + (ua!==null ? LETTERS[ua]+'. '+q.o[ua] : t('quiz_not_answered')) + '</div>';
+    rows += '<div class="wr-cor">'+t('quiz_correct_answer')+' ' + LETTERS[q.a] + '. ' + q.o[q.a] + '</div>';
+    rows += '<div style="font-size:11px;color:var(--acc);margin-top:6px">'+t('quiz_ask_ai_explain')+'</div>';
     rows += '</div>';
   }
-  el.innerHTML='<div class="wr-title">Risposte Errate (' + wrong.length + ')</div>' + rows;
+  el.innerHTML='<div class="wr-title">'+t('quiz_wrong_answers_title')+' (' + wrong.length + ')</div>' + rows;
   el.style.display='block';
 }
 
@@ -11092,7 +11092,7 @@ function togglePause(){
     stopTimer();
     pauseStart = Date.now();
     overlay.classList.add('active');
-    if(btn) btn.innerHTML = '▶ Riprendi';
+    if(btn) btn.innerHTML = t('quiz_paused_resume_btn');
     document.getElementById('timerEl').classList.add('paused');
   } else {
     // Resume: adjust startTime to exclude paused time
@@ -11102,7 +11102,7 @@ function togglePause(){
       pauseStart = null;
     }
     overlay.classList.remove('active');
-    if(btn) btn.innerHTML = 'Pausa';
+    if(btn) btn.innerHTML = t('quiz_pause_btn');
     document.getElementById('timerEl').classList.remove('paused');
     startTimer();
   }
@@ -23501,6 +23501,34 @@ var _i18n = {
     quiz_review: 'Rivedi domande & spiega AI',
     quiz_question_lbl: 'Domanda',
     quiz_of_lbl: 'di',
+    // Pause overlay
+    quiz_pause_btn: 'Pausa',
+    quiz_paused_title: '⏸ Esame in Pausa',
+    quiz_paused_body: 'Il timer è fermo. Riprendi quando sei pronto.',
+    quiz_paused_resume_btn: '▶ Riprendi',
+    // Finish modal buttons
+    quiz_continue_exam: '↩ Continua l\'esame',
+    quiz_finish_submit: '✓ Consegna e termina',
+    quiz_save_exit: '⏸ Salva ed esci — riprendi dopo',
+    // Score screen
+    quiz_iapp_note: 'Scala lineare: 200 (0/90) → 500 (90/90) · Ogni domanda corretta vale 3.33 pt · Pass = min. 30/90 (33%)',
+    quiz_wrong_answers_btn: 'Risposte Errate',
+    quiz_ai_sub: 'Esperto GDPR · EU AI Act · Privacy Law',
+    quiz_ai_context_bar: 'Analisi del tuo esame in corso…',
+    quiz_ai_input_ph: 'Chiedi una spiegazione…',
+    // toggleReview
+    quiz_no_errors: 'Nessun errore!',
+    quiz_your_answer: 'Tua risposta:',
+    quiz_not_answered: 'Non risposto',
+    quiz_correct_answer: 'Corretta:',
+    quiz_ask_ai_explain: 'Clicca per spiegazione AI',
+    quiz_wrong_answers_title: 'Risposte Errate',
+    // Quiz Bank cards
+    quiz_resume_n: '▶ Riprendi Quiz N.',
+    quiz_repeat_n: 'Ripeti Quiz N.',
+    quiz_start_n: '▶ Inizia Quiz N.',
+    quiz_scenarios_lbl: 'Scenari:',
+    quiz_q_meta_suffix: 'domande · {n} scenari · 150 min',
     // Prof. Lex JS
     prof_idle: 'In attesa…',
     prof_listening: 'In ascolto…',
@@ -23767,6 +23795,34 @@ var _i18n = {
     quiz_review: 'Review questions & AI explain',
     quiz_question_lbl: 'Question',
     quiz_of_lbl: 'of',
+    // Pause overlay
+    quiz_pause_btn: 'Pause',
+    quiz_paused_title: '⏸ Exam Paused',
+    quiz_paused_body: 'Timer is stopped. Resume when you\'re ready.',
+    quiz_paused_resume_btn: '▶ Resume',
+    // Finish modal buttons
+    quiz_continue_exam: '↩ Continue exam',
+    quiz_finish_submit: '✓ Submit and finish',
+    quiz_save_exit: '⏸ Save and exit — resume later',
+    // Score screen
+    quiz_iapp_note: 'Linear scale: 200 (0/90) → 500 (90/90) · Each correct answer = 3.33 pts · Pass = min. 30/90 (33%)',
+    quiz_wrong_answers_btn: 'Wrong Answers',
+    quiz_ai_sub: 'GDPR expert · EU AI Act · Privacy Law',
+    quiz_ai_context_bar: 'Analysing your exam…',
+    quiz_ai_input_ph: 'Ask for an explanation…',
+    // toggleReview
+    quiz_no_errors: 'No wrong answers!',
+    quiz_your_answer: 'Your answer:',
+    quiz_not_answered: 'Not answered',
+    quiz_correct_answer: 'Correct:',
+    quiz_ask_ai_explain: 'Click for AI explanation',
+    quiz_wrong_answers_title: 'Wrong Answers',
+    // Quiz Bank cards
+    quiz_resume_n: '▶ Resume Quiz N.',
+    quiz_repeat_n: 'Repeat Quiz N.',
+    quiz_start_n: '▶ Start Quiz N.',
+    quiz_scenarios_lbl: 'Scenarios:',
+    quiz_q_meta_suffix: 'questions · {n} scenarios · 150 min',
     // Prof. Lex JS
     prof_idle: 'Waiting…',
     prof_listening: 'Listening…',
@@ -29270,9 +29326,9 @@ function wbSelectSection(idx) {
 <!-- PAUSE OVERLAY -->
 <div class="pause-overlay" id="pauseOverlay">
   <div class="pause-box">
-    <h2>⏸ Esame in Pausa</h2>
-    <p>Il timer è fermo. Riprendi quando sei pronto.</p>
-    <button class="btn btn-pri" onclick="togglePause()" style="width:200px">▶ Riprendi</button>
+    <h2 data-i18n="quiz_paused_title">⏸ Esame in Pausa</h2>
+    <p data-i18n="quiz_paused_body">Il timer è fermo. Riprendi quando sei pronto.</p>
+    <button class="btn btn-pri" onclick="togglePause()" style="width:200px" data-i18n="quiz_paused_resume_btn">▶ Riprendi</button>
   </div>
 </div>
 
