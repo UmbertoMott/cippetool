@@ -31164,12 +31164,12 @@ function _ocrGetFooterNumFromImage(page) {
 
 // After all OCR done: parallel Vision calls per page → sort → sequential labels
 async function _ocrDetectAndSort() {
-  var t = document.getElementById('ocrToast');
+  var _toastEl = document.getElementById('ocrToast');
   function _toast(html, ms) {
-    if (!t) return;
-    t.innerHTML = html; t.classList.add('show');
-    clearTimeout(t._tid);
-    if (ms) t._tid = setTimeout(function(){ t.classList.remove('show'); }, ms);
+    if (!_toastEl) return;
+    _toastEl.innerHTML = html; _toastEl.classList.add('show');
+    clearTimeout(_toastEl._tid);
+    if (ms) _toastEl._tid = setTimeout(function(){ _toastEl.classList.remove('show'); }, ms);
   }
 
   var pages = _ocrPages.filter(function(p){ return p.status === 'done'; });
