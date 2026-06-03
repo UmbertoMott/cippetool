@@ -24101,11 +24101,10 @@ async function wbPickerOpen(sessionId) {
   var fileInfo = document.getElementById('wbFileInfo');
   if (noFile) noFile.style.display = 'none';
   if (fileInfo) fileInfo.style.display = 'flex';
-  // Restore document viewer HTML — anche per PDF usiamo il blocchi-testo snapshot se disponibile;
-  // se il server ha il file, wbLoadDocText lo sostituirà con la vista canvas di qualità superiore.
+  // Restore document viewer HTML — legge da IndexedDB (nessun limite) con fallback localStorage
   var blobIsPdf = s.blobName && s.blobName.toLowerCase().split('?')[0].endsWith('.pdf');
-  var savedDocHTML = '';
-  try { savedDocHTML = localStorage.getItem('wb_doc_html_' + sessionId) || s.docViewerHTML || ''; } catch(e) {}
+  var savedDocHTML = await _wbDocIDB.get('wb_doc_html_' + sessionId);
+  if (!savedDocHTML) try { savedDocHTML = s.docViewerHTML || ''; } catch(e) { savedDocHTML = ''; }
   if (savedDocHTML && savedDocHTML.length > 20) {
     var viewer = document.getElementById('wbDocViewer');
     var placeholder = document.getElementById('wbDocPlaceholder');
@@ -24216,7 +24215,7 @@ async function wbPickerOpen(sessionId) {
 
 function wbPickerDelete(sessionId) {
   if (!confirm('Eliminare questa sessione salvata?')) return;
-  try { localStorage.removeItem('wb_doc_html_' + sessionId); } catch(e) {}
+  _wbDocIDB.del('wb_doc_html_' + sessionId);
   try { localStorage.removeItem('wb_doc_text_' + sessionId); } catch(e) {}
   wbSessionSaveAll(wbSessionGetAll().filter(function(s) { return s.id !== sessionId; }));
   wbPickerRender();
@@ -24249,22 +24248,19 @@ function wbSaveSession(manual) {
     var el = document.getElementById('wbTool0' + n + 'Result');
     toolOutputs[n] = el ? el.innerHTML : '';
   });
-  // Save document viewer HTML — store full HTML in a separate localStorage key to avoid JSON size limits
+  // Salva HTML blocchi su IndexedDB (nessun limite di dimensione) — preserva evidenziazioni e note
   var docViewerEl = document.getElementById('wbDocViewer');
   var docViewerHTML = '';
   try { docViewerHTML = (docViewerEl ? docViewerEl.innerHTML : ''); } catch(e) {}
-  // Se #wbDocViewer è vuoto (PDF sostituito da canvas), usa lo snapshot dei blocchi testo salvato da wbLoadDocText
+  // Se #wbDocViewer è vuoto (PDF sostituito da canvas), usa lo snapshot dei blocchi testo
   if ((!docViewerHTML || docViewerHTML.length <= 20) && _wbDocViewerSnap && _wbDocViewerSnap.length > 20) {
     docViewerHTML = _wbDocViewerSnap;
   }
-  // Salva blocchi HTML solo se < 400K per evitare di saturare localStorage con documenti grandi
-  if (docViewerHTML.length > 20 && docViewerHTML.length <= 400000) {
-    try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML); } catch(e) {
-      try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML.substring(0, 300000)); } catch(e2) {}
-    }
+  // IndexedDB: nessun limite di dimensione → salva sempre, preserva annotazioni/evidenziazioni
+  if (docViewerHTML.length > 20) {
+    _wbDocIDB.set('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML);
   }
-  // Salva sempre il testo estratto come fallback leggero (≤80K) — funziona anche quando
-  // i blocchi HTML sono troppo grandi per localStorage o quando il server è spento.
+  // Salva sempre il testo estratto come fallback leggero (≤80K)
   if (_wbDocText && _wbDocText.length > 20) {
     try { localStorage.setItem('wb_doc_text_' + _wbCurrentSessionId, _wbDocText.substring(0, 80000)); } catch(e) {}
   }
@@ -25457,6 +25453,62 @@ if (typeof _origToggle === 'function') {
   };
 }
 
+})();
+
+// ── IndexedDB store per HTML documenti grandi (no limite di dimensione) ──
+// Salva block-HTML + annotazioni con nessun limite di storage (vs localStorage 5MB).
+var _wbDocIDB = (function() {
+  var _db = null;
+  var _DBNAME = 'wb_docs_v1', _STORE = 'docs';
+  function _open(cb) {
+    if (_db) { cb(_db); return; }
+    try {
+      var req = indexedDB.open(_DBNAME, 1);
+      req.onupgradeneeded = function(e) {
+        try { e.target.result.createObjectStore(_STORE); } catch(err) {}
+      };
+      req.onsuccess = function(e) { _db = e.target.result; cb(_db); };
+      req.onerror = function() { cb(null); };
+    } catch(e) { cb(null); }
+  }
+  return {
+    // Salva — fire-and-forget, con localStorage come backup per piccoli documenti
+    set: function(key, val) {
+      if (!val || val.length <= 20) return;
+      _open(function(d) {
+        if (d) {
+          try { d.transaction(_STORE,'readwrite').objectStore(_STORE).put(val, key); } catch(e) {}
+        }
+        // Backup su localStorage se piccolo abbastanza
+        if (val.length <= 400000) {
+          try { localStorage.setItem(key, val); } catch(e) {}
+        }
+      });
+    },
+    // Legge da IDB, fallback su localStorage
+    get: function(key) {
+      return new Promise(function(resolve) {
+        _open(function(d) {
+          if (!d) { resolve(localStorage.getItem(key) || ''); return; }
+          try {
+            var req = d.transaction(_STORE,'readonly').objectStore(_STORE).get(key);
+            req.onsuccess = function() {
+              var val = req.result || '';
+              if (val) { resolve(val); return; }
+              resolve(localStorage.getItem(key) || '');
+            };
+            req.onerror = function() { resolve(localStorage.getItem(key) || ''); };
+          } catch(e) { resolve(localStorage.getItem(key) || ''); }
+        });
+      });
+    },
+    del: function(key) {
+      _open(function(d) {
+        if (d) { try { d.transaction(_STORE,'readwrite').objectStore(_STORE).delete(key); } catch(e) {} }
+        try { localStorage.removeItem(key); } catch(e) {}
+      });
+    }
+  };
 })();
 
 // ═══════════════════════════════════════════════════════════════════
