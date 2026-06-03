@@ -24087,7 +24087,7 @@ async function wbPickerOpen(sessionId) {
   var fnEl = document.getElementById('wbFileName');
   var fmEl = document.getElementById('wbFileMeta');
   if (fnEl) fnEl.textContent = (s.docName||'documento');
-  if (fmEl) fmEl.textContent = 'Sessione ripristinata · visualizzazione documento disponibile · ricarica il file per analisi AI';
+  if (fmEl) fmEl.textContent = '🔄 Ripristino sessione…';
   var _restoredExt = (s.docName||'').split('.').pop().toLowerCase();
   _wbSetFileTypeIcon(_restoredExt);
   var noFile = document.getElementById('wbNoFile');
@@ -24157,18 +24157,45 @@ async function wbPickerOpen(sessionId) {
       if (fmEl) fmEl.textContent = '✅ Sessione ripristinata · testo documento disponibile · ricarica il file per la vista completa';
     }
   }
-  // Re-render full document from server (restores all pages, not just serialized HTML)
-  if (s.blobName) {
-    _wbCurrentBlob = s.blobName;
-    if (fmEl) fmEl.textContent = '🔄 Ricaricamento documento completo…';
-    var resolvedBlob = await _wbEnsureFileOnServer(s.blobName);
+  // Re-render full document from server.
+  // Se blobName non è stato salvato, prova a recuperarlo dal nome file (sessioni legacy).
+  var _blobToTry = s.blobName ||
+    (s.docName && /\.(docx?|pdf)$/i.test(s.docName) ? 'local/' + s.docName : null);
+  if (_blobToTry) {
+    _wbCurrentBlob = _blobToTry;
+    if (fmEl && (savedDocHTML.length <= 20)) fmEl.textContent = '🔄 Tentativo recupero documento…';
+    var resolvedBlob = await _wbEnsureFileOnServer(_blobToTry);
     if (resolvedBlob) {
       wbLoadDocText(resolvedBlob);
       wbUnlockTools();
+      if (fmEl) fmEl.textContent = '🔄 Caricamento documento…';
     } else {
-      if (fmEl) fmEl.textContent = savedDocHTML && savedDocHTML.length > 20
-        ? '✅ Sessione ripristinata · documento visibile · ricarica il file per analisi AI'
-        : '⚠️ File non disponibile sul server · ricarica manualmente il file per le analisi AI';
+      // Nessun documento recuperabile
+      var hasAnything = (savedDocHTML && savedDocHTML.length > 20) ||
+                        ((typeof savedDocText !== 'undefined') && savedDocText && savedDocText.length > 20);
+      if (hasAnything) {
+        if (fmEl) fmEl.textContent = '✅ Sessione ripristinata · documento visibile · ricarica il file per analisi AI';
+      } else {
+        // Nulla disponibile — mostra messaggio chiaro nel placeholder
+        var phErr = document.getElementById('wbDocPlaceholder');
+        if (phErr) {
+          phErr.style.display = 'flex';
+          phErr.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.7"><span style="font-size:28px">📂</span><span style="font-size:13px;color:#888;text-align:center">Documento non più disponibile sul server<br>Ricarica il file per continuare</span></div>';
+        }
+        if (fmEl) fmEl.textContent = '⚠️ File non disponibile · ricarica il file per visualizzarlo';
+      }
+    }
+  } else if (!savedDocHTML || savedDocHTML.length <= 20) {
+    // Nessun blobName e nessun HTML salvato
+    var savedDocText2 = '';
+    try { savedDocText2 = localStorage.getItem('wb_doc_text_' + sessionId) || ''; } catch(e) {}
+    if (!savedDocText2 || savedDocText2.length <= 20) {
+      var phErr2 = document.getElementById('wbDocPlaceholder');
+      if (phErr2) {
+        phErr2.style.display = 'flex';
+        phErr2.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.7"><span style="font-size:28px">📂</span><span style="font-size:13px;color:#888;text-align:center">Documento non più disponibile<br>Ricarica il file per continuare</span></div>';
+      }
+      if (fmEl) fmEl.textContent = '⚠️ File non disponibile · ricarica il file per visualizzarlo';
     }
   }
 }
