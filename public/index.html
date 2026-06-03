@@ -9955,6 +9955,12 @@ function showScreen(id, _skipHistory) {
         if (_navHistory.length > 20) _navHistory.shift();
       }
       if (window.history && history.pushState) history.pushState({s: id}, '');
+      // Salva immediatamente la sessione WB quando si esce dallo schermo workbench
+      // (aggira il debounce da 2s — evita perdita di evidenziazioni/note all'uscita)
+      if (curr === 'screenWorkbench' && typeof wbSaveSession === 'function' &&
+          typeof _wbCurrentSessionId !== 'undefined' && _wbCurrentSessionId) {
+        wbSaveSession(false);
+      }
     }
   }
 
@@ -29217,6 +29223,7 @@ function wbApplySelFormat(type, colorVal) {
       },
       redoFn: function() {}
     });
+    _wbAutoSave(); // ← salva dopo ogni evidenziazione/formattazione
   }
 
   sel.removeAllRanges();
