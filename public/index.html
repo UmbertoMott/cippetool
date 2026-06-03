@@ -24144,6 +24144,19 @@ async function wbPickerOpen(sessionId) {
     }
     if (fmEl) fmEl.textContent = '✅ Sessione ripristinata · visualizzazione documento disponibile · ricarica il file per analisi AI';
   }
+  // Fallback testo puro: se i blocchi HTML non erano disponibili, ripristina il testo estratto
+  if (!savedDocHTML || savedDocHTML.length <= 20) {
+    var savedDocText = '';
+    try { savedDocText = localStorage.getItem('wb_doc_text_' + sessionId) || ''; } catch(e) {}
+    if (savedDocText && savedDocText.length > 20) {
+      var phFb = document.getElementById('wbDocPlaceholder');
+      var dtFb = document.getElementById('wbDocText');
+      if (phFb) phFb.style.display = 'none';
+      if (dtFb) { dtFb.style.display = 'block'; dtFb.textContent = savedDocText; }
+      _wbDocText = savedDocText; // disponibile per i tool AI
+      if (fmEl) fmEl.textContent = '✅ Sessione ripristinata · testo documento disponibile · ricarica il file per la vista completa';
+    }
+  }
   // Re-render full document from server (restores all pages, not just serialized HTML)
   if (s.blobName) {
     _wbCurrentBlob = s.blobName;
@@ -24153,7 +24166,9 @@ async function wbPickerOpen(sessionId) {
       wbLoadDocText(resolvedBlob);
       wbUnlockTools();
     } else {
-      if (fmEl) fmEl.textContent = '⚠️ File non disponibile sul server · ricarica manualmente il file per le analisi AI';
+      if (fmEl) fmEl.textContent = savedDocHTML && savedDocHTML.length > 20
+        ? '✅ Sessione ripristinata · documento visibile · ricarica il file per analisi AI'
+        : '⚠️ File non disponibile sul server · ricarica manualmente il file per le analisi AI';
     }
   }
 }
@@ -24161,6 +24176,7 @@ async function wbPickerOpen(sessionId) {
 function wbPickerDelete(sessionId) {
   if (!confirm('Eliminare questa sessione salvata?')) return;
   try { localStorage.removeItem('wb_doc_html_' + sessionId); } catch(e) {}
+  try { localStorage.removeItem('wb_doc_text_' + sessionId); } catch(e) {}
   wbSessionSaveAll(wbSessionGetAll().filter(function(s) { return s.id !== sessionId; }));
   wbPickerRender();
 }
@@ -24200,11 +24216,16 @@ function wbSaveSession(manual) {
   if ((!docViewerHTML || docViewerHTML.length <= 20) && _wbDocViewerSnap && _wbDocViewerSnap.length > 20) {
     docViewerHTML = _wbDocViewerSnap;
   }
-  if (docViewerHTML.length > 20) {
+  // Salva blocchi HTML solo se < 400K per evitare di saturare localStorage con documenti grandi
+  if (docViewerHTML.length > 20 && docViewerHTML.length <= 400000) {
     try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML); } catch(e) {
-      // localStorage full — try with truncation as fallback
-      try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML.substring(0, 500000)); } catch(e2) {}
+      try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML.substring(0, 300000)); } catch(e2) {}
     }
+  }
+  // Salva sempre il testo estratto come fallback leggero (≤80K) — funziona anche quando
+  // i blocchi HTML sono troppo grandi per localStorage o quando il server è spento.
+  if (_wbDocText && _wbDocText.length > 20) {
+    try { localStorage.setItem('wb_doc_text_' + _wbCurrentSessionId, _wbDocText.substring(0, 80000)); } catch(e) {}
   }
   sessions[idx].chat = chat;
   sessions[idx].toolOutputs = toolOutputs;
