@@ -24094,11 +24094,12 @@ async function wbPickerOpen(sessionId) {
   var fileInfo = document.getElementById('wbFileInfo');
   if (noFile) noFile.style.display = 'none';
   if (fileInfo) fileInfo.style.display = 'flex';
-  // Restore document viewer HTML (skip for PDFs — wbLoadDocText will re-render all pages)
+  // Restore document viewer HTML — anche per PDF usiamo il blocchi-testo snapshot se disponibile;
+  // se il server ha il file, wbLoadDocText lo sostituirà con la vista canvas di qualità superiore.
   var blobIsPdf = s.blobName && s.blobName.toLowerCase().split('?')[0].endsWith('.pdf');
   var savedDocHTML = '';
   try { savedDocHTML = localStorage.getItem('wb_doc_html_' + sessionId) || s.docViewerHTML || ''; } catch(e) {}
-  if (savedDocHTML && savedDocHTML.length > 20 && !blobIsPdf) {
+  if (savedDocHTML && savedDocHTML.length > 20) {
     var viewer = document.getElementById('wbDocViewer');
     var placeholder = document.getElementById('wbDocPlaceholder');
     var tb = document.getElementById('wbViewerToolbar');
@@ -24195,6 +24196,10 @@ function wbSaveSession(manual) {
   var docViewerEl = document.getElementById('wbDocViewer');
   var docViewerHTML = '';
   try { docViewerHTML = (docViewerEl ? docViewerEl.innerHTML : ''); } catch(e) {}
+  // Se #wbDocViewer è vuoto (PDF sostituito da canvas), usa lo snapshot dei blocchi testo salvato da wbLoadDocText
+  if ((!docViewerHTML || docViewerHTML.length <= 20) && _wbDocViewerSnap && _wbDocViewerSnap.length > 20) {
+    docViewerHTML = _wbDocViewerSnap;
+  }
   if (docViewerHTML.length > 20) {
     try { localStorage.setItem('wb_doc_html_' + _wbCurrentSessionId, docViewerHTML); } catch(e) {
       // localStorage full — try with truncation as fallback
@@ -25401,6 +25406,7 @@ var _wbDocText = '';         // testo estratto per tool AI (client-side)
 var _wbCurrentFile = null;   // original filename
 var _wbPendingFile = null;   // File object selected but not yet uploaded
 var _wbFileCache = {};       // File objects cached by blob_name for session restore re-upload
+var _wbDocViewerSnap = '';   // snapshot di #wbDocViewer prima che wbLoadDocText lo sostituisca con canvas PDF
 var _wbFlashcardQueue = [];  // flashcards waiting to be saved
 var _wbSections = [];        // sezioni estratte da Gemini auto-segment
 var _wbSelectedSection = -1; // indice sezione selezionata (-1 = nessuna)
@@ -25766,6 +25772,7 @@ async function wbUpload() {
     _wbCurrentBlob = result.blob_name;
     _wbCurrentFile = file.name;
     _wbFileCache[result.blob_name] = file;
+    _wbAutoSave(); // salva blobName subito — previene perdita se autosave si attiva prima del render
 
     setTimeout(function() {
       wbLoadDocText(result.blob_name);
@@ -25897,6 +25904,10 @@ async function wbLoadDocText(blobName) {
     document.getElementById('wbDocPlaceholder').style.display = 'none';
     // Hide Word-style viewer: PDF uses canvas container, not text blocks
     var docViewer = document.getElementById('wbDocViewer');
+    // Snapshot text-block view BEFORE clearing — used as session-restore fallback when server file is gone
+    if (docViewer && docViewer.innerHTML && docViewer.innerHTML.length > 20) {
+      _wbDocViewerSnap = docViewer.innerHTML;
+    }
     if (docViewer) { docViewer.style.display = 'none'; docViewer.innerHTML = ''; }
     container.style.display = 'block';
     container.innerHTML = '<div style="text-align:center;padding:40px;color:#d394ff;font-family:Space Grotesk,monospace;font-size:12px">⏳ Caricamento PDF…</div>';
@@ -25978,6 +25989,8 @@ async function wbLoadDocText(blobName) {
       console.warn('[WB] Word extract error:', e);
     }
   }
+  // Re-salva sessione dopo il rendering — garantisce che blobName + snapshot siano sempre persistiti
+  _wbAutoSave();
 }
 
 function wbUnlockTools() {
@@ -28693,10 +28706,20 @@ function wbStartSpeaking() {
     };
     return null;
   }};
-  _wbCbttsPlay(text, proxyPlayer, function() {
-    _kok.active = false;
-    _wbWordHLStop();
-    _kokHidePlayer();
+  _wbCbttsPlay(text, proxyPlayer, function(played) {
+    if (!played && window.speechSynthesis) {
+      // Google TTS non disponibile → fallback Web Speech API
+      _kokSetLabel('🔊 Lettura…');
+      _wbStartSpeakingWSA(text, function() {
+        _kok.active = false;
+        _wbWordHLStop();
+        _kokHidePlayer();
+      });
+    } else {
+      _kok.active = false;
+      _wbWordHLStop();
+      _kokHidePlayer();
+    }
   });
 }
 
@@ -28916,11 +28939,14 @@ async function _wbCbttsPlay(text, playerEl, onDone) {
     _wbCbtts.ctx = new (window.AudioContext || window.webkitAudioContext)();
   var ctx = _wbCbtts.ctx;
   if (ctx.state === 'suspended') { try { await ctx.resume(); } catch(e) {} }
+  // Se il contesto è ancora sospeso dopo il tentativo di resume (Safari policy) → segnala fallback
+  if (ctx.state === 'suspended') { if (onDone) onDone(false); return; }
 
   var sentences = _wbTTSSentences(text);
   var n = sentences.length;
   setStatus('⟳');
   var _doneCalled = false;
+  var _anyScheduled = false; // true se almeno un src.start() è andato a buon fine
   function done() {
     if (_doneCalled || _wbCbtts.cancelled) return;
     _doneCalled = true;
@@ -28928,10 +28954,10 @@ async function _wbCbttsPlay(text, playerEl, onDone) {
     var ms = Math.max(0, (nextAt - ctx.currentTime) * 1000 - 80);
     if (ms > 300) {
       setTimeout(function() {
-        if (!_wbCbtts.cancelled) { setStatus(''); _wbWordHLStop(); if (onDone) onDone(); }
+        if (!_wbCbtts.cancelled) { setStatus(''); _wbWordHLStop(); if (onDone) onDone(_anyScheduled); }
       }, ms);
     } else {
-      setStatus(''); _wbWordHLStop(); if (onDone) onDone();
+      setStatus(''); _wbWordHLStop(); if (onDone) onDone(_anyScheduled);
     }
   }
 
@@ -28977,6 +29003,7 @@ async function _wbCbttsPlay(text, playerEl, onDone) {
       _wbCbtts.sources.push(src);
       var at = Math.max(nextAt, ctx.currentTime + 0.01);
       src.start(at);
+      _anyScheduled = true;
       nextAt = at + audioBuf.duration;
       if (idx === 0) _wbTTSScheduleKeepWarm();
       setStatus('▶ ' + (idx + 1) + '/' + n);
@@ -33298,7 +33325,7 @@ function App() {
             if (!r2.ok) throw new Error('tts_fail_' + r2.status);
             return r2.arrayBuffer();
           }).then(function(arrayBuf) {
-            var blob = new Blob([arrayBuf], {type:'audio/wav'});
+            var blob = new Blob([arrayBuf], {type:'audio/mpeg'});
             var url = URL.createObjectURL(blob);
             var audio = new Audio(url);
             audioSrcRef.current = audio;
